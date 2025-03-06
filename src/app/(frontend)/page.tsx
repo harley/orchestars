@@ -5,7 +5,7 @@ import React from 'react'
 // import { fileURLToPath } from 'url'
 
 // import config from '@/payload.config'
-import HomePageComponent from '@/components/home/HomePage'
+import HomePageComponent from '@/components/home'
 
 export default async function HomePage() {
   // const headers = await getHeaders()
