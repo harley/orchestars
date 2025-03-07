@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Calendar, MapPin, Users } from 'lucide-react'
 import CustomButton from '../ui/custom-button'
+import { useRouter } from 'next/navigation'
 
 interface ConcertBannerProps {
   concerts: {
@@ -17,6 +18,7 @@ interface ConcertBannerProps {
 
 const ConcertBanner: React.FC<ConcertBannerProps> = ({ concerts }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const router = useRouter()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -36,6 +38,10 @@ const ConcertBanner: React.FC<ConcertBannerProps> = ({ concerts }) => {
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % concerts.length)
+  }
+
+  const handleTicketClick = () => {
+    router.push('/concerts/1')
   }
 
   return (
@@ -82,7 +88,12 @@ const ConcertBanner: React.FC<ConcertBannerProps> = ({ concerts }) => {
                   </div>
                 </div>
 
-                <CustomButton variant="interested" size="lg" className="shadow-lg">
+                <CustomButton
+                  variant="interested"
+                  size="lg"
+                  className="shadow-lg"
+                  onClick={handleTicketClick}
+                >
                   {"I'm Interested"}
                 </CustomButton>
               </div>
@@ -91,7 +102,6 @@ const ConcertBanner: React.FC<ConcertBannerProps> = ({ concerts }) => {
         </div>
       ))}
 
-      {/* Navigation buttons */}
       <button
         onClick={handlePrev}
         className="absolute top-1/2 left-4 z-30 -translate-y-1/2 p-2 rounded-full bg-white/20 backdrop-blur text-white hover:bg-white/30 transition-all"
@@ -129,7 +139,6 @@ const ConcertBanner: React.FC<ConcertBannerProps> = ({ concerts }) => {
         </svg>
       </button>
 
-      {/* Dots navigation */}
       <div className="absolute bottom-8 left-0 right-0 z-30 flex justify-center gap-2">
         {concerts.map((_, index) => (
           <button

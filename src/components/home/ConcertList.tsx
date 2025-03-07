@@ -1,8 +1,8 @@
- 
 import React, { useEffect, useRef } from 'react'
 import { Calendar, MapPin, Users } from 'lucide-react'
 import CustomButton from '../ui/custom-button'
 import { cn } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
 
 interface Concert {
   id: number
@@ -22,6 +22,7 @@ interface ConcertListProps {
 
 const ConcertList: React.FC<ConcertListProps> = ({ concerts, title }) => {
   const elementsRef = useRef<(HTMLDivElement | null)[]>([])
+  const router = useRouter()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,6 +46,10 @@ const ConcertList: React.FC<ConcertListProps> = ({ concerts, title }) => {
       window.removeEventListener('scroll', handleScroll)
     }
   }, [])
+
+  const handleGetTickets = (id: number) => {
+    router.push(`/concerts/${id}`)
+  }
 
   return (
     <section className="py-20">
@@ -105,7 +110,9 @@ const ConcertList: React.FC<ConcertListProps> = ({ concerts, title }) => {
                 <p className="text-muted-foreground mb-6">{concert.description}</p>
 
                 <div>
-                  <CustomButton variant="primary">Get Tickets</CustomButton>
+                  <CustomButton variant="primary" onClick={() => handleGetTickets(concert.id)}>
+                    Get Tickets
+                  </CustomButton>
                 </div>
               </div>
             </div>
