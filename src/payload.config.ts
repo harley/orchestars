@@ -260,8 +260,12 @@ export default buildConfig({
           type: 'text',
           hooks: {
             beforeChange: [
-              async ({ data, findByID }) => {
-                const order = await findByID({ collection: 'orders', id: data.orderId })
+              async ({ data, req }) => {
+                if (!data?.order) return null
+                const order = await req.payload.findByID({
+                  collection: 'orders',
+                  id: data.order,
+                })
                 return order.status
               },
             ],
