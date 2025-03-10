@@ -68,6 +68,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    'zalopay-orders': ZalopayOrder;
     seatingCharts: SeatingChart;
     events: Event;
     orders: Order;
@@ -82,6 +83,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    'zalopay-orders': ZalopayOrdersSelect<false> | ZalopayOrdersSelect<true>;
     seatingCharts: SeatingChartsSelect<false> | SeatingChartsSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
@@ -164,6 +166,28 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "zalopay-orders".
+ */
+export interface ZalopayOrder {
+  id: number;
+  app_trans_id: string;
+  /**
+   * JSON array or object of items purchased.
+   */
+  items?: string | null;
+  /**
+   * Total amount of the order in VND.
+   */
+  amount: number;
+  /**
+   * Token returned by ZaloPay for this order.
+   */
+  zp_trans_token?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -281,6 +305,10 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'zalopay-orders';
+        value: number | ZalopayOrder;
+      } | null)
+    | ({
         relationTo: 'seatingCharts';
         value: number | SeatingChart;
       } | null)
@@ -383,6 +411,18 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "zalopay-orders_select".
+ */
+export interface ZalopayOrdersSelect<T extends boolean = true> {
+  app_trans_id?: T;
+  items?: T;
+  amount?: T;
+  zp_trans_token?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

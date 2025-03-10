@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import axios from 'axios'
 import CryptoJS from 'crypto-js'
 import moment from 'moment'
+import payload from 'payload'
 
 export async function POST(request: NextRequest) {
   // parse JSON body if needed:
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
     key1: process.env.ZALO_KEY1 || 'PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL',
     key2: process.env.ZALO_KEY2 || 'kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz',
     endpoint:
-      process.env.ZALO_ENDPOINT_CREATE || 'https://sb-openapi.zalopay.vn/v2/create',
+    `${process.env.ZALO_API_URL}/create` || 'https://sb-openapi.zalopay.vn/v2/create',
   }
 
   const items = [{}]
@@ -52,6 +53,20 @@ export async function POST(request: NextRequest) {
     const response = await axios.post(config.endpoint, null, {
       params: order,
     })
+    const resultData = response.data
+
+    // Insert into the `zalopay-orders` collection
+    // Make sure you have defined this collection in your payload.config.ts
+    await payload.create({
+      collection: 'zalopay-orders',
+      data: {
+        app_trans_id: order.app_trans_id,
+        items: order.item,
+        amount: order.amount,
+        zp_trans_token: resultData.zp_trans_token,
+      },
+    })
+    
 
     return NextResponse.json(response.data, { status: 200 })
   } catch (error: any) {

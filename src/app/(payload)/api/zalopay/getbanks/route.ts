@@ -1,14 +1,14 @@
 // app/(payload)/api/zalopay/getbanks/route.ts
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import axios from 'axios'
 import CryptoJS from 'crypto-js'
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   const config = {
     appid: process.env.ZALO_APPID || '2553',
     key1: process.env.ZALO_KEY1 || 'PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL',
     endpoint:
-      process.env.ZALO_ENDPOINT ||
+      process.env.ZALO_GET_BANK_ENDPOINT ||
       'https://sbgateway.zalopay.vn/api/getlistmerchantbanks',
   }
 
