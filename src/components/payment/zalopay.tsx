@@ -2,15 +2,14 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 
-// Shape of each bank item in your final UI
 interface Bank {
   id: string;       // bankcode
   label: string;    // name
   imgSrc: string;   // icon path
 }
 
-// Shape of ZaloPay’s response
-interface ZaloPayResponse {
+// shape of /api/zalopay/getbanks response
+interface ZaloPayBanksResponse {
   banks: {
     [pmcid: string]: {
       bankcode: string;
@@ -25,82 +24,114 @@ interface ZaloPayResponse {
   returnmessage: string;
 }
 
+// shape of /api/zalopay/createorder response
+interface CreateOrderResponse {
+  return_code: number;
+  return_message: string;
+  sub_return_code: number;
+  sub_return_message: string;
+  zp_trans_token: string;
+  order_url: string;
+  cashier_order_url: string;
+  order_token: string;
+  qr_code: string;
+}
+
 // The bank codes you actually care about (from your screenshot)
 const allowedBankCodes = [
-  'VTB',  // Vietinbank
-  'VARB', // Agribank
-  'VCB',  // Vietcombank
-  'BIDV', // BIDV
-  'DAB',  // Đông Á Bank
-  'SCB',  // Sacombank
-  'ACB',  // ACB
-  'MB',   // MBBank
-  'TCB',  // Techcombank
-  'VPB',  // VPBank
-  'EIB',  // Eximbank
-  'VIB',  // VIB
-  'HDB',  // HDBank
-  'OJB',  // Oceanbank
-  'SHB',  // SHB
-  'MSB',  // Maritime Bank
-  'LPB',  // Liên Việt Post Bank
-  'SGB',  // SaigonBank
-  'OCB',  // OCB
-  'SGCB', // TMCP Sài Gòn
-  'NAB',  // Nam Á Bank
-  'VAB',  // Việt Á Bank
-  'BVB',  // Bảo Việt Bank
-  'GPB',  // GPBank
-  'BAB',  // Bắc Á Bank
-  'VCCB', // Ngân hàng Bản Việt
+  'VTB', 'VARB', 'VCB', 'BIDV', 'DAB', 'SCB', 'ACB', 'MB', 'TCB', 'VPB',
+  'EIB', 'VIB', 'HDB', 'OJB', 'SHB', 'MSB', 'LPB', 'SGB', 'OCB', 'SGCB',
+  'NAB', 'VAB', 'BVB', 'GPB', 'BAB', 'VCCB',
 ];
 
 export default function ZaloPayPaymentComponent() {
   // Payment method radio
   const [paymentMethod, setPaymentMethod] = useState<string>('zalopay');
-  // Selected bank
+  // Selected bank (only relevant for ATM)
   const [selectedBank, setSelectedBank] = useState<string>('');
   // Final list of banks for ATM
   const [banks, setBanks] = useState<Bank[]>([]);
+  // The URL we’ll load in an iframe after createorder
+  const [orderUrl, setOrderUrl] = useState<string>('');
 
-  // Fetch banks on mount
+  // 1. Fetch list of banks on mount
   useEffect(() => {
-    fetch('/api/zalopay/getbanks', {
-      method: 'POST', // or 'GET' if your route is GET
-    })
+    fetch('/api/zalopay/getbanks', { method: 'POST' })
       .then(async (res) => {
         if (!res.ok) {
-          throw new Error(`ZaloPay API returned ${res.status}`);
+          throw new Error(`ZaloPay getbanks returned ${res.status}`);
         }
-        return res.json() as Promise<ZaloPayResponse>;
+        return res.json() as Promise<ZaloPayBanksResponse>;
       })
       .then((data) => {
-        // We only care about pmcid=39 (ATM) from the ZaloPay response
         const atmBanks = data.banks['39'] || [];
+        const filtered = atmBanks.filter((b) => allowedBankCodes.includes(b.bankcode));
 
-        // 1. Filter so we only keep banks in our allowed list
-        const filtered = atmBanks.filter((b) =>
-          allowedBankCodes.includes(b.bankcode)
-        );
-
-        // 2. Optionally sort them in the order of your screenshot:
-        //    (Define an array with your desired order, then .sort())
-        //    We'll skip that here, but you could do:
-        //    filtered.sort((a, b) => allowedBankCodes.indexOf(a.bankcode) - allowedBankCodes.indexOf(b.bankcode));
-
-        // 3. Map them to your Bank[] shape
         const dynamicBanks: Bank[] = filtered.map((b) => ({
           id: b.bankcode,
           label: b.name,
-          imgSrc: `/images/bank-${b.bankcode}.svg`, // e.g. /images/bank-vtb.svg
+          imgSrc: `/images/bank-${b.bankcode}.svg`,
         }));
-
         setBanks(dynamicBanks);
       })
       .catch((err) => {
         console.error('Failed to fetch banks:', err);
       });
   }, []);
+
+  // 2. Handle createorder
+  const handleCreateOrder = async () => {
+    // Determine bank_code based on paymentMethod
+    let bankCode: string;
+    if (paymentMethod === 'atm') {
+      if (!selectedBank) {
+        alert('Vui lòng chọn ngân hàng (ATM)');
+        return;
+      }
+      bankCode = selectedBank; // user-chosen bank
+    } else if (paymentMethod === 'visa') {
+      // ZaloPay docs typically use "CC" for Visa/Master/JCB
+      bankCode = 'CC';
+    } else {
+      // "zalopay"
+      bankCode = 'zalopayapp';
+    }
+
+    try {
+      // Example request body
+      const reqBody = {
+        app_user: 'user123',
+        app_time: Date.now(),
+        item: [{ id: 'item1', name: 'Item 1', price: 10000, quantity: 1 }],
+        embed_data: { note: 'test embed' },
+        amount: 50000,
+        bank_code: bankCode,
+      };
+
+      const res = await fetch('/api/zalopay/createorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reqBody),
+      });
+
+      if (!res.ok) {
+        throw new Error(`createorder returned ${res.status}`);
+      }
+
+      const data: CreateOrderResponse = await res.json();
+      console.log('Create order response:', data);
+
+      if (data.return_code === 1) {
+        // success => set the orderUrl in state
+        setOrderUrl(data.order_url);
+      } else {
+        alert(`Create order failed: ${data.return_message}`);
+      }
+    } catch (err: any) {
+      console.error('Failed to create order:', err);
+      alert('Failed to create order');
+    }
+  };
 
   return (
     <>
@@ -110,6 +141,7 @@ export default function ZaloPayPaymentComponent() {
 
       <div className="container">
         <p>Vui lòng chọn hình thức thanh toán:</p>
+        {/* Payment method radio */}
         <div className="mb-1">
           <label>
             <input
@@ -178,6 +210,27 @@ export default function ZaloPayPaymentComponent() {
                 />
               </a>
             ))}
+          </div>
+        )}
+
+        {/* Submit button */}
+        <div style={{ marginTop: '1rem' }}>
+          <button onClick={handleCreateOrder}>
+            Thanh Toán
+          </button>
+        </div>
+
+        {/* If we have an orderUrl, show an iframe */}
+        {orderUrl && (
+          <div style={{ marginTop: '1rem' }}>
+            <h3>Thanh toán qua ZaloPay:</h3>
+            <iframe
+              src={orderUrl}
+              width="600"
+              height="700"
+              title="ZaloPay Payment"
+              style={{ border: '1px solid #ccc' }}
+            />
           </div>
         )}
       </div>
