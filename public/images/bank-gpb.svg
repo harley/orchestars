@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="23px" height="28px" viewBox="0 0 23 28" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>bank-gp</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="36" height="36"></rect>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="bank-gp" transform="translate(-7.000000, -4.000000)">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <g id="Mask"></g>
+            <path d="M18.8352131,4 L18.8352131,16.041984 L21.54766,16.041984 L21.54766,8.84206093 L27.5158012,12.4182291 L27.5158012,23.3636114 L21.54766,26.7426944 L21.54766,20.6482166 L24.6327999,20.6482166 L24.6327999,17.8005896 L21.54766,17.8005896 L21.54766,17.8001684 L18.8352131,17.8001684 L18.8352131,31.5308518 L30,24.8392229 L30,10.837337 L18.8352131,4 Z M18.1647869,4 L7,10.837337 L7,24.8392229 L18.1647869,31.5308518 L18.1647869,17.8001684 L15.4527611,17.8001684 L15.4527611,17.8005896 L12.3676212,17.8005896 L12.3676212,20.6482166 L15.4527611,20.6482166 L15.4527611,26.7426944 L9.48419877,23.3636114 L9.48419877,12.4182291 L15.4527611,8.84206093 L15.4527611,16.041984 L18.1647869,16.041984 L18.1647869,4 Z" id="Page-1" fill="#EC3538" mask="url(#mask-2)"></path>
+        </g>
+    </g>
+</svg>

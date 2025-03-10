@@ -1,23 +1,13 @@
-// import { headers as getHeaders } from 'next/headers.js'
-// import Image from 'next/image'
-// import { getPayload } from 'payload'
+"use client"
 import React from 'react'
-// import { fileURLToPath } from 'url'
-
-// import config from '@/payload.config'
 import HomePageComponent from '@/components/home'
+import ZaloPayPaymentComponent from '@/components/payment/zalopay'
 
-export default async function HomePage() {
-  // const headers = await getHeaders()
-  // const payloadConfig = await config
-  // const payload = await getPayload({ config: payloadConfig })
-  // const { user } = await payload.auth({ headers })
-
-  // const fileURL = `vscode://file/${fileURLToPath(import.meta.url)}`
-
+export default function HomePage() {
   return (
     <div>
       <HomePageComponent />
+      <ZaloPayPaymentComponent />
     </div>
   )
 }

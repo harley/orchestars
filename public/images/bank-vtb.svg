@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="26px" height="26px" viewBox="0 0 26 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>bank-vietin</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="36" height="36"></rect>
+        <polygon id="path-3" points="25.8370667 18.345 25.8370667 0.161142857 5.77777778e-05 0.161142857 5.77777778e-05 18.345"></polygon>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="bank-vietin" transform="translate(-5.000000, -5.000000)">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <g id="Mask"></g>
+            <g id="ico_vietin" mask="url(#mask-2)">
+                <g transform="translate(5.000000, 5.000000)" id="Page-1">
+                    <g>
+                        <g id="Group-3" transform="translate(0.000000, 0.124629)">
+                            <mask id="mask-4" fill="white">
+                                <use xlink:href="#path-3"></use>
+                            </mask>
+                            <g id="Clip-2"></g>
+                            <path d="M16.6787689,15.6152857 C19.6627022,16.0567143 22.37768,17.0127143 24.6261022,18.345 C25.4029244,16.7027143 25.8371244,14.8704286 25.8371244,12.9375714 C25.8371244,5.88271429 20.0521244,0.161 12.9185911,0.161 C5.78505778,0.161 5.77777778e-05,5.88271429 5.77777778e-05,12.9375714 C5.77777778e-05,14.8704286 0.434257778,16.7027143 1.21079111,18.345 C3.44621333,17.0204286 6.14241333,16.0678571 9.10554667,15.6232857 L9.10554667,9.06128571 L16.6787689,9.06128571 L16.6787689,15.6152857 Z" id="Fill-1" fill="#008FD4" mask="url(#mask-4)"></path>
+                        </g>
+                        <path d="M23.8081711,19.9382857 C20.7728156,18.3391429 17.0025267,17.392 12.9187933,17.392 C8.83448222,17.392 5.06419333,18.3391429 2.02883778,19.9382857 C4.32463778,23.4862857 8.34423778,25.8388571 12.9187933,25.8388571 C17.4927711,25.8388571 21.51266,23.4862857 23.8081711,19.9382857" id="Fill-4" fill="#D92128"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
