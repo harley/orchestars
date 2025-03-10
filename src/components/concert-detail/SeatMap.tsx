@@ -1,184 +1,134 @@
+import React, { useState } from 'react'
+import { cn } from '@/lib/utils'
+import { SeatType, SeatProps } from './types'
 
-import React, { useState } from 'react';
-import { cn } from '@/lib/utils';
-
-// Define seat types and their corresponding colors
-const seatTypes = {
-  firstClass: {
-    label: "First Class",
-    color: "bg-purple-500",
-    price: 250
-  },
-  economy: {
-    label: "Economy",
-    color: "bg-blue-500",
-    price: 120
-  },
-  reduced: {
-    label: "Reduced",
-    color: "bg-green-500",
-    price: 80
-  },
-  reserved: {
-    label: "Reserved",
-    color: "bg-gray-500",
-    price: 0
-  }
-};
-
-export type SeatType = keyof typeof seatTypes;
-
-interface SeatProps {
-  id: string;
-  type: SeatType;
-  row: string;
-  number: number;
-  isSelected: boolean;
-  isReserved: boolean;
-  onSelect: (id: string) => void;
-}
-
-const Seat: React.FC<SeatProps> = ({ 
-  id, 
-  type, 
-  row, 
-  number, 
-  isSelected, 
-  isReserved, 
-  onSelect 
-}) => {
+const Seat: React.FC<SeatProps> = ({ seat, isSelected, onSelect }) => {
   const handleClick = () => {
-    if (!isReserved) {
-      onSelect(id);
+    if (!seat.isReserved) {
+      onSelect(seat)
     }
-  };
+  }
 
   return (
     <div
       className={cn(
-        "w-10 h-10 m-1 rounded flex items-center justify-center cursor-pointer transition-all transform hover:scale-110 relative group",
-        isReserved ? seatTypes.reserved.color : seatTypes[type].color,
-        isSelected && !isReserved && "ring-2 ring-yellow-400 scale-110"
+        'w-10 h-10 m-1 rounded flex items-center justify-center cursor-pointer transition-all transform hover:scale-110 relative group',
+        seat.isReserved ? 'bg-gray-500' : 'bg-blue-500',
+        isSelected && !seat.isReserved && 'ring-2 ring-yellow-400 scale-110',
       )}
       onClick={handleClick}
     >
-      <span className="text-white text-xs font-medium">{row}{number}</span>
+      <span className="text-white text-xs font-medium">
+        {seat.row}
+        {seat.number}
+      </span>
       <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-        {row}{number} - {isReserved ? "Reserved" : seatTypes[type].label}
+        {seat.row}
+        {seat.number} - {seat.isReserved ? 'Reserved' : seat.name}
       </div>
     </div>
-  );
-};
-
-interface SeatMapProps {
-  onSeatSelect: (selectedSeats: {
-    id: string;
-    type: SeatType;
-    row: string;
-    number: number;
-    price: number;
-  }[]) => void;
+  )
 }
 
-const generateSeats = () => {
-  const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-  const seatsPerRow = 12;
-  const seats = [];
+interface SeatMapProps {
+  onSeatSelect: (seat: SeatType) => void
+  selectedSeats: SeatType[]
+  event: Record<string, any>
+}
 
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
-    for (let j = 1; j <= seatsPerRow; j++) {
-      let type: SeatType = 'economy';
-      
-      // First 2 rows are first class
-      if (i < 2) {
-        type = 'firstClass';
+const generateSeats = (ticketPrices: any[]) => {
+  const rows = [
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'T',
+    'U',
+    'V',
+    'W',
+    'X',
+    'Y',
+    'Z',
+  ]
+  const seatsPerRow = 12
+  const seatRows: any[][] = []
+  let currentIndexRow = 0 // Tracks which row we are at
+
+  for (const ticketPrice of ticketPrices) {
+    const ticketSeats: any[][] = [] // Stores 3 rows per ticket price
+
+    for (let i = 0; i < 3; i++) {
+      if (currentIndexRow >= rows.length) break // Prevent out-of-bounds errors
+
+      const rowName = rows[currentIndexRow] // Get the row letter
+      const rowSeats = []
+
+      for (let s = 1; s <= seatsPerRow; s++) {
+        rowSeats.push({
+          id: `${rowName}${s}`, // E.g., "A1", "A2", ..., "A12"
+          ticketId: ticketPrice.id,
+          row: rowName,
+          number: s,
+          price: ticketPrice.price,
+          name: ticketPrice.name,
+          isReserved: false,
+        })
       }
-      // Last 2 rows are reduced
-      else if (i >= rows.length - 2) {
-        type = 'reduced';
-      }
-      
-      // Some seats are pre-reserved (random pattern)
-      const isReserved = Math.random() < 0.2;
-      
-      seats.push({
-        id: `${row}${j}`,
-        row,
-        number: j,
-        type,
-        isReserved,
-      });
+
+      ticketSeats.push(rowSeats)
+      currentIndexRow++ // Move to the next row
     }
+
+    seatRows.push(ticketSeats) // Group 3 rows per ticket type
   }
-  
-  return seats;
-};
 
-const SeatMap: React.FC<SeatMapProps> = ({ onSeatSelect }) => {
-  const [seats] = useState(generateSeats());
-  const [selectedSeatIds, setSelectedSeatIds] = useState<string[]>([]);
+  return seatRows.flat() as any[][]
+}
 
-  const handleSeatSelect = (id: string) => {
-    setSelectedSeatIds(prevSelected => {
-      const newSelected = prevSelected.includes(id)
-        ? prevSelected.filter(seatId => seatId !== id)
-        : [...prevSelected, id];
-      
-      // Update the parent component with selected seats info
-      const selectedSeatsInfo = seats
-        .filter(seat => newSelected.includes(seat.id) && !seat.isReserved)
-        .map(seat => ({
-          id: seat.id,
-          type: seat.type,
-          row: seat.row,
-          number: seat.number,
-          price: seatTypes[seat.type].price
-        }));
-      
-      onSeatSelect(selectedSeatsInfo);
-      return newSelected;
-    });
-  };
+const SeatMap: React.FC<SeatMapProps> = ({ onSeatSelect, selectedSeats, event }) => {
+  const [seats] = useState(generateSeats(event.ticketPrices))
+
+  const handleSeatSelect = (seat: SeatType) => {
+    onSeatSelect(seat)
+  }
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="mb-8">
-        <h3 className="text-xl font-bold mb-4">Seat Selection</h3>
-        
-        {/* Seat type legend */}
-        <div className="flex flex-wrap gap-4 mb-6 justify-center">
-          {Object.entries(seatTypes).map(([key, { label, color, price }]) => (
-            <div key={key} className="flex items-center">
-              <div className={`w-4 h-4 ${color} rounded mr-2`}></div>
-              <span>{label} {key !== 'reserved' && `- $${price}`}</span>
-            </div>
-          ))}
-        </div>
-        
-        {/* Stage representation */}
-        <div className="w-full bg-gray-800 text-white py-2 mb-6 text-center rounded-lg">
-          STAGE
-        </div>
-        
-        {/* Seats container */}
-        <div className="flex flex-wrap justify-center max-w-3xl mx-auto">
-          {seats.map(seat => (
-            <Seat
-              key={seat.id}
-              id={seat.id}
-              type={seat.type}
-              row={seat.row}
-              number={seat.number}
-              isSelected={selectedSeatIds.includes(seat.id)}
-              isReserved={seat.isReserved}
-              onSelect={handleSeatSelect}
-            />
-          ))}
-        </div>
+    <div className="mb-8">
+      {/* Stage representation */}
+      <div className="w-full bg-gray-800 text-white py-2 mb-6 text-center rounded-lg">STAGE</div>
+
+      {/* Seats container */}
+      <div className="flex flex-col justify-center max-w-3xl mx-auto">
+        {seats.map((rows, index) => (
+          <div key={index} className="flex flex-wrap">
+            {rows.map((seat) => (
+              <Seat
+                key={seat.id}
+                seat={seat}
+                isSelected={!!selectedSeats.find((s) => s.id === seat.id)}
+                onSelect={handleSeatSelect}
+              />
+            ))}
+          </div>
+        ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SeatMap;
+export default SeatMap

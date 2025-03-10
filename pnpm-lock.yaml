@@ -11,6 +11,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.9.0
         version: 3.10.0(react-hook-form@7.54.2(react@19.0.0))
+      '@mezh-hq/react-seat-toolkit':
+        specifier: ^3.2.4
+        version: 3.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@payloadcms/db-postgres':
         specifier: latest
         version: 3.27.0(@types/react@19.0.10)(payload@3.27.0(graphql@16.10.0)(typescript@5.7.3))(react@19.0.0)
@@ -1243,6 +1246,12 @@ packages:
     resolution: {integrity: sha512-AtPhC3pJ92CHz3dWoniSky7+MSK2WSd0xijc76I2qbTeXyeuFfYyhR6gWMg4knuY9Wz3vo9/+dXGdbQIPD8efw==}
     peerDependencies:
       yjs: '>=13.5.22'
+
+  '@mezh-hq/react-seat-toolkit@3.2.4':
+    resolution: {integrity: sha512-mOkH9szkuVh19Tk92vwAMtJFDtmgrA1gO/7M9l3GieIIoX/esImuyKI1kZc4a1gw2a4b4MnSJC3zI/hIVyur7A==}
+    peerDependencies:
+      react: ^18.0.0
+      react-dom: ^18.0.0
 
   '@monaco-editor/loader@1.5.0':
     resolution: {integrity: sha512-hKoGSM+7aAc7eRTRjpqAZucPmoNOC4UUbknb/VNoTkEIkCPhqV8LfbsgM1webRM7S/z21eHEx9Fkwx8Z/C/+Xw==}
@@ -6291,6 +6300,11 @@ snapshots:
       '@lexical/selection': 0.21.0
       lexical: 0.21.0
       yjs: 13.6.24
+
+  '@mezh-hq/react-seat-toolkit@3.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
 
   '@monaco-editor/loader@1.5.0':
     dependencies:

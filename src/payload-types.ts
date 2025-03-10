@@ -197,11 +197,34 @@ export interface Event {
   keyword?: string | null;
   startDatetime?: string | null;
   endDatetime?: string | null;
+  schedules?:
+    | {
+        date?: string | null;
+        details?:
+          | {
+              time?: string | null;
+              name?: string | null;
+              description?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
   showAfterExpiration?: boolean | null;
   showTicketsAutomatically?: boolean | null;
   eventLocation?: string | null;
   eventTermsAndConditions?: string | null;
+  ticketPrices?:
+    | {
+        name?: string | null;
+        price?: number | null;
+        currency?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   eventLogo?: (number | null) | Media;
+  eventBanner?: (number | null) | Media;
   sponsorLogo?: (number | null) | Media;
   ticketQuantityLimitation?: ('perTicketType' | 'perEvent') | null;
   updatedAt: string;
@@ -406,11 +429,34 @@ export interface EventsSelect<T extends boolean = true> {
   keyword?: T;
   startDatetime?: T;
   endDatetime?: T;
+  schedules?:
+    | T
+    | {
+        date?: T;
+        details?:
+          | T
+          | {
+              time?: T;
+              name?: T;
+              description?: T;
+              id?: T;
+            };
+        id?: T;
+      };
   showAfterExpiration?: T;
   showTicketsAutomatically?: T;
   eventLocation?: T;
   eventTermsAndConditions?: T;
+  ticketPrices?:
+    | T
+    | {
+        name?: T;
+        price?: T;
+        currency?: T;
+        id?: T;
+      };
   eventLogo?: T;
+  eventBanner?: T;
   sponsorLogo?: T;
   ticketQuantityLimitation?: T;
   updatedAt?: T;

@@ -1,196 +1,87 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
+
 import { Separator } from '@/components/ui/separator'
-import { toast } from 'sonner'
-import SeatMap, { SeatType } from '@/components/concert-detail/SeatMap'
+import { useToast } from '@/hooks/use-toast'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { useRouter } from 'next/navigation'
 import { Calendar, MapPin, Users } from 'lucide-react'
 import CustomButton from '@/components/ui/custom-button'
+import { format as dateFnsFormat } from 'date-fns'
+import Schedule from './Schedule'
+import FAQ from './FAQ'
+import FeaturedPerformers from './FeaturedPerformers'
+import { SeatType } from './types'
+import SeatMapToolkit from './SeatToolkit'
+import { categories } from './data/seat-maps/categories'
 
-interface TicketOption {
-  id: string
-  name: string
-  price: number
-  quantity: number
-}
-
-interface Performer {
-  id: number
-  name: string
-  image: string
-  genre: string
-}
-
-interface ScheduleItem {
-  time: string
-  title: string
-  description: string
-  day?: string
-}
-
-interface FAQ {
-  question: string
-  answer: string
-}
-
-const TicketDetails = () => {
+const TicketDetails = ({ event }: { event: Record<string, any> }) => {
   const router = useRouter()
 
-  const [ticketOptions, setTicketOptions] = useState<TicketOption[]>([
-    { id: 'general', name: 'General Admission', price: 89, quantity: 0 },
-    { id: 'vip', name: 'VIP Experience', price: 149, quantity: 0 },
-    { id: 'student', name: 'Student Discount', price: 49, quantity: 0 },
-  ])
+  const { toast } = useToast()
+  const [selectedSeats, setSelectedSeats] = useState<SeatType[]>([])
 
-  const [selectedSeats, setSelectedSeats] = useState<
-    {
-      id: string
-      type: SeatType
-      row: string
-      number: number
-      price: number
-    }[]
-  >([])
-
-  const handleSeatSelect = (
-    seats: {
-      id: string
-      type: SeatType
-      row: string
-      number: number
-      price: number
-    }[],
-  ) => {
-    setSelectedSeats(seats)
+  const handleSeatSelect = (seat: SeatType) => {
+    setSelectedSeats((prev) => {
+      const existingSeat = prev.find((s) => s.id === seat.id)
+      if (existingSeat) {
+        return prev.filter((s) => s.id !== seat.id)
+      } else {
+        console.log('event.ticketPrices', event.ticketPrices)
+        const ticketPrice = event.ticketPrices?.find((t: any) => t.name === seat.category?.name)
+        return [...prev, { ...seat, ticketPrice }]
+      }
+    })
   }
 
-  const performers: Performer[] = [
-    {
-      id: 1,
-      name: 'Maya Rivers',
-      image: '/placeholder.svg',
-      genre: 'Pop/R&B',
-    },
-    {
-      id: 2,
-      name: 'Electric Pulse',
-      image: '/placeholder.svg',
-      genre: 'Electronic',
-    },
-    {
-      id: 3,
-      name: 'The Resonants',
-      image: '/placeholder.svg',
-      genre: 'Alternative Rock',
-    },
-    {
-      id: 4,
-      name: 'DJ Harmony',
-      image: '/placeholder.svg',
-      genre: 'EDM',
-    },
-  ]
+  const ticketSelected = useMemo(() => {
+    return selectedSeats.reduce(
+      (obj, item) => {
+        const ticketId = item?.ticketPrice?.id
+        if (!obj[ticketId]) {
+          obj[ticketId] = {
+            id: ticketId,
+            ticketName: item.ticketPrice.name,
+            seats: [],
+            total: 0,
+            quantity: 0,
+            currency: item.ticketPrice.currency,
+          }
+        }
+        obj[ticketId].seats.push(item.label)
+        obj[ticketId].total += item.ticketPrice?.price || 0
+        obj[ticketId].quantity += 1
 
-  const schedule: ScheduleItem[] = [
-    {
-      day: 'Day 1',
-      time: '5:00 PM',
-      title: 'Doors Open',
-      description: 'Early entry for VIP ticket holders',
-    },
-    {
-      day: 'Day 1',
-      time: '6:30 PM',
-      title: 'Opening Act: The Resonants',
-      description: '45-minute set featuring new material',
-    },
-    {
-      day: 'Day 1',
-      time: '8:00 PM',
-      title: 'Main Performance: Maya Rivers',
-      description: '90-minute headline performance',
-    },
-    {
-      day: 'Day 2',
-      time: '4:30 PM',
-      title: 'Doors Open',
-      description: 'General admission',
-    },
-    {
-      day: 'Day 2',
-      time: '6:00 PM',
-      title: 'DJ Harmony Set',
-      description: 'Electronic music showcase',
-    },
-    {
-      day: 'Day 2',
-      time: '7:30 PM',
-      title: 'Electric Pulse Performance',
-      description: 'Featuring special guest collaborations',
-    },
-  ]
-
-  const faqs: FAQ[] = [
-    {
-      question: 'What items are prohibited at the venue?',
-      answer:
-        'Outside food and drinks, professional cameras, weapons, illegal substances, and large bags are prohibited. Small purses and clear bags are allowed.',
-    },
-    {
-      question: 'Is there parking available at the venue?',
-      answer:
-        'Yes, paid parking is available at the venue for $20 per vehicle. We recommend carpooling or using public transportation as parking spaces are limited.',
-    },
-    {
-      question: 'What time should I arrive?',
-      answer:
-        'We recommend arriving at least 1 hour before the scheduled performance time to allow for security checks and to find your seats.',
-    },
-    {
-      question: 'Are tickets refundable?',
-      answer:
-        'Tickets are non-refundable, but can be transferred to another person up to 48 hours before the event. Please contact customer service for assistance with transfers.',
-    },
-    {
-      question: 'Is there an age restriction for the concert?',
-      answer:
-        'The concert is open to all ages. However, attendees under 16 must be accompanied by an adult.',
-    },
-  ]
+        return obj
+      },
+      {} as Record<
+        string,
+        {
+          id: string
+          ticketName: string
+          seats: string[]
+          total: number
+          quantity: number
+          currency?: string
+        }
+      >,
+    )
+  }, [selectedSeats])
 
   const calculateTotal = () => {
-    const ticketsTotal = ticketOptions.reduce((sum, option) => {
-      return sum + option.price * option.quantity
-    }, 0)
-
-    const seatsTotal = selectedSeats.reduce((sum, seat) => {
-      return sum + seat.price
-    }, 0)
-
-    return ticketsTotal + seatsTotal
-  }
-
-  const handleQuantityChange = (id: string, quantity: number) => {
-    setTicketOptions((prevOptions) =>
-      prevOptions.map((option) => (option.id === id ? { ...option, quantity } : option)),
-    )
+    return Object.values(ticketSelected).reduce((sum, tk) => sum + tk.total, 0)
   }
 
   const handleBuyTickets = () => {
     const total = calculateTotal()
     if (total === 0) {
-      toast.error('Please select at least one ticket or seat')
+      toast({
+        title: 'Please select at least one ticket or seat',
+      })
       return
     }
 
@@ -207,8 +98,7 @@ const TicketDetails = () => {
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{
-              backgroundImage:
-                "url('https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?auto=format&fit=crop&w=1800&q=80')",
+              backgroundImage: `url(${event.eventBanner?.url})`,
             }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
@@ -217,25 +107,31 @@ const TicketDetails = () => {
           <div className="relative z-20 h-full flex items-end">
             <div className="container mx-auto px-6 md:px-10 pb-16 md:pb-20 w-full">
               <div className="max-w-3xl">
-                <div className="inline-block px-3 py-1 mb-3 border border-white/30 rounded-full backdrop-blur text-xs text-white/90">
-                  Powered by <span className="font-semibold">MelodySale</span>
-                </div>
+                {event.sponsor && (
+                  <div className="inline-block px-3 py-1 mb-3 border border-white/30 rounded-full backdrop-blur text-xs text-white/90">
+                    Powered by <span className="font-semibold">MelodySale</span>
+                  </div>
+                )}
+
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 animate-fade-in">
-                  Summer Music Festival 2023
+                  {event.title}
                 </h1>
 
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 text-white/90 mb-8">
                   <div className="flex items-center">
                     <Calendar className="h-5 w-5 mr-2" />
-                    <span>Aug 15-16, 2023 • 5:00 PM</span>
+                    <span>
+                      {dateFnsFormat(new Date(event.startDatetime), 'dd-MM-yyyy HH:mm a')} -{' '}
+                      {dateFnsFormat(new Date(event.endDatetime), 'dd-MM-yyyy HH:mm a')}
+                    </span>
                   </div>
                   <div className="flex items-center">
                     <MapPin className="h-5 w-5 mr-2" />
-                    <span>Central Park Amphitheater</span>
+                    <span>{event.eventLocation}</span>
                   </div>
                   <div className="flex items-center">
                     <Users className="h-5 w-5 mr-2" />
-                    <span>5,000+ attendees</span>
+                    <span>{'-/300'} attendees</span>
                   </div>
                 </div>
 
@@ -254,7 +150,36 @@ const TicketDetails = () => {
 
         <section className="py-12 bg-gray-50">
           <div className="container mx-auto px-4">
-            <SeatMap onSeatSelect={handleSeatSelect} />
+            <div className="w-full max-w-4xl mx-auto">
+              <h3 className="text-xl font-bold mb-4">Seat Selection</h3>
+              {/* Seat type legend */}
+              <div className="flex flex-wrap gap-4 mb-6 justify-center">
+                {event.ticketPrices?.map((option: any) => (
+                  <div key={option.id} className="flex items-center">
+                    <div
+                      className={`w-4 h-4 rounded mr-2`}
+                      style={{
+                        backgroundColor: categories.find((c) => c.name === option.name)?.color,
+                      }}
+                    ></div>
+                    <span>
+                      {option.name} {' - '}
+                      {new Intl.NumberFormat('vi-VN', {
+                        style: 'currency',
+                        currency: option.currency,
+                      }).format(option.price)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <SeatMapToolkit onSelectSeat={handleSeatSelect} />
+              {/* <SeatMap
+                onSeatSelect={handleSeatSelect}
+                selectedSeats={selectedSeats}
+                event={event}
+              /> */}
+            </div>
           </div>
         </section>
 
@@ -264,21 +189,23 @@ const TicketDetails = () => {
 
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               <div className="bg-white p-6 rounded-lg shadow-md">
-                {ticketOptions.map((option) => (
+                {Object.values(ticketSelected).map((option) => (
                   <div key={option.id} className="mb-6 last:mb-0">
                     <div className="flex justify-between items-center mb-2">
                       <div>
-                        <h3 className="font-semibold text-lg">{option.name}</h3>
-                        <p className="text-gray-600">${option.price.toFixed(2)}</p>
+                        <h3 className="font-semibold text-lg">{option.ticketName}</h3>
+                        <p className="text-gray-600">
+                          {new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                            currency: option.currency || 'VND',
+                          }).format(option.total)}
+                        </p>
                       </div>
                       <div className="w-24">
                         <Input
-                          type="number"
-                          min="0"
                           value={option.quantity}
-                          onChange={(e) =>
-                            handleQuantityChange(option.id, parseInt(e.target.value) || 0)
-                          }
+                          readOnly
+                          disabled
                           className="w-full text-center"
                         />
                       </div>
@@ -290,29 +217,19 @@ const TicketDetails = () => {
 
               <div className="bg-gray-50 p-6 rounded-lg shadow-md">
                 <h3 className="text-xl font-bold mb-4">Your Selection</h3>
-
-                {ticketOptions
-                  .filter((option) => option.quantity > 0)
-                  .map((option) => (
-                    <div key={option.id} className="flex justify-between mb-2">
-                      <span>
-                        {option.quantity}x {option.name}
-                      </span>
-                      <span>${(option.price * option.quantity).toFixed(2)}</span>
-                    </div>
-                  ))}
-
                 {selectedSeats.length > 0 && (
                   <>
                     <Separator className="my-4" />
                     <h4 className="font-medium mb-2">Selected Seats:</h4>
                     {selectedSeats.map((seat) => (
                       <div key={seat.id} className="flex justify-between mb-2">
+                        <span>Seat {seat.label}</span>
                         <span>
-                          Seat {seat.row}
-                          {seat.number} ({seat.type})
+                          {new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                            currency: seat.ticketPrice?.currency || 'VND',
+                          }).format(seat.ticketPrice?.price || 0)}
                         </span>
-                        <span>${seat.price}</span>
                       </div>
                     ))}
                   </>
@@ -321,7 +238,12 @@ const TicketDetails = () => {
                 <Separator className="my-4" />
                 <div className="flex justify-between font-bold text-xl">
                   <span>Total</span>
-                  <span>${calculateTotal().toFixed(2)}</span>
+                  <span>
+                    {new Intl.NumberFormat('vi-VN', {
+                      style: 'currency',
+                      currency: 'VND',
+                    }).format(calculateTotal() || 0)}{' '}
+                  </span>
                 </div>
 
                 <Button
@@ -335,84 +257,11 @@ const TicketDetails = () => {
           </div>
         </section>
 
-        <section className="py-12 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold mb-8 text-center">Featured Performers</h2>
+        <FeaturedPerformers />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {performers.map((performer) => (
-                <div
-                  key={performer.id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105"
-                >
-                  <div className="h-48 overflow-hidden">
-                    <img
-                      src={performer.image}
-                      alt={performer.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-lg">{performer.name}</h3>
-                    <p className="text-gray-600">{performer.genre}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <Schedule schedules={event.schedules} />
 
-        <section className="py-12 bg-white">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold mb-8 text-center">Event Schedule</h2>
-
-            <div className="max-w-3xl mx-auto">
-              {['Day 1', 'Day 2'].map((day) => (
-                <div key={day} className="mb-8">
-                  <h3 className="text-2xl font-bold mb-4 text-purple-700">{day}</h3>
-
-                  {schedule
-                    .filter((item) => item.day === day)
-                    .map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex mb-6 group hover:bg-gray-50 p-3 rounded-lg transition-colors"
-                      >
-                        <div className="w-24 flex-shrink-0 font-bold text-purple-600">
-                          {item.time}
-                        </div>
-                        <div className="border-l-2 border-purple-300 pl-4 ml-4">
-                          <h4 className="font-bold text-lg group-hover:text-purple-700 transition-colors">
-                            {item.title}
-                          </h4>
-                          <p className="text-gray-600">{item.description}</p>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-12 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
-
-            <div className="max-w-3xl mx-auto">
-              <Accordion type="single" collapsible className="w-full">
-                {faqs.map((faq, index) => (
-                  <AccordionItem key={index} value={`item-${index}`}>
-                    <AccordionTrigger className="text-left font-medium">
-                      {faq.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-gray-600">{faq.answer}</AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </div>
-          </div>
-        </section>
+        <FAQ />
       </main>
 
       <Footer />

@@ -9,43 +9,7 @@ import PastConcerts from '@/components/home/PastConcerts'
 import PerformersSection from '@/components/home/PerformersSection'
 import Sponsors from '@/components/home/Sponsors'
 import { initScrollAnimation } from '@/utils/scrollAnimation'
-
-// Mock data
-const bannerConcerts = [
-  {
-    id: 1,
-    name: 'Summer Melody Festival 2023',
-    sponsor: 'SoundWave Audio',
-    date: 'July 15, 2023',
-    time: '6:00 PM',
-    location: 'Central Park, New York',
-    attendees: 25000,
-    image:
-      'https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?auto=format&fit=crop&w=1800&q=80',
-  },
-  {
-    id: 2,
-    name: 'Harmony Nights: Under the Stars',
-    sponsor: 'Crystal Acoustics',
-    date: 'August 5, 2023',
-    time: '7:30 PM',
-    location: 'Riverfront Amphitheater, Chicago',
-    attendees: 18000,
-    image:
-      'https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&w=1800&q=80',
-  },
-  {
-    id: 3,
-    name: 'Urban Beats Festival',
-    sponsor: 'Rhythm Records',
-    date: 'September 10, 2023',
-    time: '5:00 PM',
-    location: 'Downtown Arena, Los Angeles',
-    attendees: 22000,
-    image:
-      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1800&q=80',
-  },
-]
+import { PaginatedDocs } from 'payload'
 
 const upcomingConcerts = [
   {
@@ -196,7 +160,13 @@ const sponsors = [
   },
 ]
 
-const Index = () => {
+const Index = ({
+  bannerDocs,
+  onGoingPaginatedDocs,
+}: {
+  bannerDocs: PaginatedDocs['docs']
+  onGoingPaginatedDocs: PaginatedDocs
+}) => {
   useEffect(() => {
     const cleanup = initScrollAnimation()
     return cleanup
@@ -207,8 +177,11 @@ const Index = () => {
       <Header />
 
       <main className="flex-grow">
-        <ConcertBanner concerts={bannerConcerts} />
-        <ConcertList concerts={upcomingConcerts} title="Ongoing & Upcoming Concerts" />
+        <ConcertBanner events={bannerDocs} />
+        <ConcertList
+          onGoingPaginatedDocs={onGoingPaginatedDocs}
+          title="Ongoing & Upcoming Concerts"
+        />
         <PerformersSection />
         <PastConcerts concerts={pastConcerts} />
         <Sponsors sponsors={sponsors} />

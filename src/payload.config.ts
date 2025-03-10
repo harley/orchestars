@@ -78,6 +78,34 @@ export default buildConfig({
           type: 'date',
         },
         {
+          type: 'array',
+          name: 'schedules',
+          fields: [
+            {
+              type: 'text',
+              name: 'date',
+            },
+            {
+              type: 'array',
+              name: 'details',
+              fields: [
+                {
+                  type: 'text',
+                  name: 'time',
+                },
+                {
+                  type: 'text',
+                  name: 'name',
+                },
+                {
+                  type: 'text',
+                  name: 'description',
+                },
+              ],
+            },
+          ],
+        },
+        {
           name: 'showAfterExpiration',
           type: 'checkbox',
         },
@@ -94,7 +122,32 @@ export default buildConfig({
           type: 'textarea',
         },
         {
+          type: 'array',
+          name: 'ticketPrices',
+          fields: [
+            {
+              type: 'text',
+              name: 'name',
+            },
+            {
+              type: 'number',
+              min: 0,
+              name: 'price',
+            },
+            {
+              type: 'text',
+              name: 'currency',
+              defaultValue: 'VND',
+            },
+          ],
+        },
+        {
           name: 'eventLogo',
+          type: 'upload',
+          relationTo: 'media',
+        },
+        {
+          name: 'eventBanner',
           type: 'upload',
           relationTo: 'media',
         },
