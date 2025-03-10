@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     app_time: Date.now(),
     item: JSON.stringify(items),
     embed_data: JSON.stringify(embed_data),
-    amount: 50000,
+    amount: amount,
     bank_code: bank_code,
     description: `ZaloPayDemo - Payment for order #${transID}`,
   }
