@@ -40,4 +40,5 @@ next-env.d.ts
 
 .env
 
-/media
+/media/*
+!/media/.gitkeep
