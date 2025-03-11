@@ -11,7 +11,7 @@ import Sponsors from '@/components/home/Sponsors'
 import { initScrollAnimation } from '@/utils/scrollAnimation'
 import { PaginatedDocs } from 'payload'
 
-const _upcomingConcerts = [
+const pastConcerts = [
   {
     id: 1,
     name: 'Rock Revolution Tour',
@@ -144,7 +144,7 @@ const Index = ({
           title="Ongoing & Upcoming Concerts"
         />
         <PerformersSection />
-        <PastConcerts concerts={_upcomingConcerts} />
+        <PastConcerts concerts={pastConcerts} />
         <Sponsors sponsors={sponsors} />
       </main>
 
