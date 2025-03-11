@@ -4,9 +4,13 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 
-type SearchParams = { apptransid: string }
+interface PageProps {
+    searchParams: {
+        apptransid: string;
+    }
+}
 
-const PaymentResult = async ({ searchParams }: { searchParams: SearchParams }) => {
+const PaymentResult = async ({ searchParams }: PageProps) => {
     console.log('params', searchParams)
 
     const payloadConfig = await config
