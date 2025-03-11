@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input'
 
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/hooks/use-toast'
-import Header from '@/components/layout/Header'
 import { Calendar, MapPin } from 'lucide-react'
 import { format as dateFnsFormat } from 'date-fns'
 import Schedule from './Schedule'
@@ -31,7 +30,6 @@ const TicketDetails = ({ event, performers, faqs }: { event: Event, performers: 
       if (existingSeat) {
         return prev.filter((s) => s.id !== seat.id)
       } else {
-        console.log('event.ticketPrices', event.ticketPrices)
         const ticketPrice = event.ticketPrices?.find((t: any) => t.name === seat.category?.name) as SelectedSeat['ticketPrice']
         return [...prev, { ...seat, ticketPrice, eventId: event.id }]
       }
@@ -92,8 +90,6 @@ const TicketDetails = ({ event, performers, faqs }: { event: Event, performers: 
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
-
       <ConfirmOrderModal isOpen={isOpenConfirmOrderModal} onCloseModal={handleOpenConfirmOrderModal} selectedSeats={selectedSeats} />
 
       <main className="flex-grow">

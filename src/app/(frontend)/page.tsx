@@ -2,14 +2,15 @@ import React from 'react'
 // import { headers as getHeaders } from 'next/headers.js'
 // import Image from 'next/image'
 import { getPayload } from 'payload'
-// import { fileURLToPath } from 'url'
 
 import config from '@/payload.config'
 import HomePageComponent from '@/components/home'
 import { Partner } from '@/types/Partner'
 import { Performer } from '@/types/Performer'
 import { Event } from '@/types/Event'
-import Footer from '@/components/layout/Footer'
+import ServerLayout from '@/components/layout/ServerLayout'
+
+export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
 
@@ -19,10 +20,7 @@ export default async function HomePage() {
   const bannerDocs = await payload.find({ collection: 'events', where: { endDatetime: { greater_than_equal: new Date() } }, limit: 5 })
 
   const onGoingPaginatedDocs = await payload.find({ collection: 'events', where: { endDatetime: { greater_than_equal: new Date() } }, limit: 10 })
-  console.log('bannerDocs', bannerDocs)
   // const { user } = await payload.auth({ headers })˝
-
-  // const fileURL = `vscode://file/${fileURLToPath(import.meta.url)}`
 
   // get performers
   const performers = await payload.find({ collection: 'performers', where: { status: { equals: 'active' } }, limit: 50 }).then(res => res.docs)
@@ -33,11 +31,10 @@ export default async function HomePage() {
 
 
   return (
-    <div>
+    <ServerLayout>
       <HomePageComponent bannerDocs={bannerDocs.docs} onGoingPaginatedDocs={onGoingPaginatedDocs} partners={partners as Partner[]} performers={performers as Performer[]}
         pastEvents={pastEvents as Event[]}
       />
-      <Footer />
-    </div>
+    </ServerLayout>
   )
 }

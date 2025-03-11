@@ -10,7 +10,7 @@ const Sponsors: React.FC<SponsorsProps> = ({ partners = [] }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const sponsorsPerPage = 5;
-  const totalPages = Math.ceil(partners.length / sponsorsPerPage);
+  const totalPages = Math.max(1, Math.ceil(partners.length / sponsorsPerPage));
 
   // Animation for section entrance
   useEffect(() => {
@@ -50,7 +50,7 @@ const Sponsors: React.FC<SponsorsProps> = ({ partners = [] }) => {
       className="py-20 animate-on-scroll bg-gray-100"
     >
       <div className="container mx-auto px-6 md:px-10">
-        <h2 className="text-4xl md:text-5xl font-display font-bold mb-16 text-center text-black uppercase">
+        <h2 className="text-3xl md:text-4xl font-display font-bold mb-16 text-center text-black uppercase">
           Nhà Tài Trợ Và Đối Tác
         </h2>
 

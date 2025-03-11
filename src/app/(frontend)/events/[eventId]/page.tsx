@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation'
 import { Event } from '@/types/Event'
 import { Performer } from '@/types/Performer'
 import { FAQType } from '@/types/FAQ'
-import Footer from '@/components/layout/Footer'
+import ServerLayout from '@/components/layout/ServerLayout'
 
 const ConcertDetailPage = async (props: { params: Promise<{ eventId: string }> }) => {
   const params = await props.params
@@ -30,10 +30,9 @@ const ConcertDetailPage = async (props: { params: Promise<{ eventId: string }> }
   const faqs = await payload.find({ collection: 'faqs', where: { status: { equals: 'active' } }, limit: 50 }).then(res => res.docs)
 
   return (
-    <div>
+    <ServerLayout>
       <TicketDetails event={eventDetail as Event} performers={performers as Performer[]} faqs={faqs as FAQType[]} />
-      <Footer />
-    </div>
+    </ServerLayout>
   )
 }
 

@@ -14,7 +14,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Check, CreditCard, QrCode, Timer, Info, X, AlertCircle } from 'lucide-react'
-import Header from '@/components/layout/Header'
 import { useToast } from '@/hooks/use-toast'
 
 interface PaymentMethod {
@@ -108,8 +107,6 @@ const Payment = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
-
       <main className="flex-grow py-10 bg-gray-50">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-bold text-center mb-8">Complete Your Payment</h1>
