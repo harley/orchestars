@@ -3,24 +3,15 @@ import { Calendar, MapPin, Users } from 'lucide-react'
 import CustomButton from '../ui/custom-button'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import { format as dateFnsFormat } from 'date-fns'
 
-interface Concert {
-  id: number
-  name: string
-  date: string
-  time: string
-  location: string
-  attendees: number
-  description: string
-  image: string
-}
-
+import { PaginatedDocs } from 'payload'
 interface ConcertListProps {
-  concerts: Concert[]
+  onGoingPaginatedDocs: PaginatedDocs
   title: string
 }
 
-const ConcertList: React.FC<ConcertListProps> = ({ concerts, title }) => {
+const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }) => {
   const elementsRef = useRef<(HTMLDivElement | null)[]>([])
   const router = useRouter()
 
@@ -48,7 +39,7 @@ const ConcertList: React.FC<ConcertListProps> = ({ concerts, title }) => {
   }, [])
 
   const handleGetTickets = (id: number) => {
-    router.push(`/concerts/${id}`)
+    router.push(`/events/${id}`)
   }
 
   return (
@@ -57,9 +48,9 @@ const ConcertList: React.FC<ConcertListProps> = ({ concerts, title }) => {
         <h2 className="text-3xl md:text-4xl font-display font-bold mb-12 text-center">{title}</h2>
 
         <div className="space-y-20">
-          {concerts.map((concert, index) => (
+          {onGoingPaginatedDocs?.docs?.map((evt, index) => (
             <div
-              key={concert.id}
+              key={evt.id}
               ref={(el) => (elementsRef.current[index] = el) as any}
               className={cn(
                 'grid md:grid-cols-2 gap-6 md:gap-10 animate-on-scroll',
@@ -75,8 +66,8 @@ const ConcertList: React.FC<ConcertListProps> = ({ concerts, title }) => {
                 )}
               >
                 <img
-                  src={concert.image}
-                  alt={concert.name}
+                  src={evt.eventBanner?.url}
+                  alt={evt.eventBanner?.alt || evt.title}
                   className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                 />
               </div>
@@ -88,29 +79,30 @@ const ConcertList: React.FC<ConcertListProps> = ({ concerts, title }) => {
                   index % 2 === 0 ? 'md:order-2' : 'md:order-1',
                 )}
               >
-                <h3 className="text-2xl md:text-3xl font-display font-bold mb-3">{concert.name}</h3>
+                <h3 className="text-2xl md:text-3xl font-display font-bold mb-3">{evt.title}</h3>
 
                 <div className="flex flex-col sm:flex-row gap-4 text-muted-foreground mb-4">
                   <div className="flex items-center">
                     <Calendar className="h-4 w-4 mr-2" />
                     <span className="text-sm">
-                      {concert.date}, {concert.time}
+                      {dateFnsFormat(new Date(evt.startDatetime), 'dd-MM-yyyy HH:mm a')} -{' '}
+                      {dateFnsFormat(new Date(evt.endDatetime), 'dd-MM-yyyy HH:mm a')}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <MapPin className="h-4 w-4 mr-2" />
-                    <span className="text-sm">{concert.location}</span>
+                    <span className="text-sm">{evt.location}</span>
                   </div>
                   <div className="flex items-center">
                     <Users className="h-4 w-4 mr-2" />
-                    <span className="text-sm">{concert.attendees.toLocaleString()} attendees</span>
+                    <span className="text-sm">{'-/300'} attendees</span>
                   </div>
                 </div>
 
-                <p className="text-muted-foreground mb-6">{concert.description}</p>
+                <p className="text-muted-foreground mb-6">{evt.description}</p>
 
                 <div>
-                  <CustomButton variant="primary" onClick={() => handleGetTickets(concert.id)}>
+                  <CustomButton variant="primary" onClick={() => handleGetTickets(evt.slug)}>
                     Get Tickets
                   </CustomButton>
                 </div>

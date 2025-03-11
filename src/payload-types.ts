@@ -68,7 +68,6 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    'zalopay-orders': ZalopayOrder;
     seatingCharts: SeatingChart;
     events: Event;
     orders: Order;
@@ -83,7 +82,6 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    'zalopay-orders': ZalopayOrdersSelect<false> | ZalopayOrdersSelect<true>;
     seatingCharts: SeatingChartsSelect<false> | SeatingChartsSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
@@ -169,28 +167,6 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "zalopay-orders".
- */
-export interface ZalopayOrder {
-  id: number;
-  app_trans_id: string;
-  /**
-   * JSON array or object of items purchased.
-   */
-  items?: string | null;
-  /**
-   * Total amount of the order in VND.
-   */
-  amount: number;
-  /**
-   * Token returned by ZaloPay for this order.
-   */
-  zp_trans_token?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "seatingCharts".
  */
 export interface SeatingChart {
@@ -221,11 +197,34 @@ export interface Event {
   keyword?: string | null;
   startDatetime?: string | null;
   endDatetime?: string | null;
+  schedules?:
+    | {
+        date?: string | null;
+        details?:
+          | {
+              time?: string | null;
+              name?: string | null;
+              description?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
   showAfterExpiration?: boolean | null;
   showTicketsAutomatically?: boolean | null;
   eventLocation?: string | null;
   eventTermsAndConditions?: string | null;
+  ticketPrices?:
+    | {
+        name?: string | null;
+        price?: number | null;
+        currency?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   eventLogo?: (number | null) | Media;
+  eventBanner?: (number | null) | Media;
   sponsorLogo?: (number | null) | Media;
   ticketQuantityLimitation?: ('perTicketType' | 'perEvent') | null;
   updatedAt: string;
@@ -241,8 +240,7 @@ export interface Order {
   user?: (number | null) | User;
   status?: string | null;
   total?: number | null;
-  paymentType?: string | null;
-  paidAt?: string | null;
+  currency?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -253,25 +251,10 @@ export interface Order {
 export interface OrderItem {
   id: number;
   order: number | Order;
-  ticketType?: string | null;
-  ticket: number | Ticket;
+  event: number | Event;
+  ticketPriceId: string;
   quantity: number;
   price: number;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tickets".
- */
-export interface Ticket {
-  id: number;
-  attendeeName?: string | null;
-  ticketCode?: string | null;
-  ticketType?: string | null;
-  event?: (number | null) | Event;
-  order?: (number | null) | Order;
-  orderStatus?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -283,9 +266,45 @@ export interface Payment {
   id: number;
   user: number | User;
   order: number | Order;
+  paymentMethod?: string | null;
+  currency?: string | null;
   total: number;
+  appTransId?: string | null;
+  paymentData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   status: 'processing' | 'canceled' | 'paid' | 'failed';
   paidAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tickets".
+ */
+export interface Ticket {
+  id: number;
+  attendeeName?: string | null;
+  user?: (number | null) | User;
+  ticketCode?: string | null;
+  ticketPriceInfo?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  event?: (number | null) | Event;
+  orderItem?: (number | null) | OrderItem;
+  orderStatus?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -303,10 +322,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
-      } | null)
-    | ({
-        relationTo: 'zalopay-orders';
-        value: number | ZalopayOrder;
       } | null)
     | ({
         relationTo: 'seatingCharts';
@@ -414,18 +429,6 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "zalopay-orders_select".
- */
-export interface ZalopayOrdersSelect<T extends boolean = true> {
-  app_trans_id?: T;
-  items?: T;
-  amount?: T;
-  zp_trans_token?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "seatingCharts_select".
  */
 export interface SeatingChartsSelect<T extends boolean = true> {
@@ -446,11 +449,34 @@ export interface EventsSelect<T extends boolean = true> {
   keyword?: T;
   startDatetime?: T;
   endDatetime?: T;
+  schedules?:
+    | T
+    | {
+        date?: T;
+        details?:
+          | T
+          | {
+              time?: T;
+              name?: T;
+              description?: T;
+              id?: T;
+            };
+        id?: T;
+      };
   showAfterExpiration?: T;
   showTicketsAutomatically?: T;
   eventLocation?: T;
   eventTermsAndConditions?: T;
+  ticketPrices?:
+    | T
+    | {
+        name?: T;
+        price?: T;
+        currency?: T;
+        id?: T;
+      };
   eventLogo?: T;
+  eventBanner?: T;
   sponsorLogo?: T;
   ticketQuantityLimitation?: T;
   updatedAt?: T;
@@ -465,8 +491,7 @@ export interface OrdersSelect<T extends boolean = true> {
   user?: T;
   status?: T;
   total?: T;
-  paymentType?: T;
-  paidAt?: T;
+  currency?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -476,8 +501,8 @@ export interface OrdersSelect<T extends boolean = true> {
  */
 export interface OrderItemsSelect<T extends boolean = true> {
   order?: T;
-  ticketType?: T;
-  ticket?: T;
+  event?: T;
+  ticketPriceId?: T;
   quantity?: T;
   price?: T;
   updatedAt?: T;
@@ -490,7 +515,11 @@ export interface OrderItemsSelect<T extends boolean = true> {
 export interface PaymentsSelect<T extends boolean = true> {
   user?: T;
   order?: T;
+  paymentMethod?: T;
+  currency?: T;
   total?: T;
+  appTransId?: T;
+  paymentData?: T;
   status?: T;
   paidAt?: T;
   updatedAt?: T;
@@ -502,10 +531,11 @@ export interface PaymentsSelect<T extends boolean = true> {
  */
 export interface TicketsSelect<T extends boolean = true> {
   attendeeName?: T;
+  user?: T;
   ticketCode?: T;
-  ticketType?: T;
+  ticketPriceInfo?: T;
   event?: T;
-  order?: T;
+  orderItem?: T;
   orderStatus?: T;
   updatedAt?: T;
   createdAt?: T;
