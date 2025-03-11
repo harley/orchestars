@@ -15,6 +15,16 @@ const getAppInformation = async () => {
     const appInfo = await payload.find({
         collection: 'app_information',
         limit: 1,
+        select: {
+            name: true,
+            logo: true,
+            description: true,
+            email: true,
+            phone: true,
+            address: true,
+            socials: true,
+            phoneNumber: true,
+        }
     }).then(res => res.docs?.[0])
 
     return appInfo;

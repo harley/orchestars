@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Calendar, MapPin, Users } from 'lucide-react'
+import { Calendar, MapPin } from 'lucide-react'
 import CustomButton from '../ui/custom-button'
 import { useRouter } from 'next/navigation'
 import { format as dateFnsFormat } from 'date-fns'
@@ -77,10 +77,10 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events }) => {
                     <MapPin className="h-5 w-5 mr-2" />
                     <span>{evt.eventLocation}</span>
                   </div>
-                  <div className="flex items-center">
+                  {/* <div className="flex items-center">
                     <Users className="h-5 w-5 mr-2" />
                     <span>{'-/300'} attendees</span>
-                  </div>
+                  </div> */}
                 </div>
 
                 <CustomButton
