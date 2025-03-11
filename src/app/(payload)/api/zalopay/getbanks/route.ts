@@ -2,27 +2,20 @@
 import { NextResponse } from 'next/server'
 import axios from 'axios'
 import CryptoJS from 'crypto-js'
-
+import { ZALO_PAYMENT } from '@/config/payment'
 export async function POST() {
-  const config = {
-    appid: process.env.ZALO_APPID || '2553',
-    key1: process.env.ZALO_KEY1 || 'PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL',
-    endpoint:
-      process.env.ZALO_GET_BANK_ENDPOINT ||
-      'https://sbgateway.zalopay.vn/api/getlistmerchantbanks',
-  }
 
   const reqtime = Date.now()
   const mac = CryptoJS.HmacSHA256(
-    `${config.appid}|${reqtime}`,
-    config.key1
+    `${ZALO_PAYMENT.APP_ID}|${reqtime}`,
+    ZALO_PAYMENT.KEY1
   ).toString()
 
   try {
     const response = await axios.post(
-      config.endpoint,
+      ZALO_PAYMENT.ENDPOINT,
       new URLSearchParams({
-        appid: config.appid,
+        appid: ZALO_PAYMENT.APP_ID,
         reqtime: reqtime.toString(),
         mac,
       }),
