@@ -16,7 +16,7 @@ import {
 import { Check, CreditCard, QrCode, Timer, Info, X, AlertCircle } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import { toast } from 'sonner'
+import { useToast } from '@/hooks/use-toast'
 
 interface PaymentMethod {
   id: string
@@ -25,6 +25,7 @@ interface PaymentMethod {
 }
 
 const Payment = () => {
+  const { toast } = useToast()
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
@@ -62,7 +63,11 @@ const Payment = () => {
   const handlePaymentConfirm = () => {
     // Form validation
     if (!name || !phone || !email) {
-      toast.error('Please fill in all required fields')
+      toast({
+        title: 'Error',
+        description: 'Please fill in all required fields',
+        variant: 'destructive',
+      })
       return
     }
 
@@ -94,7 +99,11 @@ const Payment = () => {
 
   const simulatePaymentSuccess = () => {
     setIsQrModalOpen(false)
-    toast.success('Payment successful! Your tickets have been sent to your email.')
+    toast({
+      title: 'Success',
+      description: 'Payment successful! Your tickets have been sent to your email.',
+      variant: 'default',
+    })
     // In a real app, we would redirect to a confirmation page or back to home
   }
 

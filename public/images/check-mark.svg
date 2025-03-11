@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="15px" viewBox="0 0 16 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>check-mark</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="NAP-TIEN----" transform="translate(-270.000000, -266.000000)">
+            <g id="check-mark" transform="translate(270.500000, 266.000000)">
+                <circle id="Oval" fill="#04BE04" cx="7.5" cy="7.5" r="7.5"></circle>
+                <path d="M11.0028614,4.59655897 C11.2324728,4.37948925 11.5945795,4.38965632 11.8116492,4.61926775 C12.0287189,4.84887918 12.0185518,5.2109858 11.7889404,5.42805552 L6.5260892,10.4034421 C6.30102211,10.6162157 5.94750308,10.6112537 5.72849645,10.3922471 L3.19954442,7.86329506 C2.97611583,7.63986647 2.97611583,7.27761714 3.19954442,7.05418855 C3.42297302,6.83075996 3.78522234,6.83075996 4.00865093,7.05418855 L6.14424914,9.18978675 L11.0028614,4.59655897 Z" id="Path" fill="#FFFFFF"></path>
+            </g>
+        </g>
+    </g>
+</svg>

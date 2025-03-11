@@ -8,24 +8,22 @@ import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/hooks/use-toast'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import { useRouter } from 'next/navigation'
 import { Calendar, MapPin, Users } from 'lucide-react'
-import CustomButton from '@/components/ui/custom-button'
 import { format as dateFnsFormat } from 'date-fns'
 import Schedule from './Schedule'
 import FAQ from './FAQ'
 import FeaturedPerformers from './FeaturedPerformers'
-import { SeatType } from './types'
+import { SeatToolKitItem, SelectedSeat } from './types'
 import SeatMapToolkit from './SeatToolkit'
 import { categories } from './data/seat-maps/categories'
+import ConfirmOrderModal from './ConfirmOrderModal'
+
 
 const TicketDetails = ({ event }: { event: Record<string, any> }) => {
-  const router = useRouter()
-
   const { toast } = useToast()
-  const [selectedSeats, setSelectedSeats] = useState<SeatType[]>([])
+  const [selectedSeats, setSelectedSeats] = useState<SelectedSeat[]>([])
 
-  const handleSeatSelect = (seat: SeatType) => {
+  const handleSeatSelect = (seat: SeatToolKitItem) => {
     setSelectedSeats((prev) => {
       const existingSeat = prev.find((s) => s.id === seat.id)
       if (existingSeat) {
@@ -33,7 +31,7 @@ const TicketDetails = ({ event }: { event: Record<string, any> }) => {
       } else {
         console.log('event.ticketPrices', event.ticketPrices)
         const ticketPrice = event.ticketPrices?.find((t: any) => t.name === seat.category?.name)
-        return [...prev, { ...seat, ticketPrice }]
+        return [...prev, { ...seat, ticketPrice, eventId: event.id }]
       }
     })
   }
@@ -85,12 +83,16 @@ const TicketDetails = ({ event }: { event: Record<string, any> }) => {
       return
     }
 
-    router.push('/payment')
+    handleOpenConfirmOrderModal(true)
   }
+
+  const [isOpenConfirmOrderModal, handleOpenConfirmOrderModal] = useState(false)
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
+      <ConfirmOrderModal isOpen={isOpenConfirmOrderModal} onCloseModal={handleOpenConfirmOrderModal} selectedSeats={selectedSeats} />
 
       <main className="flex-grow">
         <section className="relative h-[500px] md:h-[600px] overflow-hidden">
@@ -135,19 +137,18 @@ const TicketDetails = ({ event }: { event: Record<string, any> }) => {
                   </div>
                 </div>
 
-                <CustomButton
+                {/* <CustomButton
                   variant="interested"
                   size="lg"
                   className="shadow-lg"
                   onClick={handleBuyTickets}
                 >
                   Get Tickets
-                </CustomButton>
+                </CustomButton> */}
               </div>
             </div>
           </div>
         </section>
-
         <section className="py-12 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="w-full max-w-4xl mx-auto">
@@ -248,7 +249,7 @@ const TicketDetails = ({ event }: { event: Record<string, any> }) => {
 
                 <Button
                   onClick={handleBuyTickets}
-                  className="w-full mt-6 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                  className="w-full cursor-pointer mt-6 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
                 >
                   Complete Purchase
                 </Button>

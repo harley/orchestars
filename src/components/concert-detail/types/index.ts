@@ -13,3 +13,25 @@ export interface SeatProps {
   isSelected: boolean
   onSelect: (seat: SeatType) => void
 }
+
+export interface SelectedSeat {
+  id: string
+  label: string
+  ticketPrice: {
+    id: string
+    name: string
+    price: number
+    currency: string
+  }
+  eventId: number
+  [k: string]: any
+}
+
+export interface SeatToolKitItem {
+  id: string
+  label: string
+  category: {
+    id: string
+    name: string
+  }
+}

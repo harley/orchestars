@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="23px" height="26px" viewBox="0 0 23 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>bank-pg</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="36" height="36"></rect>
+        <polygon id="path-3" points="0 24.2287635 0 0.227413387 15.3195549 0.227413387 15.3195549 24.2287635 1.47014089e-15 24.2287635"></polygon>
+        <polygon id="path-5" points="0.223761026 0.244128195 15.5434051 0.244128195 15.5434051 24.2453647 0.223761026 24.2453647"></polygon>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="bank-pg" transform="translate(-6.000000, -5.000000)">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <g id="Mask"></g>
+            <g id="pgbank" mask="url(#mask-2)">
+                <g transform="translate(6.000000, 5.000000)" id="Page-1">
+                    <g>
+                        <g id="Group-3" transform="translate(0.000000, 1.596157)">
+                            <mask id="mask-4" fill="white">
+                                <use xlink:href="#path-3"></use>
+                            </mask>
+                            <g id="Clip-2"></g>
+                            <path d="M10.9064985,0.227413387 L15.3195549,6.3530069 C15.3195549,6.3530069 8.98268308,11.6036032 5.07883692,17.6709249 C1.79722667,23.9774677 7.56778051,24.3798499 8.86936,23.8547903 C6.93453949,24.6353258 4.8399959,24.177432 3.41498051,22.6366028 C2.43671385,21.5788162 1.57980103,20.3692162 0.670539487,19.2461039 C0.670539487,19.2461039 -3.91740923,14.5208738 10.9064985,0.227413387" id="Fill-1" fill="#135DAA" mask="url(#mask-4)"></path>
+                        </g>
+                        <g id="Group-6" transform="translate(7.435897, 0.062688)">
+                            <mask id="mask-6" fill="white">
+                                <use xlink:href="#path-5"></use>
+                            </mask>
+                            <g id="Clip-5"></g>
+                            <path d="M4.63711487,24.2453647 L0.223761026,18.1197712 C0.223761026,18.1197712 6.56063282,12.8691748 10.464479,6.80185314 C13.7460892,0.495310345 7.97583282,0.0929281947 6.6739559,0.61798783 C8.60877641,-0.162547667 10.7036174,0.295346045 12.1283354,1.83617525 C13.1066021,2.89396187 13.9635149,4.10356187 14.8727764,5.22667424 C14.8727764,5.22667424 19.4607251,9.95221095 4.63711487,24.2453647" id="Fill-4" fill="#F6911E" mask="url(#mask-6)"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

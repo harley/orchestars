@@ -39,7 +39,7 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }
   }, [])
 
   const handleGetTickets = (id: number) => {
-    router.push(`/concerts/${id}`)
+    router.push(`/events/${id}`)
   }
 
   return (

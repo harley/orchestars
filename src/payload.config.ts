@@ -190,26 +190,25 @@ export default buildConfig({
         {
           name: 'status',
           type: 'text',
+          // options: [
+          //   { label: 'Processing', value: 'processing' },
+          //   { label: 'Canceled', value: 'canceled' },
+          //   { label: 'Completed', value: 'completed' },
+          //   { label: 'Failed', value: 'failed' },
+          // ],
         },
         {
           name: 'total',
           type: 'number',
         },
         {
-          name: 'paymentType',
+          name: 'currency',
           type: 'text',
-        },
-        {
-          name: 'paidAt',
-          type: 'date',
         },
       ],
     },
     {
       slug: 'orderItems',
-      admin: {
-        useAsTitle: 'ticketType',
-      },
       fields: [
         {
           name: 'order',
@@ -218,14 +217,14 @@ export default buildConfig({
           required: true,
         },
         {
-          name: 'ticketType',
-          type: 'text',
-          required: false,
+          name: 'event',
+          type: 'relationship',
+          relationTo: 'events',
+          required: true,
         },
         {
-          name: 'ticket',
-          type: 'relationship',
-          relationTo: 'tickets',
+          name: 'ticketPriceId',
+          type: 'text',
           required: true,
         },
         {
@@ -261,9 +260,49 @@ export default buildConfig({
           required: true,
         },
         {
+          name: 'paymentMethod',
+          type: 'text',
+        },
+        {
+          name: 'currency',
+          type: 'text',
+        },
+        {
           name: 'total',
           type: 'number',
           required: true,
+        },
+        {
+          name: 'appTransId',
+          type: 'text',
+        },
+        {
+          name: 'paymentData',
+          type: 'json',
+          // jsonSchema: {
+          //   fileMatch: [''],
+          //   uri: '',
+          //   schema: {
+          //     type: 'object',
+          //     properties: {
+          //       app_trans_id: { type: 'string' },
+          //       app_id: { type: 'string' },
+          //       app_time: { type: 'number' },
+          //       app_user: { type: 'string' },
+          //       channel: { type: 'string' },
+          //       discount_amount: { type: 'number' },
+          //       embed_data: { type: 'string' },
+          //       item: { type: 'string' },
+          //       merchant_user_id: { type: 'string' },
+          //       server_time: { type: 'number' },
+          //       user_fee_amount: { type: 'number' },
+          //       zp_trans_id: { type: 'string' },
+          //       zp_user_id: { type: 'string' },
+          //       amount: { type: 'number' },
+          //     },
+          //     additionalProperties: true,
+          //   },
+          // },
         },
         {
           name: 'status',
@@ -291,12 +330,17 @@ export default buildConfig({
           type: 'text',
         },
         {
+          name: 'user',
+          type: 'relationship',
+          relationTo: 'users',
+        },
+        {
           name: 'ticketCode',
           type: 'text',
         },
         {
-          name: 'ticketType',
-          type: 'text',
+          name: 'ticketPriceInfo',
+          type: 'json',
         },
         {
           name: 'event',
@@ -304,9 +348,9 @@ export default buildConfig({
           relationTo: 'events',
         },
         {
-          name: 'order',
+          name: 'orderItem',
           type: 'relationship',
-          relationTo: 'orders',
+          relationTo: 'orderItems',
         },
         {
           name: 'orderStatus',

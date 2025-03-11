@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="27px" height="16px" viewBox="0 0 27 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>bank-maritime</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="36" height="36"></rect>
+        <radialGradient cx="61.4665753%" cy="29.2610973%" fx="61.4665753%" fy="29.2610973%" r="52.4169863%" gradientTransform="translate(0.614666,0.292611),scale(1.000000,0.913070),translate(-0.614666,-0.292611)" id="radialGradient-3">
+            <stop stop-color="#6F0000" offset="1.84049%"></stop>
+            <stop stop-color="#910D11" offset="32.52%"></stop>
+            <stop stop-color="#A61519" offset="44.57%"></stop>
+            <stop stop-color="#BC1B20" offset="59.38%"></stop>
+            <stop stop-color="#CB1E24" offset="73.84%"></stop>
+            <stop stop-color="#D52027" offset="87.62%"></stop>
+            <stop stop-color="#DA2128" offset="100%"></stop>
+        </radialGradient>
+        <radialGradient cx="80.4711088%" cy="58.2038274%" fx="80.4711088%" fy="58.2038274%" r="74.5263924%" gradientTransform="translate(0.804711,0.582038),scale(1.000000,0.573195),translate(-0.804711,-0.582038)" id="radialGradient-4">
+            <stop stop-color="#6F0000" offset="3.68098%"></stop>
+            <stop stop-color="#910D11" offset="30.06%"></stop>
+            <stop stop-color="#A01317" offset="41.72%"></stop>
+            <stop stop-color="#BE1B21" offset="67.76%"></stop>
+            <stop stop-color="#D11F26" offset="88.06%"></stop>
+            <stop stop-color="#DA2128" offset="100%"></stop>
+        </radialGradient>
+        <radialGradient cx="13.8065574%" cy="9.57107232%" fx="13.8065574%" fy="9.57107232%" r="94.086612%" gradientTransform="translate(0.138066,0.095711),scale(1.000000,0.915572),translate(-0.138066,-0.095711)" id="radialGradient-5">
+            <stop stop-color="#DA2128" offset="35.58%"></stop>
+            <stop stop-color="#F37021" offset="100%"></stop>
+        </radialGradient>
+        <radialGradient cx="24.7316667%" cy="69.2494444%" fx="24.7316667%" fy="69.2494444%" r="99.5731093%" gradientTransform="translate(0.247317,0.692494),scale(0.996883,1.000000),translate(-0.247317,-0.692494)" id="radialGradient-6">
+            <stop stop-color="#DA2128" offset="31.29%"></stop>
+            <stop stop-color="#910D11" offset="79.14%"></stop>
+            <stop stop-color="#6F0000" offset="100%"></stop>
+        </radialGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="bank-maritime" transform="translate(-5.000000, -10.000000)">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <g id="Mask"></g>
+            <g id="maritime" mask="url(#mask-2)">
+                <g transform="translate(5.000000, 5.000000)" id="top-logo-1">
+                    <g transform="translate(0.000000, 4.986301)">
+                        <g id="Group">
+                            <path d="M17.8043478,12.1265492 C17.8043478,11.2683627 17.4913043,10.4881931 16.9826087,9.8640574 L16.9826087,9.8640574 L9.74347826,1.28219178 L9.74347826,1.28219178 C9.1173913,0.502022179 8.13913043,0.0339204175 7.04347826,0.0339204175 C5.12608696,0.0339204175 3.52173913,1.59425962 3.52173913,3.54468363 C3.52173913,4.40287019 3.83478261,5.18303979 4.34347826,5.80717547 L4.34347826,5.80717547 L11.5826087,14.4280496 L11.5826087,14.4280496 C12.2086957,15.2082192 13.1869565,15.6763209 14.2826087,15.6763209 C16.2391304,15.6373125 17.8043478,14.0769733 17.8043478,12.1265492 Z" id="XMLID_36_" fill="url(#radialGradient-3)"></path>
+                            <path d="M16.4347826,14.8961513 C17.1,14.3890411 17.5695652,13.64788 17.726087,12.8677104 L17.726087,12.8677104 L19.6434783,4.32485323 L19.6434783,4.32485323 C19.8782609,3.34964123 19.6826087,2.25740378 19.0173913,1.39921722 C17.8434783,-0.161121983 15.6521739,-0.434181344 14.0869565,0.736073059 C13.4217391,1.2431833 12.9521739,1.98434442 12.7956522,2.76451402 L12.7956522,2.76451402 L10.9173913,11.1123288 L10.8782609,11.3463796 C10.6434783,12.3215917 10.8391304,13.4138291 11.5043478,14.2720157 C12.6782609,15.7933464 14.9086957,16.1054142 16.4347826,14.8961513 Z" id="XMLID_35_" fill="url(#radialGradient-4)"></path>
+                            <path d="M27,12.1265492 C27,11.2683627 26.6869565,10.4881931 26.1782609,9.8640574 L26.1782609,9.8640574 L18.9,1.28219178 L18.9,1.28219178 C18.273913,0.502022179 17.2956522,0.0339204175 16.2,0.0339204175 C14.2826087,0.0339204175 12.6782609,1.59425962 12.6782609,3.54468363 C12.6782609,4.40287019 12.9913043,5.18303979 13.5,5.80717547 L13.5,5.80717547 L20.7391304,14.4280496 L20.7391304,14.4280496 C21.3652174,15.2082192 22.3434783,15.6763209 23.4391304,15.6763209 C25.4347826,15.6373125 27,14.0769733 27,12.1265492 Z" id="XMLID_34_" fill="url(#radialGradient-5)"></path>
+                            <ellipse id="XMLID_33_" fill="url(#radialGradient-6)" cx="3.63913043" cy="12.1265492" rx="3.52173913" ry="3.51076321"></ellipse>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
