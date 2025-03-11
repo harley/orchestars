@@ -4,10 +4,13 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 
+type SearchParams = {
+    apptransid: string;
+}
+
 interface PageProps {
-    searchParams: {
-        apptransid: string;
-    }
+    params: { [key: string]: string | string[] | undefined };
+    searchParams: SearchParams;
 }
 
 const PaymentResult = async ({ searchParams }: PageProps) => {
