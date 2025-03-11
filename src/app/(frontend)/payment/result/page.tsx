@@ -1,17 +1,13 @@
-
 import React from 'react';
 import PaymentResultPage from './ResultPage';
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 
-type SearchParams = Promise<{ apptransid: string }>
+type SearchParams = { apptransid: string }
 
-
-const PaymentResult = async (props: { searchParams: SearchParams }) => {
-
-    const params = await props.searchParams;
-    console.log('params', params)
+const PaymentResult = async ({ searchParams }: { searchParams: SearchParams }) => {
+    console.log('params', searchParams)
 
     const payloadConfig = await config
     const payload = await getPayload({ config: payloadConfig })
@@ -19,11 +15,10 @@ const PaymentResult = async (props: { searchParams: SearchParams }) => {
     const paymentInfo = await payload.find({
         collection: 'payments',
         limit: 1,
-        where: { appTransId: { equals: params.apptransid } },
+        where: { appTransId: { equals: searchParams.apptransid } },
     }).then(res => res.docs?.[0])
 
     console.log('paymentInfo', paymentInfo)
-
 
     if (!paymentInfo) {
         return notFound()
