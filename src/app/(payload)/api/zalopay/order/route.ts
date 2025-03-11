@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
       let customerData = (
         await payload.find({
           collection: 'users',
-          where: { email: customer.email as WhereField },
+          where: { email: {equals: customer.email}},
           limit: 1,
         })
       ).docs?.[0]
