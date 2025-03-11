@@ -4,13 +4,14 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 
-export default async function PaymentResult({
-    searchParams,
-}: {
-    searchParams: { [key: string]: string | string[] | undefined }
-}) {
-    const apptransid = searchParams.apptransid as string
-    console.log('params', searchParams)
+interface PageProps {
+    params: Record<string, never>;
+    searchParams: { [key: string]: string | undefined };
+}
+
+const PaymentResult = async (props: PageProps) => {
+    const apptransid = props.searchParams.apptransid
+    console.log('params', props.searchParams)
 
     const payloadConfig = await config
     const payload = await getPayload({ config: payloadConfig })
@@ -32,3 +33,5 @@ export default async function PaymentResult({
         </div>
     );
 }
+
+export default PaymentResult;
