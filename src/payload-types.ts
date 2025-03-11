@@ -331,7 +331,6 @@ export interface AppInformation {
   socials?:
     | {
         name?: string | null;
-        icon?: string | null;
         link?: string | null;
         id?: string | null;
       }[]
@@ -642,7 +641,6 @@ export interface AppInformationSelect<T extends boolean = true> {
     | T
     | {
         name?: T;
-        icon?: T;
         link?: T;
         id?: T;
       };
