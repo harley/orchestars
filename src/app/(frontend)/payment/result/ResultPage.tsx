@@ -15,10 +15,9 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
     const { toast } = useToast()
     const [isSuccess, setIsSuccess] = useState<boolean | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const status = paymentInfo.status;
 
     useEffect(() => {
-        const status = paymentInfo.status;
-
         const timer = setTimeout(() => {
             setIsSuccess(status === 'paid');
 
@@ -43,7 +42,7 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
         }, 1500);
 
         return () => clearTimeout(timer);
-    }, [paymentInfo, toast]);
+    }, [paymentInfo, toast, status]);
 
 
     // Handle payment retry
@@ -52,12 +51,12 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
     };
 
     useEffect(() => {
-        if (!isLoading) {
+        if (isLoading && status !== 'paid' && status !== 'failed') {
             setTimeout(() => {
                 handleRetry();
             }, 3000);
         }
-    }, [isLoading])
+    }, [isLoading, status])
 
     // If still loading, show a spinner
     if (isLoading) {
