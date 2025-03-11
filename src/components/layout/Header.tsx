@@ -5,6 +5,8 @@ import { Ticket } from 'lucide-react'
 import CustomButton from '../ui/custom-button'
 
 const Header = () => {
+  // return information of website
+
   const [scrolled, setScrolled] = useState(false)
   const [scrollPosition, setScrollPosition] = useState(0)
 

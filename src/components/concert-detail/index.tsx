@@ -7,8 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/hooks/use-toast'
 import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
-import { Calendar, MapPin, Users } from 'lucide-react'
+import { Calendar, MapPin } from 'lucide-react'
 import { format as dateFnsFormat } from 'date-fns'
 import Schedule from './Schedule'
 import FAQ from './FAQ'
@@ -17,9 +16,12 @@ import { SeatToolKitItem, SelectedSeat } from './types'
 import SeatMapToolkit from './SeatToolkit'
 import { categories } from './data/seat-maps/categories'
 import ConfirmOrderModal from './ConfirmOrderModal'
+import { Event } from '@/types/Event'
+import { Performer } from '@/types/Performer'
+import { FAQType } from '@/types/FAQ'
 
 
-const TicketDetails = ({ event }: { event: Record<string, any> }) => {
+const TicketDetails = ({ event, performers, faqs }: { event: Event, performers: Performer[], faqs: FAQType[] }) => {
   const { toast } = useToast()
   const [selectedSeats, setSelectedSeats] = useState<SelectedSeat[]>([])
 
@@ -30,7 +32,7 @@ const TicketDetails = ({ event }: { event: Record<string, any> }) => {
         return prev.filter((s) => s.id !== seat.id)
       } else {
         console.log('event.ticketPrices', event.ticketPrices)
-        const ticketPrice = event.ticketPrices?.find((t: any) => t.name === seat.category?.name)
+        const ticketPrice = event.ticketPrices?.find((t: any) => t.name === seat.category?.name) as SelectedSeat['ticketPrice']
         return [...prev, { ...seat, ticketPrice, eventId: event.id }]
       }
     })
@@ -109,11 +111,11 @@ const TicketDetails = ({ event }: { event: Record<string, any> }) => {
           <div className="relative z-20 h-full flex items-end">
             <div className="container mx-auto px-6 md:px-10 pb-16 md:pb-20 w-full">
               <div className="max-w-3xl">
-                {event.sponsor && (
+                {/* {event.sponsor && (
                   <div className="inline-block px-3 py-1 mb-3 border border-white/30 rounded-full backdrop-blur text-xs text-white/90">
                     Powered by <span className="font-semibold">MelodySale</span>
                   </div>
-                )}
+                )} */}
 
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 animate-fade-in">
                   {event.title}
@@ -123,18 +125,18 @@ const TicketDetails = ({ event }: { event: Record<string, any> }) => {
                   <div className="flex items-center">
                     <Calendar className="h-5 w-5 mr-2" />
                     <span>
-                      {dateFnsFormat(new Date(event.startDatetime), 'dd-MM-yyyy HH:mm a')} -{' '}
-                      {dateFnsFormat(new Date(event.endDatetime), 'dd-MM-yyyy HH:mm a')}
+                      {event.startDatetime && dateFnsFormat(new Date(event.startDatetime), 'dd-MM-yyyy HH:mm a')} -{' '}
+                      {event.endDatetime && dateFnsFormat(new Date(event.endDatetime), 'dd-MM-yyyy HH:mm a')}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <MapPin className="h-5 w-5 mr-2" />
                     <span>{event.eventLocation}</span>
                   </div>
-                  <div className="flex items-center">
+                  {/* <div className="flex items-center">
                     <Users className="h-5 w-5 mr-2" />
                     <span>{'-/300'} attendees</span>
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* <CustomButton
@@ -152,7 +154,7 @@ const TicketDetails = ({ event }: { event: Record<string, any> }) => {
         <section className="py-12 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="w-full max-w-4xl mx-auto">
-              <h3 className="text-xl font-bold mb-4">Seat Selection</h3>
+              <h3 className="text-xl font-bold mb-4">Đặt chỗ</h3>
               {/* Seat type legend */}
               <div className="flex flex-wrap gap-4 mb-6 justify-center">
                 {event.ticketPrices?.map((option: any) => (
@@ -221,7 +223,7 @@ const TicketDetails = ({ event }: { event: Record<string, any> }) => {
                 {selectedSeats.length > 0 && (
                   <>
                     <Separator className="my-4" />
-                    <h4 className="font-medium mb-2">Selected Seats:</h4>
+                    <h4 className="font-medium mb-2">Ghế đã chọn:</h4>
                     {selectedSeats.map((seat) => (
                       <div key={seat.id} className="flex justify-between mb-2">
                         <span>Seat {seat.label}</span>
@@ -238,7 +240,7 @@ const TicketDetails = ({ event }: { event: Record<string, any> }) => {
 
                 <Separator className="my-4" />
                 <div className="flex justify-between font-bold text-xl">
-                  <span>Total</span>
+                  <span>Tổng</span>
                   <span>
                     {new Intl.NumberFormat('vi-VN', {
                       style: 'currency',
@@ -251,21 +253,20 @@ const TicketDetails = ({ event }: { event: Record<string, any> }) => {
                   onClick={handleBuyTickets}
                   className="w-full cursor-pointer mt-6 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
                 >
-                  Complete Purchase
+                  Thanh toán
                 </Button>
               </div>
             </div>
           </div>
         </section>
 
-        <FeaturedPerformers />
+        <FeaturedPerformers performers={performers} />
 
         <Schedule schedules={event.schedules} />
 
-        <FAQ />
-      </main>
+        {faqs?.length > 0 && <FAQ faqs={faqs} />}
 
-      <Footer />
+      </main>
     </div>
   )
 }

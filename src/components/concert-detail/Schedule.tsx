@@ -15,7 +15,7 @@ const Schedule = ({ schedules }: { schedules: ScheduleItem[] }) => {
   return (
     <section className="py-12 bg-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-8 text-center">Event Schedule</h2>
+        <h2 className="text-3xl font-bold mb-8 text-center">Lịch trình</h2>
 
         <div className="max-w-3xl mx-auto">
           {schedules.map((schedule) => (

@@ -2,6 +2,11 @@ import TicketDetails from '@/components/concert-detail'
 import React from 'react'
 import { getPayload, WhereField } from 'payload'
 import config from '@/payload.config'
+import { notFound } from 'next/navigation'
+import { Event } from '@/types/Event'
+import { Performer } from '@/types/Performer'
+import { FAQType } from '@/types/FAQ'
+import Footer from '@/components/layout/Footer'
 
 const ConcertDetailPage = async (props: { params: Promise<{ eventId: string }> }) => {
   const params = await props.params
@@ -14,11 +19,20 @@ const ConcertDetailPage = async (props: { params: Promise<{ eventId: string }> }
     collection: 'events',
     limit: 1,
     where: { slug: eventSlug as WhereField },
-  })
+  }).then(res => res.docs?.[0])
+
+  if (!eventDetail) {
+    return notFound()
+  }
+
+  const performers = await payload.find({ collection: 'performers', where: { status: { equals: 'active' } }, limit: 50 }).then(res => res.docs)
+
+  const faqs = await payload.find({ collection: 'faqs', where: { status: { equals: 'active' } }, limit: 50 }).then(res => res.docs)
 
   return (
     <div>
-      <TicketDetails event={eventDetail.docs[0]} />
+      <TicketDetails event={eventDetail as Event} performers={performers as Performer[]} faqs={faqs as FAQType[]} />
+      <Footer />
     </div>
   )
 }

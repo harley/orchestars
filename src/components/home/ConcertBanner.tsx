@@ -41,9 +41,8 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events }) => {
       {events.map((evt, index) => (
         <div
           key={evt.id}
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
+          className={`absolute inset-0 transition-opacity duration-1000 ${index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
         >
           <div className="absolute inset-0 bg-black/30 z-10" />
           <div
@@ -70,8 +69,8 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events }) => {
                   <div className="flex items-center">
                     <Calendar className="h-5 w-5 mr-2" />
                     <span>
-                      {dateFnsFormat(new Date(evt.startDatetime), 'dd-MM-yyyy HH:mm a')} -{' '}
-                      {dateFnsFormat(new Date(evt.endDatetime), 'dd-MM-yyyy HH:mm a')}
+                      {dateFnsFormat(new Date(evt.startDatetime), 'dd/MM/yyyy HH:mm a')} -{' '}
+                      {dateFnsFormat(new Date(evt.endDatetime), 'dd/MM/yyyy HH:mm a')}
                     </span>
                   </div>
                   <div className="flex items-center">
@@ -140,9 +139,8 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events }) => {
           <button
             key={index}
             onClick={() => handleDotClick(index)}
-            className={`h-2 rounded-full transition-all ${
-              index === currentIndex ? 'w-8 bg-white' : 'w-2 bg-white/50 hover:bg-white/80'
-            }`}
+            className={`h-2 rounded-full transition-all ${index === currentIndex ? 'w-8 bg-white' : 'w-2 bg-white/50 hover:bg-white/80'
+              }`}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}

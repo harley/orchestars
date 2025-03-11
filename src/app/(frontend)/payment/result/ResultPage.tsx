@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Check, X, ArrowLeft, ArrowRight, RefreshCcw, AlertCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+// import Footer from '@/components/layout/Footer';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
@@ -70,7 +70,7 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
                         <p className="text-gray-500">Please wait while we confirm your payment...</p>
                     </div>
                 </main>
-                <Footer />
+                {/* <Footer /> */}
             </div>
         );
     }
@@ -215,7 +215,7 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
                     )}
                 </div>
             </main>
-            <Footer />
+            {/* <Footer /> */}
         </>
 
     );
