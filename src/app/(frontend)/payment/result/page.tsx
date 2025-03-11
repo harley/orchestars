@@ -4,6 +4,7 @@ import PaymentResultPage from './ResultPage';
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { notFound } from 'next/navigation'
+import Footer from '@/components/layout/Footer';
 
 type SearchParams = Promise<{ apptransid: string }>
 
@@ -31,6 +32,7 @@ const PaymentResult = async (props: { searchParams: SearchParams }) => {
     return (
         <div className="min-h-screen flex flex-col">
             <PaymentResultPage paymentInfo={paymentInfo} />
+            <Footer />
         </div>
     );
 };

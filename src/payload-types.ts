@@ -74,6 +74,10 @@ export interface Config {
     orderItems: OrderItem;
     payments: Payment;
     tickets: Ticket;
+    app_information: AppInformation;
+    partners: Partner;
+    performers: Performer;
+    faqs: Faq;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -88,6 +92,10 @@ export interface Config {
     orderItems: OrderItemsSelect<false> | OrderItemsSelect<true>;
     payments: PaymentsSelect<false> | PaymentsSelect<true>;
     tickets: TicketsSelect<false> | TicketsSelect<true>;
+    app_information: AppInformationSelect<false> | AppInformationSelect<true>;
+    partners: PartnersSelect<false> | PartnersSelect<true>;
+    performers: PerformersSelect<false> | PerformersSelect<true>;
+    faqs: FaqsSelect<false> | FaqsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -310,6 +318,68 @@ export interface Ticket {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "app_information".
+ */
+export interface AppInformation {
+  id: number;
+  name: string;
+  logo?: (number | null) | Media;
+  description?: string | null;
+  address?: string | null;
+  email?: string | null;
+  phoneNumber?: string | null;
+  socials?:
+    | {
+        name?: string | null;
+        link?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners".
+ */
+export interface Partner {
+  id: number;
+  name: string;
+  logo?: (number | null) | Media;
+  description?: string | null;
+  status?: ('active' | 'inactive') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "performers".
+ */
+export interface Performer {
+  id: number;
+  name: string;
+  avatar?: (number | null) | Media;
+  genre?: string | null;
+  role?: string | null;
+  description?: string | null;
+  status?: ('active' | 'inactive') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: number;
+  question: string;
+  answer: string;
+  status?: ('active' | 'inactive') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -346,6 +416,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'tickets';
         value: number | Ticket;
+      } | null)
+    | ({
+        relationTo: 'app_information';
+        value: number | AppInformation;
+      } | null)
+    | ({
+        relationTo: 'partners';
+        value: number | Partner;
+      } | null)
+    | ({
+        relationTo: 'performers';
+        value: number | Performer;
+      } | null)
+    | ({
+        relationTo: 'faqs';
+        value: number | Faq;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -537,6 +623,64 @@ export interface TicketsSelect<T extends boolean = true> {
   event?: T;
   orderItem?: T;
   orderStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "app_information_select".
+ */
+export interface AppInformationSelect<T extends boolean = true> {
+  name?: T;
+  logo?: T;
+  description?: T;
+  address?: T;
+  email?: T;
+  phoneNumber?: T;
+  socials?:
+    | T
+    | {
+        name?: T;
+        link?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners_select".
+ */
+export interface PartnersSelect<T extends boolean = true> {
+  name?: T;
+  logo?: T;
+  description?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "performers_select".
+ */
+export interface PerformersSelect<T extends boolean = true> {
+  name?: T;
+  avatar?: T;
+  genre?: T;
+  role?: T;
+  description?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs_select".
+ */
+export interface FaqsSelect<T extends boolean = true> {
+  question?: T;
+  answer?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }

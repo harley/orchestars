@@ -15,7 +15,6 @@ import {
 } from '@/components/ui/dialog'
 import { Check, CreditCard, QrCode, Timer, Info, X, AlertCircle } from 'lucide-react'
 import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
 import { useToast } from '@/hooks/use-toast'
 
 interface PaymentMethod {
@@ -348,7 +347,7 @@ const Payment = () => {
         </DialogContent>
       </Dialog>
 
-      <Footer />
+
     </div>
   )
 }

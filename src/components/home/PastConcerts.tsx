@@ -1,20 +1,12 @@
 import React, { useRef, useEffect } from 'react'
-import { MapPin, Users } from 'lucide-react'
-
-interface PastConcert {
-  id: number
-  name: string
-  date: string
-  location: string
-  attendees: number
-  image: string
-}
-
+import { MapPin } from 'lucide-react'
+import { Event } from '@/types/Event'
+import { format as dateFnsFormat } from 'date-fns'
 interface PastConcertsProps {
-  concerts: PastConcert[]
+  events: Event[]
 }
 
-const PastConcerts: React.FC<PastConcertsProps> = ({ concerts }) => {
+const PastConcerts: React.FC<PastConcertsProps> = ({ events }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const cardsRef = useRef<(HTMLDivElement | null)[]>([])
 
@@ -102,36 +94,37 @@ const PastConcerts: React.FC<PastConcertsProps> = ({ concerts }) => {
           className="flex overflow-x-auto space-x-6 pb-6 hide-scrollbar animate-on-scroll"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {concerts.map((concert, index) => (
+          {events.map((evt, index) => (
             <div
-              key={concert.id}
+              key={evt.id}
               ref={(el) => (cardsRef.current[index] = el) as any}
               className="flex-shrink-0 w-[280px] bg-white rounded-lg overflow-hidden shadow-subtle hover:shadow-md transition-all"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="h-[180px] overflow-hidden">
                 <img
-                  src={concert.image}
-                  alt={concert.name}
+                  src={evt.eventBanner?.url}
+                  alt={evt.eventBanner?.alt || evt.title}
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                 />
               </div>
 
               <div className="p-5">
-                <h3 className="font-semibold text-lg mb-2 line-clamp-1">{concert.name}</h3>
-                <p className="text-muted-foreground text-sm mb-3">{concert.date}</p>
+                <h3 className="font-semibold text-lg mb-2 line-clamp-1">{evt.title}</h3>
+                <p className="text-muted-foreground text-sm mb-3"> {evt.startDatetime && dateFnsFormat(new Date(evt.startDatetime), 'dd/MM/yyyy HH:mm a')} -{' '}
+                  {evt.endDatetime && dateFnsFormat(new Date(evt.endDatetime), 'dd/MM/yyyy HH:mm a')}</p>
 
                 <div className="flex justify-between items-center text-sm">
                   <div className="flex items-center">
                     <MapPin className="h-4 w-4 mr-1 text-primary/70" />
-                    <span className="text-muted-foreground line-clamp-1">{concert.location}</span>
+                    <span className="text-muted-foreground line-clamp-1">{evt.eventLocation}</span>
                   </div>
-                  <div className="flex items-center">
+                  {/* <div className="flex items-center">
                     <Users className="h-4 w-4 mr-1 text-primary/70" />
                     <span className="text-muted-foreground">
-                      {concert.attendees.toLocaleString()}
+                      {evt.attendees.toLocaleString()}
                     </span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

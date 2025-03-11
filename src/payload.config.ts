@@ -10,6 +10,10 @@ import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Partners } from './collections/Partners'
+import { AppInformation } from './collections/AppInformation'
+import { Performers } from './collections/Performers'
+import { FAQs } from './collections/FAQ'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -371,6 +375,10 @@ export default buildConfig({
         },
       ],
     },
+    AppInformation,
+    Partners,
+    Performers,
+    FAQs,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

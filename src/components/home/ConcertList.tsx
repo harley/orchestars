@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { Calendar, MapPin, Users } from 'lucide-react'
+import { Calendar, MapPin } from 'lucide-react'
 import CustomButton from '../ui/custom-button'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
@@ -85,18 +85,18 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }
                   <div className="flex items-center">
                     <Calendar className="h-4 w-4 mr-2" />
                     <span className="text-sm">
-                      {dateFnsFormat(new Date(evt.startDatetime), 'dd-MM-yyyy HH:mm a')} -{' '}
-                      {dateFnsFormat(new Date(evt.endDatetime), 'dd-MM-yyyy HH:mm a')}
+                      {dateFnsFormat(new Date(evt.startDatetime), 'dd/MM/yyyy HH:mm a')} -{' '}
+                      {dateFnsFormat(new Date(evt.endDatetime), 'dd/MM/yyyy HH:mm a')}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <MapPin className="h-4 w-4 mr-2" />
-                    <span className="text-sm">{evt.location}</span>
+                    <span className="text-sm">{evt.eventLocation}</span>
                   </div>
-                  <div className="flex items-center">
+                  {/* <div className="flex items-center">
                     <Users className="h-4 w-4 mr-2" />
                     <span className="text-sm">{'-/300'} attendees</span>
-                  </div>
+                  </div> */}
                 </div>
 
                 <p className="text-muted-foreground mb-6">{evt.description}</p>
