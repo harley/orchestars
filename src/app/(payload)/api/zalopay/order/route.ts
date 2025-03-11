@@ -33,6 +33,20 @@ const generateCode = (prefix: string): string => {
   return `${prefix}-${timestamp}-${randomPart}`
 }
 
+function generatePassword(length: number = 12): string {
+  const chars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?'
+  let password = ''
+  const randomValues = new Uint32Array(length)
+  crypto.getRandomValues(randomValues)
+
+  for (let i = 0; i < length; i++) {
+    password += chars[randomValues[i] % chars.length]
+  }
+
+  return password
+}
+
 export async function POST(request: NextRequest) {
   // parse JSON body if needed:
   // const body = await request.json() // if you expect a JSON body from the client
@@ -151,7 +165,8 @@ export async function POST(request: NextRequest) {
         // create new user
         customerData = await payload.create({
           collection: 'users',
-          data: { ...customer, role: 'customer' },
+          // quick fix for generate default password, need to update later
+          data: { ...customer, password: generatePassword(), role: 'customer' },
           req: { transactionID },
         })
       }

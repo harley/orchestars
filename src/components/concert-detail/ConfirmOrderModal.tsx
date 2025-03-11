@@ -40,11 +40,11 @@ const ConfirmOrderModal = ({ isOpen, onCloseModal, selectedSeats }: { isOpen: bo
         if (!obj[ticketId]) {
           obj[ticketId] = {
             id: ticketId,
-            ticketName: item.ticketPrice.name,
+            ticketName: item.ticketPrice?.name,
             seats: [],
             total: 0,
             quantity: 0,
-            currency: item.ticketPrice.currency,
+            currency: item.ticketPrice?.currency,
           }
         }
         obj[ticketId].seats.push(item.label)
