@@ -4,14 +4,12 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 
-type Props = {
-    params: {}
-    searchParams: {
-        apptransid: string
-    }
-}
-
-export default async function PaymentResult({ searchParams }: Props) {
+export default async function PaymentResult({
+    searchParams,
+}: {
+    searchParams: { [key: string]: string | string[] | undefined }
+}) {
+    const apptransid = searchParams.apptransid as string
     console.log('params', searchParams)
 
     const payloadConfig = await config
@@ -20,7 +18,7 @@ export default async function PaymentResult({ searchParams }: Props) {
     const paymentInfo = await payload.find({
         collection: 'payments',
         limit: 1,
-        where: { appTransId: { equals: searchParams.apptransid } },
+        where: { appTransId: { equals: apptransid } },
     }).then(res => res.docs?.[0])
 
     console.log('paymentInfo', paymentInfo)
