@@ -1,8 +1,6 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import Header from '@/components/layout/Header'
-// import Footer from '@/components/layout/Footer'
 import ConcertBanner from '@/components/home/ConcertBanner'
 import ConcertList from '@/components/home/ConcertList'
 import PastConcerts from '@/components/home/PastConcerts'
@@ -32,13 +30,8 @@ const Index = ({
     return cleanup
   }, [])
 
-
-  console.log('partners', partners);
-
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
-
       <main className="flex-grow">
         <ConcertBanner events={bannerDocs} />
         <ConcertList

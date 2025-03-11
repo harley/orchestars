@@ -10,7 +10,6 @@ const SeatMapToolkit = ({ onSelectSeat }: { onSelectSeat: (seat: any) => void })
   const [seats, setSeats] = useState(seatsJson)
 
   const handleSeatClick = (seat: any) => {
-    console.log('seat', seat)
     if (seat.status !== SeatStatus.Unavailable && seat.status !== SeatStatus.Locked) {
       onSelectSeat(seat)
       setSeats((prevSeats) => {
@@ -37,9 +36,6 @@ const SeatMapToolkit = ({ onSelectSeat }: { onSelectSeat: (seat: any) => void })
         mode={'user'}
         events={{
           onSeatClick: handleSeatClick,
-          onFreeSeatClick: (seat) => {
-            console.log(seat)
-          },
         }}
         data={{
           name: 'Categorized Example',

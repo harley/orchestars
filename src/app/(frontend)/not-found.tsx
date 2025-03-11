@@ -1,8 +1,8 @@
+'use client'
+
 import React from 'react'
 import { useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
 import CustomButton from '@/components/ui/custom-button'
 import Link from 'next/link'
 
@@ -15,8 +15,6 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
-
       <main className="flex-grow flex items-center justify-center">
         <div className="container mx-auto px-6 py-20 text-center">
           <h1 className="text-6xl md:text-8xl font-display font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
@@ -30,8 +28,6 @@ const NotFound = () => {
           </CustomButton>
         </div>
       </main>
-
-      <Footer />
     </div>
   )
 }

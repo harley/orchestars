@@ -4,8 +4,6 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Check, X, ArrowLeft, ArrowRight, RefreshCcw, AlertCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import Header from '@/components/layout/Header';
-// import Footer from '@/components/layout/Footer';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
@@ -62,7 +60,6 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
     if (isLoading) {
         return (
             <div className="min-h-screen flex flex-col">
-                <Header />
                 <main className="flex-grow flex flex-col items-center justify-center p-4">
                     <div className="text-center">
                         <RefreshCcw className="h-12 w-12 animate-spin mx-auto text-primary mb-4" />
@@ -70,14 +67,12 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
                         <p className="text-gray-500">Please wait while we confirm your payment...</p>
                     </div>
                 </main>
-                {/* <Footer /> */}
             </div>
         );
     }
 
     return (
         <>
-            <Header />
             <main className="flex-grow py-10 bg-gray-50">
                 <div className="container max-w-3xl mx-auto px-4">
                     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -215,7 +210,6 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
                     )}
                 </div>
             </main>
-            {/* <Footer /> */}
         </>
 
     );

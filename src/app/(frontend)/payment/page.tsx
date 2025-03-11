@@ -1,13 +1,12 @@
-import Footer from '@/components/layout/Footer'
+import ServerLayout from '@/components/layout/ServerLayout'
 import Payment from '@/components/payment'
 import React from 'react'
 
 const PaymentPage = () => {
   return (
-    <div>
+    <ServerLayout>
       <Payment />
-      <Footer />
-    </div>
+    </ServerLayout>
   )
 }
 

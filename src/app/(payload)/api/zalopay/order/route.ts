@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import axios from 'axios'
 import CryptoJS from 'crypto-js'
-import payload, { WhereField } from 'payload'
+import payload from 'payload'
 import { format, getTime } from 'date-fns'
 import { ZALO_PAYMENT } from '@/config/payment'
 import config from '@/payload.config'
@@ -37,7 +37,6 @@ export async function POST(request: NextRequest) {
   // parse JSON body if needed:
   // const body = await request.json() // if you expect a JSON body from the client
   const body = await request.json()
-  console.log('body', body)
 
   const customer = body.customer as CustomerInfo
 
@@ -143,7 +142,7 @@ export async function POST(request: NextRequest) {
       let customerData = (
         await payload.find({
           collection: 'users',
-          where: { email: {equals: customer.email}},
+          where: { email: { equals: customer.email } },
           limit: 1,
         })
       ).docs?.[0]

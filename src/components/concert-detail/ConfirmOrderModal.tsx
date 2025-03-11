@@ -91,8 +91,6 @@ const ConfirmOrderModal = ({ isOpen, onCloseModal, selectedSeats }: { isOpen: bo
 
   const handleConfirm = async (data: FormValues) => {
     try {
-      console.log(data);
-
       const bodyData = {
         customer: data,
         order: {
@@ -107,11 +105,7 @@ const ConfirmOrderModal = ({ isOpen, onCloseModal, selectedSeats }: { isOpen: bo
         }
       }
 
-      console.log('bodyData', bodyData);
-      debugger;
-
       const result = await axios.post(`/api/${selectedPaymentMethod}/order`, bodyData).then(res => res.data)
-      console.log('result', result);
 
       window.location.href = result.order_url;
     } catch (error: any) {

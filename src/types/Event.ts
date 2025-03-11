@@ -44,5 +44,5 @@ export type Event = {
     url: string
     [k: string]: any
   }
-  ticketQuantityLimitation: string
+  ticketQuantityLimitation?: 'perTicketType' | 'perEvent'
 }

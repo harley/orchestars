@@ -1,27 +1,13 @@
-'use server'
+'use client'
 
 import React from 'react'
 import Link from 'next/link'
 import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail } from 'lucide-react'
-import { getPayload } from 'payload'
+import { AppInformation } from '@/types/AppInformation'
 
-import config from '@/payload.config'
 
-const getAppInformation = async () => {
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
-  const appInfo = await payload.find({
-    collection: 'app_information',
-    limit: 1,
-  }).then(res => res.docs?.[0])
 
-  return appInfo;
-}
-
-const Footer = async () => {
-
-  const appInformation = await getAppInformation()
-
+const Footer = ({ appInformation }: { appInformation: AppInformation }) => {
   return (
     <footer className="bg-secondary/40 py-16 mt-20">
       <div className="container mx-auto px-6 md:px-10">
