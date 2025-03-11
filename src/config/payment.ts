@@ -3,8 +3,8 @@ export const ZALO_PAYMENT = {
   KEY1: process.env.ZALO_KEY1 || 'sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn',
   KEY2: process.env.ZALO_KEY2 || 'trMrHtvjo6myautxDUiAcYsVtaeQ8nhf',
   ENDPOINT: process.env.ZALO_API_URL || 'https://sb-openapi.zalopay.vn',
-  REDIRECT_URL: process.env.ZALO_REDIRECT_URL || 'http://localhost:3000/payment/result',
+  REDIRECT_URL: `${process.env.APP_BASE_URL}/payment/result`|| 'http://localhost:3000/payment/result',
   CALLBACK_URL:
-    process.env.ZALO_CALLBACK_URL ||
+  `${process.env.APP_BASE_URL}/api/zalopay/callback`||
     'https://65ae-14-191-175-74.ngrok-free.app/api/zalopay/callback',
 }
