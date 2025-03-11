@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
 
   const embed_data = {
     preferred_payment_method: 'Zalopay_wallet',
-    redirecturl: 'http://localhost:3000/payment/result',
+    redirecturl: `${process.env.APP_BASE_URL}/payment/result`,
     columninfo: JSON.stringify({ orderCode }),
     promotioninfo: JSON.stringify({}),
   }
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     amount,
     description: `Payment for order #${orderCode}`,
     mac: '',
-    callback_url: 'https://65ae-14-191-175-74.ngrok-free.app/api/zalopay/callback',
+    callback_url: `${process.env.APP_BASE_URL}/api/zalopay/callback`,
   }
 
   const data = [
