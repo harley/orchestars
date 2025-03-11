@@ -19,6 +19,7 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
     useEffect(() => {
         const status = paymentInfo.status;
 
+        console.log(isSuccess);
         const timer = setTimeout(() => {
             setIsSuccess(status === 'paid');
 
@@ -52,12 +53,12 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
     };
 
     useEffect(() => {
-        if (!isLoading) {
-            setTimeout(() => {
-                handleRetry();
-            }, 3000);
+        if (!isLoading && isSuccess === false) {
+          setTimeout(() => {
+            handleRetry();
+          }, 3000);
         }
-    }, [isLoading])
+      }, [isLoading, isSuccess]);
 
     // If still loading, show a spinner
     if (isLoading) {
