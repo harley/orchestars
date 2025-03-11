@@ -5,7 +5,7 @@ import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 
 interface PageProps {
-    params: Record<string, never>;
+    params: Promise<any>;
     searchParams: { [key: string]: string | undefined };
 }
 
