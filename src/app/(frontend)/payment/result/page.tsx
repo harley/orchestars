@@ -5,8 +5,10 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 
+type SearchParams = Promise<{ apptransid: string }>
 
-const PaymentResult = async (props: { searchParams: { apptransid: string } }) => {
+
+const PaymentResult = async (props: { searchParams: SearchParams }) => {
 
     const params = await props.searchParams;
     console.log('params', params)

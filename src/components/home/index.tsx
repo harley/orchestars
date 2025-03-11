@@ -11,45 +11,6 @@ import Sponsors from '@/components/home/Sponsors'
 import { initScrollAnimation } from '@/utils/scrollAnimation'
 import { PaginatedDocs } from 'payload'
 
-const upcomingConcerts = [
-  {
-    id: 1,
-    name: 'Acoustic Nights: Unplugged Sessions',
-    date: 'October 5, 2023',
-    time: '8:00 PM',
-    location: 'The Grand Theater, Boston',
-    attendees: 5000,
-    description:
-      'Experience the raw talent of acoustic artists in an intimate setting. This special unplugged session brings together the finest voices and instrumentalists for an unforgettable night.',
-    image:
-      'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: 2,
-    name: 'Classical Symphony Orchestra',
-    date: 'October 12, 2023',
-    time: '7:00 PM',
-    location: 'Symphony Hall, San Francisco',
-    attendees: 3500,
-    description:
-      'The renowned Classical Symphony Orchestra presents an evening of timeless masterpieces from Beethoven, Mozart, and Bach. Conducted by Maestro James Richardson.',
-    image:
-      'https://images.unsplash.com/photo-1507838153414-b4b713384a76?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: 3,
-    name: 'Jazz & Blues Festival',
-    date: 'November 2, 2023',
-    time: '6:30 PM',
-    location: 'Blue Note Club, New Orleans',
-    attendees: 2000,
-    description:
-      "A celebration of America's most iconic musical genres. Featuring top jazz and blues artists from around the country performing their signature pieces and improvised sets.",
-    image:
-      'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?auto=format&fit=crop&w=800&q=80',
-  },
-]
-
 const pastConcerts = [
   {
     id: 1,

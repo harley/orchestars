@@ -207,6 +207,9 @@ importers:
       '@types/node':
         specifier: ^22.5.4
         version: 22.13.9
+      '@types/qs':
+        specifier: ^6.9.18
+        version: 6.9.18
       '@types/react':
         specifier: 19.0.10
         version: 19.0.10
@@ -2400,6 +2403,9 @@ packages:
 
   '@types/pg@8.10.2':
     resolution: {integrity: sha512-MKFs9P6nJ+LAeHLU3V0cODEOgyThJ3OAnmOlsZsxux6sfQs3HRXR5bBn7xG5DjckEFhTAxsXi7k7cd0pCMxpJw==}
+
+  '@types/qs@6.9.18':
+    resolution: {integrity: sha512-kK7dgTYDyGqS+e2Q4aK9X3D7q234CIZ1Bv0q/7Z5IwRDoADNU81xXJK/YVyLbLTZCoIwUoDoffFeF+p/eIklAA==}
 
   '@types/react-dom@19.0.4':
     resolution: {integrity: sha512-4fSQ8vWFkg+TGhePfUzVmat3eC14TXYSsiiDSLI0dVLsrm9gZFABjPy/Qu6TKgl1tq1Bu1yDsuQgY3A3DOjCcg==}
@@ -7784,6 +7790,8 @@ snapshots:
       '@types/node': 22.13.9
       pg-protocol: 1.7.1
       pg-types: 4.0.2
+
+  '@types/qs@6.9.18': {}
 
   '@types/react-dom@19.0.4(@types/react@19.0.10)':
     dependencies:

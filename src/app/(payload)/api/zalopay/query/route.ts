@@ -20,16 +20,14 @@ export async function POST(request: NextRequest) {
     const { app_trans_id } = body
 
     if (!app_trans_id) {
-      return NextResponse.json(
-        { message: 'Missing app_trans_id' },
-        { status: 400 }
-      )
+      return NextResponse.json({ message: 'Missing app_trans_id' }, { status: 400 })
     }
 
     // Build the postData
     const postData = {
       app_id: config.app_id,
       app_trans_id, // from the request body
+      mac: '',
     }
 
     // Construct the HMAC input: app_id|app_trans_id|key1
@@ -52,7 +50,7 @@ export async function POST(request: NextRequest) {
     console.error('ZaloPay query error:', error)
     return NextResponse.json(
       { message: 'Internal Server Error', error: error.message },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
