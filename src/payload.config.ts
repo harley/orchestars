@@ -109,7 +109,7 @@ export default buildConfig({
     tasks: [],
   },
   email: resendAdapter({
-    defaultFromAddress: 'info@orchestars.com',
+    defaultFromAddress: 'info@orchestars.vn',
     defaultFromName: 'Orchestars',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
