@@ -11,6 +11,8 @@ import { PaginatedDocs } from 'payload'
 import { Partner } from '@/types/Partner'
 import { Performer } from '@/types/Performer'
 import { Event } from '@/types/Event'
+import ActivitiesSection from './components/Activities'
+import { Activity } from '@/payload-types'
 
 const HomeClient = ({
   bannerDocs,
@@ -18,12 +20,14 @@ const HomeClient = ({
   partners,
   performers,
   pastEvents,
+  activity,
 }: {
   bannerDocs: PaginatedDocs['docs']
   onGoingPaginatedDocs: PaginatedDocs
   partners: Partner[]
   performers: Performer[]
   pastEvents: Event[]
+  activity?: Activity
 }) => {
   useEffect(() => {
     const cleanup = initScrollAnimation()
@@ -41,6 +45,7 @@ const HomeClient = ({
         {performers.length > 0 && <PerformersSection performers={performers} />}
         {pastEvents.length > 0 && <PastConcerts events={pastEvents} />}
         {partners.length > 0 && <Sponsors partners={partners} />}
+        {activity && <ActivitiesSection activity={activity} />}
       </main>
     </div>
   )

@@ -105,7 +105,7 @@ const PerformersSection = ({ performers }: { performers: Performer[] }) => {
       />
 
       <div className="container mx-auto px-6 md:px-10">
-        <h2 className="text-4xl md:text-5xl font-display font-bold mb-6 text-center bg-clip-text text-black">
+        <h2 className="text-3xl md:text-4xl font-display font-bold mb-6 text-center bg-clip-text text-black">
           Nghệ Sĩ Nổi Bật
         </h2>
         <p className="text-muted-foreground text-center mb-16 max-w-2xl mx-auto text-lg">
