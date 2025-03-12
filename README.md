@@ -1,12 +1,6 @@
-# Payload Website Template
+# Orchestars
 
-This is the official [Payload Website Template](https://github.com/payloadcms/payload/blob/main/templates/website). Use it to power websites, blogs, or portfolios from small to enterprise. This repo includes a fully-working backend, enterprise-grade admin panel, and a beautifully designed, production-ready website.
-
-This template is right for you if you are working on:
-
-- A personal or enterprise-grade website, blog, or portfolio
-- A content publishing platform with a fully featured publication workflow
-- Exploring the capabilities of Payload
+We used Payload CMS to build this website. See https://github.com/payloadcms/payload/blob/main/templates/website. 
 
 Core features:
 
@@ -27,40 +21,15 @@ Core features:
 
 To spin up this example locally, follow these steps:
 
-### Clone
-
-If you have not done so already, you need to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
-
-#### Method 1 (recommended)
-
-Go to Payload Cloud and [clone this template](https://payloadcms.com/new/clone/website). This will create a new repository on your GitHub account with this template's code which you can then clone to your own machine.
-
-#### Method 2
-
-Use the `create-payload-app` CLI to clone this template directly to your machine:
-
 ```bash
-pnpx create-payload-app my-project -t website
+git clone https://github.com/harley/orchestars.git
+cd orchestars
+cp .env.example .env # update with the right values
+pnpm install
+pnpm dev
 ```
 
-#### Method 3
-
-Use the `git` CLI to clone this template directly to your machine:
-
-```bash
-git clone -n --depth=1 --filter=tree:0 https://github.com/payloadcms/payload my-project && cd my-project && git sparse-checkout set --no-cone templates/website && git checkout && rm -rf .git && git init && git add . && git mv -f templates/website/{.,}* . && git add . && git commit -m "Initial commit"
-```
-
-### Development
-
-1. First [clone the repo](#clone) if you have not done so already
-1. `cd my-project && cp .env.example .env` to copy the example environment variables
-1. `pnpm install && pnpm dev` to install dependencies and start the dev server
-1. open `http://localhost:3000` to open the app in your browser
-
-That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
-
-## How it works
+## How PayloadCMS works
 
 The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:
 
@@ -256,10 +225,6 @@ To run Payload in production, you need to build and start the Admin panel. To do
 1. Finally run `pnpm start` or `npm run start` to run Node in production and serve Payload from the `.build` directory.
 1. When you're ready to go live, see Deployment below for more details.
 
-### Deploying to Payload Cloud
-
-The easiest way to deploy your project is to use [Payload Cloud](https://payloadcms.com/new/import), a one-click hosting solution to deploy production-ready instances of your Payload apps directly from your GitHub repo.
-
 ### Deploying to Vercel
 
 This template can also be deployed to Vercel for free. You can get started by choosing the Vercel DB adapter during the setup of the template or by manually installing and configuring it:
@@ -305,17 +270,3 @@ export default buildConfig({
   // ...
 ```
 
-There is also a simplified [one click deploy](https://github.com/payloadcms/payload/tree/templates/with-vercel-postgres) to Vercel should you need it.
-
-### Self-hosting
-
-Before deploying your app, you need to:
-
-1. Ensure your app builds and serves in production. See [Production](#production) for more details.
-2. You can then deploy Payload as you would any other Node.js or Next.js application either directly on a VPS, DigitalOcean's Apps Platform, via Coolify or more. More guides coming soon.
-
-You can also deploy your app manually, check out the [deployment documentation](https://payloadcms.com/docs/production/deployment) for full details.
-
-## Questions
-
-If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).

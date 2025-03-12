@@ -19,7 +19,7 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
                 format: 0,
                 mode: 'normal',
                 style: '',
-                text: 'Payload Website Template',
+                text: 'Orchestars',
                 version: 1,
               },
             ],
@@ -81,7 +81,7 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
   },
   meta: {
     description: 'An open-source website built with Payload and Next.js.',
-    title: 'Payload Website Template',
+    title: 'Orchestars',
   },
   title: 'Home',
   layout: [],

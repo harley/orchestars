@@ -16,7 +16,7 @@ import { getServerSideURL } from '@/utilities/getURL'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
+  return doc?.title ? `${doc.title} | Orchestars` : 'Orchestars'
 }
 
 const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
