@@ -28,7 +28,12 @@ const ConcertDetailPage = async (props: { params: Promise<{ eventId: string }> }
   }
 
   const performers = await payload
-    .find({ collection: 'performers', where: { status: { equals: 'active' } }, limit: 50 })
+    .find({
+      collection: 'performers',
+      where: { status: { equals: 'active' } },
+      sort: 'displayOrder',
+      limit: 50,
+    })
     .then((res) => res.docs)
 
   const faqs = await payload

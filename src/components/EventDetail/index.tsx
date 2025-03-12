@@ -29,7 +29,6 @@ const TicketDetails = ({
   performers: Performer[]
   faqs: FAQType[]
 }) => {
-  console.log('event', event)
   const { toast } = useToast()
   const [selectedSeats, setSelectedSeats] = useState<SelectedSeat[]>([])
 

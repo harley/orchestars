@@ -12,6 +12,12 @@ export const Performers: CollectionConfig = {
       required: true,
     },
     {
+      name: 'displayOrder',
+      type: 'number',
+      required: false,
+      defaultValue: 0,
+    },
+    {
       name: 'avatar',
       type: 'upload',
       relationTo: 'media',

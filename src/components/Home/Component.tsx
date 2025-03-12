@@ -31,7 +31,12 @@ export async function Home() {
 
   // get performers
   const performers = await payload
-    .find({ collection: 'performers', where: { status: { equals: 'active' } }, limit: 50 })
+    .find({
+      collection: 'performers',
+      where: { status: { equals: 'active' } },
+      sort: 'displayOrder',
+      limit: 50,
+    })
     .then((res) => res.docs)
   // get past concerts
   const pastEvents = await payload

@@ -69,16 +69,21 @@ const Sponsors: React.FC<SponsorsProps> = ({ partners = [] }) => {
                   {partners
                     .slice(pageIndex * sponsorsPerPage, (pageIndex + 1) * sponsorsPerPage)
                     .map((partner) => (
-                      <div
+                      <a
                         key={partner.id}
-                        className="bg-white p-4 h-44 w-44 flex items-center justify-center rounded-lg shadow-sm transform transition-all duration-300 hover:shadow-md"
+                        href={partner.link}
+                        rel={'noreferrer'}
+                        target="_blank"
+                        className="cursor-pointer"
                       >
-                        <img
-                          src={partner.logo?.url}
-                          alt={partner.logo?.alt || partner.name}
-                          className="max-h-24 max-w-32 object-contain transition-transform duration-300 hover:scale-110"
-                        />
-                      </div>
+                        <div className="bg-white p-4 h-44 w-44 flex items-center justify-center rounded-lg shadow-sm transform transition-all duration-300 hover:shadow-md">
+                          <img
+                            src={partner.logo?.url}
+                            alt={partner.logo?.alt || partner.name}
+                            className="max-h-24 max-w-32 object-contain transition-transform duration-300 hover:scale-110"
+                          />
+                        </div>
+                      </a>
                     ))}
                 </div>
               </div>
