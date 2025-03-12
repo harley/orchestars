@@ -40,7 +40,7 @@ const HomeClient = ({
         <ConcertBanner events={bannerDocs} />
         <ConcertList
           onGoingPaginatedDocs={onGoingPaginatedDocs}
-          title="Ongoing & Upcoming Concerts"
+          title="Sự Kiện Đang Diễn Ra & Sắp Tới"
         />
         {performers.length > 0 && <PerformersSection performers={performers} />}
         {pastEvents.length > 0 && <PastConcerts events={pastEvents} />}

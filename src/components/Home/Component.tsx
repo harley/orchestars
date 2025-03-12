@@ -9,6 +9,8 @@ import { Performer } from '@/types/Performer'
 import { Partner } from '@/types/Partner'
 
 export const fetchCache = 'force-no-store'
+export const dynamic = 'force-dynamic' // Add this to disable static rendering
+export const revalidate = 0 // Add this to disable cache
 
 export async function Home() {
   // const headers = await getHeaders()

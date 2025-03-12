@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { revalidateFooter } from './hooks/revalidateFooter'
+import { link } from '@/fields/link'
 
 export const Footer: GlobalConfig = {
   slug: 'footer',
@@ -82,6 +83,22 @@ export const Footer: GlobalConfig = {
       type: 'text',
       required: false,
       defaultValue: 'Connect with us',
+    },
+    {
+      name: 'navItems',
+      type: 'array',
+      fields: [
+        link({
+          appearances: false,
+        }),
+      ],
+      maxRows: 6,
+      admin: {
+        initCollapsed: true,
+        components: {
+          RowLabel: '@/Footer/RowLabel#RowLabel',
+        },
+      },
     },
   ],
   hooks: {
