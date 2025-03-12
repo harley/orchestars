@@ -878,6 +878,7 @@ export interface Partner {
   name: string;
   logo?: (number | null) | Media;
   description?: string | null;
+  link?: string | null;
   status?: ('active' | 'inactive') | null;
   updatedAt: string;
   createdAt: string;
@@ -889,6 +890,7 @@ export interface Partner {
 export interface Performer {
   id: number;
   name: string;
+  displayOrder?: number | null;
   avatar?: (number | null) | Media;
   genre?: string | null;
   role?: string | null;
@@ -1628,6 +1630,7 @@ export interface PartnersSelect<T extends boolean = true> {
   name?: T;
   logo?: T;
   description?: T;
+  link?: T;
   status?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1638,6 +1641,7 @@ export interface PartnersSelect<T extends boolean = true> {
  */
 export interface PerformersSelect<T extends boolean = true> {
   name?: T;
+  displayOrder?: T;
   avatar?: T;
   genre?: T;
   role?: T;

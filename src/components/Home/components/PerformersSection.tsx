@@ -120,7 +120,7 @@ const PerformersSection = ({ performers }: { performers: Performer[] }) => {
 
           <div
             // ref={scrollContainerRef}
-            className="flex overflow-x-auto pb-8 gap-8 hide-scrollbar scroll-smooth"
+            className="flex overflow-x-auto pb-8 gap-8 hide-scrollbar scroll-smooth justify-center"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
