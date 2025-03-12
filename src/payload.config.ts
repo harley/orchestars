@@ -14,6 +14,7 @@ import { Partners } from './collections/Partners'
 import { AppInformation } from './collections/AppInformation'
 import { Performers } from './collections/Performers'
 import { FAQs } from './collections/FAQ'
+// import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -389,6 +390,10 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
+    // avoid auto sync in production: https://orm.drizzle.team/docs/drizzle-kit-push
+    // push: process.env.NODE_ENV !== 'production',
+    // https://payloadcms.com/docs/database/migrations#running-migrations-in-production
+    // prodMigrations: migrations,
   }),
   sharp,
   plugins: [
