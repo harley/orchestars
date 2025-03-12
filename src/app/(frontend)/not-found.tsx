@@ -1,17 +1,17 @@
 'use client'
 
 import React from 'react'
-import { useLocation } from 'react-router-dom'
+import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import CustomButton from '@/components/ui/custom-button'
 import Link from 'next/link'
 
 const NotFound = () => {
-  const location = useLocation()
+  const pathname = usePathname()
 
   useEffect(() => {
-    console.error('404 Error: User attempted to access non-existent route:', location.pathname)
-  }, [location.pathname])
+    console.error('404 Error: User attempted to access non-existent route:', pathname)
+  }, [pathname])
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -21,7 +21,7 @@ const NotFound = () => {
             404
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-10">
-            Oops! This page has left the concert.
+            Oops! Page not found.
           </p>
           <CustomButton variant="primary" size="lg" asChild>
             <Link href="/">Return to Home</Link>
