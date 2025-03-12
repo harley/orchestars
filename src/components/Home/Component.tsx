@@ -8,6 +8,8 @@ import { Event } from '@/types/Event'
 import { Performer } from '@/types/Performer'
 import { Partner } from '@/types/Partner'
 
+export const fetchCache = 'force-no-store'
+
 export async function Home() {
   // const headers = await getHeaders()
   const payloadConfig = await config

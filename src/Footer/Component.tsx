@@ -4,6 +4,7 @@ import React from 'react'
 
 import type { Footer } from '@/payload-types'
 import { Facebook, Instagram, Mail, MapPin, Phone, Twitter, Youtube } from 'lucide-react'
+import TikTok from '@/components/Icons/TikTok'
 
 export async function Footer() {
   const footerData: Footer = await getCachedGlobal('footer', 1)()
@@ -75,6 +76,9 @@ export async function Footer() {
                   )}
                   {String(link.name).toLowerCase() === 'youtube' && (
                     <Youtube className="h-5 w-5 text-primary/80" />
+                  )}
+                  {String(link.name).toLowerCase() === 'tiktok' && (
+                    <TikTok className="h-5 w-5 text-primary/80" />
                   )}
                 </a>
               ))}
