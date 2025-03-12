@@ -46,17 +46,17 @@ const CustomButton = ({
       {...(asChild
         ? {}
         : {
-            className: cn(
-              baseStyles,
-              variants[variant],
-              sizes[size],
-              fullWidth ? 'w-full' : '',
-              isLoading ? 'opacity-70 cursor-not-allowed' : '',
-              className,
-            ),
-            disabled: isLoading || props.disabled,
-            ...props,
-          })}
+          className: cn(
+            baseStyles,
+            variants[variant],
+            sizes[size],
+            fullWidth ? 'w-full' : '',
+            isLoading ? 'opacity-70 cursor-not-allowed' : '',
+            className,
+          ),
+          disabled: isLoading || props.disabled,
+          ...props,
+        })}
     >
       {isLoading && (
         <svg

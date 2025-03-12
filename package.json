@@ -1,7 +1,7 @@
 {
-  "name": "orchestars-cp",
+  "name": "orchestars-vn",
   "version": "1.0.0",
-  "description": "Website template for Payload",
+  "description": "A blank template to get started with Payload 3.0",
   "license": "MIT",
   "type": "module",
   "scripts": {

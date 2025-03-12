@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="36px" height="17px" viewBox="0 0 36 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>bank-nama</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="36" height="36"></rect>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="bank-nama" transform="translate(0.000000, -10.000000)">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <g id="Mask"></g>
+            <g id="nama" mask="url(#mask-2)">
+                <g transform="translate(0.000000, 10.000000)" id="Page-1">
+                    <g>
+                        <polygon id="Fill-1" fill="#006AB6" points="9.53684082 -0.00022173913 -0.000220408163 16.4276913 7.37537143 16.4276913 13.2360245 6.19664783"></polygon>
+                        <polygon id="Fill-2" fill="#006AB6" points="17.4715347 -0.00022173913 7.93447347 16.4276913 15.3093306 16.4276913 21.1714531 6.19664783"></polygon>
+                        <polygon id="Fill-3" fill="#006AB6" points="25.6594776 -0.00022173913 16.123151 16.4276913 35.2729469 16.4276913"></polygon>
+                        <g id="Group-8" transform="translate(21.306122, 6.819291)">
+                            <path d="M4.2715102,0.343917391 C6.36391837,0.343917391 8.06032653,2.05352609 8.06032653,4.16300435 C8.06032653,6.27174348 6.36391837,7.98135217 4.2715102,7.98135217 C2.17836735,7.98135217 0.481959184,6.27174348 0.481959184,4.16300435 C0.481959184,2.05352609 2.17836735,0.343917391 4.2715102,0.343917391" id="Fill-4" fill="#FFF100"></path>
+                            <polygon id="Fill-6" fill="#FEFEFE" points="4.33322449 2.40394783 5.1597551 3.2362087 5.98702041 4.0692087 5.1597551 4.90294783 4.33322449 5.7352087 3.50669388 4.90294783 2.68089796 4.0692087 3.50669388 3.2362087"></polygon>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
