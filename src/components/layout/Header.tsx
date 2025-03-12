@@ -85,7 +85,7 @@ const Header = ({ appInformation }: { appInformation: AppInformation }) => {
                     <Link href="/" className="nav-link font-medium text-white/90 hover:text-white">
                         Trang chủ
                     </Link>
-                    <Link href="/about" className="nav-link font-medium text-white/90 hover:text-white">
+                    <Link href="/about-us" className="nav-link font-medium text-white/90 hover:text-white">
                         Về chúng tôi
                     </Link>
                 </nav>
