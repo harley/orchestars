@@ -30,21 +30,5 @@ export const Tickets: CollectionConfig = {
       type: 'relationship',
       relationTo: 'orderItems',
     },
-    {
-      name: 'orderStatus',
-      type: 'text',
-      hooks: {
-        beforeChange: [
-          async ({ data, req }) => {
-            if (!data?.order) return null
-            const order = await req.payload.findByID({
-              collection: 'orders',
-              id: data.order,
-            })
-            return order.status
-          },
-        ],
-      },
-    },
   ],
 }
