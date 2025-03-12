@@ -389,6 +389,8 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
+    // avoid auto sync in production: https://orm.drizzle.team/docs/drizzle-kit-push
+    push: process.env.NODE_ENV !== 'production',
   }),
   sharp,
   plugins: [
