@@ -38,6 +38,10 @@ export async function Home() {
 
   const partners = await payload.find({ collection: 'partners', limit: 50 }).then((res) => res.docs)
 
+  const activity = await payload
+    .find({ collection: 'activities', where: { status: { equals: 'active' } }, limit: 1 })
+    .then((res) => res.docs?.[0])
+
   return (
     <HomeClient
       bannerDocs={bannerDocs.docs}
@@ -45,6 +49,7 @@ export async function Home() {
       partners={partners as Partner[]}
       performers={performers as Performer[]}
       pastEvents={pastEvents as Event[]}
+      activity={activity}
     />
   )
 }

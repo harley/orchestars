@@ -78,6 +78,7 @@ export interface Config {
     tickets: Ticket;
     partners: Partner;
     performers: Performer;
+    activities: Activity;
     faqs: Faq;
     redirects: Redirect;
     forms: Form;
@@ -102,6 +103,7 @@ export interface Config {
     tickets: TicketsSelect<false> | TicketsSelect<true>;
     partners: PartnersSelect<false> | PartnersSelect<true>;
     performers: PerformersSelect<false> | PerformersSelect<true>;
+    activities: ActivitiesSelect<false> | ActivitiesSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -897,6 +899,27 @@ export interface Performer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "activities".
+ */
+export interface Activity {
+  id: number;
+  mainTitle: string;
+  description?: string | null;
+  status?: ('active' | 'inactive') | null;
+  list?:
+    | {
+        title?: string | null;
+        description?: string | null;
+        image?: (number | null) | Media;
+        isShow?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "faqs".
  */
 export interface Faq {
@@ -1126,6 +1149,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'performers';
         value: number | Performer;
+      } | null)
+    | ({
+        relationTo: 'activities';
+        value: number | Activity;
       } | null)
     | ({
         relationTo: 'faqs';
@@ -1616,6 +1643,26 @@ export interface PerformersSelect<T extends boolean = true> {
   role?: T;
   description?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "activities_select".
+ */
+export interface ActivitiesSelect<T extends boolean = true> {
+  mainTitle?: T;
+  description?: T;
+  status?: T;
+  list?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        isShow?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

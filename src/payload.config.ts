@@ -25,14 +25,14 @@ import { Partners } from './collections/Partners'
 import { Performers } from './collections/Performers'
 import { FAQs } from './collections/FAQ'
 import { resendAdapter } from '@payloadcms/email-resend'
+import { Activities } from './collections/Activities'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
   admin: {
-    components: {
-    },
+    components: {},
     importMap: {
       baseDir: path.resolve(dirname),
     },
@@ -80,6 +80,7 @@ export default buildConfig({
     Tickets,
     Partners,
     Performers,
+    Activities,
     FAQs,
   ],
   cors: [getServerSideURL()].filter(Boolean),
