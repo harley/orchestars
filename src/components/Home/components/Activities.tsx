@@ -81,6 +81,7 @@ const ActivitiesSection = ({ activity }: { activity: Activity }) => {
       >
         {activity?.list?.map((activity, index) => (
           <div
+            key={activity.id}
             className={cn(
               'glass-card p-6 rounded-xl transition-all duration-500 hover:scale-105 hover:shadow-xl',
               'animate-on-scroll translate-y-4 flex-shrink-0',
