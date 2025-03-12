@@ -18,6 +18,7 @@ import ConfirmOrderModal from './ConfirmOrderModal'
 import { Event } from '@/types/Event'
 import { Performer } from '@/types/Performer'
 import { FAQType } from '@/types/FAQ'
+import TermCondition from './TermCondition'
 
 const TicketDetails = ({
   event,
@@ -201,45 +202,51 @@ const TicketDetails = ({
 
         <section className="py-12 bg-white">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold mb-8 text-center">Ticket Options</h2>
+            <h2 className="text-3xl font-bold mb-8 text-center">Vé đã chọn</h2>
 
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                {Object.values(ticketSelected).map((option) => (
-                  <div key={option.id} className="mb-6 last:mb-0">
-                    <div className="flex justify-between items-center mb-2">
-                      <div>
-                        <h3 className="font-semibold text-lg">{option.ticketName}</h3>
-                        <p className="text-gray-600">
-                          {new Intl.NumberFormat('vi-VN', {
-                            style: 'currency',
-                            currency: option.currency || 'VND',
-                          }).format(option.total)}
-                        </p>
-                      </div>
-                      <div className="w-24">
-                        <Input
-                          value={option.quantity}
-                          readOnly
-                          disabled
-                          className="w-full text-center"
-                        />
-                      </div>
-                    </div>
-                    <Separator className="my-4" />
+              <div className="bg-white p-6 rounded-lg shadow-md relative">
+                {!Object.values(ticketSelected).length ? (
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    Vui lòng chọn vé
                   </div>
-                ))}
+                ) : (
+                  Object.values(ticketSelected).map((option) => (
+                    <div key={option.id} className="mb-6 last:mb-0">
+                      <div className="flex justify-between items-center mb-2">
+                        <div>
+                          <h3 className="font-semibold text-lg">{option.ticketName}</h3>
+                          <p className="text-gray-600">
+                            {new Intl.NumberFormat('vi-VN', {
+                              style: 'currency',
+                              currency: option.currency || 'VND',
+                            }).format(option.total)}
+                          </p>
+                        </div>
+                        <div className="w-24">
+                          <Input
+                            value={option.quantity}
+                            readOnly
+                            disabled
+                            className="w-full text-center"
+                          />
+                        </div>
+                      </div>
+                      <Separator className="my-4" />
+                    </div>
+                  ))
+                )}
               </div>
 
               <div className="bg-gray-50 p-6 rounded-lg shadow-md">
-                <h3 className="text-xl font-bold mb-4">Your Selection</h3>
+                <h3 className="text-xl font-bold mb-4">Ghế đã chọn</h3>
                 {selectedSeats.length > 0 && (
                   <>
                     <Separator className="my-4" />
-                    <h4 className="font-medium mb-2">Ghế đã chọn:</h4>
+                    {/* <h4 className="font-medium mb-2">Ghế đã chọn:</h4> */}
                     {selectedSeats.map((seat) => (
                       <div key={seat.id} className="flex justify-between mb-2">
-                        <span>Seat {seat.label}</span>
+                        <span>Ghế {seat.label}</span>
                         <span>
                           {new Intl.NumberFormat('vi-VN', {
                             style: 'currency',
@@ -264,7 +271,7 @@ const TicketDetails = ({
 
                 <Button
                   onClick={handleBuyTickets}
-                  className="w-full cursor-pointer mt-6 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                  className="w-full cursor-pointer mt-6 bg-gradient-to-r text-white from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
                 >
                   Thanh toán
                 </Button>
@@ -275,7 +282,11 @@ const TicketDetails = ({
 
         <FeaturedPerformers performers={performers} />
 
-        <Schedule schedules={event.schedules} />
+        {!!event.schedules?.length && <Schedule schedules={event.schedules} />}
+
+        {event.eventTermsAndConditions && (
+          <TermCondition termCondition={event.eventTermsAndConditions} />
+        )}
 
         {faqs?.length > 0 && <FAQ faqs={faqs} />}
       </main>

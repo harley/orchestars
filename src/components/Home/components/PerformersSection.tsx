@@ -106,11 +106,11 @@ const PerformersSection = ({ performers }: { performers: Performer[] }) => {
 
       <div className="container mx-auto px-6 md:px-10">
         <h2 className="text-4xl md:text-5xl font-display font-bold mb-6 text-center bg-clip-text text-black">
-          Featured Performers
+          Nghệ Sĩ Nổi Bật
         </h2>
         <p className="text-muted-foreground text-center mb-16 max-w-2xl mx-auto text-lg">
-          Experience unforgettable performances by these incredible artists who bring their unique
-          sound and energy to our stages.
+          Trải nghiệm những màn trình diễn đáng nhớ từ các nghệ sĩ tài năng, mang đến âm thanh độc
+          đáo và năng lượng cuốn hút trên sân khấu của chúng tôi.
         </p>
 
         <div className="relative">
