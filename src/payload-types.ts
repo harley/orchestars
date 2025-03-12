@@ -312,7 +312,6 @@ export interface Ticket {
     | null;
   event?: (number | null) | Event;
   orderItem?: (number | null) | OrderItem;
-  orderStatus?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -637,7 +636,6 @@ export interface TicketsSelect<T extends boolean = true> {
   ticketPriceInfo?: T;
   event?: T;
   orderItem?: T;
-  orderStatus?: T;
   updatedAt?: T;
   createdAt?: T;
 }
