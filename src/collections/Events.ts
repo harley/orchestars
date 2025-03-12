@@ -25,10 +25,23 @@ export const Events: CollectionConfig = {
     {
       name: 'startDatetime',
       type: 'date',
+      admin: {
+        date: {
+          pickerAppearance: 'dayAndTime',
+          timeFormat: 'HH:mm a',
+        },
+      },
     },
     {
       name: 'endDatetime',
       type: 'date',
+      // timezone: true,
+      admin: {
+        date: {
+          pickerAppearance: 'dayAndTime',
+          timeFormat: 'HH:mm a',
+        },
+      },
     },
     {
       type: 'array',
