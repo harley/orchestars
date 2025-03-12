@@ -388,6 +388,7 @@ export interface Category {
  */
 export interface User {
   id: number;
+  username?: string | null;
   firstName?: string | null;
   lastName?: string | null;
   role?: ('admin' | 'super-admin' | 'customer') | null;
@@ -1476,6 +1477,7 @@ export interface CategoriesSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  username?: T;
   firstName?: T;
   lastName?: T;
   role?: T;
