@@ -111,7 +111,7 @@ const TicketDetails = ({
         <section className="relative h-[500px] md:h-[600px] overflow-hidden">
           <div className="absolute inset-0 bg-black/50 z-10" />
           <div
-            className="absolute inset-0 bg-cover bg-center"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${event.eventBanner?.url})`,
             }}
@@ -137,16 +137,19 @@ const TicketDetails = ({
                     <Calendar className="h-5 w-5 mr-2" />
                     <span>
                       {event.startDatetime &&
-                        dateFnsFormat(new Date(event.startDatetime), 'dd-MM-yyyy HH:mm a')}{' '}
+                        dateFnsFormat(new Date(event.startDatetime), 'dd/MM/yyyy HH:mm a')}{' '}
                       -{' '}
                       {event.endDatetime &&
-                        dateFnsFormat(new Date(event.endDatetime), 'dd-MM-yyyy HH:mm a')}
+                        dateFnsFormat(new Date(event.endDatetime), 'dd/MM/yyyy HH:mm a')}
                     </span>
                   </div>
-                  <div className="flex items-center">
-                    <MapPin className="h-5 w-5 mr-2" />
-                    <span>{event.eventLocation}</span>
-                  </div>
+                  {event.eventLocation && (
+                    <div className="flex items-center">
+                      <MapPin className="h-5 w-5 mr-2" />
+                      <span>{event.eventLocation}</span>
+                    </div>
+                  )}
+
                   {/* <div className="flex items-center">
                     <Users className="h-5 w-5 mr-2" />
                     <span>{'-/300'} attendees</span>

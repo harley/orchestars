@@ -14,6 +14,9 @@ import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Home } from '@/components/Home/Component'
 
+export const dynamic = 'force-dynamic' // Add this to disable static rendering
+export const revalidate = 0 // Add this to disable cache
+
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
   const pages = await payload.find({

@@ -89,10 +89,13 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }
                       {dateFnsFormat(new Date(evt.endDatetime), 'dd/MM/yyyy HH:mm a')}
                     </span>
                   </div>
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    <span className="text-sm">{evt.eventLocation}</span>
-                  </div>
+                  {evt.eventLocation && (
+                    <div className="flex items-center">
+                      <MapPin className="h-4 w-4 mr-2" />
+                      <span className="text-sm">{evt.eventLocation}</span>
+                    </div>
+                  )}
+
                   {/* <div className="flex items-center">
                     <Users className="h-4 w-4 mr-2" />
                     <span className="text-sm">{'-/300'} attendees</span>
@@ -107,7 +110,7 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }
                     className="bg-gray-800 text-white hover:bg-gray-800/90 shadow-subtle"
                     onClick={() => handleGetTickets(evt.slug)}
                   >
-                    Get Tickets
+                    Đặt vé
                   </CustomButton>
                 </div>
               </div>

@@ -9,8 +9,8 @@ import TikTok from '@/components/Icons/TikTok'
 export async function Footer() {
   const footerData: Footer = await getCachedGlobal('footer', 1)()
   return (
-    <footer className="bg-secondary/40 py-16 mt-auto">
-      <div className="container mx-auto px-6 md:px-10">
+    <footer className="bg-zinc-100 pt-8 pb-3 mt-auto">
+      <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {/* Left Column - Address and Contact */}
           <div className="space-y-4 animate-on-scroll">
@@ -86,10 +86,23 @@ export async function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-border mt-12 pt-6 text-center text-sm text-muted-foreground border-gray-200">
+        <div className="border-t border-border mt-12 pt-4 text-center text-sm text-muted-foreground border-gray-200 flex justify-between items-center gap-2">
           <p>
             © {2025} {footerData?.title}. All rights reserved.
           </p>
+          {!!footerData?.navItems?.length && (
+            <div className="flex flex-wrap justify-center gap-6 text-sm">
+              {footerData.navItems.map((navItem, index) => (
+                <Link
+                  key={index}
+                  href={navItem.link?.url || '/'}
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {navItem.link?.label}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </footer>
