@@ -99,10 +99,10 @@ const config = {
         error: 'hsl(var(--error))',
         warning: 'hsl(var(--warning))',
       },
-      fontFamily: {
-        mono: ['var(--font-geist-mono)'],
-        sans: ['var(--font-geist-sans)'],
-      },
+      // fontFamily: {
+      //   mono: ['var(--font-geist-mono)'],
+      //   sans: ['var(--font-geist-sans)'],
+      // },
       keyframes: {
         'accordion-down': {
           from: { height: '0' },
