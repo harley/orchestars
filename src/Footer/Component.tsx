@@ -92,8 +92,9 @@ export async function Footer() {
           </p>
           {!!footerData?.navItems?.length && (
             <div className="flex flex-wrap justify-center gap-6 text-sm">
-              {footerData.navItems.map((navItem) => (
+              {footerData.navItems.map((navItem, index) => (
                 <Link
+                  key={index}
                   href={navItem.link?.url || '/'}
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
