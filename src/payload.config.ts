@@ -16,7 +16,14 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
-
+import { Events } from './collections/Events'
+import { Orders } from './collections/Orders'
+import { OrderItems } from './collections/OrderItems'
+import { Payments } from './collections/Payments'
+import { Tickets } from './collections/Tickets'
+import { Partners } from './collections/Partners'
+import { Performers } from './collections/Performers'
+import { FAQs } from './collections/FAQ'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -64,7 +71,21 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URI || '',
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users],
+  collections: [
+    Pages,
+    Posts,
+    Media,
+    Categories,
+    Users,
+    Events,
+    Orders,
+    OrderItems,
+    Payments,
+    Tickets,
+    Partners,
+    Performers,
+    FAQs,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins: [

@@ -1,6 +1,4 @@
 import type { GlobalConfig } from 'payload'
-
-import { link } from '@/fields/link'
 import { revalidateFooter } from './hooks/revalidateFooter'
 
 export const Footer: GlobalConfig = {
@@ -10,20 +8,80 @@ export const Footer: GlobalConfig = {
   },
   fields: [
     {
-      name: 'navItems',
+      name: 'logo',
+      type: 'upload',
+      required: false,
+      relationTo: 'media',
+    },
+    {
+      name: 'title',
+      type: 'text',
+      required: false,
+    },
+    {
+      name: 'description',
+      type: 'text',
+      required: false,
+    },
+    {
+      name: 'address',
+      type: 'text',
+      required: false,
+    },
+    {
+      name: 'email',
+      type: 'text',
+      required: false,
+    },
+    {
+      name: 'phoneNumber',
+      type: 'text',
+      required: false,
+    },
+    {
+      name: 'socials',
       type: 'array',
-      fields: [
-        link({
-          appearances: false,
-        }),
-      ],
-      maxRows: 6,
-      admin: {
-        initCollapsed: true,
-        components: {
-          RowLabel: '@/Footer/RowLabel#RowLabel',
+      required: false,
+      defaultValue: [
+        {
+          name: 'Facebook',
+          link: '',
         },
-      },
+        {
+          name: 'Instagram',
+          link: '',
+        },
+        {
+          name: 'Twitter',
+          link: '',
+        },
+        {
+          name: 'Youtube',
+          link: '',
+        },
+      ],
+      fields: [
+        {
+          type: 'text',
+          name: 'name',
+        },
+        {
+          type: 'text',
+          name: 'link',
+        },
+      ],
+    },
+    {
+      name: 'contactTitle',
+      type: 'text',
+      required: false,
+      defaultValue: 'Contact Us',
+    },
+    {
+      name: 'connectUsTitle',
+      type: 'text',
+      required: false,
+      defaultValue: 'Connect with us',
     },
   ],
   hooks: {

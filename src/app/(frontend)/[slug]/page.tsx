@@ -12,6 +12,7 @@ import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { Home } from '@/components/Home/Component'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -46,7 +47,19 @@ type Args = {
 export default async function Page({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = 'home' } = await paramsPromise
+
   const url = '/' + slug
+
+  if (slug === 'home') {
+    return (
+      <>
+        {/* // <article className="pt-16 pb-24"> */}
+        <PageClient />
+        <Home />
+        {/* // </article> */}
+      </>
+    )
+  }
 
   let page: RequiredDataFromCollectionSlug<'pages'> | null
 
