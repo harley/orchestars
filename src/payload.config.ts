@@ -24,6 +24,8 @@ import { Tickets } from './collections/Tickets'
 import { Partners } from './collections/Partners'
 import { Performers } from './collections/Performers'
 import { FAQs } from './collections/FAQ'
+import { resendAdapter } from '@payloadcms/email-resend'
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -106,4 +108,9 @@ export default buildConfig({
     },
     tasks: [],
   },
+  email: resendAdapter({
+    defaultFromAddress: 'info@orchestars.vn',
+    defaultFromName: 'Orchestars',
+    apiKey: process.env.RESEND_API_KEY || '',
+  }),
 })
