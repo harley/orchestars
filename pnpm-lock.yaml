@@ -17,6 +17,9 @@ importers:
       '@payloadcms/db-postgres':
         specifier: latest
         version: 3.28.0(@types/react@19.0.10)(payload@3.28.0(graphql@16.10.0)(typescript@5.7.3))(react@19.0.0)
+      '@payloadcms/email-resend':
+        specifier: ^3.28.0
+        version: 3.28.0(payload@3.28.0(graphql@16.10.0)(typescript@5.7.3))
       '@payloadcms/live-preview-react':
         specifier: latest
         version: 3.28.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -1421,6 +1424,12 @@ packages:
 
   '@payloadcms/email-nodemailer@3.28.0':
     resolution: {integrity: sha512-cnoSSI/59OR9Vc3IBm9PNxuGnD5YXhvWs/z5XuEUWlJo0i1gYMFr6j5+z23Zf2J2wFCiLdmn8x+DaC+woYiY8w==}
+    engines: {node: ^18.20.2 || >=20.9.0}
+    peerDependencies:
+      payload: 3.28.0
+
+  '@payloadcms/email-resend@3.28.0':
+    resolution: {integrity: sha512-TNNbaZ2KzMbXq9BvpcsmETlcZCd3ycKKck0Emdd/rjvrZBo9Gb7f/ZyYvToqIptFoyMOqj6y7zuHU+dPO7MpLQ==}
     engines: {node: ^18.20.2 || >=20.9.0}
     peerDependencies:
       payload: 3.28.0
@@ -7024,6 +7033,10 @@ snapshots:
   '@payloadcms/email-nodemailer@3.28.0(payload@3.28.0(graphql@16.10.0)(typescript@5.7.3))':
     dependencies:
       nodemailer: 6.9.16
+      payload: 3.28.0(graphql@16.10.0)(typescript@5.7.3)
+
+  '@payloadcms/email-resend@3.28.0(payload@3.28.0(graphql@16.10.0)(typescript@5.7.3))':
+    dependencies:
       payload: 3.28.0(graphql@16.10.0)(typescript@5.7.3)
 
   '@payloadcms/graphql@3.28.0(graphql@16.10.0)(payload@3.28.0(graphql@16.10.0)(typescript@5.7.3))(typescript@5.7.3)':

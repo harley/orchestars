@@ -25,6 +25,7 @@
     "@mezh-hq/react-seat-toolkit": "^3.2.5",
     "@payloadcms/admin-bar": "latest",
     "@payloadcms/db-postgres": "latest",
+    "@payloadcms/email-resend": "^3.28.0",
     "@payloadcms/live-preview-react": "latest",
     "@payloadcms/next": "latest",
     "@payloadcms/payload-cloud": "latest",
