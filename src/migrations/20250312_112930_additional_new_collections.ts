@@ -647,9 +647,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   DROP TABLE "seating_charts" CASCADE;
   DROP TABLE "app_information_socials" CASCADE;
   DROP TABLE "app_information" CASCADE;
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_seating_charts_fk";
+  -- ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_seating_charts_fk";
   
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_app_information_fk";
+  -- ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_app_information_fk";
   
   DROP INDEX IF EXISTS "payload_locked_documents_rels_seating_charts_id_idx";
   DROP INDEX IF EXISTS "payload_locked_documents_rels_app_information_id_idx";
@@ -1639,17 +1639,17 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   CREATE INDEX IF NOT EXISTS "app_information_logo_idx" ON "app_information" USING btree ("logo_id");
   CREATE INDEX IF NOT EXISTS "app_information_updated_at_idx" ON "app_information" USING btree ("updated_at");
   CREATE INDEX IF NOT EXISTS "app_information_created_at_idx" ON "app_information" USING btree ("created_at");
-  DO $$ BEGIN
-   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_seating_charts_fk" FOREIGN KEY ("seating_charts_id") REFERENCES "public"."seating_charts"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
+  -- DO $$ BEGIN
+  --  ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_seating_charts_fk" FOREIGN KEY ("seating_charts_id") REFERENCES "public"."seating_charts"("id") ON DELETE cascade ON UPDATE no action;
+  -- EXCEPTION
+  --  WHEN duplicate_object THEN null;
+  -- END $$;
   
-  DO $$ BEGIN
-   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_app_information_fk" FOREIGN KEY ("app_information_id") REFERENCES "public"."app_information"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
+  -- DO $$ BEGIN
+  --  ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_app_information_fk" FOREIGN KEY ("app_information_id") REFERENCES "public"."app_information"("id") ON DELETE cascade ON UPDATE no action;
+  -- EXCEPTION
+  --  WHEN duplicate_object THEN null;
+  -- END $$;
   
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_seating_charts_id_idx" ON "payload_locked_documents_rels" USING btree ("seating_charts_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_app_information_id_idx" ON "payload_locked_documents_rels" USING btree ("app_information_id");
