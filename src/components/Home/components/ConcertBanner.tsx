@@ -62,34 +62,40 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events }) => {
                   </div>
                 )}
 
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 animate-fade-in">
-                  {evt.title}
-                </h1>
+                {evt.title && evt.configuration?.showBannerTitle && (
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 animate-fade-in">
+                    {evt.title}
+                  </h1>
+                )}
 
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 text-white/90 mb-8">
-                  <div className="flex items-center">
-                    <Calendar className="h-5 w-5 mr-2" />
-                    <span>
-                      {dateFnsFormat(new Date(evt.startDatetime), 'dd/MM/yyyy HH:mm a')} -{' '}
-                      {dateFnsFormat(new Date(evt.endDatetime), 'dd/MM/yyyy HH:mm a')}
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <MapPin className="h-5 w-5 mr-2" />
-                    <span>{evt.eventLocation}</span>
-                  </div>
-                  {/* <div className="flex items-center">
-                    <Users className="h-5 w-5 mr-2" />
-                    <span>{'-/300'} attendees</span>
-                  </div> */}
+                  {evt.configuration?.showBannerTime && (
+                    <div className="flex items-center">
+                      <Calendar className="h-5 w-5 mr-2" />
+                      <span>
+                        {evt.startDatetime &&
+                          dateFnsFormat(new Date(evt.startDatetime), 'dd/MM/yyyy HH:mm a')}{' '}
+                        -{' '}
+                        {evt.endDatetime &&
+                          dateFnsFormat(new Date(evt.endDatetime), 'dd/MM/yyyy HH:mm a')}
+                      </span>
+                    </div>
+                  )}
+
+                  {evt.eventLocation && evt.configuration?.showBannerLocation && (
+                    <div className="flex items-center">
+                      <MapPin className="h-5 w-5 mr-2" />
+                      <span>{evt.eventLocation}</span>
+                    </div>
+                  )}
                 </div>
 
                 <CustomButton
                   size="lg"
-                  className="shadow-lg bg-gray-900/80 hover:bg-gray-900/90"
+                  className="shadow-lg bg-slate-100/80 text-black hover:bg-slate-100/100"
                   onClick={() => handleTicketClick(evt)}
                 >
-                  {"I'm Interested"}
+                  Xem chi tiết
                 </CustomButton>
               </div>
             </div>

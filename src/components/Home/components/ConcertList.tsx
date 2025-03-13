@@ -102,7 +102,9 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }
                   </div> */}
                 </div>
 
-                <p className="text-muted-foreground mb-6">{evt.description}</p>
+                <pre className="text-muted-foreground mb-6 text-sm whitespace-pre-wrap font-montserrat">
+                  {evt.description}
+                </pre>
 
                 <div>
                   <CustomButton

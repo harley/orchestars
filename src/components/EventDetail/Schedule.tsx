@@ -1,3 +1,4 @@
+import { Event } from '@/payload-types'
 import React from 'react'
 
 interface ScheduleItem {
@@ -11,18 +12,22 @@ interface ScheduleItem {
   }[]
 }
 
-const Schedule = ({ schedules }: { schedules: ScheduleItem[] }) => {
+const Schedule = ({ schedules }: { schedules: Event['schedules'] }) => {
+  const _schedules = (schedules as ScheduleItem[])
+    ?.filter((sch) => !!sch)
+    .map((sch) => sch as unknown as ScheduleItem)
+
   return (
     <section className="py-12 bg-white">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold mb-8 text-center">Lịch trình</h2>
 
         <div className="max-w-3xl mx-auto">
-          {schedules.map((schedule) => (
-            <div key={schedule.date} className="mb-8">
-              <h3 className="text-2xl font-bold mb-4 text-purple-700">{schedule.date}</h3>
+          {_schedules.map((schedule, idx) => (
+            <div key={idx} className="mb-8">
+              <h3 className="text-2xl font-bold mb-4 text-purple-700">{schedule?.date}</h3>
 
-              {schedule.details.map((item, index) => (
+              {schedule.details?.map((item, index) => (
                 <div
                   key={index}
                   className="flex mb-6 group hover:bg-gray-50 p-3 rounded-lg transition-colors"

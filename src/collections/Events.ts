@@ -1,3 +1,11 @@
+import { Banner } from '@/blocks/Banner/config'
+import { CallToAction } from '@/blocks/CallToAction/config'
+import {
+  BlocksFeature,
+  lexicalEditor,
+  LinkFeature,
+  UploadFeature,
+} from '@payloadcms/richtext-lexical'
 import type { CollectionConfig } from 'payload'
 
 export const Events: CollectionConfig = {
@@ -17,6 +25,53 @@ export const Events: CollectionConfig = {
     {
       name: 'description',
       type: 'textarea',
+    },
+    {
+      name: 'detailDescription',
+      type: 'richText',
+      editor: lexicalEditor({
+        features: ({ defaultFeatures, rootFeatures }) => [
+          ...defaultFeatures,
+          LinkFeature({
+            // Example showing how to customize the built-in fields
+            // of the Link feature
+            fields: ({ defaultFields }) => [
+              ...defaultFields,
+              {
+                name: 'rel',
+                label: 'Rel Attribute',
+                type: 'select',
+                hasMany: true,
+                options: ['noopener', 'noreferrer', 'nofollow'],
+                admin: {
+                  description:
+                    'The rel attribute defines the relationship between a linked resource and the current document. This is a custom link field.',
+                },
+              },
+            ],
+          }),
+          UploadFeature({
+            collections: {
+              uploads: {
+                // Example showing how to customize the built-in fields
+                // of the Upload feature
+                fields: [
+                  {
+                    name: 'caption',
+                    type: 'richText',
+                    editor: lexicalEditor(),
+                  },
+                ],
+              },
+            },
+          }),
+          // This is incredibly powerful. You can re-use your Payload blocks
+          // directly in the Lexical editor as follows:
+          BlocksFeature({
+            blocks: [Banner, CallToAction],
+          }),
+        ],
+      }),
     },
     {
       name: 'keyword',
@@ -133,6 +188,27 @@ export const Events: CollectionConfig = {
         {
           label: 'Per Event',
           value: 'perEvent',
+        },
+      ],
+    },
+    {
+      name: 'configuration',
+      type: 'group',
+      fields: [
+        {
+          name: 'showBannerTitle',
+          type: 'checkbox',
+          defaultValue: true,
+        },
+        {
+          name: 'showBannerTime',
+          type: 'checkbox',
+          defaultValue: true,
+        },
+        {
+          name: 'showBannerLocation',
+          type: 'checkbox',
+          defaultValue: true,
         },
       ],
     },

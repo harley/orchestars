@@ -15,10 +15,12 @@ import { SeatToolKitItem, SelectedSeat } from './types'
 import SeatMapToolkit from './SeatToolkit'
 import { categories } from './data/seat-maps/categories'
 import ConfirmOrderModal from './ConfirmOrderModal'
-import { Event } from '@/types/Event'
+// import { Event } from '@/types/Event'
 import { Performer } from '@/types/Performer'
 import { FAQType } from '@/types/FAQ'
 import TermCondition from './TermCondition'
+import { Event, Media } from '@/payload-types'
+import DetailDescription from './DetailDescription'
 
 const TicketDetails = ({
   event,
@@ -112,7 +114,7 @@ const TicketDetails = ({
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{
-              backgroundImage: `url(${event.eventBanner?.url})`,
+              backgroundImage: `url(${(event.eventBanner as Media)?.url})`,
             }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
@@ -126,23 +128,27 @@ const TicketDetails = ({
                     Powered by <span className="font-semibold">MelodySale</span>
                   </div>
                 )} */}
-
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 animate-fade-in">
-                  {event.title}
-                </h1>
+                {event.title && event.configuration?.showBannerTitle && (
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 animate-fade-in">
+                    {event.title}
+                  </h1>
+                )}
 
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 text-white/90 mb-8">
-                  <div className="flex items-center">
-                    <Calendar className="h-5 w-5 mr-2" />
-                    <span>
-                      {event.startDatetime &&
-                        dateFnsFormat(new Date(event.startDatetime), 'dd/MM/yyyy HH:mm a')}{' '}
-                      -{' '}
-                      {event.endDatetime &&
-                        dateFnsFormat(new Date(event.endDatetime), 'dd/MM/yyyy HH:mm a')}
-                    </span>
-                  </div>
-                  {event.eventLocation && (
+                  {event.configuration?.showBannerTime && (
+                    <div className="flex items-center">
+                      <Calendar className="h-5 w-5 mr-2" />
+                      <span>
+                        {event.startDatetime &&
+                          dateFnsFormat(new Date(event.startDatetime), 'dd/MM/yyyy HH:mm a')}{' '}
+                        -{' '}
+                        {event.endDatetime &&
+                          dateFnsFormat(new Date(event.endDatetime), 'dd/MM/yyyy HH:mm a')}
+                      </span>
+                    </div>
+                  )}
+
+                  {event.eventLocation && event.configuration?.showBannerLocation && (
                     <div className="flex items-center">
                       <MapPin className="h-5 w-5 mr-2" />
                       <span>{event.eventLocation}</span>
@@ -167,6 +173,9 @@ const TicketDetails = ({
             </div>
           </div>
         </section>
+
+        <DetailDescription event={event} />
+
         <section className="py-12 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="w-full max-w-4xl mx-auto">

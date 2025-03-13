@@ -44,7 +44,7 @@ const ConcertDetailPage = async (props: { params: Promise<{ eventId: string }> }
     <div className="">
       <PageClient />
       <EventDetail
-        event={eventDetail as Event}
+        event={eventDetail}
         performers={performers as Performer[]}
         faqs={faqs as FAQType[]}
       />

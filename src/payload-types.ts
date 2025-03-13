@@ -756,6 +756,21 @@ export interface Event {
   title?: string | null;
   slug?: string | null;
   description?: string | null;
+  detailDescription?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   keyword?: string | null;
   startDatetime?: string | null;
   endDatetime?: string | null;
@@ -789,6 +804,11 @@ export interface Event {
   eventBanner?: (number | null) | Media;
   sponsorLogo?: (number | null) | Media;
   ticketQuantityLimitation?: ('perTicketType' | 'perEvent') | null;
+  configuration?: {
+    showBannerTitle?: boolean | null;
+    showBannerTime?: boolean | null;
+    showBannerLocation?: boolean | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -1529,6 +1549,7 @@ export interface EventsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   description?: T;
+  detailDescription?: T;
   keyword?: T;
   startDatetime?: T;
   endDatetime?: T;
@@ -1562,6 +1583,13 @@ export interface EventsSelect<T extends boolean = true> {
   eventBanner?: T;
   sponsorLogo?: T;
   ticketQuantityLimitation?: T;
+  configuration?:
+    | T
+    | {
+        showBannerTitle?: T;
+        showBannerTime?: T;
+        showBannerLocation?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

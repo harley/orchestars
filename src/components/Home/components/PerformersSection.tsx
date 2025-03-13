@@ -24,15 +24,18 @@ const PerformerCard: React.FC<{ performer: Performer; index: number }> = ({ perf
 
       <h3 className="text-2xl font-bold mb-3 text-black">{performer.name}</h3>
 
-      <div className="flex items-center gap-2 text-sm text-muted-foreground/80 mb-2">
-        <Music className="w-4 h-4" />
-        <span>{performer.genre}</span>
-      </div>
-
-      <div className="flex items-center gap-2 text-sm text-muted-foreground/80 mb-4">
-        <Users className="w-4 h-4" />
-        <span>{performer.role}</span>
-      </div>
+      {performer.genre && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground/80 mb-2">
+          <Music className="w-4 h-4" />
+          <span>{performer.genre}</span>
+        </div>
+      )}
+      {performer.role && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground/80 mb-4">
+          <Users className="w-4 h-4" />
+          <span>{performer.role}</span>
+        </div>
+      )}
 
       <p className="text-sm text-muted-foreground/90 leading-relaxed">{performer.description}</p>
     </div>
