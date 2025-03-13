@@ -1,22 +1,32 @@
 'use client';
-
 import { useSearchParams, useRouter } from 'next/navigation';
 import React from 'react';
 import { Button } from '@/components/ui/button';
-
 const VietQRPaymentComponent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const amount = searchParams.get('amount');
   const addInfo = searchParams.get('addInfo');
-
+  const [isValidParams, setIsValidParams] = React.useState(true);
   // Wait for the "amount" parameter to be available
   if (!amount) {
     return <div>Loading payment information...</div>;
   }
+  // Validate amount is a positive number
+  React.useEffect(() => {
+    const amountNum = Number(amount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      setIsValidParams(false);
+    }
+  }, [amount]);
+  if (!isValidParams) {
+    return <div className="text-red-500">Invalid payment parameters</div>;
+  }
 
-  // Construct the image URL with the parsed query parameters
-  const imageUrl = `https://img.vietqr.io/image/vietcombank-1055355412-compact2.jpg?amount=${amount}&addInfo=${addInfo}&accountName=${encodeURIComponent("CONG TY CO PHAN ORCHESTARS")}`;
+  const bankId = process.env.NEXT_PUBLIC_VIETQR_BANK_ID || 'vietcombank';
+  const accountNumber = process.env.NEXT_PUBLIC_VIETQR_ACCOUNT_NUMBER || '1055355412';
+  const accountName = process.env.NEXT_PUBLIC_VIETQR_ACCOUNT_NAME || "CONG TY CO PHAN ORCHESTARS";
+  const imageUrl = `https://img.vietqr.io/image/${bankId}-${accountNumber}-compact2.jpg?amount=${amount}&addInfo=${addInfo || ''}&accountName=${encodeURIComponent(accountName)}`;
   const handleGoHome = () => {
     router.push('/');
   };
