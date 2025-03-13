@@ -10,7 +10,7 @@ const TermCondition = ({ termCondition }: { termCondition: string }) => {
           <div className="mt-8 p-6 bg-white rounded-lg shadow-md">
             <pre
               dangerouslySetInnerHTML={{ __html: termCondition }}
-              className="whitespace-pre-wrap"
+              className="whitespace-pre-wrap font-montserrat"
             ></pre>
           </div>
         </div>

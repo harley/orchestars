@@ -109,7 +109,7 @@ const TicketDetails = ({
       />
 
       <main className="flex-grow">
-        <section className="relative h-[500px] md:h-[600px] overflow-hidden">
+        <section className="relative h-[500px] md:h-[700px] overflow-hidden">
           <div className="absolute inset-0 bg-black/50 z-10" />
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
