@@ -3,7 +3,7 @@ import CryptoJS from 'crypto-js'
 import { ZALO_PAYMENT } from '@/config/payment'
 import payload from 'payload'
 import config from '@/payload.config'
-import { Order } from '@/payload-types'
+import { Event, Order } from '@/payload-types'
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,13 +34,25 @@ export async function POST(request: NextRequest) {
       return jsonResponse(0, 'Payment is not in processing status')
     }
 
-    await updatePaymentStatus(payment.id)
-    await updateOrderStatus((payment.order as Order)?.id)
+    const transactionID = await payload.db.beginTransaction()
+    if (!transactionID) {
+      throw new Error('Có lỗi xảy ra! Vui lòng thử lại')
+    }
+    try {
+      await updatePaymentStatus(payment.id, transactionID)
+      await updateOrderStatus((payment.order as Order)?.id, transactionID)
+      await updateTicketStatus((payment.order as Order)?.id, transactionID)
 
-    console.log(`Order status updated successfully for app_trans_id = ${appTransId}`)
-    return jsonResponse(1, 'Success')
+      console.log(`Order status updated successfully for app_trans_id = ${appTransId}`)
+      await payload.db.commitTransaction(transactionID)
+      return jsonResponse(1, 'Success')
+    } catch (error) {
+      await payload.db.rollbackTransaction(transactionID)
+      return jsonResponse(0, error instanceof Error ? error.message : 'An unknown error occurred')
+    }
   } catch (error: unknown) {
     console.error('Error processing payment:', error)
+
     return jsonResponse(0, error instanceof Error ? error.message : 'An unknown error occurred')
   }
 }
@@ -55,7 +67,10 @@ async function findPayment(appTransId: string) {
   return result.docs?.[0] || null
 }
 
-async function updatePaymentStatus(paymentId: number) {
+async function updatePaymentStatus(
+  paymentId: number,
+  transactionID: number | Promise<number | string> | string,
+) {
   return payload.update({
     collection: 'payments',
     id: paymentId,
@@ -63,17 +78,54 @@ async function updatePaymentStatus(paymentId: number) {
       status: 'paid',
       paidAt: new Date().toISOString(),
     },
+    req: { transactionID },
   })
 }
 
-async function updateOrderStatus(orderId: number) {
+async function updateOrderStatus(
+  orderId: number,
+  transactionID: number | Promise<number | string> | string,
+) {
   return payload.update({
     collection: 'orders',
     id: orderId,
     data: { status: 'completed' },
+    req: { transactionID },
   })
 }
 
+async function updateTicketStatus(
+  orderId: number,
+  transactionID: number | Promise<number | string> | string,
+) {
+  const orderItems = await payload
+    .find({
+      collection: 'orderItems',
+      where: { order: { equals: orderId } },
+    })
+    .then((res) => res.docs)
+
+  if (!orderItems?.length) {
+    return
+  }
+
+  await Promise.all(
+    orderItems.map((oItem) =>
+      payload.update({
+        collection: 'tickets',
+        where: {
+          orderItem: { equals: oItem.id },
+          event: { equals: (oItem.event as Event).id },
+        },
+        data: {
+          status: 'booked',
+        },
+        req: { transactionID },
+      }),
+    ),
+  )
+}
+
 function jsonResponse(code: number, message: string) {
-  return NextResponse.json({ return_code: code, return_message: message })
+  return NextResponse.json({ return_code: code, message })
 }

@@ -113,9 +113,11 @@ const ConfirmOrderModal = ({
       window.location.href = result.order_url
     } catch (error: any) {
       console.log('error, ', error)
+
+      const messageError = error?.response?.data?.message || 'Có lỗi xảy ra! Vui lòng thử lại'
       toast({
-        title: 'Payment failed',
-        description: error?.response?.return_message || 'Failed to process your payment.',
+        title: 'Thao tác không thành công',
+        description: messageError,
         variant: 'destructive',
       })
     }
@@ -181,7 +183,13 @@ const ConfirmOrderModal = ({
                     <Label htmlFor="email">Email *</Label>
                     <Input
                       placeholder="Nhập email"
-                      {...register('email', { required: 'Email không được để trống' })}
+                      {...register('email', {
+                        required: 'Email không được để trống',
+                        pattern: {
+                          value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                          message: 'Email không đúng định dạng',
+                        },
+                      })}
                     />
                     {errors.email?.message && (
                       <p className="text-red-500">{errors.email.message}</p>

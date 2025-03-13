@@ -5,6 +5,7 @@ import payload from 'payload'
 import { format, getTime } from 'date-fns'
 import { ZALO_PAYMENT } from '@/config/payment'
 import config from '@/payload.config'
+import { Event, Order, User } from '@/payload-types'
 
 interface CustomerInfo {
   firstName: string
@@ -13,7 +14,7 @@ interface CustomerInfo {
   email: string
 }
 
-interface OrderItem {
+interface NewOrderItem {
   price: number
   quantity: number
   seat: string
@@ -21,9 +22,23 @@ interface OrderItem {
   ticketPriceId: string
 }
 
-interface Order {
+interface NewInputOrder {
   currency: string
-  orderItems: OrderItem[]
+  orderItems: NewOrderItem[]
+}
+
+interface ZaloPayOrder {
+  title?: string
+  app_id: string
+  app_trans_id: string
+  app_user: string
+  app_time: number
+  item: string
+  embed_data: string
+  amount: number
+  description: string
+  mac: string
+  callback_url?: string
 }
 
 const generateCode = (prefix: string): string => {
@@ -50,26 +65,170 @@ function generatePassword(length: number = 12): string {
 }
 
 export async function POST(request: NextRequest) {
-  // parse JSON body if needed:
-  // const body = await request.json() // if you expect a JSON body from the client
   const body = await request.json()
 
   const customer = body.customer as CustomerInfo
 
-  const order = body.order as Order
+  const order = body.order as NewInputOrder
   const orderItems = order.orderItems
-
-  // todo
-  // 1 check user info, it not exist, will create a new one
-  // 2 check event id, ticket id is exist
-  // 3 check seat is available
-  // 4 create order
-  // 5 create order items
-  // 6 create payment
-  //
 
   const orderCode = generateCode('ORD')
 
+  try {
+    await payload.init({ config })
+
+    // check seat available
+    await checkSeatAvailable({ orderItems })
+
+    const { zalopayDataOrder } = generateZaloPayOrderData({ orderCode, orderItems, customer })
+
+    // check event id, ticket id is exist
+    const events = await checkEvents({ orderItems })
+
+    const transactionID = await payload.db.beginTransaction()
+    if (!transactionID) {
+      throw new Error('Có lỗi xảy ra! Vui lòng thử lại')
+    }
+
+    try {
+      // 1 check user info, it not exist, will create a new one
+      const customerData = await createCustomerIfNotExist(customer, transactionID)
+
+      // 2 check event id, ticket id is exist
+      // 3 check seat is available
+
+      // create order
+      const { newOrder } = await createOrderAndTickets({
+        orderCode,
+        customerData,
+        orderItems,
+        events,
+        transactionID,
+        currency: order.currency,
+      })
+
+      // create payment record
+      await createPayment({
+        customerData,
+        newOrder,
+        zaloPayOrder: zalopayDataOrder,
+        transactionID,
+        currency: order.currency,
+      })
+
+      const { result: resultData } = await createZaloPaymentLink({
+        zalopayDataOrder,
+      })
+
+      // todo write payment history
+
+      // Commit the transaction
+      await payload.db.commitTransaction(transactionID)
+
+      return NextResponse.json(resultData, { status: 200 })
+    } catch (error) {
+      // Rollback the transaction
+      await payload.db.rollbackTransaction(transactionID)
+
+      return NextResponse.json(
+        { message: 'Có lỗi xảy ra! Vui lòng thử lại', error },
+        { status: 400 },
+      )
+    }
+  } catch (error: any) {
+    console.error('ZaloPay create order error:', error)
+    return NextResponse.json(
+      { message: error?.message || 'Có lỗi xảy ra! Vui lòng thử lại' },
+      { status: 400 },
+    )
+  }
+}
+
+const checkSeatAvailable = async ({ orderItems }: { orderItems: NewOrderItem[] }) => {
+  // Group seats by eventId for more efficient querying
+  const seatsByEvent = orderItems.reduce(
+    (acc, item) => {
+      if (!acc[item.eventId]) {
+        acc[item.eventId] = []
+      }
+
+      ;(acc[item.eventId] as string[]).push(item.seat)
+
+      return acc
+    },
+    {} as Record<number, string[]>,
+  )
+
+  // Check all seats in parallel, grouped by event
+  const seatCheckPromises = Object.entries(seatsByEvent).map(async ([eventId, seats]) => {
+    const existingSeats = await payload.find({
+      collection: 'tickets',
+      where: {
+        and: [
+          {
+            status: {
+              in: ['booked', 'pending_payment', 'hold'],
+            },
+          },
+          {
+            seat: {
+              in: seats,
+            },
+          },
+          {
+            event: {
+              equals: Number(eventId),
+            },
+          },
+        ],
+      },
+    })
+
+    if (existingSeats.docs.length > 0) {
+      const unavailableSeats = existingSeats.docs.map((ticket) => ticket.seat).join(', ')
+      throw new Error(`Ghế ${unavailableSeats} hiện đã được đặt. Vui lòng chọn ghế khác.`)
+    }
+  })
+
+  await Promise.all(seatCheckPromises)
+}
+
+const checkEvents = async ({ orderItems }: { orderItems: NewOrderItem[] }) => {
+  const events = await payload
+    .find({
+      collection: 'events',
+      where: { id: { in: orderItems.map((item) => item.eventId) } },
+    })
+    .then((res) => res.docs)
+
+  if (!events.length) {
+    throw new Error('Sự kiện không tồn tại')
+  }
+
+  for (const event of events) {
+    const hasValidTicket = orderItems.some((oItem) => {
+      if (oItem.eventId !== event.id) return false
+
+      return event.ticketPrices?.some((evtTkPr) => oItem.ticketPriceId === evtTkPr.id) ?? false
+    })
+
+    if (!hasValidTicket) {
+      throw new Error(`Loại vé không tồn tại cho sự kiện ${event.title || event.id}`)
+    }
+  }
+
+  return events
+}
+
+const generateZaloPayOrderData = ({
+  orderCode,
+  orderItems,
+  customer,
+}: {
+  orderCode: string
+  orderItems: NewOrderItem[]
+  customer: CustomerInfo
+}) => {
   const embed_data = {
     preferred_payment_method: 'Zalopay_wallet',
     redirecturl: ZALO_PAYMENT.REDIRECT_URL,
@@ -86,7 +245,7 @@ export async function POST(request: NextRequest) {
   const title = `Order #${orderCode}`
   const app_trans_id = `${format(new Date(), 'yyMMdd')}-${app_time}-${Math.floor(Math.random() * 1000000000)}`
 
-  const zalopayDataOrder = {
+  const zalopayDataOrder: ZaloPayOrder = {
     title,
     app_id: ZALO_PAYMENT.APP_ID,
     app_trans_id,
@@ -114,166 +273,178 @@ export async function POST(request: NextRequest) {
 
   console.log('zalopayDataOrder', zalopayDataOrder)
 
-  try {
-    const response = await axios.post(`${ZALO_PAYMENT.ENDPOINT}/v2/create`, null, {
-      params: zalopayDataOrder,
+  return { zalopayDataOrder }
+}
+
+const createZaloPaymentLink = async ({ zalopayDataOrder }: { zalopayDataOrder: ZaloPayOrder }) => {
+  const response = await axios.post(`${ZALO_PAYMENT.ENDPOINT}/v2/create`, null, {
+    params: zalopayDataOrder,
+  })
+  const resultData = response.data
+
+  if (resultData?.return_code === 2) {
+    throw new Error(resultData)
+  }
+
+  console.log('resultData', resultData)
+
+  return {
+    result: resultData,
+  }
+}
+
+const createCustomerIfNotExist = async (
+  customer: CustomerInfo,
+  transactionID: number | Promise<number | string> | string,
+) => {
+  let customerData = (
+    await payload.find({
+      collection: 'users',
+      where: { email: { equals: customer.email } },
+      limit: 1,
     })
-    const resultData = response.data
+  ).docs?.[0]
 
-    if (resultData?.return_code === 2) {
-      return NextResponse.json(resultData, { status: 400 })
-    }
+  if (!customerData) {
+    // create new user
+    customerData = await payload.create({
+      collection: 'users',
+      // quick fix for generate default password, need to update later
+      data: { ...customer, password: generatePassword(), role: 'customer' },
+      req: { transactionID },
+    })
+  }
 
-    console.log('resultData', resultData)
+  return customerData
+}
 
-    await payload.init({ config })
+const createOrderAndTickets = async ({
+  orderCode,
+  customerData,
+  orderItems,
+  events,
+  transactionID,
+  currency,
+}: {
+  orderCode: string
+  customerData: User
+  orderItems: NewOrderItem[]
+  events: Event[]
+  transactionID: number | Promise<number | string> | string
+  currency: string
+}) => {
+  const mapObjectEvents = events.reduce(
+    (evtObj, event) => {
+      evtObj[event.id] = event
 
-    const transactionID = await payload.db.beginTransaction()
-    if (!transactionID) {
-      throw new Error('Failed to start transaction')
-    }
+      return evtObj
+    },
+    {} as Record<string, any>,
+  )
+  const amount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0)
+  const newOrder = await payload.create({
+    collection: 'orders',
+    data: {
+      orderCode,
+      user: customerData.id,
+      status: 'processing',
+      total: amount,
+      currency,
+    },
+    req: { transactionID },
+  })
 
-    const events = await payload
-      .find({
-        collection: 'events',
-        where: { id: { in: orderItems.map((item) => item.eventId) } },
-      })
-      .then((res) => res.docs)
-
-    if (!events.length) {
-      throw new Error('Event not found')
-    }
-
-    const mapObjectEvents = events.reduce(
-      (evtObj, event) => {
-        evtObj[event.id] = event
-
-        return evtObj
+  // create order items
+  const orderItemPromises = orderItems.map((item) =>
+    payload.create({
+      collection: 'orderItems',
+      data: {
+        event: item.eventId,
+        ticketPriceId: item.ticketPriceId,
+        seat: item.seat,
+        order: newOrder.id,
+        price: item.price,
+        quantity: item.quantity,
       },
-      {} as Record<string, any>,
+      req: { transactionID },
+    }),
+  )
+  const newOrderItems = await Promise.all(orderItemPromises)
+
+  const ticketPromises = orderItems.map(async (itemInput) => {
+    const event = mapObjectEvents[itemInput.eventId]
+    const ticketPriceInfo = event?.ticketPrices?.find(
+      (ticketPrice: any) => ticketPrice.id === itemInput.ticketPriceId,
     )
 
-    try {
-      // Make an update using the local API
-      let customerData = (
-        await payload.find({
-          collection: 'users',
-          where: { email: { equals: customer.email } },
-          limit: 1,
-        })
-      ).docs?.[0]
+    const orderItem = newOrderItems.find(
+      (nOrderItem) =>
+        nOrderItem.ticketPriceId === itemInput.ticketPriceId && nOrderItem.seat === itemInput.seat,
+    )
 
-      if (!customerData) {
-        // create new user
-        customerData = await payload.create({
-          collection: 'users',
-          // quick fix for generate default password, need to update later
-          data: { ...customer, password: generatePassword(), role: 'customer' },
-          req: { transactionID },
-        })
-      }
-
-      // 2 check event id, ticket id is exist
-      // 3 check seat is available
-
-      // create order
-      const newOrder = await payload.create({
-        collection: 'orders',
-        data: {
-          orderCode,
-          user: customerData.id,
-          status: 'processing',
-          total: amount,
-          currency: order.currency,
-        },
-        req: { transactionID },
-      })
-
-      // create order items
-      const orderItemPromises = orderItems.map((item) =>
-        payload.create({
-          collection: 'orderItems',
-          data: {
-            event: item.eventId,
-            ticketPriceId: item.ticketPriceId,
-            order: newOrder.id,
-            price: item.price,
-            quantity: item.quantity,
-          },
-          req: { transactionID },
-        }),
-      )
-      const newOrderItems = await Promise.all(orderItemPromises)
-
-      const ticketPromises = orderItems.map(async (itemInput) => {
-        const event = mapObjectEvents[itemInput.eventId]
-        const ticketPriceInfo = event?.ticketPrices?.find(
-          (ticketPrice: any) => ticketPrice.id === itemInput.ticketPriceId,
-        )
-
-        const orderItem = newOrderItems.find(
-          (orderItem) => orderItem.ticketPriceId === itemInput.ticketPriceId,
-        )
-
-        return payload.create({
-          collection: 'tickets',
-          data: {
-            ticketCode: generateCode('TK'),
-            attendeeName: `${customer.firstName} ${customer.lastName}`,
-            ticketPriceInfo: {
-              ticketPriceId: ticketPriceInfo.id,
-              name: ticketPriceInfo.name,
-              price: ticketPriceInfo.price,
-            },
-            event: itemInput.eventId,
-            orderItem: orderItem?.id,
-            user: customerData.id,
-          },
-          req: { transactionID },
-        })
-      })
-
-      await Promise.all(ticketPromises)
-
-      // create payment record
-      await payload.create({
-        collection: 'payments',
-        data: {
-          user: customerData.id,
-          order: newOrder.id,
-          paymentMethod: 'zalopay',
-          currency: order.currency,
-          total: amount,
-          status: 'processing',
-          appTransId: app_trans_id,
-          paymentData: {
-            app_trans_id,
-            app_id: ZALO_PAYMENT.APP_ID,
-            app_time,
-            app_user,
-            embed_data: JSON.stringify(embed_data),
-            item: JSON.stringify(orderItems),
-            server_time: app_time,
-            amount,
-          },
-        },
-        req: { transactionID },
-      })
-
-      // todo write payment history
-
-      // Commit the transaction
-      await payload.db.commitTransaction(transactionID)
-    } catch (error) {
-      // Rollback the transaction
-      await payload.db.rollbackTransaction(transactionID)
-
-      return NextResponse.json({ message: 'Something went wrong', error }, { status: 400 })
+    if (!orderItem || !itemInput.seat) {
+      throw new Error('Vui lòng chọn ghế và thực hiện lại thao tác')
     }
 
-    return NextResponse.json(resultData, { status: 200 })
-  } catch (error: any) {
-    console.error('ZaloPay create order error:', error)
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 })
-  }
+    return payload.create({
+      collection: 'tickets',
+      data: {
+        ticketCode: generateCode('TK'),
+        attendeeName: `${customerData.firstName} ${customerData.lastName}`,
+        seat: itemInput.seat,
+        status: 'pending_payment',
+        ticketPriceInfo: {
+          ticketPriceId: ticketPriceInfo.id,
+          name: ticketPriceInfo.name,
+          price: ticketPriceInfo.price,
+        },
+        event: itemInput.eventId,
+        orderItem: orderItem?.id,
+        user: customerData.id,
+      },
+      req: { transactionID },
+    })
+  })
+
+  await Promise.all(ticketPromises)
+
+  return { newOrder }
+}
+
+const createPayment = async ({
+  customerData,
+  newOrder,
+  zaloPayOrder,
+  transactionID,
+  currency,
+}: {
+  customerData: User
+  newOrder: Order
+  currency: string
+  zaloPayOrder: ZaloPayOrder
+  transactionID: number | Promise<number | string> | string
+}) => {
+  await payload.create({
+    collection: 'payments',
+    data: {
+      user: customerData.id,
+      order: newOrder.id,
+      paymentMethod: 'zalopay',
+      currency,
+      total: zaloPayOrder.amount,
+      status: 'processing',
+      appTransId: zaloPayOrder.app_trans_id,
+      paymentData: {
+        app_trans_id: zaloPayOrder.app_trans_id,
+        app_id: ZALO_PAYMENT.APP_ID,
+        app_time: zaloPayOrder.app_time,
+        app_user: zaloPayOrder.app_user,
+        embed_data: zaloPayOrder.embed_data,
+        item: zaloPayOrder.item,
+        server_time: zaloPayOrder.app_time,
+        amount: zaloPayOrder.amount,
+      },
+    },
+    req: { transactionID },
+  })
 }
