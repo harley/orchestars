@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react'
-import { MapPin } from 'lucide-react'
+import { Calendar, MapPin } from 'lucide-react'
 import { Event } from '@/types/Event'
 import { format as dateFnsFormat } from 'date-fns'
 interface PastConcertsProps {
@@ -45,7 +45,7 @@ const PastConcerts: React.FC<PastConcertsProps> = ({ events }) => {
     <section className="py-20">
       <div className="container mx-auto px-6 md:px-10">
         <div className="flex justify-between items-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-display font-bold">Past Concerts</h2>
+          <h2 className="text-3xl md:text-4xl font-display font-bold">Sự Kiện Đã Diễn Ra</h2>
 
           <div className="flex space-x-2">
             <button
@@ -111,27 +111,27 @@ const PastConcerts: React.FC<PastConcertsProps> = ({ events }) => {
 
               <div className="p-5">
                 <h3 className="font-semibold text-lg mb-2 line-clamp-1">{evt.title}</h3>
-                <p className="text-muted-foreground text-sm mb-3">
-                  {' '}
-                  {evt.startDatetime &&
-                    dateFnsFormat(new Date(evt.startDatetime), 'dd/MM/yyyy HH:mm a')}{' '}
-                  -{' '}
-                  {evt.endDatetime &&
-                    dateFnsFormat(new Date(evt.endDatetime), 'dd/MM/yyyy HH:mm a')}
-                </p>
-
-                <div className="flex justify-between items-center text-sm">
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1 text-primary/70" />
-                    <span className="text-muted-foreground line-clamp-1">{evt.eventLocation}</span>
-                  </div>
-                  {/* <div className="flex items-center">
-                    <Users className="h-4 w-4 mr-1 text-primary/70" />
-                    <span className="text-muted-foreground">
-                      {evt.attendees.toLocaleString()}
-                    </span>
-                  </div> */}
+                <div className="flex items-center">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  <span className="text-sm">
+                    {evt.startDatetime &&
+                      dateFnsFormat(new Date(evt.startDatetime), 'dd/MM/yyyy HH:mm a')}{' '}
+                    -{' '}
+                    {evt.endDatetime &&
+                      dateFnsFormat(new Date(evt.endDatetime), 'dd/MM/yyyy HH:mm a')}
+                  </span>
                 </div>
+
+                {evt.eventLocation && (
+                  <div className="flex justify-between items-center text-sm">
+                    <div className="flex items-center">
+                      <MapPin className="h-4 w-4 mr-1 text-primary/70" />
+                      <span className="text-muted-foreground line-clamp-1">
+                        {evt.eventLocation}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ))}
