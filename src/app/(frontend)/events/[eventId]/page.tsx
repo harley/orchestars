@@ -40,6 +40,17 @@ const ConcertDetailPage = async (props: { params: Promise<{ eventId: string }> }
     .find({ collection: 'faqs', where: { status: { equals: 'active' } }, limit: 50 })
     .then((res) => res.docs)
 
+  const unavailableSeats = await payload
+    .find({
+      collection: 'tickets',
+      where: {
+        status: { in: ['booked', 'pending_payment', 'hold'] },
+        event: { equals: eventDetail.id },
+      },
+      select: { seat: true },
+    })
+    .then((res) => res.docs.map((tk) => tk.seat).filter((exist) => !!exist))
+
   return (
     <div className="">
       <PageClient />
@@ -47,6 +58,7 @@ const ConcertDetailPage = async (props: { params: Promise<{ eventId: string }> }
         event={eventDetail}
         performers={performers as Performer[]}
         faqs={faqs as FAQType[]}
+        unavailableSeats={unavailableSeats as string[]}
       />
     </div>
   )
