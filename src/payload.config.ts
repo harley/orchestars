@@ -1,12 +1,9 @@
 // storage-adapter-import-placeholder
 import { postgresAdapter } from '@payloadcms/db-postgres'
 // import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
-import path from 'path'
-import { buildConfig } from 'payload'
-import { fileURLToPath } from 'url'
+
 import sharp from 'sharp'
 
-import sharp from 'sharp' // sharp-import
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
@@ -96,7 +93,6 @@ export default buildConfig({
     // storage-adapter-placeholder
   ],
   secret: process.env.PAYLOAD_SECRET,
-  sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
