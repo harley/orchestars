@@ -8,17 +8,14 @@ const VietQRPaymentComponent = () => {
   const amount = searchParams.get('amount');
   const addInfo = searchParams.get('addInfo');
   const [isValidParams, setIsValidParams] = React.useState(true);
-  // Wait for the "amount" parameter to be available
-  if (!amount) {
-    return <div>Loading payment information...</div>;
-  }
-  // Validate amount is a positive number
   React.useEffect(() => {
     const amountNum = Number(amount);
     if (isNaN(amountNum) || amountNum <= 0) {
       setIsValidParams(false);
     }
   }, [amount]);
+
+
   if (!isValidParams) {
     return <div className="text-red-500">Invalid payment parameters</div>;
   }
