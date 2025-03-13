@@ -30,6 +30,10 @@ export async function POST(request: NextRequest) {
       return jsonResponse(-1, 'Payment record not found')
     }
 
+    if (payment.status !== 'processing') {
+      return jsonResponse(0, 'Payment is not in processing status')
+    }
+
     await updatePaymentStatus(payment.id)
     await updateOrderStatus((payment.order as Order)?.id)
 
@@ -47,8 +51,6 @@ async function findPayment(appTransId: string) {
     where: { appTransId: { equals: appTransId } },
     limit: 1,
   })
-
-  console.log('result', result)
 
   return result.docs?.[0] || null
 }
