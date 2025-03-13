@@ -835,6 +835,7 @@ export interface OrderItem {
   order: number | Order;
   event: number | Event;
   ticketPriceId: string;
+  seat?: string | null;
   quantity: number;
   price: number;
   updatedAt: string;
@@ -875,6 +876,7 @@ export interface Ticket {
   attendeeName?: string | null;
   user?: (number | null) | User;
   ticketCode?: string | null;
+  seat?: string | null;
   ticketPriceInfo?:
     | {
         [k: string]: unknown;
@@ -886,6 +888,7 @@ export interface Ticket {
     | null;
   event?: (number | null) | Event;
   orderItem?: (number | null) | OrderItem;
+  status?: ('booked' | 'pending_payment' | 'hold' | 'cancelled') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1614,6 +1617,7 @@ export interface OrderItemsSelect<T extends boolean = true> {
   order?: T;
   event?: T;
   ticketPriceId?: T;
+  seat?: T;
   quantity?: T;
   price?: T;
   updatedAt?: T;
@@ -1644,9 +1648,11 @@ export interface TicketsSelect<T extends boolean = true> {
   attendeeName?: T;
   user?: T;
   ticketCode?: T;
+  seat?: T;
   ticketPriceInfo?: T;
   event?: T;
   orderItem?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }
