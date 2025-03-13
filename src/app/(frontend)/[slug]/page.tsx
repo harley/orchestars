@@ -14,32 +14,34 @@ import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Home } from '@/components/Home/Component'
 
-export const dynamic = 'force-dynamic' // Add this to disable static rendering
-export const revalidate = 0 // Add this to disable cache
+export const dynamic = 'force-dynamic' // Force dynamic rendering
+export const revalidate = 0 // Disable cache
+export const dynamicParams = true
+export const fetchCache = 'force-no-store' // Ensure fresh fetch
 
-export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise })
-  const pages = await payload.find({
-    collection: 'pages',
-    draft: false,
-    limit: 1000,
-    overrideAccess: false,
-    pagination: false,
-    select: {
-      slug: true,
-    },
-  })
+// export async function generateStaticParams() {
+//   const payload = await getPayload({ config: configPromise })
+//   const pages = await payload.find({
+//     collection: 'pages',
+//     draft: false,
+//     limit: 1000,
+//     overrideAccess: false,
+//     pagination: false,
+//     select: {
+//       slug: true,
+//     },
+//   })
 
-  const params = pages.docs
-    ?.filter((doc) => {
-      return doc.slug !== 'home'
-    })
-    .map(({ slug }) => {
-      return { slug }
-    })
+//   const params = pages.docs
+//     ?.filter((doc) => {
+//       return doc.slug !== 'home'
+//     })
+//     .map(({ slug }) => {
+//       return { slug }
+//     })
 
-  return params
-}
+//   return params
+// }
 
 type Args = {
   params: Promise<{
