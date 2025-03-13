@@ -26,10 +26,12 @@ const TicketDetails = ({
   event,
   performers,
   faqs,
+  unavailableSeats,
 }: {
   event: Event
   performers: Performer[]
   faqs: FAQType[]
+  unavailableSeats?: string[]
 }) => {
   const { toast } = useToast()
   const [selectedSeats, setSelectedSeats] = useState<SelectedSeat[]>([])
@@ -201,7 +203,7 @@ const TicketDetails = ({
                 ))}
               </div>
 
-              <SeatMapToolkit onSelectSeat={handleSeatSelect} />
+              <SeatMapToolkit onSelectSeat={handleSeatSelect} unavailableSeats={unavailableSeats} />
               {/* <SeatMap
                 onSeatSelect={handleSeatSelect}
                 selectedSeats={selectedSeats}
