@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Check, CreditCard, Info, X, Loader2 } from 'lucide-react'
+import { Check, CreditCard, Info, X, Loader2, QrCode } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { SelectedSeat } from './types'
 import { useToast } from '@/hooks/use-toast'
@@ -77,7 +77,7 @@ const ConfirmOrderModal = ({
   const paymentMethods: PaymentMethod[] = [
     // { id: 'vnpay', name: 'Banking Application (VNPay)', icon: <CreditCard className="h-5 w-5" /> },
     { id: 'zalopay', name: 'ZaloPay', icon: <CreditCard className="h-5 w-5" /> },
-    // { id: 'vietqr', name: 'VietQR', icon: <QrCode className="h-5 w-5" /> },
+    { id: 'vietqr', name: 'VietQR', icon: <QrCode className="h-5 w-5" /> },
     // { id: 'momo', name: 'Momo Wallet', icon: <CreditCard className="h-5 w-5" /> },
     // { id: 'card', name: 'International Payment Card', icon: <CreditCard className="h-5 w-5" /> },
   ]
@@ -105,12 +105,24 @@ const ConfirmOrderModal = ({
           })),
         },
       }
+      if (selectedPaymentMethod === 'vietqr') {
+        const totalAmount = selectedSeats.reduce((acc, seat) => {
+          const price = seat.ticketPrice?.price || 0;
+          const quantity = 1; // or use a dynamic value if available
+          return acc + price * quantity;
+        }, 0);
+        // Redirect to your dedicated VietQR payment page
+        const seatLabels = selectedSeats.map((seat) => seat.label).join(',');
+        const baseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL || window.location.origin;
+        window.location.href = `${baseUrl}/payment/vietqr?amount=${totalAmount}&addInfo=Phi%20mua%20ve%20&seat=${encodeURIComponent(seatLabels)}`;        
+      } else {
 
       const result = await axios
         .post(`/api/${selectedPaymentMethod}/order`, bodyData)
         .then((res) => res.data)
-
+      
       window.location.href = result.order_url
+      }
     } catch (error: any) {
       console.log('error, ', error)
       toast({
