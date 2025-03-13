@@ -6,6 +6,7 @@ import * as migration_20250312_170914_add_activities_collection from './20250312
 import * as migration_20250312_181537_add_nav_items_column_footer from './20250312_181537_add_nav_items_column_footer';
 import * as migration_20250312_190107_add_display_order_column_performer_collection_and_add_link_column_partner_collection from './20250312_190107_add_display_order_column_performer_collection_and_add_link_column_partner_collection';
 import * as migration_20250313_035532_add_detailDescription_and_configuration_fields_event_table from './20250313_035532_add_detailDescription_and_configuration_fields_event_table';
+import * as migration_20250313_085919_add_seat_field_to_order_item_and_ticket_collection from './20250313_085919_add_seat_field_to_order_item_and_ticket_collection';
 
 export const migrations = [
   {
@@ -46,6 +47,11 @@ export const migrations = [
   {
     up: migration_20250313_035532_add_detailDescription_and_configuration_fields_event_table.up,
     down: migration_20250313_035532_add_detailDescription_and_configuration_fields_event_table.down,
-    name: '20250313_035532_add_detailDescription_and_configuration_fields_event_table'
+    name: '20250313_035532_add_detailDescription_and_configuration_fields_event_table',
+  },
+  {
+    up: migration_20250313_085919_add_seat_field_to_order_item_and_ticket_collection.up,
+    down: migration_20250313_085919_add_seat_field_to_order_item_and_ticket_collection.down,
+    name: '20250313_085919_add_seat_field_to_order_item_and_ticket_collection'
   },
 ];
