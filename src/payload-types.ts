@@ -235,6 +235,14 @@ export interface Event {
   eventBanner?: (number | null) | Media;
   sponsorLogo?: (number | null) | Media;
   ticketQuantityLimitation?: ('perTicketType' | 'perEvent') | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -565,6 +573,13 @@ export interface EventsSelect<T extends boolean = true> {
   eventBanner?: T;
   sponsorLogo?: T;
   ticketQuantityLimitation?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
