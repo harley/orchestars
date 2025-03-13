@@ -1,5 +1,5 @@
+import { cn } from '@/utilities/ui'
 import React from 'react'
-import { cn } from '@/lib/utils'
 
 interface CustomButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'interested'
@@ -46,17 +46,17 @@ const CustomButton = ({
       {...(asChild
         ? {}
         : {
-            className: cn(
-              baseStyles,
-              variants[variant],
-              sizes[size],
-              fullWidth ? 'w-full' : '',
-              isLoading ? 'opacity-70 cursor-not-allowed' : '',
-              className,
-            ),
-            disabled: isLoading || props.disabled,
-            ...props,
-          })}
+          className: cn(
+            baseStyles,
+            variants[variant],
+            sizes[size],
+            fullWidth ? 'w-full' : '',
+            isLoading ? 'opacity-70 cursor-not-allowed' : '',
+            className,
+          ),
+          disabled: isLoading || props.disabled,
+          ...props,
+        })}
     >
       {isLoading && (
         <svg

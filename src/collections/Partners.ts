@@ -22,6 +22,11 @@ export const Partners: CollectionConfig = {
       required: false,
     },
     {
+      name: 'link',
+      type: 'text',
+      required: false,
+    },
+    {
       name: 'status',
       type: 'select',
       defaultValue: 'active',

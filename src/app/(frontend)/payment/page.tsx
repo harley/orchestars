@@ -1,12 +1,13 @@
-import ServerLayout from '@/components/layout/ServerLayout'
-import Payment from '@/components/payment'
+import Payment from '@/components/Payment'
 import React from 'react'
+import PageClient from './page.client'
 
 const PaymentPage = () => {
   return (
-    <ServerLayout>
+    <div className="">
+      <PageClient />
       <Payment />
-    </ServerLayout>
+    </div>
   )
 }
 

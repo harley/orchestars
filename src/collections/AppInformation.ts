@@ -69,5 +69,10 @@ export const AppInformation: CollectionConfig = {
         },
       ],
     },
+    {
+      name: 'aboutUs',
+      type: 'richText',
+      required: false,
+    },
   ],
 }

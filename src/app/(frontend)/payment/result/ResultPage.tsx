@@ -1,58 +1,57 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { Check, X, ArrowLeft, ArrowRight, RefreshCcw, AlertCircle } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
+import React, { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { Check, X, ArrowLeft, ArrowRight, RefreshCcw, AlertCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { useToast } from '@/hooks/use-toast'
+import { useRouter } from 'next/navigation'
+import { format } from 'date-fns'
 
 const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }) => {
-    const router = useRouter();
+    const router = useRouter()
     const { toast } = useToast()
-    const [isSuccess, setIsSuccess] = useState<boolean | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const status = paymentInfo.status;
+    const [isSuccess, setIsSuccess] = useState<boolean | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
+    const status = paymentInfo.status
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            setIsSuccess(status === 'paid');
+            setIsSuccess(status === 'paid')
 
             // Show toast notification
             if (status === 'paid') {
-                setIsLoading(false);
+                setIsLoading(false)
                 toast({
-                    title: "Payment completed successfully!"
-                });
+                    title: 'Payment completed successfully!',
+                })
             } else if (status === 'failed') {
-                setIsLoading(false);
+                setIsLoading(false)
                 toast({
-                    title: "Payment failed. Please try again.",
-                    variant: "destructive"
-                });
+                    title: 'Payment failed. Please try again.',
+                    variant: 'destructive',
+                })
             } else {
-                setIsLoading(true);
+                setIsLoading(true)
                 toast({
-                    title: "Payment processing...",
-                });
+                    title: 'Payment processing...',
+                })
             }
-        }, 1500);
+        }, 1500)
 
-        return () => clearTimeout(timer);
-    }, [paymentInfo, toast, status]);
-
+        return () => clearTimeout(timer)
+    }, [paymentInfo, toast, status])
 
     // Handle payment retry
     const handleRetry = () => {
-        window.location.reload();
-    };
+        window.location.reload()
+    }
 
     useEffect(() => {
         if (isLoading && status !== 'paid' && status !== 'failed') {
             setTimeout(() => {
-                handleRetry();
-            }, 3000);
+                handleRetry()
+            }, 3000)
         }
     }, [isLoading, status])
 
@@ -68,7 +67,7 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
                     </div>
                 </main>
             </div>
-        );
+        )
     }
 
     return (
@@ -79,8 +78,8 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
                         {/* Result Header */}
                         <div
                             className={`p-8 ${isSuccess
-                                ? "bg-gradient-to-r from-green-500 to-emerald-600"
-                                : "bg-gradient-to-r from-red-500 to-rose-600"
+                                    ? 'bg-gradient-to-r from-green-500 to-emerald-600'
+                                    : 'bg-gradient-to-r from-red-500 to-rose-600'
                                 } text-white text-center`}
                         >
                             <div className="mx-auto w-20 h-20 flex items-center justify-center rounded-full bg-white mb-6">
@@ -92,14 +91,13 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
                             </div>
 
                             <h1 className="text-3xl font-bold mb-2">
-                                {isSuccess ? "Payment Successful!" : "Payment Failed"}
+                                {isSuccess ? 'Payment Successful!' : 'Payment Failed'}
                             </h1>
 
                             <p className="text-white/90 text-lg">
                                 {isSuccess
-                                    ? "Your transaction has been completed"
-                                    : "There was an issue processing your payment"
-                                }
+                                    ? 'Your transaction has been completed'
+                                    : 'There was an issue processing your payment'}
                             </p>
                         </div>
 
@@ -117,7 +115,9 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
 
                                         <div className="flex justify-between">
                                             <span className="text-gray-600">Date:</span>
-                                            <span className="font-medium">{format(paymentInfo.createdAt, 'dd/MM/yyyy HH:mm:ss')}</span>
+                                            <span className="font-medium">
+                                                {format(paymentInfo.createdAt, 'dd/MM/yyyy HH:mm:ss')}
+                                            </span>
                                         </div>
 
                                         <div className="flex justify-between">
@@ -127,10 +127,13 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
 
                                         <div className="flex justify-between border-t pt-4 mt-4">
                                             <span className="text-gray-900 font-bold">Total Amount:</span>
-                                            <span className="text-primary font-bold"> {new Intl.NumberFormat('vi-VN', {
-                                                style: 'currency',
-                                                currency: paymentInfo.currency || 'VND',
-                                            }).format(paymentInfo.total)}</span>
+                                            <span className="text-primary font-bold">
+                                                {' '}
+                                                {new Intl.NumberFormat('vi-VN', {
+                                                    style: 'currency',
+                                                    currency: paymentInfo.currency || 'VND',
+                                                }).format(paymentInfo.total)}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -143,8 +146,9 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
                                         <div>
                                             <h3 className="font-medium text-amber-800">Payment Not Completed</h3>
                                             <p className="text-amber-700 text-sm mt-1">
-                                                Your payment could not be processed. This could be due to insufficient funds,
-                                                incorrect payment details, or a temporary issue with the payment provider.
+                                                Your payment could not be processed. This could be due to insufficient
+                                                funds, incorrect payment details, or a temporary issue with the payment
+                                                provider.
                                             </p>
                                         </div>
                                     </div>
@@ -162,30 +166,19 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
                             <div className="flex flex-col sm:flex-row gap-4 mt-6">
                                 {isSuccess ? (
                                     <>
-                                        <Button
-                                            variant="outline"
-                                            className="flex-1"
-                                            onClick={() => router.push('/')}
-                                        >
+                                        <Button variant="outline" className="flex-1" onClick={() => router.push('/')}>
                                             <ArrowLeft className="mr-2 h-4 w-4" />
                                             Back to Home
                                         </Button>
                                     </>
                                 ) : (
                                     <>
-                                        <Button
-                                            variant="outline"
-                                            className="flex-1"
-                                            onClick={() => router.push('/')}
-                                        >
+                                        <Button variant="outline" className="flex-1" onClick={() => router.push('/')}>
                                             <ArrowLeft className="mr-2 h-4 w-4" />
                                             Back to Home
                                         </Button>
 
-                                        <Button
-                                            className="flex-1 bg-primary hover:bg-primary/90"
-                                            onClick={handleRetry}
-                                        >
+                                        <Button className="flex-1 bg-primary hover:bg-primary/90" onClick={handleRetry}>
                                             <RefreshCcw className="mr-2 h-4 w-4" />
                                             Try Again
                                         </Button>
@@ -199,8 +192,8 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
                     {isSuccess && (
                         <div className="mt-8 text-center">
                             <p className="text-gray-600 mb-4">
-                                Your tickets have been sent to your email address.
-                                You can also view them in your account.
+                                Your tickets have been sent to your email address. You can also view them in your
+                                account.
                             </p>
                             <Link href="/" className="text-primary hover:underline inline-flex items-center">
                                 Go to upcoming events
@@ -211,8 +204,7 @@ const PaymentResultPage = ({ paymentInfo }: { paymentInfo: Record<string, any> }
                 </div>
             </main>
         </>
+    )
+}
 
-    );
-};
-
-export default PaymentResultPage;
+export default PaymentResultPage
