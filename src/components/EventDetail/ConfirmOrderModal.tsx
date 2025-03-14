@@ -95,7 +95,7 @@ const ConfirmOrderModal = ({
   ]
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>(
-    PAYMENT_METHODS.ZALOPAY,
+    PAYMENT_METHODS.BANK_TRANSFER,
   )
 
   const {
@@ -154,7 +154,6 @@ const ConfirmOrderModal = ({
     style: 'currency',
     currency: 'VND',
   }).format(calculateTotal)
-
 
   // const transactionImage = watch('transactionImage')
 
@@ -286,8 +285,6 @@ const ConfirmOrderModal = ({
                   <span className="text-2xl font-bold text-primary">{formatTotalMoney}</span>
                 </div>
 
-
-
                 {selectedPaymentMethod === PAYMENT_METHODS.ZALOPAY && (
                   <>
                     <div className="grid xl:grid-cols-2 grid-cols-1 gap-2">
@@ -336,7 +333,7 @@ const ConfirmOrderModal = ({
                         ) : (
                           <Check className="mr-2 h-4 w-4" />
                         )}
-                        Chuyển qua trang thanh toán
+                        Xác nhận đơn và Chuyển qua trang thanh toán
                       </Button>
                       <Button
                         variant="outline"
