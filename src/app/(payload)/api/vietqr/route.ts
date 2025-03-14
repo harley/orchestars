@@ -5,6 +5,20 @@ import { VIET_QR } from '@/config/payment'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+
+    // Validate required fields
+    if (!body.addInfo || !body.amount) {
+      return NextResponse.json(
+        { message: 'Nội dung và số tiền không được để trống' },
+        { status: 400 },
+      )
+    }
+
+    // Validate amount is a number
+    if (isNaN(Number(body.amount)) || Number(body.amount) <= 0) {
+      return NextResponse.json({ message: 'Số tiền phải lớn hơn 0' }, { status: 400 })
+    }
+
     const response = await axios.post(
       'https://api.vietqr.io/v2/generate',
       {
