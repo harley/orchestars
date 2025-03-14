@@ -34,8 +34,8 @@ export const Orders: CollectionConfig = {
                 const { docs: orderItems } = await req.payload.find({
                   collection: 'orderItems',
                   where: {
-                    orderCode: {
-                      equals: originalDoc.orderCode,
+                    id: {
+                      equals: originalDoc.orderId,
                     },
                   },
                 });
