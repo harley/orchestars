@@ -17,6 +17,9 @@ import { Toaster } from '@/components/ui/toaster'
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
 
+import { Analytics } from '@vercel/analytics/next';
+
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // const { isEnabled } = await draftMode()
 
@@ -39,6 +42,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Footer />
         </Providers>
         <Toaster />
+        <Analytics />
       </body>
     </html>
   )
