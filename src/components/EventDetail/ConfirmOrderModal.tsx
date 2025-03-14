@@ -86,13 +86,13 @@ const ConfirmOrderModal = ({
 
   const paymentMethods: PaymentMethod[] = [
     // { id: 'vnpay', name: 'Banking Application (VNPay)', icon: <CreditCard className="h-5 w-5" /> },
-    { id: PAYMENT_METHODS.ZALOPAY, name: 'ZaloPay', icon: <CreditCard className="h-5 w-5" /> },
+    // { id: PAYMENT_METHODS.ZALOPAY, name: 'ZaloPay', icon: <CreditCard className="h-5 w-5" /> },
     // { id: 'vietqr', name: 'VietQR', icon: <QrCode className="h-5 w-5" /> },
     // { id: 'momo', name: 'Momo Wallet', icon: <CreditCard className="h-5 w-5" /> },
     // { id: 'card', name: 'International Payment Card', icon: <CreditCard className="h-5 w-5" /> },
     {
       id: PAYMENT_METHODS.BANK_TRANSFER,
-      name: 'Chuyển khoản trực tiếp đến tài khoản ngân hàng',
+      name: 'Chuyển khoản ngân hàng (quét mã QR)',
       icon: <CreditCard className="h-5 w-5" />,
     },
   ]
