@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { QRCodeCanvas } from 'qrcode.react'
 import axios from 'axios'
 import { Loader2 } from 'lucide-react'
 
@@ -9,7 +8,7 @@ interface VietQRProps {
 }
 
 const VietQR: React.FC<VietQRProps> = ({ amount, addInfo }) => {
-  const [qrCode, setQrCode] = useState('')
+  const [qrCodeData, setQrCodeData] = useState<{ qrCode?: string; qrDataURL?: string }>()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -19,8 +18,7 @@ const VietQR: React.FC<VietQRProps> = ({ amount, addInfo }) => {
           amount,
           addInfo,
         })
-        const qrCode = res.data?.data?.qrCode
-        setQrCode(qrCode)
+        setQrCodeData(res.data?.data)
       } catch (error) {
         console.error('Error generating QR:', error)
       } finally {
@@ -35,18 +33,23 @@ const VietQR: React.FC<VietQRProps> = ({ amount, addInfo }) => {
 
   return (
     <div className="text-center">
-      <h2 className="mb-1">VietQR Code</h2>
-      <div className="relative w-[200px] h-[200px]">
+      <div className="relative w-[350px] h-[350px]">
         {loading && (
           <div className="absolute z-50 top-[30%] left-1/2 -translate-x-1/2 p-5 bg-gray-100/30 rounded-md flex flex-col items-center justify-center gap-2">
             <Loader2 className="w-12 h-12 animate-spin" />
             <span className="text-xs">Đang tải...</span>
           </div>
         )}
-        {qrCode && <QRCodeCanvas value={qrCode} size={200} />}
+        {qrCodeData?.qrDataURL && (
+          <img
+            src={qrCodeData?.qrDataURL}
+            className="max-w-[540px] max-h-[540px] object-contain w-full h-full box-border"
+            alt=""
+          />
+        )}
       </div>
 
-      <p className="mt-1">Quét mã này để chuyển tiền</p>
+      <p className="mt-1 text-sm font-semibold italic">Quét mã này để chuyển tiền</p>
     </div>
   )
 }
