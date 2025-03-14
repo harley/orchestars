@@ -151,6 +151,20 @@ export const Events: CollectionConfig = {
           name: 'name',
         },
         {
+          type: 'select',
+          name: 'key',
+          admin: {
+            description: 'Giá trị giảm dần theo khu vực, với Zone 1 là vé đắt nhất.',
+          },
+          options: [
+            { label: 'Zone 1', value: 'zone1' },
+            { label: 'Zone 2', value: 'zone2' },
+            { label: 'Zone 3', value: 'zone3' },
+            { label: 'Zone 4', value: 'zone4' },
+            { label: 'Zone 5', value: 'zone5' },
+          ],
+        },
+        {
           type: 'number',
           min: 0,
           name: 'price',

@@ -47,7 +47,7 @@ const TicketDetails = ({
         return prev.filter((s) => s.id !== seat.id)
       } else {
         const ticketPrice = event.ticketPrices?.find(
-          (t: any) => t.name === seat.category?.name,
+          (t: any) => t.key === seat.category?.id,
         ) as SelectedSeat['ticketPrice']
         return [...prev, { ...seat, ticketPrice, eventId: event.id }]
       }

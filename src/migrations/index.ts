@@ -9,6 +9,7 @@ import * as migration_20250313_035532_add_detailDescription_and_configuration_fi
 import * as migration_20250313_085919_add_seat_field_to_order_item_and_ticket_collection from './20250313_085919_add_seat_field_to_order_item_and_ticket_collection';
 import * as migration_20250313_093244_update_order_status_field_to_enum from './20250313_093244_update_order_status_field_to_enum';
 import * as migration_20250314_025724_add_seat_holding_collection from './20250314_025724_add_seat_holding_collection';
+import * as migration_20250314_124747_add_key_ticket_price_for_event_collectin from './20250314_124747_add_key_ticket_price_for_event_collectin';
 
 export const migrations = [
   {
@@ -64,6 +65,11 @@ export const migrations = [
   {
     up: migration_20250314_025724_add_seat_holding_collection.up,
     down: migration_20250314_025724_add_seat_holding_collection.down,
-    name: '20250314_025724_add_seat_holding_collection'
+    name: '20250314_025724_add_seat_holding_collection',
+  },
+  {
+    up: migration_20250314_124747_add_key_ticket_price_for_event_collectin.up,
+    down: migration_20250314_124747_add_key_ticket_price_for_event_collectin.down,
+    name: '20250314_124747_add_key_ticket_price_for_event_collectin'
   },
 ];

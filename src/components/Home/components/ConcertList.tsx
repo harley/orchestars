@@ -1,11 +1,10 @@
 import React, { useEffect, useRef } from 'react'
 import { Calendar, MapPin } from 'lucide-react'
-import CustomButton from '@/components/ui/custom-button'
-import { useRouter } from 'next/navigation'
 import { format as dateFnsFormat } from 'date-fns'
 
 import { PaginatedDocs } from 'payload'
 import { cn } from '@/utilities/ui'
+import Link from 'next/link'
 interface ConcertListProps {
   onGoingPaginatedDocs: PaginatedDocs
   title: string
@@ -13,7 +12,6 @@ interface ConcertListProps {
 
 const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }) => {
   const elementsRef = useRef<(HTMLDivElement | null)[]>([])
-  const router = useRouter()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,10 +35,6 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }
       window.removeEventListener('scroll', handleScroll)
     }
   }, [])
-
-  const handleGetTickets = (id: number) => {
-    router.push(`/events/${id}`)
-  }
 
   return (
     <section className="py-20 ">
@@ -107,13 +101,13 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }
                 </pre>
 
                 <div>
-                  <CustomButton
+                  <Link
                     // variant="primary"
-                    className="bg-gray-800 text-white hover:bg-gray-800/90 shadow-subtle"
-                    onClick={() => handleGetTickets(evt.slug)}
+                    href={`/events/${evt.slug}`}
+                    className="text-sm px-4 py-2 bg-gray-800 text-white hover:bg-gray-800/90 shadow-subtle relative cursor-pointer rounded-lg font-medium inline-flex items-center justify-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/20"
                   >
                     Đặt vé
-                  </CustomButton>
+                  </Link>
                 </div>
               </div>
             </div>
