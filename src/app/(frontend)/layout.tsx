@@ -25,7 +25,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         {/* <InitTheme /> */}
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
-        <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>
       <body>
         <Providers>
@@ -50,8 +49,8 @@ export const metadata: Metadata = {
   openGraph: mergeOpenGraph(),
   twitter: {
     card: 'summary_large_image',
-    creator: '@payloadcms',
+    creator: '@coderpush',
   },
-  description: '',
-  title: 'Orchestars',
+  description: 'Orchestars is a dynamic music company committed to transforming the orchestral landscape',
+  title: 'Experience Live Orchestral Music Like Never Before | Orchestars',
 }

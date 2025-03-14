@@ -3,14 +3,14 @@ import { getServerSideURL } from './getURL'
 
 const defaultOpenGraph: Metadata['openGraph'] = {
   type: 'website',
-  description: 'An open-source website built with Payload and Next.js.',
+  description: 'Orchestars is a dynamic music company committed to transforming the orchestral landscape',
   images: [
     {
-      url: `${getServerSideURL()}/website-template-OG.webp`,
+      url: `${getServerSideURL()}/meta-image.web`,
     },
   ],
   siteName: 'Orchestars',
-  title: 'Orchestars',
+  title: 'Experience Live Orchestral Music Like Never Before | Orchestars',
 }
 
 export const mergeOpenGraph = (og?: Metadata['openGraph']): Metadata['openGraph'] => {
