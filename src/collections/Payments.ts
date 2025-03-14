@@ -90,18 +90,18 @@ export const Payments: CollectionConfig = {
               try {
                 await req.payload.update({
                   collection: 'orders',
-                  id: originalDoc.order, 
-                  data: { status: 'complete' },
-                });
+                  id: originalDoc.order,
+                  data: { status: 'completed' },
+                })
               } catch (error) {
-                console.error('Error updating order status:', error);
+                console.error('Error updating order status:', error)
               }
             }
-            return value;
+            return value
           },
         ],
       },
-    },    
+    },
     {
       name: 'paidAt',
       type: 'date',

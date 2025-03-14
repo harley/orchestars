@@ -1,10 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { generateTicketBookEmailHtml } from './TicketBookedEmail';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
-
-// Create the absolute path to the file in the public folder
-const attachmentPath = join(process.cwd(), 'public', 'eventTerms.doc');
+import { afterChangeStatus } from './hooks/afterChangeStatus'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
@@ -63,34 +58,8 @@ export const Tickets: CollectionConfig = {
       ],
       required: false,
       hooks: {
-        afterChange: [
-          async ({ value, originalDoc, req }) => {
-            if (value) {
-              try {
-                const fileBuffer = await readFile(attachmentPath);
-                await req.payload.sendEmail({
-                  from: "onboarding@resend.dev",
-                  to: 'ruby@coderpush.com',
-                  subject: 'Hello World',
-                  html: await generateTicketBookEmailHtml({ ticketCode: originalDoc.ticketCode }),
-                  attachments: [
-                    {
-                      content: fileBuffer,
-                      filename: 'eventTerms.doc',
-                      path: './eventTerms.doc',
-                      contentType: 'application/msword',
-                    },
-                  ],
-                });
-              } catch (error) {
-                console.error('Error sending email:', error);
-              }
-            }
-            return value;
-          },
-        ],
+        afterChange: [afterChangeStatus],
       },
     },
   ],
-  
 }

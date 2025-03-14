@@ -1,30 +1,15 @@
-import QRCode from 'qrcode';
-
 export interface TicketData {
-  ticketCode?: string;
+  ticketCode?: string
+  eventName: string
 }
-
-export async function generateQRCode(ticketCode: string): Promise<string> {
-  try {
-    // Generate a Data URL representing the QR code image for the given ticket code.
-    const qrDataUrl = await QRCode.toDataURL(ticketCode);
-    return qrDataUrl;
-  } catch (error) {
-    console.error("Error generating QR code:", error);
-    return '';
-  }
-}
-
 
 export async function generateTicketBookEmailHtml(ticketData: TicketData) {
-  const qrCodeDataUrl = ticketData.ticketCode ? await generateQRCode(ticketData.ticketCode) : '';
-  console.log(qrCodeDataUrl)
-    return `
+  return `
   <!DOCTYPE html>
   <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>Ticket Confirmation - ATTACK ON TITAN - DEVOTION 2025</title>
+    <title>Ticket Confirmation - ${ticketData.eventName}</title>
     <style>
       body { font-family: Arial, sans-serif; line-height: 1.6; }
       .container { max-width: 600px; margin: 0 auto; }
@@ -43,10 +28,10 @@ export async function generateTicketBookEmailHtml(ticketData: TicketData) {
       <div class="content">
         <p>
           Imagine Philharmonic Orchestra (IPO) xin cảm ơn bạn đã đặt vé tham dự chương trình hòa nhạc
-          <strong>ATTACK ON TITAN - DEVOTION 2025</strong>.
+          <strong>${ticketData.eventName}</strong>.
         </p>
         <p>
-          We appreciate your purchasing tickets to the <strong>ATTACK ON TITAN - DEVOTION 2025</strong> concert.
+          We appreciate your purchasing tickets to the <strong>${ticketData.eventName}</strong> concert.
         </p>
         <p>
           <strong>Thông tin vé của bạn như sau:</strong><br>
@@ -60,16 +45,13 @@ export async function generateTicketBookEmailHtml(ticketData: TicketData) {
           Bạn vui lòng xem điều khoản &amp; điều kiện, quy định check-in đính kèm bên dưới và mang theo email vé điện tử có chứa QR code để check-in tại đêm nhạc.<br>
           Please check the attached terms &amp; conditions and check in. You will need this email ticket containing QR code to check in at the show.
         </p>
-        <div class="qr-code">
-          ${qrCodeDataUrl ? `<img src="${qrCodeDataUrl}" alt="QR Code" />` : '<p>[QR CODE PLACEHOLDER]</p>'}
-        </div>
         <p>
           Khách hàng có trách nhiệm bảo mật tuyệt đối mã Mã QR Vé điện tử của mình. Trường hợp có nhiều hơn 1 người check-in bằng 1 Mã QR Vé điện tử, BTC sẽ chấp nhận người đầu tiên check-in mã QR Vé đó được tham gia chương trình.<br>
           Audiences are responsible for keeping the E-Ticket QR code absolutely confidential. In case more than 1 person checks in with 1 e-Ticket QR Code, the Organizing Committee will accept the first person to check in with that QR Code as referenced in the show.
         </p>
         <p>
-          Hẹn gặp bạn tại hòa nhạc giao hưởng <strong>ATTACK ON TITAN - DEVOTION 2025</strong>!<br>
-          See you at the <strong>ATTACK ON TITAN - DEVOTION 2025</strong> concert!
+          Hẹn gặp bạn tại hòa nhạc giao hưởng <strong>${ticketData.eventName}</strong>!<br>
+          See you at the <strong>${ticketData.eventName}</strong> concert!
         </p>
         <p>
           Trân trọng,<br>
@@ -79,6 +61,5 @@ export async function generateTicketBookEmailHtml(ticketData: TicketData) {
      
   </body>
   </html>
-    `;
-  }
-  
+    `
+}
