@@ -8,3 +8,13 @@ export const ZALO_PAYMENT = {
   REDIRECT_URL: `${APP_BASE_URL}/payment/result`,
   CALLBACK_URL: `${APP_BASE_URL}/api/zalopay/callback`,
 }
+
+export const VIET_QR = {
+  X_CLIENT_ID: process.env.VIET_QR_X_CLIENT_ID || '',
+  X_API_KEY: process.env.VIET_QR_X_API_KEY || '',
+  ACCOUNT_NO: process.env.VIET_QR_ACCOUNT_NO || '',
+  ACCOUNT_NAME: process.env.VIET_QR_ACCOUNT_NAME || '',
+  BANK_NAME: process.env.VIET_QR_BANK_NAME || '',
+  ACQ_ID: process.env.VIET_QR_ACQ_ID || '',
+  TEMPLATE: process.env.VIET_QR_TEMPLATE || 'compact',
+}

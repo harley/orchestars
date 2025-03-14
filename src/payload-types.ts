@@ -76,6 +76,7 @@ export interface Config {
     orderItems: OrderItem;
     payments: Payment;
     tickets: Ticket;
+    seatHoldings: SeatHolding;
     partners: Partner;
     performers: Performer;
     activities: Activity;
@@ -101,6 +102,7 @@ export interface Config {
     orderItems: OrderItemsSelect<false> | OrderItemsSelect<true>;
     payments: PaymentsSelect<false> | PaymentsSelect<true>;
     tickets: TicketsSelect<false> | TicketsSelect<true>;
+    seatHoldings: SeatHoldingsSelect<false> | SeatHoldingsSelect<true>;
     partners: PartnersSelect<false> | PartnersSelect<true>;
     performers: PerformersSelect<false> | PerformersSelect<true>;
     activities: ActivitiesSelect<false> | ActivitiesSelect<true>;
@@ -820,7 +822,7 @@ export interface Order {
   id: number;
   orderCode?: string | null;
   user?: (number | null) | User;
-  status?: string | null;
+  status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
   total?: number | null;
   currency?: string | null;
   updatedAt: string;
@@ -862,6 +864,9 @@ export interface Payment {
     | number
     | boolean
     | null;
+  transaction?: {
+    code?: string | null;
+  };
   status: 'processing' | 'canceled' | 'paid' | 'failed';
   paidAt?: string | null;
   updatedAt: string;
@@ -889,6 +894,31 @@ export interface Ticket {
   event?: (number | null) | Event;
   orderItem?: (number | null) | OrderItem;
   status?: ('booked' | 'pending_payment' | 'hold' | 'cancelled') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "seatHoldings".
+ */
+export interface SeatHolding {
+  id: number;
+  seatName: string;
+  event: number | Event;
+  code: string;
+  userInfo?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  closedAt?: string | null;
+  expire_time?: string | null;
+  ipAddress?: string | null;
+  userAgent?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1166,6 +1196,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'tickets';
         value: number | Ticket;
+      } | null)
+    | ({
+        relationTo: 'seatHoldings';
+        value: number | SeatHolding;
       } | null)
     | ({
         relationTo: 'partners';
@@ -1635,6 +1669,11 @@ export interface PaymentsSelect<T extends boolean = true> {
   total?: T;
   appTransId?: T;
   paymentData?: T;
+  transaction?:
+    | T
+    | {
+        code?: T;
+      };
   status?: T;
   paidAt?: T;
   updatedAt?: T;
@@ -1653,6 +1692,22 @@ export interface TicketsSelect<T extends boolean = true> {
   event?: T;
   orderItem?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "seatHoldings_select".
+ */
+export interface SeatHoldingsSelect<T extends boolean = true> {
+  seatName?: T;
+  event?: T;
+  code?: T;
+  userInfo?: T;
+  closedAt?: T;
+  expire_time?: T;
+  ipAddress?: T;
+  userAgent?: T;
   updatedAt?: T;
   createdAt?: T;
 }
