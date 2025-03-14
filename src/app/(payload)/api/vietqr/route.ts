@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       )
     }
-
     // Validate amount is a number
     if (isNaN(Number(body.amount)) || Number(body.amount) <= 0) {
       return NextResponse.json({ message: 'Số tiền phải lớn hơn 0' }, { status: 400 })

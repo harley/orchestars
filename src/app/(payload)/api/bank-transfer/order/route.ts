@@ -5,7 +5,7 @@ import { Event, Order, User } from '@/payload-types'
 import { generateCode } from '@/utilities/generateCode'
 import { generatePassword } from '@/utilities/generatePassword'
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
-
+import { VIET_QR } from '@/config/payment'
 interface CustomerInfo {
   firstName: string
   lastName: string
@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
 
   const order = body.order as NewInputOrder
   const orderItems = order.orderItems
+  const selectedSeats = order.orderItems.map(oI => oI.seat)
 
   const orderCode = generateCode('ORD')
 
@@ -52,7 +53,10 @@ export async function POST(request: NextRequest) {
 
     // check event id, ticket id is exist
     const events = await checkEvents({ orderItems })
-
+    const eventById = await payload.db.findOne({ collection: 'events', where: { id: { equals: order?.orderItems[0]?.eventId } } })
+    const bankName = VIET_QR.BANK_NAME;
+    const accountName = VIET_QR.ACCOUNT_NAME;
+    const accountNo= VIET_QR.ACCOUNT_NO;
     const transactionID = await payload.db.beginTransaction()
     if (!transactionID) {
       throw new Error('Có lỗi xảy ra! Vui lòng thử lại')
@@ -87,8 +91,14 @@ export async function POST(request: NextRequest) {
 
       // Commit the transaction
       await payload.db.commitTransaction(transactionID)
+      const content = `Thanh toán tiền vé cho ghế ${selectedSeats.map((s) => s).join(', ')} tại sự kiện ${eventById.title} - order ${orderCode}`;
 
-      return NextResponse.json({ status: 200 })
+      const encodedContent = encodeURIComponent(content);
+      const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+
+      const paymentLink = `${baseUrl}/payment/vietqr?amount=${amount}&contentBankTransfer=${encodedContent}&bankName=${bankName}&accountName=${accountName}&accountNo=${accountNo}`;
+
+      return NextResponse.json({ paymentLink, status: 200 })
     } catch (error) {
       // Rollback the transaction
       await payload.db.rollbackTransaction(transactionID)
@@ -115,7 +125,7 @@ const checkSeatAvailable = async ({ orderItems }: { orderItems: NewOrderItem[] }
         acc[item.eventId] = []
       }
 
-      ;(acc[item.eventId] as string[]).push(item.seat)
+      ; (acc[item.eventId] as string[]).push(item.seat)
 
       return acc
     },

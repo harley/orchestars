@@ -13,8 +13,7 @@ import { SelectedSeat } from './types'
 import { useToast } from '@/hooks/use-toast'
 import axios from 'axios'
 import { Event } from '@/payload-types'
-import VietQR from './VietQR'
-import { BankInformation } from '@/types/BankInformation'
+
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 
 interface PaymentMethod {
@@ -37,13 +36,11 @@ const ConfirmOrderModal = ({
   onCloseModal,
   selectedSeats,
   event,
-  bankInformation,
 }: {
   isOpen: boolean
   onCloseModal: (options?: { resetSeat?: boolean }) => void
   selectedSeats: SelectedSeat[]
   event: Event
-  bankInformation?: BankInformation
 }) => {
   const { toast } = useToast()
   const ticketSelected = useMemo(() => {
@@ -137,12 +134,9 @@ const ConfirmOrderModal = ({
           window.location.href = result.order_url
         }
       } else if (selectedPaymentMethod === PAYMENT_METHODS.BANK_TRANSFER) {
-        toast({
-          title: 'Gửi thành công',
-          description: 'Giao dịch của bạn sẽ được kiểm tra và phản hồi lại bạn trong vòng 24 giờ',
-          variant: 'default',
-        })
-        onCloseModal({ resetSeat: true })
+        if (result.paymentLink) {
+          window.location.href = result.paymentLink
+        }
       }
     } catch (error: any) {
       console.log('error, ', error)
@@ -161,11 +155,6 @@ const ConfirmOrderModal = ({
     currency: 'VND',
   }).format(calculateTotal)
 
-  const contentBankTransfer = useMemo(
-    () =>
-      `Thanh toán tiền vé cho ghế ${selectedSeats.map((s) => s.label).join(', ')} tại sự kiện ${event.title}`,
-    [selectedSeats, event.title],
-  )
 
   // const transactionImage = watch('transactionImage')
 
@@ -297,127 +286,7 @@ const ConfirmOrderModal = ({
                   <span className="text-2xl font-bold text-primary">{formatTotalMoney}</span>
                 </div>
 
-                {selectedPaymentMethod === PAYMENT_METHODS.BANK_TRANSFER && (
-                  <div className="mb-6 p-4 rounded-lg shadow-md bg-gray-50">
-                    <h3 className="font-medium text-lg mb-4">Hướng dẫn chuyển khoản</h3>
-                    <ol className="list-decimal ml-4 space-y-2 mb-4">
-                      <li>Mở ứng dụng ngân hàng của bạn</li>
-                      <li>
-                        Quét mã QR bên dưới hoặc chuyển khoản theo thông tin:
-                        <ul className="list-disc ml-4 mt-2">
-                          <li>
-                            Ngân hàng: <b>{bankInformation?.bankName}</b>
-                          </li>
-                          <li>
-                            Số tài khoản: <b>{bankInformation?.accountNo}</b>
-                          </li>
-                          <li>
-                            Chủ tài khoản: <b>{bankInformation?.accountName}</b>
-                          </li>
-                        </ul>
-                      </li>
-                      <li>Nhập số tiền: {formatTotalMoney}</li>
-                      <li>Điền nội dung chuyển khoản như bên dưới</li>
 
-                      <div className="flex justify-center mb-4">
-                        <VietQR amount={calculateTotal.toString()} addInfo={contentBankTransfer} />
-                      </div>
-
-                      <div className="flex items-center gap-2 bg-white p-2 rounded shadow">
-                        <div className="flex-1">
-                          <p className="text-sm text-gray-500 mb-2">Nội dung chuyển khoản:</p>
-                          <p className="font-medium text-sm">{contentBankTransfer}</p>
-                        </div>
-                        <Button
-                          variant="outline"
-                          type="button"
-                          size="sm"
-                          onClick={() => {
-                            navigator.clipboard.writeText(contentBankTransfer)
-                            toast({
-                              title: 'Đã sao chép nội dung chuyển khoản',
-                              duration: 2000,
-                            })
-                          }}
-                        >
-                          <Check className="h-4 w-4" />
-                          Copy
-                        </Button>
-                      </div>
-
-                      <li>Nhập mã giao dịch và chụp hình giao dịch gửi cho chúng tôi</li>
-                      <div>
-                        <Label htmlFor="lastName">Mã giao dịch *</Label>
-                        <Input
-                          placeholder="Nhập mã giao dịch"
-                          {...register('transactionCode', {
-                            required: 'Mã giao dịch không được để trống',
-                          })}
-                        />
-                        {errors.transactionCode?.message && (
-                          <p className="text-red-500">{errors.transactionCode.message}</p>
-                        )}
-                      </div>
-                      {/* <div>
-                        <Label htmlFor="transactionImage">Hình ảnh giao dịch *</Label>
-                        <div className="mt-2 flex items-center justify-center w-full">
-                          <label
-                            htmlFor="transaction-image"
-                            className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-                          >
-                            {!transactionImage || !(transactionImage instanceof File) ? (
-                              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                <svg
-                                  className="w-8 h-8 mb-4 text-gray-500"
-                                  aria-hidden="true"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 20 16"
-                                >
-                                  <path
-                                    stroke="currentColor"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                                  />
-                                </svg>
-                                <p className="mb-2 text-sm text-gray-500">
-                                  <span className="font-semibold">Bấm để tải ảnh</span> hoặc kéo thả
-                                  vào đây
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  PNG, JPG hoặc JPEG (Tối đa 5MB)
-                                </p>
-                              </div>
-                            ) : (
-                              <img
-                                src={URL.createObjectURL(transactionImage)}
-                                alt="Preview"
-                                className="h-full w-full object-contain"
-                              />
-                            )}
-                            <input
-                              id="transaction-image"
-                              type="file"
-                              className="hidden"
-                              accept="image/png, image/jpeg, image/jpg"
-                              {...register('transactionImage', {
-                                onChange: (e) => {
-                                  console.log('e.target?.files', e.target?.files)
-                                  setValue('transactionImage', e.target?.files?.[0])
-                                },
-                              })}
-                            />
-                          </label>
-                        </div>
-                        {errors.transactionImage?.message && (
-                          <p className="text-red-500 mt-2">{errors.transactionImage.message}</p>
-                        )}
-                      </div> */}
-                    </ol>
-                  </div>
-                )}
 
                 {selectedPaymentMethod === PAYMENT_METHODS.ZALOPAY && (
                   <>

@@ -6,7 +6,6 @@ import { notFound } from 'next/navigation'
 import { Performer } from '@/types/Performer'
 import { FAQType } from '@/types/FAQ'
 import PageClient from './page.client'
-import { VIET_QR } from '@/config/payment'
 
 const ConcertDetailPage = async (props: { params: Promise<{ eventId: string }> }) => {
   const params = await props.params
@@ -59,11 +58,6 @@ const ConcertDetailPage = async (props: { params: Promise<{ eventId: string }> }
         performers={performers as Performer[]}
         faqs={faqs as FAQType[]}
         unavailableSeats={unavailableSeats as string[]}
-        bankInformation={{
-          accountName: VIET_QR.ACCOUNT_NAME,
-          accountNo: VIET_QR.ACCOUNT_NO,
-          bankName: VIET_QR.BANK_NAME,
-        }}
       />
     </div>
   )
