@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { afterChangeStatus } from './hooks/afterChangeStatus'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
@@ -56,6 +57,9 @@ export const Tickets: CollectionConfig = {
         },
       ],
       required: false,
+      hooks: {
+        afterChange: [afterChangeStatus],
+      },
     },
   ],
 }
