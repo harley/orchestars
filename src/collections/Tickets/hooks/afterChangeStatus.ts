@@ -8,7 +8,7 @@ import QRCode from 'qrcode'
 const attachmentPath = join(process.cwd(), 'public', 'eventTerms.doc')
 
 export const afterChangeStatus = async ({ value, originalDoc, req }: FieldHookArgs) => {
-  if (value) {
+  if (value === "booked") {
     try {
       const fileBuffer = await readFile(attachmentPath)
 
