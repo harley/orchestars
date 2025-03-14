@@ -6,7 +6,7 @@ const defaultOpenGraph: Metadata['openGraph'] = {
   description: 'Orchestars is a dynamic music company committed to transforming the orchestral landscape',
   images: [
     {
-      url: `${getServerSideURL()}/meta-image.web`,
+      url: `${getServerSideURL()}/meta-image.webp`,
     },
   ],
   siteName: 'Orchestars',
