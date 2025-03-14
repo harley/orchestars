@@ -64,6 +64,16 @@ export const Payments: CollectionConfig = {
       // },
     },
     {
+      type: 'group',
+      name: 'transaction',
+      fields: [
+        {
+          type: 'text',
+          name: 'code',
+        },
+      ],
+    },
+    {
       name: 'status',
       type: 'select',
       required: true,

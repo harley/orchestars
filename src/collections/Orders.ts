@@ -17,13 +17,14 @@ export const Orders: CollectionConfig = {
     },
     {
       name: 'status',
-      type: 'text',
-      // options: [
-      //   { label: 'Processing', value: 'processing' },
-      //   { label: 'Canceled', value: 'canceled' },
-      //   { label: 'Completed', value: 'completed' },
-      //   { label: 'Failed', value: 'failed' },
-      // ],
+      type: 'select',
+      defaultValue: 'processing',
+      options: [
+        { label: 'Processing', value: 'processing' },
+        { label: 'Canceled', value: 'canceled' },
+        { label: 'Completed', value: 'completed' },
+        { label: 'Failed', value: 'failed' },
+      ],
     },
     {
       name: 'total',

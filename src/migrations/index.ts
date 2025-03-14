@@ -7,6 +7,8 @@ import * as migration_20250312_181537_add_nav_items_column_footer from './202503
 import * as migration_20250312_190107_add_display_order_column_performer_collection_and_add_link_column_partner_collection from './20250312_190107_add_display_order_column_performer_collection_and_add_link_column_partner_collection';
 import * as migration_20250313_035532_add_detailDescription_and_configuration_fields_event_table from './20250313_035532_add_detailDescription_and_configuration_fields_event_table';
 import * as migration_20250313_085919_add_seat_field_to_order_item_and_ticket_collection from './20250313_085919_add_seat_field_to_order_item_and_ticket_collection';
+import * as migration_20250313_093244_update_order_status_field_to_enum from './20250313_093244_update_order_status_field_to_enum';
+import * as migration_20250314_025724_add_seat_holding_collection from './20250314_025724_add_seat_holding_collection';
 
 export const migrations = [
   {
@@ -52,6 +54,16 @@ export const migrations = [
   {
     up: migration_20250313_085919_add_seat_field_to_order_item_and_ticket_collection.up,
     down: migration_20250313_085919_add_seat_field_to_order_item_and_ticket_collection.down,
-    name: '20250313_085919_add_seat_field_to_order_item_and_ticket_collection'
+    name: '20250313_085919_add_seat_field_to_order_item_and_ticket_collection',
+  },
+  {
+    up: migration_20250313_093244_update_order_status_field_to_enum.up,
+    down: migration_20250313_093244_update_order_status_field_to_enum.down,
+    name: '20250313_093244_update_order_status_field_to_enum',
+  },
+  {
+    up: migration_20250314_025724_add_seat_holding_collection.up,
+    down: migration_20250314_025724_add_seat_holding_collection.down,
+    name: '20250314_025724_add_seat_holding_collection'
   },
 ];

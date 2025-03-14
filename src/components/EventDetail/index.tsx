@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/hooks/use-toast'
-import { Calendar, MapPin } from 'lucide-react'
+import { Calendar, Loader2, MapPin } from 'lucide-react'
 import { format as dateFnsFormat } from 'date-fns'
 import Schedule from './Schedule'
 import FAQ from './FAQ'
@@ -21,18 +21,25 @@ import { FAQType } from '@/types/FAQ'
 import TermCondition from './TermCondition'
 import { Event, Media } from '@/payload-types'
 import DetailDescription from './DetailDescription'
+import { BankInformation } from '@/types/BankInformation'
+import { useRouter } from 'next/navigation'
+import { getCookie, setCookie } from '@/utilities/clientCookies'
+import axios from 'axios'
 
 const TicketDetails = ({
   event,
   performers,
   faqs,
   unavailableSeats,
+  bankInformation,
 }: {
   event: Event
   performers: Performer[]
   faqs: FAQType[]
   unavailableSeats?: string[]
+  bankInformation?: BankInformation
 }) => {
+  const router = useRouter()
   const { toast } = useToast()
   const [selectedSeats, setSelectedSeats] = useState<SelectedSeat[]>([])
 
@@ -88,16 +95,45 @@ const TicketDetails = ({
     return Object.values(ticketSelected).reduce((sum, tk) => sum + tk.total, 0)
   }
 
-  const handleBuyTickets = () => {
-    const total = calculateTotal()
-    if (total === 0) {
-      toast({
-        title: 'Please select at least one ticket or seat',
-      })
-      return
-    }
+  const [isLoadingSeatHolding, setLoadingSeatHolding] = useState(false)
+  const handleBuyTickets = async () => {
+    try {
+      const total = calculateTotal()
+      if (total === 0) {
+        toast({
+          title: 'Vui lòng chọn ghế',
+          variant: 'destructive',
+        })
+        return
+      }
 
-    handleOpenConfirmOrderModal(true)
+      setLoadingSeatHolding(true)
+
+      const seatHoldingCode = getCookie('seatHoldingCode')
+
+      const seatNames = selectedSeats.map((s) => s.label).join(',')
+
+      const result = await axios
+        .post('/api/seat-holding', {
+          seatName: seatNames,
+          eventId: event.id,
+          seatHoldingCode,
+        })
+        .then((res) => res.data)
+
+      setCookie('seatHoldingCode', result.seatHoldingCode, new Date(result.expireTime))
+
+      handleOpenConfirmOrderModal(true)
+    } catch (error: any) {
+      console.log('error', error)
+      toast({
+        title:
+          error?.response?.data?.message || 'Có lỗi xảy ra khi tiến hành giữ chỗ và thanh toán',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoadingSeatHolding(false)
+    }
   }
 
   const [isOpenConfirmOrderModal, handleOpenConfirmOrderModal] = useState(false)
@@ -106,8 +142,16 @@ const TicketDetails = ({
     <div className="min-h-screen flex flex-col">
       <ConfirmOrderModal
         isOpen={isOpenConfirmOrderModal}
-        onCloseModal={handleOpenConfirmOrderModal}
+        onCloseModal={(options?: { resetSeat?: boolean }) => {
+          handleOpenConfirmOrderModal(false)
+          if (options?.resetSeat) {
+            setSelectedSeats([])
+            router.refresh()
+          }
+        }}
         selectedSeats={selectedSeats}
+        event={event}
+        bankInformation={bankInformation}
       />
 
       <main className="flex-grow">
@@ -284,9 +328,13 @@ const TicketDetails = ({
 
                 <Button
                   onClick={handleBuyTickets}
+                  disabled={isLoadingSeatHolding}
                   className="w-full cursor-pointer mt-6 bg-gradient-to-r text-white from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
                 >
-                  Thanh toán
+                  {isLoadingSeatHolding && (
+                    <Loader2 className={'my-28 h-16 w-16 text-primary/60 animate-spin'} />
+                  )}
+                  Giữ chỗ và Thanh toán
                 </Button>
               </div>
             </div>
