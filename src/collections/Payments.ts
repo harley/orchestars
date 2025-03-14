@@ -83,7 +83,25 @@ export const Payments: CollectionConfig = {
         { label: 'Paid', value: 'paid' },
         { label: 'Failed', value: 'failed' },
       ],
-    },
+      hooks: {
+        afterChange: [
+          async ({ value, originalDoc, req }) => {
+            if (value === 'paid' && originalDoc.order) {
+              try {
+                await req.payload.update({
+                  collection: 'orders',
+                  id: originalDoc.order, 
+                  data: { status: 'complete' },
+                });
+              } catch (error) {
+                console.error('Error updating order status:', error);
+              }
+            }
+            return value;
+          },
+        ],
+      },
+    },    
     {
       name: 'paidAt',
       type: 'date',

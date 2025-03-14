@@ -822,7 +822,7 @@ export interface Order {
   id: number;
   orderCode?: string | null;
   user?: (number | null) | User;
-  status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
+  status?: string | null;
   total?: number | null;
   currency?: string | null;
   updatedAt: string;
