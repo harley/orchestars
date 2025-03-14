@@ -21,7 +21,6 @@ import { FAQType } from '@/types/FAQ'
 import TermCondition from './TermCondition'
 import { Event, Media } from '@/payload-types'
 import DetailDescription from './DetailDescription'
-import { BankInformation } from '@/types/BankInformation'
 import { useRouter } from 'next/navigation'
 import { getCookie, setCookie } from '@/utilities/clientCookies'
 import axios from 'axios'
@@ -31,13 +30,11 @@ const TicketDetails = ({
   performers,
   faqs,
   unavailableSeats,
-  bankInformation,
 }: {
   event: Event
   performers: Performer[]
   faqs: FAQType[]
   unavailableSeats?: string[]
-  bankInformation?: BankInformation
 }) => {
   const router = useRouter()
   const { toast } = useToast()
@@ -151,7 +148,6 @@ const TicketDetails = ({
         }}
         selectedSeats={selectedSeats}
         event={event}
-        bankInformation={bankInformation}
       />
 
       <main className="flex-grow">
