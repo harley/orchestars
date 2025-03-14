@@ -336,7 +336,7 @@ const ConfirmOrderModal = ({
                         ) : (
                           <Check className="mr-2 h-4 w-4" />
                         )}
-                        Tôi đã chuyển tiền
+                        Chuyển qua trang thanh toán
                       </Button>
                       <Button
                         variant="outline"
