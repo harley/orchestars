@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { Suspense } from 'react'
 import PageClient from '../result/page.client'
 import QRDetailComponent from "@/components/EventDetail/QRDetailComponent";
 
@@ -7,7 +7,9 @@ const VietQRPaymentPage = () => {
   return (
     <div className="">
       <PageClient />
-      <QRDetailComponent />
+      <Suspense fallback={<div>Loading...</div>}>
+        <QRDetailComponent />
+      </Suspense>
     </div>
   )
 }

@@ -38,8 +38,6 @@ export async function POST(request: NextRequest) {
 
   const order = body.order as NewInputOrder
   const orderItems = order.orderItems
-  const selectedSeats = order.orderItems.map(oI => oI.seat)
-
   const orderCode = generateCode('ORD')
 
   try {
@@ -53,7 +51,7 @@ export async function POST(request: NextRequest) {
 
     // check event id, ticket id is exist
     const events = await checkEvents({ orderItems })
-    const eventById = await payload.db.findOne({ collection: 'events', where: { id: { equals: order?.orderItems[0]?.eventId } } })
+
     const bankName = VIET_QR.BANK_NAME;
     const accountName = VIET_QR.ACCOUNT_NAME;
     const accountNo= VIET_QR.ACCOUNT_NO;
@@ -91,7 +89,7 @@ export async function POST(request: NextRequest) {
 
       // Commit the transaction
       await payload.db.commitTransaction(transactionID)
-      const content = `Thanh toán tiền vé cho ghế ${selectedSeats.map((s) => s).join(', ')} tại sự kiện ${eventById.title} - order ${orderCode}`;
+      const content = `${orderCode}`;
 
       const encodedContent = encodeURIComponent(content);
       const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
