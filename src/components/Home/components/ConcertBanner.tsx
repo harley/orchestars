@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Calendar, MapPin } from 'lucide-react'
-import CustomButton from '@/components/ui/custom-button'
-import { useRouter } from 'next/navigation'
 import { format as dateFnsFormat } from 'date-fns'
+import Link from 'next/link'
 
 interface EventBannerProps {
   events: Record<string, any>[]
@@ -10,7 +9,6 @@ interface EventBannerProps {
 
 const ConcertBanner: React.FC<EventBannerProps> = ({ events }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const router = useRouter()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -30,10 +28,6 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events }) => {
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % events.length)
-  }
-
-  const handleTicketClick = (evt: Record<string, any>) => {
-    router.push(`/events/${evt.slug}`)
   }
 
   return (
@@ -90,13 +84,12 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events }) => {
                   )}
                 </div>
 
-                <CustomButton
-                  size="lg"
-                  className="shadow-lg bg-slate-100/80 text-black hover:bg-slate-100/100"
-                  onClick={() => handleTicketClick(evt)}
+                <Link
+                  href={`/events/${evt.slug}`}
+                  className="shadow-lg bg-slate-100/80 text-black text-base px-6 py-3 hover:bg-slate-100/100 relative cursor-pointer rounded-lg font-medium inline-flex items-center justify-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/20"
                 >
                   Xem chi tiết
-                </CustomButton>
+                </Link>
               </div>
             </div>
           </div>

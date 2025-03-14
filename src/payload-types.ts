@@ -797,6 +797,10 @@ export interface Event {
   ticketPrices?:
     | {
         name?: string | null;
+        /**
+         * Giá trị giảm dần theo khu vực, với Zone 1 là vé đắt nhất.
+         */
+        key?: ('zone1' | 'zone2' | 'zone3' | 'zone4' | 'zone5') | null;
         price?: number | null;
         currency?: string | null;
         id?: string | null;
@@ -1612,6 +1616,7 @@ export interface EventsSelect<T extends boolean = true> {
     | T
     | {
         name?: T;
+        key?: T;
         price?: T;
         currency?: T;
         id?: T;
