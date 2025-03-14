@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       const content = `${orderCode}`;
 
       const encodedContent = encodeURIComponent(content);
-      const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+      const baseUrl = process.env.APP_BASE_URL || 'http://localhost:3000';
 
       const paymentLink = `${baseUrl}/payment/vietqr?amount=${amount}&contentBankTransfer=${encodedContent}&bankName=${bankName}&accountName=${accountName}&accountNo=${accountNo}`;
 

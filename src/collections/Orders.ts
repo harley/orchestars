@@ -30,8 +30,7 @@ export const Orders: CollectionConfig = {
         afterChange: [
           async ({ value, originalDoc, req }) => {
             // When an order's status is updated to 'paid'
-            console.log('value', value)
-            console.log('originalDoc', originalDoc)
+
             if (value === 'completed' && originalDoc) {
               try {
                 const orderItems = await req.payload
