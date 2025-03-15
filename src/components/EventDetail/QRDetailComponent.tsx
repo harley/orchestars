@@ -50,7 +50,7 @@ const QRDetailComponent = () => {
   } = useForm<FormValues>()
   const router = useRouter()
   const transactionImage = watch('transactionImage')
-  const _transactionCode = watch('transactionCode')
+  // const _transactionCode = watch('transactionCode')
 
   if (!isValidParams) {
     return (

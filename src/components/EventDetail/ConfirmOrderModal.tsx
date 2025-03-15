@@ -33,12 +33,11 @@ type FormValues = {
 }
 
 const ConfirmOrderModal = ({
-  _event,
   isOpen,
   onCloseModal,
   selectedSeats,
 }: {
-  _event: Event
+  event: Event
   isOpen: boolean
   onCloseModal: (options?: { resetSeat?: boolean }) => void
   selectedSeats: SelectedSeat[]
