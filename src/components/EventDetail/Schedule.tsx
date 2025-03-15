@@ -1,5 +1,6 @@
 import { Event } from '@/payload-types'
 import React from 'react'
+import { format as dateFnsFormat, isValid } from 'date-fns'
 
 interface ScheduleItem {
   id: string
@@ -25,7 +26,11 @@ const Schedule = ({ schedules }: { schedules: Event['schedules'] }) => {
         <div className="max-w-3xl mx-auto">
           {_schedules.map((schedule, idx) => (
             <div key={idx} className="mb-8">
-              <h3 className="text-2xl font-bold mb-4 text-purple-700">{schedule?.date}</h3>
+              <h3 className="text-2xl font-bold mb-4 text-purple-700">
+                {schedule?.date && isValid(new Date(schedule.date))
+                  ? dateFnsFormat(schedule.date, 'dd/MM/yyyy')
+                  : schedule?.date}
+              </h3>
 
               {schedule.details?.map((item, index) => (
                 <div

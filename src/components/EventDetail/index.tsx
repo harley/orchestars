@@ -6,24 +6,25 @@ import { Input } from '@/components/ui/input'
 
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/hooks/use-toast'
-import { Calendar, Loader2, MapPin } from 'lucide-react'
-import { format as dateFnsFormat } from 'date-fns'
+import { Loader2 } from 'lucide-react'
+import { isSameDay } from 'date-fns'
 import Schedule from './Schedule'
 import FAQ from './FAQ'
 import FeaturedPerformers from './FeaturedPerformers'
 import { SeatToolKitItem, SelectedSeat } from './types'
 import SeatMapToolkit from './SeatToolkit'
-import { categories } from './data/seat-maps/categories'
 import ConfirmOrderModal from './ConfirmOrderModal'
-// import { Event } from '@/types/Event'
 import { Performer } from '@/types/Performer'
 import { FAQType } from '@/types/FAQ'
 import TermCondition from './TermCondition'
-import { Event, Media } from '@/payload-types'
+import { Event } from '@/payload-types'
 import DetailDescription from './DetailDescription'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { getCookie, setCookie } from '@/utilities/clientCookies'
 import axios from 'axios'
+import DateSelector from './DateSelector'
+import TicketPrices from './TicketPrices'
+import EventBanner from './EventBanner'
 
 const TicketDetails = ({
   event,
@@ -37,6 +38,8 @@ const TicketDetails = ({
   unavailableSeats?: string[]
 }) => {
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const { toast } = useToast()
   const [selectedSeats, setSelectedSeats] = useState<SelectedSeat[]>([])
 
@@ -88,6 +91,32 @@ const TicketDetails = ({
     )
   }, [selectedSeats])
 
+  const [loadingScheduleMap, setLoadingScheduleMap] = useState(false)
+
+  const eventScheduleId = searchParams.get('eventScheduleId')
+
+  const selectedSchedule = useMemo(() => {
+    const schedule = event.schedules?.find((sche) => sche.id === eventScheduleId)
+
+    setLoadingScheduleMap(false)
+
+    return schedule
+  }, [eventScheduleId, event.schedules])
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setLoadingScheduleMap(true)
+    setSelectedSeats([])
+    console.log('pathname', pathname)
+
+    const schedule = date
+      ? event.schedules?.find((sche) => isSameDay(sche.date as string, date))
+      : null
+    const eventScheduleId = schedule?.id || ''
+    const newPathname = `${pathname}?eventScheduleId=${eventScheduleId}`
+
+    router.push(newPathname, { scroll: false })
+  }
+
   const calculateTotal = () => {
     return Object.values(ticketSelected).reduce((sum, tk) => sum + tk.total, 0)
   }
@@ -115,6 +144,7 @@ const TicketDetails = ({
           seatName: seatNames,
           eventId: event.id,
           seatHoldingCode,
+          eventScheduleId,
         })
         .then((res) => res.data)
 
@@ -151,70 +181,7 @@ const TicketDetails = ({
       />
 
       <main className="flex-grow">
-        <section className="relative h-[500px] md:h-[700px] overflow-hidden">
-          <div className="absolute inset-0 bg-black/50 z-10" />
-          <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${(event.eventBanner as Media)?.url})`,
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-          </div>
-
-          <div className="relative z-20 h-full flex items-end">
-            <div className="container mx-auto px-6 md:px-10 pb-16 md:pb-20 w-full">
-              <div className="max-w-3xl">
-                {/* {event.sponsor && (
-                  <div className="inline-block px-3 py-1 mb-3 border border-white/30 rounded-full backdrop-blur text-xs text-white/90">
-                    Powered by <span className="font-semibold">MelodySale</span>
-                  </div>
-                )} */}
-                {event.title && event.configuration?.showBannerTitle && (
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 animate-fade-in">
-                    {event.title}
-                  </h1>
-                )}
-
-                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 text-white/90 mb-8">
-                  {event.configuration?.showBannerTime && (
-                    <div className="flex items-center">
-                      <Calendar className="h-5 w-5 mr-2" />
-                      <span>
-                        {event.startDatetime &&
-                          dateFnsFormat(new Date(event.startDatetime), 'dd/MM/yyyy HH:mm a')}{' '}
-                        -{' '}
-                        {event.endDatetime &&
-                          dateFnsFormat(new Date(event.endDatetime), 'dd/MM/yyyy HH:mm a')}
-                      </span>
-                    </div>
-                  )}
-
-                  {event.eventLocation && event.configuration?.showBannerLocation && (
-                    <div className="flex items-center">
-                      <MapPin className="h-5 w-5 mr-2" />
-                      <span>{event.eventLocation}</span>
-                    </div>
-                  )}
-
-                  {/* <div className="flex items-center">
-                    <Users className="h-5 w-5 mr-2" />
-                    <span>{'-/300'} attendees</span>
-                  </div> */}
-                </div>
-
-                {/* <CustomButton
-                  variant="interested"
-                  size="lg"
-                  className="shadow-lg"
-                  onClick={handleBuyTickets}
-                >
-                  Get Tickets
-                </CustomButton> */}
-              </div>
-            </div>
-          </div>
-        </section>
+        <EventBanner event={event} />
 
         <DetailDescription event={event} />
 
@@ -223,32 +190,36 @@ const TicketDetails = ({
             <div className="w-full max-w-4xl mx-auto">
               <h3 className="text-xl font-bold mb-4">Đặt chỗ</h3>
               {/* Seat type legend */}
-              <div className="flex flex-wrap gap-4 mb-6 justify-center">
-                {event.ticketPrices?.map((option: any) => (
-                  <div key={option.id} className="flex items-center">
-                    <div
-                      className={`w-4 h-4 rounded mr-2`}
-                      style={{
-                        backgroundColor: categories.find((c) => c.name === option.name)?.color,
-                      }}
-                    ></div>
-                    <span>
-                      {option.name} {' - '}
-                      {new Intl.NumberFormat('vi-VN', {
-                        style: 'currency',
-                        currency: option.currency,
-                      }).format(option.price)}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              <TicketPrices ticketPrices={event.ticketPrices} />
 
-              <SeatMapToolkit onSelectSeat={handleSeatSelect} unavailableSeats={unavailableSeats} />
-              {/* <SeatMap
-                onSeatSelect={handleSeatSelect}
-                selectedSeats={selectedSeats}
-                event={event}
-              /> */}
+              <div className="relative">
+                {loadingScheduleMap && (
+                  <div className="absolute z-50 top-[30%] left-1/2 -translate-x-1/2 p-5 bg-gray-100/30 rounded-md flex flex-col items-center justify-center gap-2">
+                    <Loader2 className="w-12 h-12 animate-spin" />
+                    <span>Đang tải...</span>
+                  </div>
+                )}
+                <DateSelector
+                  schedules={event.schedules || []}
+                  selectedDate={
+                    selectedSchedule?.date ? new Date(selectedSchedule?.date) : undefined
+                  }
+                  onDateSelect={handleDateSelect}
+                />
+
+                {!!selectedSchedule ? (
+                  <SeatMapToolkit
+                    onSelectSeat={handleSeatSelect}
+                    unavailableSeats={unavailableSeats}
+                  />
+                ) : (
+                  <div className="text-center py-8 bg-gray-100 rounded-lg">
+                    <p className="text-lg text-gray-600">
+                      Vui lòng chọn ngày tham dự để xem sơ đồ chọn ghế
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>

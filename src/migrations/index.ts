@@ -10,6 +10,8 @@ import * as migration_20250313_085919_add_seat_field_to_order_item_and_ticket_co
 import * as migration_20250313_093244_update_order_status_field_to_enum from './20250313_093244_update_order_status_field_to_enum';
 import * as migration_20250314_025724_add_seat_holding_collection from './20250314_025724_add_seat_holding_collection';
 import * as migration_20250314_124747_add_key_ticket_price_for_event_collectin from './20250314_124747_add_key_ticket_price_for_event_collectin';
+import * as migration_20250314_624747_modify_schedule_date_varchar_to_date_type from './20250314_624747_modify_schedule_date_varchar_to_date_type';
+import * as migration_20250315_151022_add_event_schedule_id_to_ticket_and_seat_holding_collection from './20250315_151022_add_event_schedule_id_to_ticket_and_seat_holding_collection';
 
 export const migrations = [
   {
@@ -70,6 +72,16 @@ export const migrations = [
   {
     up: migration_20250314_124747_add_key_ticket_price_for_event_collectin.up,
     down: migration_20250314_124747_add_key_ticket_price_for_event_collectin.down,
-    name: '20250314_124747_add_key_ticket_price_for_event_collectin'
+    name: '20250314_124747_add_key_ticket_price_for_event_collectin',
+  },
+  {
+    up: migration_20250314_624747_modify_schedule_date_varchar_to_date_type.up,
+    down: migration_20250314_624747_modify_schedule_date_varchar_to_date_type.down,
+    name: '20250314_624747_modify_schedule_date_varchar_to_date_type',
+  },
+  {
+    up: migration_20250315_151022_add_event_schedule_id_to_ticket_and_seat_holding_collection.up,
+    down: migration_20250315_151022_add_event_schedule_id_to_ticket_and_seat_holding_collection.down,
+    name: '20250315_151022_add_event_schedule_id_to_ticket_and_seat_holding_collection'
   },
 ];

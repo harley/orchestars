@@ -896,6 +896,7 @@ export interface Ticket {
     | boolean
     | null;
   event?: (number | null) | Event;
+  eventScheduleId?: string | null;
   orderItem?: (number | null) | OrderItem;
   status?: ('booked' | 'pending_payment' | 'hold' | 'cancelled') | null;
   updatedAt: string;
@@ -909,6 +910,7 @@ export interface SeatHolding {
   id: number;
   seatName: string;
   event: number | Event;
+  eventScheduleId?: string | null;
   code: string;
   userInfo?:
     | {
@@ -1695,6 +1697,7 @@ export interface TicketsSelect<T extends boolean = true> {
   seat?: T;
   ticketPriceInfo?: T;
   event?: T;
+  eventScheduleId?: T;
   orderItem?: T;
   status?: T;
   updatedAt?: T;
@@ -1707,6 +1710,7 @@ export interface TicketsSelect<T extends boolean = true> {
 export interface SeatHoldingsSelect<T extends boolean = true> {
   seatName?: T;
   event?: T;
+  eventScheduleId?: T;
   code?: T;
   userInfo?: T;
   closedAt?: T;

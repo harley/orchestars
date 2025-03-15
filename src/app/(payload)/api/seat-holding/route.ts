@@ -7,6 +7,7 @@ import { headers } from 'next/headers'
 type SeatHoldingRequest = {
   seatName: string
   eventId: number
+  eventScheduleId: string
   seatHoldingCode?: string // current session seatHoldingCode
   userInfo?: Record<string, any>
 }
@@ -15,13 +16,43 @@ export async function POST(request: NextRequest) {
   try {
     const body: SeatHoldingRequest = await request.json()
     if (!body.seatName) {
-      return NextResponse.json({ message: 'Seat is required' }, { status: 400 })
+      return NextResponse.json({ message: 'Ghế ngồi không được để trống' }, { status: 400 })
     }
     if (!body.eventId) {
-      return NextResponse.json({ message: 'Event is required' }, { status: 400 })
+      return NextResponse.json({ message: 'Sự kiện không được để trống' }, { status: 400 })
+    }
+
+    if (!body.eventScheduleId) {
+      return NextResponse.json(
+        { message: 'Ngày tham gia sự kiện không được để trống' },
+        { status: 400 },
+      )
     }
 
     await payload.init({ config })
+
+    // check event exist
+    const event = await payload
+      .findByID({
+        collection: 'events',
+        id: Number(body.eventId),
+        select: {
+          id: true,
+          title: true,
+          schedules: true,
+        },
+      })
+      .then((evt) => evt)
+
+    if (!event) {
+      throw new Error('Sự kiện không tồn tại')
+    }
+
+    const existSchedule = event.schedules?.some((sch) => sch?.id === body.eventScheduleId)
+
+    if (!existSchedule) {
+      throw new Error(`Ngày tham dự sự kiện không đúng`)
+    }
 
     await checkSeatAvailable(body)
 
@@ -46,6 +77,9 @@ export async function POST(request: NextRequest) {
           id: seatHolding.id,
           data: {
             expire_time: expireTime,
+            event: body.eventId as number,
+            eventScheduleId: body.eventScheduleId,
+            seatName: body.seatName,
           },
           select: {
             id: true,
@@ -75,6 +109,7 @@ export async function POST(request: NextRequest) {
       data: {
         code: seatHoldingCode,
         event: body.eventId as number,
+        eventScheduleId: body.eventScheduleId,
         expire_time: expireTime,
         seatName: body.seatName,
         userInfo,
@@ -106,6 +141,7 @@ const checkSeatAvailable = async (body: SeatHoldingRequest) => {
       seatName: { like: seatName },
     })),
     event: { equals: body.eventId },
+    eventScheduleId: { equals: body.eventScheduleId },
     closedAt: { exists: false },
     expire_time: { greater_than: new Date().toISOString() },
   }
@@ -152,6 +188,11 @@ const checkSeatAvailable = async (body: SeatHoldingRequest) => {
           {
             event: {
               equals: Number(body.eventId),
+            },
+          },
+          {
+            eventScheduleId: {
+              equals: body.eventScheduleId,
             },
           },
         ],

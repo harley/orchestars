@@ -103,7 +103,7 @@ export const Events: CollectionConfig = {
       name: 'schedules',
       fields: [
         {
-          type: 'text',
+          type: 'date',
           name: 'date',
         },
         {
