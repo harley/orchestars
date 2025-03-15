@@ -27,13 +27,29 @@ import { FAQs } from './collections/FAQ'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { Activities } from './collections/Activities'
 import { SeatHoldings } from './collections/SeatHoldings'
+import { Logo } from './components/Logo/Logo'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
   admin: {
-    components: {},
+    meta: {
+      titleSuffix: '- Admin',
+      description: 'For the organizing team',
+      icons: [
+        {
+          url: '/favicon.ico',
+          rel: 'icon',
+          type: 'image/x-icon',
+        },
+      ],
+    },
+    components: {
+      graphics: {
+        Logo: '/components/Logo/Logo#Logo',
+      },
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },
