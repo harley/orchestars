@@ -4934,7 +4934,7 @@
         "block": "left",
         "x": 250,
         "y": 760,
-        "label": "P17",
+        "label": "P19",
         "square": true,
         "status": "Available",
         "category": "zone4"
@@ -4944,7 +4944,7 @@
         "block": "left",
         "x": 220,
         "y": 760,
-        "label": "P19",
+        "label": "P21",
         "square": true,
         "status": "Available",
         "category": "zone4"
@@ -4954,7 +4954,7 @@
         "block": "left",
         "x": 190,
         "y": 760,
-        "label": "P21",
+        "label": "P23",
         "square": true,
         "status": "Available",
         "category": "zone4"
