@@ -34,7 +34,7 @@ const eslintConfig = [
     },
   },
   {
-    ignores: ['.next/'],
+    ignores: ['.next/', 'src/payload-types.ts'],
   },
   {
     files: ['src/migrations/**/*.ts'],
