@@ -86,7 +86,7 @@ const ConfirmOrderModal = ({
 
   const paymentMethods: PaymentMethod[] = [
     // { id: 'vnpay', name: 'Banking Application (VNPay)', icon: <CreditCard className="h-5 w-5" /> },
-    { id: PAYMENT_METHODS.ZALOPAY, name: 'ZaloPay', icon: <CreditCard className="h-5 w-5" /> },
+    // { id: PAYMENT_METHODS.ZALOPAY, name: 'ZaloPay', icon: <CreditCard className="h-5 w-5" /> },
     // { id: 'vietqr', name: 'VietQR', icon: <QrCode className="h-5 w-5" /> },
     // { id: 'momo', name: 'Momo Wallet', icon: <CreditCard className="h-5 w-5" /> },
     // { id: 'card', name: 'International Payment Card', icon: <CreditCard className="h-5 w-5" /> },
@@ -320,7 +320,7 @@ const ConfirmOrderModal = ({
 
                 {selectedPaymentMethod === PAYMENT_METHODS.BANK_TRANSFER && (
                   <>
-                    <div className="grid xl:grid-cols-2 grid-cols-1 gap-2">
+                    <div className="grid 2xl:grid-cols-2 grid-cols-1 gap-2">
                       <Button
                         type="submit"
                         className="bg-green-600 hover:bg-green-700 cursor-pointer text-white"
@@ -331,7 +331,7 @@ const ConfirmOrderModal = ({
                         ) : (
                           <Check className="mr-2 h-4 w-4" />
                         )}
-                        Xác nhận đơn và Chuyển qua trang thanh toán
+                        Xác nhận và Qua trang thanh toán
                       </Button>
                       <Button
                         variant="outline"
