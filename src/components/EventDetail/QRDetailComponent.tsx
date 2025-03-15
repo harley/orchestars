@@ -106,11 +106,7 @@ const QRDetailComponent = () => {
           </h3>
           <div className="flex justify-center mb-4">
             {/* The QR code component */}
-            <VietQR
-              amount={amount}
-              addInfo={contentBankTransfer}
-              onGenerate={(url) => setQrDataUrl(url)}
-            />
+            <VietQR amount={amount} addInfo={contentBankTransfer} onGenerate={setQrDataUrl} />
           </div>
           {/* Example "Tải ảnh QR" button */}
           <Button
