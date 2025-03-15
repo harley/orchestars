@@ -27,7 +27,6 @@ import { FAQs } from './collections/FAQ'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { Activities } from './collections/Activities'
 import { SeatHoldings } from './collections/SeatHoldings'
-import { Logo } from './components/Logo/Logo'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)

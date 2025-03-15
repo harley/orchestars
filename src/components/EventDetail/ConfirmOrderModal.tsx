@@ -37,10 +37,10 @@ const ConfirmOrderModal = ({
   onCloseModal,
   selectedSeats,
 }: {
+  event: Event
   isOpen: boolean
   onCloseModal: (options?: { resetSeat?: boolean }) => void
   selectedSeats: SelectedSeat[]
-  event: Event
 }) => {
   const { toast } = useToast()
   const searchParams = useSearchParams()

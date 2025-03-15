@@ -34,7 +34,13 @@ const eslintConfig = [
     },
   },
   {
-    ignores: ['.next/'],
+    ignores: ['.next/', 'src/payload-types.ts'],
+  },
+  {
+    files: ['src/migrations/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^(payload|req)$' }],
+    },
   },
 ]
 
