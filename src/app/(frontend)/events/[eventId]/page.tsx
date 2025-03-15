@@ -7,13 +7,18 @@ import { Performer } from '@/types/Performer'
 import { FAQType } from '@/types/FAQ'
 import PageClient from './page.client'
 
-const ConcertDetailPage = async (props: { params: Promise<{ eventId: string }> }) => {
+const ConcertDetailPage = async (props: {
+  params: Promise<{ eventId: string }>
+  searchParams: Promise<{ eventScheduleId: string }>
+}) => {
   const params = await props.params
+  const searchParams = await props.searchParams
 
   const eventSlug = params.eventId
 
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
+
   const eventDetail = await payload
     .find({
       collection: 'events',
@@ -39,16 +44,21 @@ const ConcertDetailPage = async (props: { params: Promise<{ eventId: string }> }
     .find({ collection: 'faqs', where: { status: { equals: 'active' } }, limit: 50 })
     .then((res) => res.docs)
 
-  const unavailableSeats = await payload
-    .find({
-      collection: 'tickets',
-      where: {
-        status: { in: ['booked', 'pending_payment', 'hold'] },
-        event: { equals: eventDetail.id },
-      },
-      select: { seat: true },
-    })
-    .then((res) => res.docs.map((tk) => tk.seat).filter((exist) => !!exist))
+  let unavailableSeats: string[] = []
+  if (searchParams.eventScheduleId) {
+    unavailableSeats = await payload
+      .find({
+        collection: 'tickets',
+        where: {
+          status: { in: ['booked', 'pending_payment', 'hold'] },
+          event: { equals: eventDetail.id },
+          eventScheduleId: { equals: searchParams.eventScheduleId },
+        },
+        select: { seat: true },
+      })
+      .then((res) => res.docs.map((tk) => tk.seat as string).filter((exist) => !!exist))
+      .catch(() => [])
+  }
 
   return (
     <div className="">

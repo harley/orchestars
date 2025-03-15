@@ -13,6 +13,7 @@ import { SelectedSeat } from './types'
 import { useToast } from '@/hooks/use-toast'
 import axios from 'axios'
 import { Event } from '@/payload-types'
+import { useSearchParams } from 'next/navigation'
 
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 
@@ -35,7 +36,6 @@ const ConfirmOrderModal = ({
   isOpen,
   onCloseModal,
   selectedSeats,
-  event,
 }: {
   isOpen: boolean
   onCloseModal: (options?: { resetSeat?: boolean }) => void
@@ -43,6 +43,9 @@ const ConfirmOrderModal = ({
   event: Event
 }) => {
   const { toast } = useToast()
+  const searchParams = useSearchParams()
+  const eventScheduleId = searchParams.get('eventScheduleId')
+
   const ticketSelected = useMemo(() => {
     return selectedSeats.reduce(
       (obj, item) => {
@@ -83,7 +86,7 @@ const ConfirmOrderModal = ({
 
   const paymentMethods: PaymentMethod[] = [
     // { id: 'vnpay', name: 'Banking Application (VNPay)', icon: <CreditCard className="h-5 w-5" /> },
-    // { id: PAYMENT_METHODS.ZALOPAY, name: 'ZaloPay', icon: <CreditCard className="h-5 w-5" /> },
+    { id: PAYMENT_METHODS.ZALOPAY, name: 'ZaloPay', icon: <CreditCard className="h-5 w-5" /> },
     // { id: 'vietqr', name: 'VietQR', icon: <QrCode className="h-5 w-5" /> },
     // { id: 'momo', name: 'Momo Wallet', icon: <CreditCard className="h-5 w-5" /> },
     // { id: 'card', name: 'International Payment Card', icon: <CreditCard className="h-5 w-5" /> },
@@ -121,6 +124,7 @@ const ConfirmOrderModal = ({
             seat: seat.label,
             eventId: seat.eventId,
             ticketPriceId: seat.ticketPrice.id,
+            eventScheduleId: eventScheduleId,
           })),
         },
       }
@@ -164,12 +168,6 @@ const ConfirmOrderModal = ({
           <DialogTitle className="text-center text-xl">
             <h1 className="text-3xl font-bold text-center mb-8">Xác Nhận Đặt Vé Và Thanh Toán</h1>
           </DialogTitle>
-          {/* <DialogDescription className="text-center">
-        <div className="flex items-center justify-center gap-2 text-amber-600 bg-amber-50 py-2 rounded-md mb-2">
-          <Timer className="h-5 w-5" />
-          <span>Payment expires in {formatTime(timeRemaining)}</span>
-        </div>
-      </DialogDescription> */}
         </DialogHeader>
         <form onSubmit={handleSubmit(handleConfirm)}>
           <div className="container mx-auto px-4">

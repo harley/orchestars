@@ -31,6 +31,11 @@ export const Tickets: CollectionConfig = {
       relationTo: 'events',
     },
     {
+      name: 'eventScheduleId',
+      type: 'text',
+      required: false,
+    },
+    {
       name: 'orderItem',
       type: 'relationship',
       relationTo: 'orderItems',
