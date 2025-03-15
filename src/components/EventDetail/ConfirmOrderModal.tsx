@@ -32,15 +32,15 @@ type FormValues = {
 }
 
 const ConfirmOrderModal = ({
+  _event,
   isOpen,
   onCloseModal,
   selectedSeats,
-  event,
 }: {
+  _event: Event
   isOpen: boolean
   onCloseModal: (options?: { resetSeat?: boolean }) => void
   selectedSeats: SelectedSeat[]
-  event: Event
 }) => {
   const { toast } = useToast()
   const ticketSelected = useMemo(() => {

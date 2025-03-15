@@ -50,7 +50,7 @@ const QRDetailComponent = () => {
   } = useForm<FormValues>()
   const router = useRouter()
   const transactionImage = watch('transactionImage')
-  const transactionCode = watch('transactionCode')
+  const _transactionCode = watch('transactionCode')
 
   if (!isValidParams) {
     return (
@@ -112,7 +112,7 @@ const QRDetailComponent = () => {
               onGenerate={(url) => setQrDataUrl(url)}
             />
           </div>
-          {/* Example “Tải ảnh QR” button */}
+          {/* Example "Tải ảnh QR" button */}
           <Button
             variant="outline"
             className="w-full"

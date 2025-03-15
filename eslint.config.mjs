@@ -36,6 +36,12 @@ const eslintConfig = [
   {
     ignores: ['.next/'],
   },
+  {
+    files: ['src/migrations/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^(payload|req)$' }],
+    },
+  },
 ]
 
 export default eslintConfig

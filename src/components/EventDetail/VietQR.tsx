@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
@@ -7,10 +7,10 @@ import { Loader2 } from 'lucide-react'
 interface VietQRProps {
   amount: string
   addInfo: string
-  onGenerate: (url: string) => void 
+  onGenerate: (url: string) => void
 }
 
-const VietQR: React.FC<VietQRProps> = ({ amount, addInfo, onGenerate}) => {
+const VietQR: React.FC<VietQRProps> = ({ amount, addInfo, onGenerate }) => {
   const [qrCodeData, setQrCodeData] = useState<{ qrCode?: string; qrDataURL?: string }>()
   const [loading, setLoading] = useState(true)
 
@@ -20,7 +20,6 @@ const VietQR: React.FC<VietQRProps> = ({ amount, addInfo, onGenerate}) => {
         const res = await axios.post('/api/vietqr', {
           amount,
           addInfo,
-          
         })
         setQrCodeData(res.data?.data)
         onGenerate(res.data?.data?.qrDataURL)
@@ -34,7 +33,7 @@ const VietQR: React.FC<VietQRProps> = ({ amount, addInfo, onGenerate}) => {
     if (amount && addInfo) {
       generateQR()
     }
-  }, [amount, addInfo]) // Empty dependency array means it runs only once when component mounts
+  }, [amount, addInfo, onGenerate])
 
   return (
     <div className="text-center">
