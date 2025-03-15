@@ -18,6 +18,11 @@ export const SeatHoldings: CollectionConfig = {
       required: true,
     },
     {
+      name: 'eventScheduleId',
+      type: 'text',
+      required: false,
+    },
+    {
       name: 'code',
       type: 'text',
       required: true,
