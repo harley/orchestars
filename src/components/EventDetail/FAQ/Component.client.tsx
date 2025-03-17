@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/accordion'
 import { FAQType } from '@/types/FAQ'
 
-const FAQ = ({ faqs }: { faqs: FAQType[] }) => {
+const FAQClient = ({ faqs }: { faqs: FAQType[] }) => {
   return (
     <section className="py-12 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -30,4 +30,4 @@ const FAQ = ({ faqs }: { faqs: FAQType[] }) => {
   )
 }
 
-export default FAQ
+export default FAQClient

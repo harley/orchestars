@@ -1,6 +1,6 @@
 import { Event } from '@/payload-types'
 import React from 'react'
-import { categories } from './data/seat-maps/categories'
+import { categories } from '../data/seat-maps/categories'
 
 const TicketPrices = ({ ticketPrices }: { ticketPrices: Event['ticketPrices'] }) => {
   return (

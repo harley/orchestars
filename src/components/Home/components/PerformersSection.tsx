@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useRef, useEffect } from 'react'
 import { Music, Users } from 'lucide-react'
 import { Performer } from '@/types/Performer'
