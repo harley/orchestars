@@ -12,7 +12,7 @@ import FAQ from '@/components/EventDetail/FAQ/Component'
 import DetailDescriptionClient from '@/components/EventDetail/DetailDescription/Component.client'
 import { fetchEvent } from './actions'
 
-export const dynamic = 'force-dynamic'
+// export const dynamic = 'force-dynamic'
 export const revalidate = 60
 export const dynamicParams = true
 
