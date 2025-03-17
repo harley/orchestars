@@ -72,6 +72,7 @@ export const fetchPastEvents = async () => {
     const stringifiedQuery = stringify(
       {
         where: { endDatetime: { less_than: new Date() } },
+        sort: '-startDatetime',
         limit: 50,
       },
       { addQueryPrefix: true },
