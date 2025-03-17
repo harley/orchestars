@@ -57,7 +57,7 @@ export async function generateTicketBookEmailHtml(ticketData: TicketData) {
               <strong>Your booking details are as follows:</strong>
             </p>
             <p>
-              Ticket Code: ${ticketData.ticketCode || 'N/A'}<br />
+              Ticket Code(s): ${ticketData.ticketCode || 'N/A'}<br />
               <!-- You can insert additional dynamic details here -->
             </p>
             <p>
