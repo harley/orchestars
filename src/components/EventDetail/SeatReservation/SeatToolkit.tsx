@@ -1,13 +1,46 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import '@mezh-hq/react-seat-toolkit/styles'
 import SeatToolkit, { SeatStatus } from '@mezh-hq/react-seat-toolkit'
-import { Armchair } from 'lucide-react'
-import seatsJson from '@/components/concert-detail/data/seat-maps/seats.json'
-import texts from '@/components/concert-detail/data/seat-maps/texts.json'
-import { categories } from './data/seat-maps/categories'
+import { Armchair, Loader2 } from 'lucide-react'
+import seatsJson from '@/components/EventDetail/data/seat-maps/seats.json'
+import texts from '@/components/EventDetail/data/seat-maps/texts.json'
+import { categories } from '../data/seat-maps/categories'
 
-const SeatMapToolkit = ({ onSelectSeat }: { onSelectSeat: (seat: any) => void }) => {
-  const [seats, setSeats] = useState(seatsJson)
+type SeatItem = {
+  id: string
+  x: number
+  y: number
+  label: string
+  square: boolean
+  status: 'Available' | 'Unavailable' | string
+  category: string
+}
+
+const SeatMapToolkit = ({
+  onSelectSeat,
+  unavailableSeats,
+}: {
+  onSelectSeat: (seat: any) => void
+  unavailableSeats?: string[]
+}) => {
+  const [loadingMap, setLoadingMap] = useState(true)
+  const [seats, setSeats] = useState<SeatItem[]>([])
+
+  useEffect(() => {
+    if (unavailableSeats?.length) {
+      const seatSet = new Set(unavailableSeats)
+      setSeats(
+        seatsJson.map((seat) => ({
+          ...seat,
+          status: seatSet.has(seat.label) ? 'Unavailable' : 'Available',
+        })),
+      )
+      setLoadingMap(false)
+    } else {
+      setSeats(seatsJson)
+      setLoadingMap(false)
+    }
+  }, [unavailableSeats])
 
   const handleSeatClick = (seat: any) => {
     if (seat.status !== SeatStatus.Unavailable && seat.status !== SeatStatus.Locked) {
@@ -31,7 +64,13 @@ const SeatMapToolkit = ({ onSelectSeat }: { onSelectSeat: (seat: any) => void })
   }
 
   return (
-    <div>
+    <div className="relative">
+      {loadingMap && (
+        <div className="absolute z-50 top-[30%] left-1/2 -translate-x-1/2 p-5 bg-gray-100/30 rounded-md flex flex-col items-center justify-center gap-2">
+          <Loader2 className="w-12 h-12 animate-spin" />
+          <span>Đang tải...</span>
+        </div>
+      )}
       <SeatToolkit
         mode={'user'}
         events={{

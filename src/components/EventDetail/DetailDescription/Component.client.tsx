@@ -1,9 +1,11 @@
+'use client'
+
 import { Event } from '@/payload-types'
 import React, { useState } from 'react'
 import { RichText as RichTextConverter } from '@payloadcms/richtext-lexical/react'
 import { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 
-const DetailDescription = ({ event }: { event: Event }) => {
+const DetailDescriptionClient = ({ event }: { event: Event }) => {
   const [isExpanded, setIsExpanded] = useState(false)
 
   return (
@@ -31,4 +33,4 @@ const DetailDescription = ({ event }: { event: Event }) => {
   )
 }
 
-export default DetailDescription
+export default DetailDescriptionClient

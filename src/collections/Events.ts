@@ -236,6 +236,7 @@ export const Events: CollectionConfig = {
       () => {
         // revalidate home data on client side
         revalidateTag('home-events')
+        revalidateTag('event-detail')
       },
     ],
   },
