@@ -203,6 +203,9 @@ importers:
       qs:
         specifier: ^6.14.0
         version: 6.14.0
+      qs-esm:
+        specifier: ^7.0.2
+        version: 7.0.2
       react:
         specifier: 19.0.0
         version: 19.0.0
