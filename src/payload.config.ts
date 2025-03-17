@@ -16,7 +16,7 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
-import { Events } from './collections/Events'
+import { EventsGlobal, Events } from './collections/Events'
 import { Orders } from './collections/Orders'
 import { OrderItems } from './collections/OrderItems'
 import { Payments } from './collections/Payments'
@@ -101,7 +101,7 @@ export default buildConfig({
     FAQs,
   ],
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Header, Footer],
+  globals: [Header, Footer, EventsGlobal],
   plugins: [
     ...plugins,
     // storage-adapter-placeholder

@@ -1,7 +1,11 @@
+import { revalidateTag } from 'next/cache'
 import type { CollectionConfig } from 'payload'
 
 export const Partners: CollectionConfig = {
   slug: 'partners',
+  access: {
+    read: () => true,
+  },
   admin: {
     useAsTitle: 'name',
   },
@@ -43,4 +47,12 @@ export const Partners: CollectionConfig = {
       required: false,
     },
   ],
+  hooks: {
+    afterChange: [
+      () => {
+        // revalidate home data on client side
+        revalidateTag('home-partners')
+      },
+    ],
+  },
 }
