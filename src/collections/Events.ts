@@ -6,10 +6,14 @@ import {
   LinkFeature,
   UploadFeature,
 } from '@payloadcms/richtext-lexical'
-import type { CollectionConfig } from 'payload'
+import { revalidateTag } from 'next/cache'
+import type { CollectionConfig, GlobalConfig } from 'payload'
 
 export const Events: CollectionConfig = {
   slug: 'events',
+  access: {
+    read: () => true,
+  },
   admin: {
     useAsTitle: 'title',
   },
@@ -227,4 +231,20 @@ export const Events: CollectionConfig = {
       ],
     },
   ],
+  hooks: {
+    afterChange: [
+      () => {
+        // revalidate home data on client side
+        revalidateTag('home-events')
+      },
+    ],
+  },
+}
+
+export const EventsGlobal: GlobalConfig = {
+  slug: 'events',
+  access: {
+    read: () => true,
+  },
+  fields: Events.fields,
 }
