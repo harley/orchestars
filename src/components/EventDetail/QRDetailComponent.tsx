@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { Check, Loader2 } from 'lucide-react'
@@ -11,45 +11,16 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import VietQR from './VietQR'
 import { Copy } from 'lucide-react'
-
-type PaymentDetails = {
-  amount: string
-  accountName: string
-  accountNo: string
-  bankName: string
-  contentBankTransfer: string
-  qrDataURL: string
-}
+import { PaymentDetails } from './types'
 
 type FormValues = {
   transactionCode?: string
   transactionImage?: File
 }
 
-const QRDetailComponent = () => {
+const QRDetailComponent = ({ paymentDetails }: { paymentDetails: PaymentDetails }) => {
   const { toast } = useToast()
   const router = useRouter()
-  const [toDecrypt, setToDecrypt] = useState("");
-  
-  React.useEffect(() => {
-    const currentUrl = window.location.href;
-    const questionMarkIndex = currentUrl.indexOf('?');
-    if (questionMarkIndex === -1) {
-      console.error('No query string found in the URL');
-    } else {
-      setToDecrypt(currentUrl.slice(questionMarkIndex + 1));
-    }
-  }, []);
-  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails >({
-    amount: "",
-    accountName: "",
-    accountNo: "",
-    bankName: "",
-    contentBankTransfer: "",
-    qrDataURL: ""
-  }
-  )
-
   const {
     register,
     watch,
@@ -97,10 +68,6 @@ const QRDetailComponent = () => {
       router.push('/')
     }, 1000)
   }
-
-  const handlePaymentDetails = React.useCallback((details: any) => {
-    setPaymentDetails(details)
-  }, [])
   const allowTransactionInput = false
   return (
     <div className="bg-white p-4 rounded-md shadow-md m-4">
@@ -116,11 +83,7 @@ const QRDetailComponent = () => {
           </h3>
           <div className="flex justify-center mb-4">
             {/* The QR code component */}
-            <VietQR
-              to_decrypt_params={toDecrypt}
-  
-              onPaymentDetails={handlePaymentDetails}
-           />
+            <VietQR paymentDetails={paymentDetails} />
           </div>
           {/* Example "Tải ảnh QR" button */}
           <Button
@@ -131,7 +94,6 @@ const QRDetailComponent = () => {
           >
             Tải ảnh QR
           </Button>
-
         </div>
 
         {/* Right Column: Manual bank transfer approach */}
