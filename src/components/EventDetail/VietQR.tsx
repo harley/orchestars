@@ -5,24 +5,31 @@ import axios from 'axios'
 import { Loader2 } from 'lucide-react'
 
 interface VietQRProps {
-  amount: string
-  addInfo: string
-  onGenerate: (url: string) => void
+  to_decrypt_params: string
+  onPaymentDetails: (details: {
+    amount: string
+    accountName: string
+    accountNo: string
+    bankName: string
+    contentBankTransfer: string
+    qrDataURL: string
+  }) => void
 }
 
-const VietQR: React.FC<VietQRProps> = ({ amount, addInfo, onGenerate }) => {
+const VietQR: React.FC<VietQRProps> = ({ to_decrypt_params, onPaymentDetails }) => {
   const [qrCodeData, setQrCodeData] = useState<{ qrCode?: string; qrDataURL?: string }>()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const generateQR = async () => {
+      const encryptedString = decodeURIComponent(to_decrypt_params);
       try {
         const res = await axios.post('/api/vietqr', {
-          amount,
-          addInfo,
+          to_decrypt_params: encryptedString,
         })
-        setQrCodeData(res.data?.data)
-        onGenerate(res.data?.data?.qrDataURL)
+        const data = res.data
+        setQrCodeData(data)
+        onPaymentDetails(res.data)
       } catch (error) {
         console.error('Error generating QR:', error)
       } finally {
@@ -30,10 +37,10 @@ const VietQR: React.FC<VietQRProps> = ({ amount, addInfo, onGenerate }) => {
       }
     }
 
-    if (amount && addInfo) {
+    if (to_decrypt_params) {
       generateQR()
     }
-  }, [amount, addInfo, onGenerate])
+  }, [to_decrypt_params, onPaymentDetails])
 
   return (
     <div className="text-center">
@@ -46,13 +53,12 @@ const VietQR: React.FC<VietQRProps> = ({ amount, addInfo, onGenerate }) => {
         )}
         {qrCodeData?.qrDataURL && (
           <img
-            src={qrCodeData?.qrDataURL}
+            src={qrCodeData.qrDataURL}
             className="max-w-[540px] max-h-[540px] object-contain w-full h-full box-border"
-            alt=""
+            alt="QR Code"
           />
         )}
       </div>
-
       <p className="mt-1 text-sm font-semibold italic">Quét mã này để chuyển tiền</p>
     </div>
   )
