@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
 }
 
 const checkSeatAvailable = async (body: SeatHoldingRequest) => {
-  const arrSeatNames = body.seatName.split(',') as string[]
+  const arrSeatNames = [...new Set(body.seatName.split(','))] as string[]
 
   const conditions: Where = {
     or: arrSeatNames.map((seatName) => ({
@@ -173,6 +173,7 @@ const checkSeatAvailable = async (body: SeatHoldingRequest) => {
   const existingTicketSeats = await payload
     .find({
       collection: 'tickets',
+      limit: arrSeatNames.length,
       where: {
         and: [
           {

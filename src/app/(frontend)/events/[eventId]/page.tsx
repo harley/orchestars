@@ -44,6 +44,7 @@ const EventDetailPage = async (props: {
           eventScheduleId: { equals: searchParams.eventScheduleId },
         },
         select: { seat: true },
+        limit: 1000,
       })
       .then((res) => res.docs.map((tk) => tk.seat as string).filter((exist) => !!exist))
       .catch(() => [])

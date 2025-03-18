@@ -3,7 +3,7 @@ import CryptoJS from 'crypto-js'
 import { ZALO_PAYMENT } from '@/config/payment'
 import payload from 'payload'
 import config from '@/payload.config'
-import { Event, Order } from '@/payload-types'
+// import { Event } from '@/payload-types'
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,8 +40,10 @@ export async function POST(request: NextRequest) {
     }
     try {
       await updatePaymentStatus(payment.id, transactionID)
-      await updateOrderStatus((payment.order as Order)?.id, transactionID)
-      await updateTicketStatus((payment.order as Order)?.id, transactionID)
+
+      // No need to update the order status and ticket status here. The status update action runs in the hook of Payment Collection.
+      // await updateOrderStatus((payment.order as Order)?.id, transactionID)
+      // await updateTicketStatus((payment.order as Order)?.id, transactionID)
 
       console.log(`Order status updated successfully for app_trans_id = ${appTransId}`)
       await payload.db.commitTransaction(transactionID)
@@ -82,49 +84,49 @@ async function updatePaymentStatus(
   })
 }
 
-async function updateOrderStatus(
-  orderId: number,
-  transactionID: number | Promise<number | string> | string,
-) {
-  return payload.update({
-    collection: 'orders',
-    id: orderId,
-    data: { status: 'completed' },
-    req: { transactionID },
-  })
-}
+// async function updateOrderStatus(
+//   orderId: number,
+//   transactionID: number | Promise<number | string> | string,
+// ) {
+//   return payload.update({
+//     collection: 'orders',
+//     id: orderId,
+//     data: { status: 'completed' },
+//     req: { transactionID },
+//   })
+// }
 
-async function updateTicketStatus(
-  orderId: number,
-  transactionID: number | Promise<number | string> | string,
-) {
-  const orderItems = await payload
-    .find({
-      collection: 'orderItems',
-      where: { order: { equals: orderId } },
-    })
-    .then((res) => res.docs)
+// async function updateTicketStatus(
+//   orderId: number,
+//   transactionID: number | Promise<number | string> | string,
+// ) {
+//   const orderItems = await payload
+//     .find({
+//       collection: 'orderItems',
+//       where: { order: { equals: orderId } },
+//     })
+//     .then((res) => res.docs)
 
-  if (!orderItems?.length) {
-    return
-  }
+//   if (!orderItems?.length) {
+//     return
+//   }
 
-  await Promise.all(
-    orderItems.map((oItem) =>
-      payload.update({
-        collection: 'tickets',
-        where: {
-          orderItem: { equals: oItem.id },
-          event: { equals: (oItem.event as Event).id },
-        },
-        data: {
-          status: 'booked',
-        },
-        req: { transactionID },
-      }),
-    ),
-  )
-}
+//   await Promise.all(
+//     orderItems.map((oItem) =>
+//       payload.update({
+//         collection: 'tickets',
+//         where: {
+//           orderItem: { equals: oItem.id },
+//           event: { equals: (oItem.event as Event).id },
+//         },
+//         data: {
+//           status: 'booked',
+//         },
+//         req: { transactionID },
+//       }),
+//     ),
+//   )
+// }
 
 function jsonResponse(code: number, message: string) {
   return NextResponse.json({ return_code: code, message })
