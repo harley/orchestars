@@ -5,7 +5,7 @@ import { format as dateFnsFormat } from 'date-fns'
 
 const EventBanner = ({ event }: { event: Event }) => {
   return (
-    <section className="relative h-[170px] sm:[h-200px] md:h-[300px] lg:h-[400px] xl:h-[500px] 2xl:h-[700px] overflow-hidden">
+    <section className="relative h-[170px] sm:h-[200px] md:h-[300px] lg:h-[400px] xl:h-[500px] 2xl:h-[700px] overflow-hidden">
       <div className="absolute inset-0 z-10" />
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"

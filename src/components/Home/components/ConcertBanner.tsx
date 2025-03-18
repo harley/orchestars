@@ -31,7 +31,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events }) => {
   }
 
   return (
-    <div className="relative w-full h-[170px] sm:[h-200px] md:h-[300px] lg:h-[400px] xl:h-[500px] 2xl:h-[700px] overflow-hidden">
+    <div className="relative w-full h-[170px] sm:h-[200px] md:h-[300px] lg:h-[400px] xl:h-[500px] 2xl:h-[700px] overflow-hidden">
       {events.map((evt, index) => (
         <div
           key={evt.id}
