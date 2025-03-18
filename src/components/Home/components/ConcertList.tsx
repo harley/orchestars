@@ -60,8 +60,8 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }
                 )}
               >
                 <img
-                  src={evt.eventBanner?.url}
-                  alt={evt.eventBanner?.alt || evt.title}
+                  src={evt.eventThumbnail?.url || evt.eventBanner?.url}
+                  alt={evt.eventThumbnail?.alt || evt.eventBanner?.alt || evt.title}
                   className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                 />
               </div>

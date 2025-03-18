@@ -191,6 +191,11 @@ export const Events: CollectionConfig = {
       relationTo: 'media',
     },
     {
+      name: 'eventThumbnail',
+      type: 'upload',
+      relationTo: 'media',
+    },
+    {
       name: 'sponsorLogo',
       type: 'upload',
       relationTo: 'media',
