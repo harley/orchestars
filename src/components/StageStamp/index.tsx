@@ -16,8 +16,13 @@ const environmentStyles: Record<Environment, { text: string; colors: string[] }>
   },
 }
 
+const isValidEnvironment = (env: string | undefined): env is Environment => {
+  return env === 'staging' || env === 'development'
+}
+
 export const StageStamp: React.FC = () => {
-  const environment = (process.env.NEXT_PUBLIC_ENVIRONMENT as Environment) || 'development'
+  const rawEnvironment = process.env.NEXT_PUBLIC_ENVIRONMENT
+  const environment = isValidEnvironment(rawEnvironment) ? rawEnvironment : 'development'
   const { text, colors } = environmentStyles[environment]
 
   return (
