@@ -13,15 +13,16 @@ import { Providers } from '@/providers'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 // import { draftMode } from 'next/headers'
 import { Toaster } from '@/components/ui/toaster'
+import { StageStamp } from '@/components/StageStamp'
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
 
-import { Analytics } from '@vercel/analytics/next';
-
+import { Analytics } from '@vercel/analytics/next'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // const { isEnabled } = await draftMode()
+  const environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+  const shouldShowStamp = !environment || environment !== 'production'
 
   return (
     <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
@@ -40,6 +41,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Header />
           <div className="pt-[72px]">{children}</div>
           <Footer />
+          {shouldShowStamp && <StageStamp />}
         </Providers>
         <Toaster />
         <Analytics />
@@ -55,6 +57,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     creator: '@coderpush',
   },
-  description: 'Orchestars is a dynamic music company committed to transforming the orchestral landscape',
+  description:
+    'Orchestars is a dynamic music company committed to transforming the orchestral landscape',
   title: 'Experience Live Orchestral Music Like Never Before | Orchestars',
 }
