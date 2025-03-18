@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { Check, Loader2 } from 'lucide-react'
 
@@ -11,36 +11,16 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import VietQR from './VietQR'
 import { Copy } from 'lucide-react'
+import { PaymentDetails } from './types'
 
 type FormValues = {
   transactionCode?: string
   transactionImage?: File
 }
 
-const QRDetailComponent = () => {
-  const searchParams = useSearchParams()
-  const amount = searchParams.get('amount') || ''
-  const accountName = searchParams.get('accountName') || ''
-  const accountNo = searchParams.get('accountNo') || ''
-  const bankName = searchParams.get('bankName') || ''
-  const contentBankTransfer = searchParams.get('contentBankTransfer') || ''
-  const [isValidParams, setIsValidParams] = React.useState(true)
+const QRDetailComponent = ({ paymentDetails }: { paymentDetails: PaymentDetails }) => {
   const { toast } = useToast()
-  const [qrDataUrl, setQrDataUrl] = React.useState<string>('')
-
-  React.useEffect(() => {
-    const amountNum = Number(amount)
-    if (isNaN(amountNum) || amountNum <= 0) {
-      setIsValidParams(false)
-    }
-  }, [amount])
-
-  // Format amount to VND currency
-  const formatTotalMoney = new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-  }).format(Number(amount))
-
+  const router = useRouter()
   const {
     register,
     watch,
@@ -48,21 +28,20 @@ const QRDetailComponent = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>()
-  const router = useRouter()
   const transactionImage = watch('transactionImage')
-  // const _transactionCode = watch('transactionCode')
 
-  if (!isValidParams) {
-    return (
-      <div className="p-4">
-        <p className="text-red-600">Số tiền không hợp lệ. Vui lòng kiểm tra lại!</p>
-      </div>
-    )
-  }
+  // Format amount to VND currency once paymentDetails is available
+  const formatTotalMoney =
+    paymentDetails &&
+    new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(Number(paymentDetails.amount))
+
   const handleDownloadQR = () => {
-    if (!qrDataUrl) return
+    if (!paymentDetails?.qrDataURL) return
     const link = document.createElement('a')
-    link.href = qrDataUrl
+    link.href = paymentDetails.qrDataURL
     link.download = 'QR.png'
     link.click()
   }
@@ -85,12 +64,10 @@ const QRDetailComponent = () => {
         'Cảm ơn bạn! Chúng tôi sẽ sớm xác nhận và gửi thông tin chi tiết đến email của bạn trong vòng 24 giờ',
       duration: 5000,
     })
-
     setTimeout(() => {
       router.push('/')
     }, 1000)
   }
-
   const allowTransactionInput = false
   return (
     <div className="bg-white p-4 rounded-md shadow-md m-4">
@@ -106,14 +83,14 @@ const QRDetailComponent = () => {
           </h3>
           <div className="flex justify-center mb-4">
             {/* The QR code component */}
-            <VietQR amount={amount} addInfo={contentBankTransfer} onGenerate={setQrDataUrl} />
+            <VietQR paymentDetails={paymentDetails} />
           </div>
           {/* Example "Tải ảnh QR" button */}
           <Button
             variant="outline"
             className="w-full"
             onClick={handleDownloadQR}
-            disabled={!qrDataUrl}
+            disabled={!paymentDetails?.qrDataURL}
           >
             Tải ảnh QR
           </Button>
@@ -129,11 +106,11 @@ const QRDetailComponent = () => {
             <div className="grid grid-cols-3 gap-2 bg-gray-50 p-2 rounded shadow items-center">
               <div className="col-span-1 text-sm text-gray-500">Nội dung CK:</div>
               <div className="col-span-2 flex items-center justify-between">
-                <p className="font-medium text-sm">{contentBankTransfer}</p>
+                <p className="font-medium text-sm">{paymentDetails?.contentBankTransfer}</p>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleCopy(contentBankTransfer, 'nội dung CK')}
+                  onClick={() => handleCopy(paymentDetails?.contentBankTransfer, 'nội dung CK')}
                   style={{ marginLeft: '4px' }}
                 >
                   <Copy />
@@ -145,11 +122,11 @@ const QRDetailComponent = () => {
             <div className="grid grid-cols-3 gap-2 bg-gray-50 p-2 rounded shadow items-center">
               <div className="col-span-1 text-sm text-gray-500">Ngân hàng:</div>
               <div className="col-span-2 flex items-center justify-between">
-                <p className="font-medium text-sm">{bankName}</p>
+                <p className="font-medium text-sm">{paymentDetails?.bankName}</p>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleCopy(bankName, 'tên ngân hàng')}
+                  onClick={() => handleCopy(paymentDetails?.bankName, 'tên ngân hàng')}
                   style={{ marginLeft: '4px' }}
                 >
                   <Copy />
@@ -161,11 +138,11 @@ const QRDetailComponent = () => {
             <div className="grid grid-cols-3 gap-2 bg-gray-50 p-2 rounded shadow items-center">
               <div className="col-span-1 text-sm text-gray-500">Thụ hưởng:</div>
               <div className="col-span-2 flex items-center justify-between">
-                <p className="font-medium text-sm">{accountName}</p>
+                <p className="font-medium text-sm">{paymentDetails?.accountName}</p>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleCopy(accountName, 'tên chủ tài khoản')}
+                  onClick={() => handleCopy(paymentDetails?.accountName, 'tên chủ tài khoản')}
                   style={{ marginLeft: '4px' }}
                 >
                   <Copy />
@@ -177,11 +154,11 @@ const QRDetailComponent = () => {
             <div className="grid grid-cols-3 gap-2 bg-gray-50 p-2 rounded shadow items-center">
               <div className="col-span-1 text-sm text-gray-500">Số tài khoản:</div>
               <div className="col-span-2 flex items-center justify-between">
-                <p className="font-medium text-sm">{accountNo}</p>
+                <p className="font-medium text-sm">{paymentDetails?.accountNo}</p>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleCopy(accountNo, 'số tài khoản')}
+                  onClick={() => handleCopy(paymentDetails?.accountNo, 'số tài khoản')}
                   style={{ marginLeft: '4px' }}
                 >
                   <Copy />

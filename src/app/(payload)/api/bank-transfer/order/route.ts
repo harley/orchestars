@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import payload from 'payload'
+import CryptoJS from 'crypto-js'
 import config from '@/payload.config'
 import { Order, User } from '@/payload-types'
 import { generateCode } from '@/utilities/generateCode'
@@ -70,6 +71,7 @@ export async function POST(request: NextRequest) {
       // todo send mail
 
       // Commit the transaction
+
       await payload.db.commitTransaction(transactionID)
 
       const content = `${orderCode}`
@@ -78,7 +80,16 @@ export async function POST(request: NextRequest) {
       const bankName = VIET_QR.BANK_NAME
       const accountName = VIET_QR.ACCOUNT_NAME
       const accountNo = VIET_QR.ACCOUNT_NO
-      const paymentLink = `${APP_BASE_URL}/payment/vietqr?amount=${amount}&contentBankTransfer=${encodedContent}&bankName=${bankName}&accountName=${accountName}&accountNo=${accountNo}`
+
+      const encryptKey = VIET_QR.ENCRYPT_KEY
+      const to_encrypt_params = `amount=${amount}&contentBankTransfer=${encodedContent}&bankName=${bankName}&accountName=${accountName}&accountNo=${accountNo}`
+      const encrypted_params = CryptoJS.AES.encrypt(to_encrypt_params, encryptKey)
+
+      let encryptedString = encrypted_params.toString()
+
+      encryptedString = Buffer.from(encryptedString).toString('base64')
+
+      const paymentLink = `${APP_BASE_URL}/payment/vietqr?transactionKey=${encryptedString}`
 
       const nextResponse = NextResponse.json({ paymentLink, status: 200 })
 
