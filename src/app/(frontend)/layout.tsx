@@ -13,12 +13,12 @@ import { Providers } from '@/providers'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 // import { draftMode } from 'next/headers'
 import { Toaster } from '@/components/ui/toaster'
+import { EnvironmentIndicator } from '@/components/EnvironmentIndicator'
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
 
-import { Analytics } from '@vercel/analytics/next';
-
+import { Analytics } from '@vercel/analytics/next'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // const { isEnabled } = await draftMode()
@@ -38,6 +38,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           /> */}
 
           <Header />
+          <EnvironmentIndicator />
           <div className="pt-[72px]">{children}</div>
           <Footer />
         </Providers>
@@ -55,6 +56,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     creator: '@coderpush',
   },
-  description: 'Orchestars is a dynamic music company committed to transforming the orchestral landscape',
+  description:
+    'Orchestars is a dynamic music company committed to transforming the orchestral landscape',
   title: 'Experience Live Orchestral Music Like Never Before | Orchestars',
 }
