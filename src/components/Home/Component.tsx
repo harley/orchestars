@@ -1,7 +1,7 @@
 import HomeClient from './Component.client'
 import { PaginatedDocs } from 'payload'
 
-import React, { cache } from 'react'
+import React from 'react'
 
 import { Event } from '@/types/Event'
 import { Performer } from '@/types/Performer'
@@ -15,7 +15,7 @@ import {
   fetchPerformers,
 } from './actions'
 
-const getDataHomePage = cache(async () => {
+const getDataHomePage = async () => {
   try {
     const [eventsData, performerData, pastEventData, partnerData, activitiesData] =
       await Promise.all([
@@ -65,7 +65,7 @@ const getDataHomePage = cache(async () => {
       activity: undefined,
     }
   }
-})
+}
 
 export async function Home() {
   const { bannerDocs, onGoingPaginatedDocs, performers, pastEvents, partners, activity } =
