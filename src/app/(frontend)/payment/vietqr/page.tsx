@@ -1,17 +1,8 @@
-'use client'
-import React, { Suspense } from 'react'
-import PageClient from '../result/page.client'
-import QRDetailComponent from "@/components/EventDetail/QRDetailComponent";
+import VietQRPaymentPageClient from './page.client'
 
-const VietQRPaymentPage = () => {
-  return (
-    <div className="">
-      <PageClient />
-      <Suspense fallback={<div>Loading...</div>}>
-        <QRDetailComponent />
-      </Suspense>
-    </div>
-  )
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+export default function VietQRPaymentPage() {
+  return <VietQRPaymentPageClient />
 }
-
-export default VietQRPaymentPage
