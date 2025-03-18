@@ -17,4 +17,5 @@ export const VIET_QR = {
   BANK_NAME: process.env.VIET_QR_BANK_NAME || '',
   ACQ_ID: process.env.VIET_QR_ACQ_ID || '',
   TEMPLATE: process.env.VIET_QR_TEMPLATE || 'compact',
+  ENCRYPT_KEY: process.env.VIET_QR_ENCRYPT_KEY || '',
 }

@@ -35,3 +35,12 @@ export interface SeatToolKitItem {
     name: string
   }
 }
+
+export interface PaymentDetails {
+  amount: string
+  accountName: string
+  accountNo: string
+  bankName: string
+  contentBankTransfer: string
+  qrDataURL: string
+}
