@@ -810,6 +810,7 @@ export interface Event {
     | null;
   eventLogo?: (number | null) | Media;
   eventBanner?: (number | null) | Media;
+  eventThumbnail?: (number | null) | Media;
   sponsorLogo?: (number | null) | Media;
   ticketQuantityLimitation?: ('perTicketType' | 'perEvent') | null;
   configuration?: {
@@ -1627,6 +1628,7 @@ export interface EventsSelect<T extends boolean = true> {
       };
   eventLogo?: T;
   eventBanner?: T;
+  eventThumbnail?: T;
   sponsorLogo?: T;
   ticketQuantityLimitation?: T;
   configuration?:
