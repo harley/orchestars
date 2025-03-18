@@ -11,6 +11,10 @@ const VietQRPaymentPage = async (props: { searchParams: Promise<{ transactionKey
   const searchParams = await props.searchParams
   const transactionKey = searchParams.transactionKey
 
+  if (!transactionKey) {
+    return notFound()
+  }
+
   const paymentDetails = await generateQrPayment({ transactionKey })
 
   if (!paymentDetails) {
