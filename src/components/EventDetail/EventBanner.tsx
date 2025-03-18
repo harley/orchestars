@@ -5,15 +5,15 @@ import { format as dateFnsFormat } from 'date-fns'
 
 const EventBanner = ({ event }: { event: Event }) => {
   return (
-    <section className="relative h-[500px] md:h-[700px] overflow-hidden">
-      <div className="absolute inset-0 bg-black/50 z-10" />
+    <section className="relative h-[170px] sm:[h-200px] md:h-[300px] lg:h-[400px] xl:h-[500px] 2xl:h-[700px] overflow-hidden">
+      <div className="absolute inset-0 z-10" />
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url(${(event.eventBanner as Media)?.url})`,
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 to-transparent" />
       </div>
 
       <div className="relative z-20 h-full flex items-end">
