@@ -7,7 +7,7 @@ import {
   UploadFeature,
 } from '@payloadcms/richtext-lexical'
 import { revalidateTag } from 'next/cache'
-import type { CollectionConfig, GlobalConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
 
 export const Events: CollectionConfig = {
   slug: 'events',
@@ -245,12 +245,4 @@ export const Events: CollectionConfig = {
       },
     ],
   },
-}
-
-export const EventsGlobal: GlobalConfig = {
-  slug: 'events',
-  access: {
-    read: () => true,
-  },
-  fields: Events.fields,
 }

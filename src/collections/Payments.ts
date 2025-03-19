@@ -87,10 +87,11 @@ export const Payments: CollectionConfig = {
         afterChange: [
           async ({ value, originalDoc, req }) => {
             if (value === 'paid' && originalDoc.order) {
+              const orderId = (originalDoc.order?.id || originalDoc.order) as number
               try {
                 await req.payload.update({
                   collection: 'orders',
-                  id: originalDoc.order,
+                  id: orderId,
                   data: { status: 'completed' },
                 })
               } catch (error) {

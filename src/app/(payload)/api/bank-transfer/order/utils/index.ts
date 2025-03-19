@@ -161,9 +161,39 @@ export const createCustomerIfNotExist = async ({
     customerData = await payload.create({
       collection: 'users',
       // quick fix for generate default password, need to update later
-      data: { ...customer, password: generatePassword(), role: 'customer' },
+      data: {
+        ...customer,
+        phoneNumber: customer.phoneNumber, // is using
+        phoneNumbers: [
+          { isUsing: true, createdAt: new Date().toISOString(), phone: customer.phoneNumber },
+        ],
+        password: generatePassword(),
+        role: 'customer',
+      },
       req: { transactionID },
     })
+  } else {
+    // update phone number
+    const updatePhoneNumbers = customerData.phoneNumbers || []
+    if (customer.phoneNumber) {
+      const existPhone = updatePhoneNumbers.find((p) => p.phone === customer.phoneNumber)
+
+      if (!existPhone) {
+        updatePhoneNumbers.push({
+          createdAt: new Date().toISOString(),
+          phone: customer.phoneNumber,
+          isUsing: false,
+        })
+
+        await payload.update({
+          collection: 'users',
+          id: customerData.id,
+          data: {
+            phoneNumbers: updatePhoneNumbers,
+          },
+        })
+      }
+    }
   }
 
   return customerData
