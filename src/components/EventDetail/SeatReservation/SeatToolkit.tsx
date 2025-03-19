@@ -15,7 +15,11 @@ type SeatItem = {
   status: 'Available' | 'Unavailable' | string
   category: string
 }
-
+type SelectedSeatRow = {
+  rowChar: string,
+  count: number,
+  seatsOnRow: SeatItem[],
+}
 const SeatMapToolkit = ({
   onSelectSeat,
   unavailableSeats,
@@ -25,6 +29,7 @@ const SeatMapToolkit = ({
 }) => {
   const [loadingMap, setLoadingMap] = useState(true)
   const [seats, setSeats] = useState<SeatItem[]>([])
+  const [rows, setRows] = useState<SelectedSeatRow[]>([]);
 
   useEffect(() => {
     if (unavailableSeats?.length) {
@@ -42,8 +47,47 @@ const SeatMapToolkit = ({
     }
   }, [unavailableSeats])
 
+  useEffect(() => {
+    const reservedSeats = seats.filter(seat => seat.status === 'Reserved');
+
+    const grouped: { [key: string]: SeatItem[] } = {};
+
+    reservedSeats.forEach(seat => {
+      const rowChar = seat.label?.[0];
+      if (!rowChar) return; // skip if label is undefined
+
+      if (!grouped[rowChar]) {
+        grouped[rowChar] = [];
+      }
+      grouped[rowChar]!.push(seat);
+    });
+
+    const newRows: SelectedSeatRow[] = Object.keys(grouped).map((rowChar) => ({
+      rowChar,
+      count: grouped[rowChar]!.length,
+      seatsOnRow: grouped[rowChar]!.sort((a, b) => {
+        const aNum = parseInt(a.id.split('-')[1] ?? '0', 10);
+        const bNum = parseInt(b.id.split('-')[1] ?? '0', 10);
+        return aNum - bNum;
+      }),
+    }));
+
+    setRows(newRows);
+  }, [seats]);
+
+
   const handleSeatClick = (seat: any) => {
-    if (seat.status !== SeatStatus.Unavailable && seat.status !== SeatStatus.Locked) {
+    const seatRowChar = seat.label[0];
+    const seatNumber = parseInt(seat.id.split('-')[1]);
+
+    const selectedRow = rows.find((r) => r.rowChar === seatRowChar);
+    const selectedSeatNumbers = selectedRow?.seatsOnRow.map((s) => parseInt(s.id.split('-')[1]!)) || [];
+
+    const isSelectedSeatAdjacentToAnySeatInSeatsOnRow = selectedSeatNumbers.length === 0 || selectedSeatNumbers.some(
+      (selectedNumber) => Math.abs(selectedNumber - seatNumber) === 1
+    );
+    if (seat.status !== SeatStatus.Unavailable && seat.status !== SeatStatus.Locked && isSelectedSeatAdjacentToAnySeatInSeatsOnRow) {
+      console.log(seat);
       onSelectSeat(seat)
       setSeats((prevSeats) => {
         return prevSeats.map((s) => {
