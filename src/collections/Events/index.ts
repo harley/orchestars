@@ -8,6 +8,7 @@ import {
 } from '@payloadcms/richtext-lexical'
 import { revalidateTag } from 'next/cache'
 import type { CollectionConfig } from 'payload'
+import { EVENT_STATUSES } from './constants/status'
 
 export const Events: CollectionConfig = {
   slug: 'events',
@@ -234,6 +235,12 @@ export const Events: CollectionConfig = {
           defaultValue: true,
         },
       ],
+    },
+    {
+      name: 'status',
+      type: 'select',
+      required: false,
+      options: EVENT_STATUSES,
     },
   ],
   hooks: {
