@@ -5,6 +5,8 @@ import { Armchair, Loader2 } from 'lucide-react'
 import seatsJson from '@/components/EventDetail/data/seat-maps/seats.json'
 import texts from '@/components/EventDetail/data/seat-maps/texts.json'
 import { categories } from '../data/seat-maps/categories'
+import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogFooter, DialogClose } from '@/components/ui/dialog'
+import { Button } from "@/components/ui/button"
 
 type SeatItem = {
   id: string
@@ -15,11 +17,7 @@ type SeatItem = {
   status: 'Available' | 'Unavailable' | string
   category: string
 }
-type SelectedSeatRow = {
-  rowChar: string,
-  count: number,
-  seatsOnRow: SeatItem[],
-}
+
 const SeatMapToolkit = ({
   onSelectSeat,
   unavailableSeats,
@@ -29,7 +27,7 @@ const SeatMapToolkit = ({
 }) => {
   const [loadingMap, setLoadingMap] = useState(true)
   const [seats, setSeats] = useState<SeatItem[]>([])
-  const [rows, setRows] = useState<SelectedSeatRow[]>([]);
+  const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
     if (unavailableSeats?.length) {
@@ -47,54 +45,25 @@ const SeatMapToolkit = ({
     }
   }, [unavailableSeats])
 
-  useEffect(() => {
-    const reservedSeats = seats.filter(seat => seat.status === 'Reserved');
-
-    const grouped: { [key: string]: SeatItem[] } = {};
-
-    reservedSeats.forEach(seat => {
-      const rowChar = seat.label?.[0];
-      if (!rowChar) return; // skip if label is undefined
-
-      if (!grouped[rowChar]) {
-        grouped[rowChar] = [];
-      }
-      grouped[rowChar]!.push(seat);
-    });
-
-    const newRows: SelectedSeatRow[] = Object.keys(grouped).map((rowChar) => ({
-      rowChar,
-      count: grouped[rowChar]!.length,
-      seatsOnRow: grouped[rowChar]!.sort((a, b) => {
-        const aNum = parseInt(a.id.split('-')[1] ?? '0', 10);
-        const bNum = parseInt(b.id.split('-')[1] ?? '0', 10);
-        return aNum - bNum;
-      }),
-    }));
-
-    setRows(newRows);
-  }, [seats]);
-
-
   const handleSeatClick = (seat: any) => {
     const seatRowChar = seat.label[0];
     const seatNumber = parseInt(seat.id.split('-')[1]);
 
-    const selectedRow = rows.find((r) => r.rowChar === seatRowChar);
-    console.log(selectedRow?.seatsOnRow);
     const selectedSeatNumbersInRow = seats
     .filter((s) => s.status === 'Reserved' && s.label?.[0] === seatRowChar)
     .map((s) => parseInt(s.id.split('-')[1] ?? '0', 10));
-    console.log(selectedSeatNumbersInRow);
 
-    console.log(seatNumber);
-    console.log(selectedSeatNumbersInRow.length === 0);
     const isSelectedSeatAdjacentToAnySeatInSeatsOnRow = selectedSeatNumbersInRow.length === 0 ||
     selectedSeatNumbersInRow.some((num) => Math.abs(num - seatNumber) === 1);
+    if (
+      seat.status === SeatStatus.Available &&
+      !isSelectedSeatAdjacentToAnySeatInSeatsOnRow
+    ) {
+      setShowModal(true)
+      return
+    }
 
-    console.log(isSelectedSeatAdjacentToAnySeatInSeatsOnRow);
     if (seat.status !== SeatStatus.Unavailable && seat.status !== SeatStatus.Locked ) {
-      console.log(seat);
       onSelectSeat(seat)
       setSeats((prevSeats) => {
         return prevSeats.map((s) => {
@@ -193,6 +162,21 @@ const SeatMapToolkit = ({
           },
         }}
       />
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Không chọn được ghế</DialogTitle>
+          </DialogHeader>
+          <div>
+            <p>Xin quý khách vui lòng chọn lại ghế sát cạnh ghế đã chọn cùng hàng. </p>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button onClick={() => setShowModal(false)}>Close</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
