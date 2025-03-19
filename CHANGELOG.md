@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.1.0](https://github.com/harley/orchestars/compare/v1.0.0...v1.1.0) (2025-03-19)
+
+
+### Features
+
+* add EnvironmentIndicator component to display environment status ([#66](https://github.com/harley/orchestars/issues/66)) ([e0351f2](https://github.com/harley/orchestars/commit/e0351f2e9c1fee9ea540b03c2e3570f00171d419))
+* add event thumbnail field ([#67](https://github.com/harley/orchestars/issues/67)) ([8b60ede](https://github.com/harley/orchestars/commit/8b60eded2dd9c40a4e99e27761d106bc9b4c81f6))
+* add thumbnail event migration file ([#69](https://github.com/harley/orchestars/issues/69)) ([1a4b71b](https://github.com/harley/orchestars/commit/1a4b71be95af10ccda6026cd8e017ed269bc8784))
+* improve site performance ([#57](https://github.com/harley/orchestars/issues/57)) ([1108f42](https://github.com/harley/orchestars/commit/1108f42a01bb9fe2f9d8dea487ba4821b4a7384d))
+
+
+### Bug Fixes
+
+* **api:** Sort past events by start date descending ([#62](https://github.com/harley/orchestars/issues/62)) ([dc4a7e6](https://github.com/harley/orchestars/commit/dc4a7e6c62aca39052ad72d788edafb5b56f2abc))
+* enable dynamic rendering for home page ([#71](https://github.com/harley/orchestars/issues/71)) ([f1f43a8](https://github.com/harley/orchestars/commit/f1f43a8ea82932c4e7c43d8a8e23c45bef170237))
+* https://github.com/amannn/action-semantic-pull-request/issues/249 ([fb70e76](https://github.com/harley/orchestars/commit/fb70e76f850ba899e3811678846a5f790c361f86))
+* update footer UI ([#77](https://github.com/harley/orchestars/issues/77)) ([91db9b7](https://github.com/harley/orchestars/commit/91db9b7ca4e592f5658a8e6fe022234d9f68d850))
+
 ## 1.0.0 (2025-03-17)
 
 
