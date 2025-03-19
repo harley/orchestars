@@ -41,14 +41,9 @@ jobs:
             deps
             core
             test
-          subjectPattern: ^(?![A-Z]).+$
-          subjectPatternError: |
-            The subject "{subject}" found in the pull request title "{title}"
-            didn't match the configured pattern. Please ensure that the subject
-            doesn't start with an uppercase character.
           wip: true
-          validateSingleCommit: true
-          validateSingleCommitMatchesPrTitle: true
+          headerPattern: '^([a-zA-Z]*)(?:\(([\w$.\-*/ ]*)\))?: (.*)$'
+          headerPatternCorrespondence: type, scope, subject
 
       - uses: marocchino/sticky-pull-request-comment@v2
         if: always() && (steps.lint_pr_title.outputs.error_message != null)
@@ -62,14 +57,15 @@ jobs:
             Valid format: `type(scope): subject`
             - type: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
             - scope: auth, db, ui, api, deps, core, test (optional)
-            - subject: must start with lowercase
+            - subject: can start with any case
 
             Examples:
-            ✅ feat(auth): add OAuth2 support
-            ✅ fix(db): resolve connection timeout
-            ✅ docs: update README
-            ❌ Feature: Add new button
-            ❌ update stuff
+            ✅ feat(auth): Add OAuth2 support
+            ✅ fix(db): Resolve connection timeout
+            ✅ docs: Update README
+            ✅ feat: Add new feature
+            ❌ random text without type
+            ❌ : missing type
 
             Details:
             ```
