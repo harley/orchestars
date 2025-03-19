@@ -122,12 +122,10 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
-    events: Event;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
-    events: EventsSelect<false> | EventsSelect<true>;
   };
   locale: null;
   user: User & {
@@ -394,6 +392,15 @@ export interface Category {
  */
 export interface User {
   id: number;
+  phoneNumber?: string | null;
+  phoneNumbers?:
+    | {
+        phone?: string | null;
+        createdAt?: string | null;
+        isUsing?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
   username?: string | null;
   firstName?: string | null;
   lastName?: string | null;
@@ -1572,6 +1579,15 @@ export interface CategoriesSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  phoneNumber?: T;
+  phoneNumbers?:
+    | T
+    | {
+        phone?: T;
+        createdAt?: T;
+        isUsing?: T;
+        id?: T;
+      };
   username?: T;
   firstName?: T;
   lastName?: T;

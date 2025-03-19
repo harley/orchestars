@@ -1,16 +1,17 @@
 import React from 'react'
-import { getPayload } from 'payload'
-import config from '@/payload.config'
+// import { getPayload } from 'payload'
+// import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 import PageClient from './page.client'
 import EventBanner from '@/components/EventDetail/EventBanner'
-import Schedule from '@/components/EventDetail/Schedule'
-import TermCondition from '@/components/EventDetail/TermCondition'
-import SeatReservationClient from '@/components/EventDetail/SeatReservation/Component.client'
+// import Schedule from '@/components/EventDetail/Schedule'
+// import TermCondition from '@/components/EventDetail/TermCondition'
+// import SeatReservationClient from '@/components/EventDetail/SeatReservation/Component.client'
 import FeaturedPerformers from '@/components/EventDetail/FeaturedPerformers/Component'
-import FAQ from '@/components/EventDetail/FAQ/Component'
+// import FAQ from '@/components/EventDetail/FAQ/Component'
 import DetailDescriptionClient from '@/components/EventDetail/DetailDescription/Component.client'
 import { fetchEvent } from './actions'
+import UpcomingSaleBanner from '@/components/EventDetail/UpcomingSale'
 
 // export const dynamic = 'force-dynamic'
 export const revalidate = 60
@@ -21,7 +22,7 @@ const EventDetailPage = async (props: {
   searchParams: Promise<{ eventScheduleId: string }>
 }) => {
   const params = await props.params
-  const searchParams = await props.searchParams
+  // const searchParams = await props.searchParams
 
   const eventSlug = params.eventId
 
@@ -31,24 +32,24 @@ const EventDetailPage = async (props: {
     return notFound()
   }
 
-  let unavailableSeats: string[] = []
-  if (searchParams.eventScheduleId) {
-    const payloadConfig = await config
-    const payload = await getPayload({ config: payloadConfig })
-    unavailableSeats = await payload
-      .find({
-        collection: 'tickets',
-        where: {
-          status: { in: ['booked', 'pending_payment', 'hold'] },
-          event: { equals: eventDetail.id },
-          eventScheduleId: { equals: searchParams.eventScheduleId },
-        },
-        select: { seat: true },
-        limit: 1000,
-      })
-      .then((res) => res.docs.map((tk) => tk.seat as string).filter((exist) => !!exist))
-      .catch(() => [])
-  }
+  // let unavailableSeats: string[] = []
+  // if (searchParams.eventScheduleId) {
+  //   const payloadConfig = await config
+  //   const payload = await getPayload({ config: payloadConfig })
+  //   unavailableSeats = await payload
+  //     .find({
+  //       collection: 'tickets',
+  //       where: {
+  //         status: { in: ['booked', 'pending_payment', 'hold'] },
+  //         event: { equals: eventDetail.id },
+  //         eventScheduleId: { equals: searchParams.eventScheduleId },
+  //       },
+  //       select: { seat: true },
+  //       limit: 1000,
+  //     })
+  //     .then((res) => res.docs.map((tk) => tk.seat as string).filter((exist) => !!exist))
+  //     .catch(() => [])
+  // }
 
   return (
     <div className="">
@@ -56,17 +57,19 @@ const EventDetailPage = async (props: {
       <div className="min-h-screen flex flex-col">
         <main className="flex-grow">
           <EventBanner event={eventDetail} />
+          <UpcomingSaleBanner />
           <DetailDescriptionClient event={eventDetail} />
-          <SeatReservationClient
+          {/* <SeatReservationClient
             event={eventDetail}
             unavailableSeats={unavailableSeats as string[]}
-          />
+          /> */}
+
           <FeaturedPerformers />
-          {!!eventDetail.schedules?.length && <Schedule schedules={eventDetail.schedules} />}
+          {/* {!!eventDetail.schedules?.length && <Schedule schedules={eventDetail.schedules} />}
           {eventDetail.eventTermsAndConditions && (
             <TermCondition termCondition={eventDetail.eventTermsAndConditions} />
           )}
-          <FAQ />
+          <FAQ /> */}
         </main>
       </div>
     </div>
