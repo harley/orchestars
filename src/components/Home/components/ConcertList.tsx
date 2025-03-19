@@ -55,7 +55,7 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }
               {/* Image section */}
               <div
                 className={cn(
-                  'rounded-lg overflow-hidden h-[300px] md:h-full shadow-md',
+                  'rounded-lg overflow-hidden h-[250px] sm:h-[300px] md:h-full shadow-md',
                   index % 2 === 0 ? 'md:order-1' : 'md:order-2',
                 )}
               >
