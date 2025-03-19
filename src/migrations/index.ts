@@ -13,6 +13,7 @@ import * as migration_20250314_124747_add_key_ticket_price_for_event_collectin f
 import * as migration_20250314_624747_modify_schedule_date_varchar_to_date_type from './20250314_624747_modify_schedule_date_varchar_to_date_type'
 import * as migration_20250315_151022_add_event_schedule_id_to_ticket_and_seat_holding_collection from './20250315_151022_add_event_schedule_id_to_ticket_and_seat_holding_collection'
 import * as migration_20250318_082022_add_thumbnail_to_event_collection from './20250318_082022_add_thumbnail_to_event_collection'
+import * as migration_20250319_092110_add_phone_number_to_user_collection from './20250319_092110_add_phone_number_to_user_collection'
 import * as migration_20250319_193430_drop_not_null_columns_in_event_collection from './20250319_193430_drop_not_null_columns_in_event_collection'
 
 export const migrations = [
@@ -90,6 +91,11 @@ export const migrations = [
     up: migration_20250318_082022_add_thumbnail_to_event_collection.up,
     down: migration_20250318_082022_add_thumbnail_to_event_collection.down,
     name: '20250318_082022_add_thumbnail_to_event_collection',
+  },
+  {
+    up: migration_20250319_092110_add_phone_number_to_user_collection.up,
+    down: migration_20250319_092110_add_phone_number_to_user_collection.down,
+    name: '20250319_092110_add_phone_number_to_user_collection',
   },
   {
     up: migration_20250319_193430_drop_not_null_columns_in_event_collection.up,
