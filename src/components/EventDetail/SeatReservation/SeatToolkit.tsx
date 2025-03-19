@@ -81,16 +81,33 @@ const SeatMapToolkit = ({
     const seatNumber = parseInt(seat.id.split('-')[1]);
 
     const selectedRow = rows.find((r) => r.rowChar === seatRowChar);
-    const selectedSeatNumbers = selectedRow?.seatsOnRow.map((s) => parseInt(s.id.split('-')[1]!)) || [];
+    console.log(selectedRow?.seatsOnRow);
+    const selectedSeatNumbersInRow = seats
+    .filter((s) => s.status === 'Reserved' && s.label?.[0] === seatRowChar)
+    .map((s) => parseInt(s.id.split('-')[1] ?? '0', 10));
+    console.log(selectedSeatNumbersInRow);
 
-    const isSelectedSeatAdjacentToAnySeatInSeatsOnRow = selectedSeatNumbers.length === 0 || selectedSeatNumbers.some(
-      (selectedNumber) => Math.abs(selectedNumber - seatNumber) === 1
-    );
-    if (seat.status !== SeatStatus.Unavailable && seat.status !== SeatStatus.Locked && isSelectedSeatAdjacentToAnySeatInSeatsOnRow) {
+    console.log(seatNumber);
+    console.log(selectedSeatNumbersInRow.length === 0);
+    const isSelectedSeatAdjacentToAnySeatInSeatsOnRow = selectedSeatNumbersInRow.length === 0 ||
+    selectedSeatNumbersInRow.some((num) => Math.abs(num - seatNumber) === 1);
+
+    console.log(isSelectedSeatAdjacentToAnySeatInSeatsOnRow);
+    if (seat.status !== SeatStatus.Unavailable && seat.status !== SeatStatus.Locked ) {
       console.log(seat);
       onSelectSeat(seat)
       setSeats((prevSeats) => {
         return prevSeats.map((s) => {
+          const seatNewStatus = () =>{
+            if (s.status === SeatStatus.Reserved) {
+              return SeatStatus.Available
+            }
+            else if (isSelectedSeatAdjacentToAnySeatInSeatsOnRow) {
+              return SeatStatus.Reserved
+            } else {
+              return SeatStatus.Available
+            }
+          }
           if (
             s.id === seat.id &&
             s.status !== SeatStatus.Unavailable &&
@@ -98,7 +115,7 @@ const SeatMapToolkit = ({
           ) {
             return {
               ...s,
-              status: s.status === SeatStatus.Reserved ? SeatStatus.Available : SeatStatus.Reserved,
+              status: seatNewStatus(),
             }
           }
           return s
