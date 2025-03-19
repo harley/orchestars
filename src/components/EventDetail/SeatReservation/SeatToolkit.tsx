@@ -168,7 +168,7 @@ const SeatMapToolkit = ({
             <DialogTitle>Không chọn được ghế</DialogTitle>
           </DialogHeader>
           <div>
-            <p>Xin quý khách vui lòng chọn lại ghế sát cạnh ghế đã chọn cùng hàng. </p>
+            <p>Xin quý khách vui lòng không bỏ trống ghế. </p>
           </div>
           <DialogFooter>
             <DialogClose asChild>
