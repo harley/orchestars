@@ -3,8 +3,10 @@ import { CustomerInfo, NewOrderItem } from '../types'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { generatePassword } from '@/utilities/generatePassword'
-import { Event, User } from '@/payload-types'
+import { Event, Payment, Promotion, User } from '@/payload-types'
 import { generateCode } from '@/utilities/generateCode'
+import { isAfter, isBefore } from 'date-fns'
+import { USER_PROMOTION_REDEMPTION_STATUS } from '@/collections/Promotion/constants/status'
 
 export const checkSeatAvailable = async ({
   orderItems,
@@ -206,6 +208,7 @@ export const createOrderAndTickets = async ({
   events,
   transactionID,
   currency,
+  promotion,
   payload,
 }: {
   orderCode: string
@@ -214,6 +217,7 @@ export const createOrderAndTickets = async ({
   events: Event[]
   transactionID: number | Promise<number | string> | string
   currency: string
+  promotion?: Promotion
   payload: BasePayload
 }) => {
   const mapObjectEvents = events.reduce(
@@ -224,14 +228,26 @@ export const createOrderAndTickets = async ({
     },
     {} as Record<string, any>,
   )
-  const amount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0)
+  let amount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0)
+  const totalBeforeDiscount = amount
+  let totalDiscount = 0
+  if (promotion) {
+    totalDiscount = calculateTotalDiscount({ amount, promotion })
+
+    amount = amount - totalDiscount
+  }
+
   const newOrder = await payload.create({
     collection: 'orders',
     data: {
       orderCode,
       user: customerData.id,
       status: 'processing',
+      totalBeforeDiscount,
+      totalDiscount,
       total: amount,
+      promotionCode: promotion?.code,
+      promotion: promotion?.id,
       currency,
     },
     req: { transactionID },
@@ -293,4 +309,142 @@ export const createOrderAndTickets = async ({
   await Promise.all(ticketPromises)
 
   return { newOrder }
+}
+
+export const checkPromotionCode = async ({
+  promotionCode,
+  eventId,
+  userId,
+  payload,
+}: {
+  promotionCode: string
+  eventId: number
+  userId: number
+  payload: BasePayload
+}) => {
+  // check promotion exist
+  const promotion = await payload
+    .find({
+      collection: 'promotions',
+      limit: 1,
+      where: {
+        status: { equals: 'active' },
+        event: { equals: eventId },
+        code: { equals: promotionCode },
+      },
+    })
+    .then((res) => res.docs?.[0])
+
+  if (!promotion) {
+    throw new Error(`Mã giảm giá [${promotionCode}] không hợp lệ`)
+  }
+
+  if (!promotion.maxRedemptions) {
+    throw new Error(`Mã giảm giá [${promotion.code}] không hợp lệ`)
+  }
+  const currentTime = new Date()
+  if (promotion.startDate && isAfter(promotion.startDate, currentTime)) {
+    throw new Error(`Không thể dùng mã giảm giá [${promotion.code}] trước thời gian quy định`)
+  }
+
+  if (promotion.endDate && isBefore(promotion.endDate, currentTime)) {
+    throw new Error(`Mã giảm giá [${promotion.code}] đã hết hạn`)
+  }
+  const userPromotionsPendingPayment = await payload
+    .count({
+      collection: 'userPromotionRedemptions',
+      where: {
+        promotion: { equals: promotion.id },
+        status: { equals: 'pending' },
+        expireAt: { greater_than_equal: currentTime.toISOString() },
+      },
+    })
+    .then((res) => res.totalDocs)
+
+  const remainNumberRedemption =
+    promotion.maxRedemptions - (promotion.totalUsed || 0) - userPromotionsPendingPayment
+
+  if (remainNumberRedemption <= 0) {
+    throw new Error(`Mã giảm giá [${promotion.code}] đã hết lượt sử dụng`)
+  }
+
+  const countTotalCurrentUserRedemption = await payload
+    .count({
+      collection: 'userPromotionRedemptions',
+      where: {
+        promotion: { equals: promotion.id },
+        user: { equals: userId },
+        or: [
+          {
+            status: { in: [USER_PROMOTION_REDEMPTION_STATUS.used.value] },
+          },
+          {
+            status: { in: [USER_PROMOTION_REDEMPTION_STATUS.pending.value] },
+            expireAt: { greater_than_equal: currentTime.toISOString() },
+          },
+        ],
+      },
+    })
+    .then((res) => res.totalDocs)
+
+  if (
+    !isNaN(promotion.perUserLimit as number) &&
+    countTotalCurrentUserRedemption >= (promotion.perUserLimit as number)
+  ) {
+    throw new Error(`Bạn đã dùng hết số lượt được áp dụng cho giảm giá [${promotion.code}] này`)
+  }
+
+  return promotion
+}
+
+export const calculateTotalDiscount = ({
+  amount,
+  promotion,
+}: {
+  amount: number
+  promotion?: Promotion
+}) => {
+  let totalDiscount = 0
+  if (promotion) {
+    if (promotion.discountType === 'percentage') {
+      totalDiscount = (amount * promotion.discountValue) / 100
+    } else if (promotion.discountType === 'fixed_amount') {
+      totalDiscount = promotion.discountValue
+    }
+  }
+
+  return totalDiscount
+}
+
+export const createUserPromotionRedemption = async ({
+  promotion,
+  user,
+  payment,
+  eventId,
+  transactionID,
+  payload,
+}: {
+  promotion: Promotion
+  user: User
+  payment: Payment
+  eventId: number
+  transactionID: number | Promise<number | string> | string
+  payload: BasePayload
+}) => {
+  // expire at 30 minutes
+  const expireAt = new Date()
+  expireAt.setMinutes(expireAt.getMinutes() + 30)
+
+  return payload.create({
+    collection: 'userPromotionRedemptions',
+    data: {
+      promotion: promotion.id,
+      user: user.id,
+      event: eventId,
+      payment: payment.id,
+      expireAt: expireAt.toISOString(),
+      status: 'pending',
+    },
+    req: { transactionID },
+  })
 }

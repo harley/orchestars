@@ -62,20 +62,24 @@ export const afterChangeStatus = async ({ value, originalDoc, req }: FieldHookAr
         const attachmentPath = join(process.cwd(), 'public', 'eventTerms.doc')
         const fileBuffer = await readFile(attachmentPath)
 
-        await req.payload.sendEmail({
-          to: userEmail,
-          subject: 'Ticket Confirmation',
-          html,
-          attachDataUrls: true,
-          attachments: [
-            {
-              content: fileBuffer,
-              filename: 'eventTerms.doc',
-              // contentType: 'application/msword',
-            },
-            ...attachments,
-          ],
-        })
+        await req.payload
+          .sendEmail({
+            to: userEmail,
+            subject: 'Ticket Confirmation',
+            html,
+            attachDataUrls: true,
+            attachments: [
+              {
+                content: fileBuffer,
+                filename: 'eventTerms.doc',
+                // contentType: 'application/msword',
+              },
+              ...attachments,
+            ],
+          })
+          .catch((error) => {
+            console.error('Error while sending mail ticket', error)
+          })
       }
     } catch (error) {
       console.error('Error updating ticket status:', error)
