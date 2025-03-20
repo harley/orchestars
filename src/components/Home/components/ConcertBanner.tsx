@@ -16,7 +16,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events }) => {
     }, 6000)
 
     return () => clearInterval(interval)
-  }, [events.length])
+  }, [events?.length])
 
   const handleDotClick = (index: number) => {
     setCurrentIndex(index)
@@ -32,7 +32,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events }) => {
 
   return (
     <div className="relative w-full h-[170px] sm:h-[200px] md:h-[300px] lg:h-[400px] xl:h-[500px] 2xl:h-[700px] overflow-hidden">
-      {events.map((evt, index) => (
+      {events?.map((evt, index) => (
         <div
           key={evt.id}
           className={`absolute inset-0 transition-opacity duration-1000 ${
@@ -139,7 +139,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events }) => {
       )}
 
       <div className="absolute bottom-2 md:bottom-8 left-0 right-0 z-30 flex justify-center gap-2">
-        {events.map((_, index) => (
+        {events?.map((_, index) => (
           <button
             key={index}
             onClick={() => handleDotClick(index)}

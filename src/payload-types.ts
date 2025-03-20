@@ -788,6 +788,7 @@ export interface Event {
   schedules?:
     | {
         date?: string | null;
+        scheduleImage?: (number | null) | Media;
         details?:
           | {
               time?: string | null;
@@ -1620,6 +1621,7 @@ export interface EventsSelect<T extends boolean = true> {
     | T
     | {
         date?: T;
+        scheduleImage?: T;
         details?:
           | T
           | {

@@ -16,6 +16,7 @@ import * as migration_20250318_082022_add_thumbnail_to_event_collection from './
 import * as migration_20250319_092110_add_phone_number_to_user_collection from './20250319_092110_add_phone_number_to_user_collection';
 import * as migration_20250319_140740_add_status_event_collection from './20250319_140740_add_status_event_collection';
 import * as migration_20250319_193430_drop_not_null_columns_in_event_collection from './20250319_193430_drop_not_null_columns_in_event_collection';
+import * as migration_20250320_035237 from './20250320_035237';
 
 export const migrations = [
   {
@@ -106,6 +107,11 @@ export const migrations = [
   {
     up: migration_20250319_193430_drop_not_null_columns_in_event_collection.up,
     down: migration_20250319_193430_drop_not_null_columns_in_event_collection.down,
-    name: '20250319_193430_drop_not_null_columns_in_event_collection'
+    name: '20250319_193430_drop_not_null_columns_in_event_collection',
+  },
+  {
+    up: migration_20250320_035237.up,
+    down: migration_20250320_035237.down,
+    name: '20250320_035237'
   },
 ];

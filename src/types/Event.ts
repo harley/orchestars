@@ -9,6 +9,7 @@ export type Event = {
   schedules: Array<{
     id: string
     date: string
+    scheduleImage: string
     details: Array<{
       id: string
       time: string
