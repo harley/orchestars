@@ -22,6 +22,20 @@ const nextConfig = {
   },
   reactStrictMode: true,
   redirects,
+  webpack: (config, { isServer }) => {
+    // Exclude Supabase Edge Functions from webpack compilation
+    config.module.rules.push({
+      test: /supabase\/functions\/.+/,
+      use: 'null-loader',
+    })
+
+    // Also exclude these files from source maps and module resolution
+    if (!config.resolve) config.resolve = {}
+    if (!config.resolve.alias) config.resolve.alias = {}
+    config.resolve.alias['supabase/functions'] = false
+
+    return config
+  },
 }
 
 export default withPayload(nextConfig, { devBundleServerPackages: false })
