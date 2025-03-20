@@ -4,13 +4,6 @@ on:
   push:
     branches:
       - main
-  # pull_request events are used to update the PR body with the release notes preview
-  pull_request:
-    types: [opened, reopened, synchronize]
-
-permissions:
-  contents: read
-  pull-requests: write
 
 jobs:
   update_release_draft:
