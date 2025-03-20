@@ -107,7 +107,7 @@ export const plugins: Plugin[] = [
   }),
 
   importExportPlugin({
-    collections: ['orders', 'orderItems', "tickets", "payments", "seatHoldings"],
+    collections: ['orders', 'orderItems', "tickets", "payments", "seatHoldings", "users"],
     overrideExportCollection: (collection) => {
       collection.admin.group = 'System'
       collection.upload.staticDir = path.resolve('uploads')
