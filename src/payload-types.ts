@@ -843,7 +843,7 @@ export interface Promotion {
   event?: (number | null) | Event;
   maxRedemptions: number;
   totalUsed?: number | null;
-  perUserLimit?: number | null;
+  perUserLimit: number;
   discountType: 'percentage' | 'fixed_amount';
   discountValue: number;
   startDate: string;
@@ -864,7 +864,7 @@ export interface UserPromotionRedemption {
   user: number | User;
   redeemAt?: string | null;
   expireAt?: string | null;
-  status?: ('pending' | 'used' | 'cancelled') | null;
+  status: 'pending' | 'used' | 'cancelled';
   updatedAt: string;
   createdAt: string;
 }

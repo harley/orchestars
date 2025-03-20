@@ -31,6 +31,8 @@ export const Promotions: CollectionConfig = {
     {
       name: 'perUserLimit',
       type: 'number',
+      required: true,
+      defaultValue: 1,
     },
     {
       name: 'discountType',

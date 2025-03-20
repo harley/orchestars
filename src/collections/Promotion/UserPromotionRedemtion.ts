@@ -1,4 +1,8 @@
 import type { CollectionConfig } from 'payload'
+import {
+  USER_PROMOTION_REDEMPTION_STATUS,
+  USER_PROMOTION_REDEMPTION_STATUSES,
+} from './constants/status'
 // import { afterChangeStatus } from './hooks/afterChangeStatus'
 
 export const UserPromotionRedemptions: CollectionConfig = {
@@ -51,21 +55,9 @@ export const UserPromotionRedemptions: CollectionConfig = {
     {
       name: 'status',
       type: 'select',
-      options: [
-        {
-          label: 'Pending', // user has been processing the order for payment
-          value: 'pending',
-        },
-        {
-          label: 'Used', // user has been succeed the payment
-          value: 'used',
-        },
-        {
-          label: 'Cancelled', // user canceled order or the payment is expire
-          value: 'cancelled',
-        },
-      ],
-      required: false,
+      options: USER_PROMOTION_REDEMPTION_STATUSES,
+      required: true,
+      defaultValue: USER_PROMOTION_REDEMPTION_STATUS.pending.value,
     },
   ],
 }
