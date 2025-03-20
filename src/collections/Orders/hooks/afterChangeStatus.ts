@@ -66,7 +66,7 @@ export const afterChangeStatus = async ({ value, originalDoc, req }: FieldHookAr
           to: userEmail,
           subject: 'Ticket Confirmation',
           html,
-          cc:  'receipts@orchestars.vn',
+          cc: 'receipts@orchestars.vn',
           attachDataUrls: true,
           attachments: [
             {
