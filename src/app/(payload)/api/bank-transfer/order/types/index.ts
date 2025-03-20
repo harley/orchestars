@@ -17,6 +17,7 @@ export interface NewOrderItem {
 export interface NewInputOrder {
   currency: string
   orderItems: NewOrderItem[]
+  promotionCode?: string
 }
 
 export interface BankTransferTransaction {

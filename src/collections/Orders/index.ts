@@ -31,12 +31,33 @@ export const Orders: CollectionConfig = {
       },
     },
     {
-      name: 'total',
-      type: 'number',
-    },
-    {
       name: 'currency',
       type: 'text',
+    },
+    {
+      name: 'promotion',
+      type: 'relationship',
+      relationTo: 'promotions',
+      required: false,
+    },
+    {
+      name: 'promotionCode',
+      type: 'text',
+      required: false,
+    },
+    {
+      name: 'totalBeforeDiscount',
+      type: 'number',
+      required: false,
+    },
+    {
+      name: 'totalDiscount',
+      type: 'number',
+      required: false,
+    },
+    {
+      name: 'total',
+      type: 'number',
     },
   ],
 }

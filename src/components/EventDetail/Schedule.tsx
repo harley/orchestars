@@ -1,10 +1,12 @@
-import { Event } from '@/payload-types'
+import { Event, Media } from '@/payload-types'
 import React from 'react'
 import { format as dateFnsFormat, isValid } from 'date-fns'
-
+import EventScheduleImage from '@/components/EventDetail/EventScheduleImage'
+  
 interface ScheduleItem {
   id: string
   date: string
+  scheduleImage: Media
   details: {
     id: string
     name: string
@@ -31,6 +33,7 @@ const Schedule = ({ schedules }: { schedules: Event['schedules'] }) => {
                   ? dateFnsFormat(schedule.date, 'dd/MM/yyyy')
                   : schedule?.date}
               </h3>
+              <EventScheduleImage scheduleImage={schedule.scheduleImage} />
 
               {schedule.details?.map((item, index) => (
                 <div

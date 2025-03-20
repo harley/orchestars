@@ -1,21 +1,24 @@
-import * as migration_20250311_133956_init_schemas from './20250311_133956_init_schemas';
-import * as migration_20250312_005922_add_about_us_column from './20250312_005922_add_about_us_column';
-import * as migration_20250312_064605_ignore_order_status_in_tickets_collection from './20250312_064605_ignore_order_status_in_tickets_collection';
-import * as migration_20250312_112930_additional_new_collections from './20250312_112930_additional_new_collections';
-import * as migration_20250312_170914_add_activities_collection from './20250312_170914_add_activities_collection';
-import * as migration_20250312_181537_add_nav_items_column_footer from './20250312_181537_add_nav_items_column_footer';
-import * as migration_20250312_190107_add_display_order_column_performer_collection_and_add_link_column_partner_collection from './20250312_190107_add_display_order_column_performer_collection_and_add_link_column_partner_collection';
-import * as migration_20250313_035532_add_detailDescription_and_configuration_fields_event_table from './20250313_035532_add_detailDescription_and_configuration_fields_event_table';
-import * as migration_20250313_085919_add_seat_field_to_order_item_and_ticket_collection from './20250313_085919_add_seat_field_to_order_item_and_ticket_collection';
-import * as migration_20250313_093244_update_order_status_field_to_enum from './20250313_093244_update_order_status_field_to_enum';
-import * as migration_20250314_025724_add_seat_holding_collection from './20250314_025724_add_seat_holding_collection';
-import * as migration_20250314_124747_add_key_ticket_price_for_event_collectin from './20250314_124747_add_key_ticket_price_for_event_collectin';
-import * as migration_20250314_624747_modify_schedule_date_varchar_to_date_type from './20250314_624747_modify_schedule_date_varchar_to_date_type';
-import * as migration_20250315_151022_add_event_schedule_id_to_ticket_and_seat_holding_collection from './20250315_151022_add_event_schedule_id_to_ticket_and_seat_holding_collection';
-import * as migration_20250318_082022_add_thumbnail_to_event_collection from './20250318_082022_add_thumbnail_to_event_collection';
-import * as migration_20250319_092110_add_phone_number_to_user_collection from './20250319_092110_add_phone_number_to_user_collection';
-import * as migration_20250319_140740_add_status_event_collection from './20250319_140740_add_status_event_collection';
-import * as migration_20250319_193430_drop_not_null_columns_in_event_collection from './20250319_193430_drop_not_null_columns_in_event_collection';
+import * as migration_20250311_133956_init_schemas from './20250311_133956_init_schemas'
+import * as migration_20250312_005922_add_about_us_column from './20250312_005922_add_about_us_column'
+import * as migration_20250312_064605_ignore_order_status_in_tickets_collection from './20250312_064605_ignore_order_status_in_tickets_collection'
+import * as migration_20250312_112930_additional_new_collections from './20250312_112930_additional_new_collections'
+import * as migration_20250312_170914_add_activities_collection from './20250312_170914_add_activities_collection'
+import * as migration_20250312_181537_add_nav_items_column_footer from './20250312_181537_add_nav_items_column_footer'
+import * as migration_20250312_190107_add_display_order_column_performer_collection_and_add_link_column_partner_collection from './20250312_190107_add_display_order_column_performer_collection_and_add_link_column_partner_collection'
+import * as migration_20250313_035532_add_detailDescription_and_configuration_fields_event_table from './20250313_035532_add_detailDescription_and_configuration_fields_event_table'
+import * as migration_20250313_085919_add_seat_field_to_order_item_and_ticket_collection from './20250313_085919_add_seat_field_to_order_item_and_ticket_collection'
+import * as migration_20250313_093244_update_order_status_field_to_enum from './20250313_093244_update_order_status_field_to_enum'
+import * as migration_20250314_025724_add_seat_holding_collection from './20250314_025724_add_seat_holding_collection'
+import * as migration_20250314_124747_add_key_ticket_price_for_event_collectin from './20250314_124747_add_key_ticket_price_for_event_collectin'
+import * as migration_20250314_624747_modify_schedule_date_varchar_to_date_type from './20250314_624747_modify_schedule_date_varchar_to_date_type'
+import * as migration_20250315_151022_add_event_schedule_id_to_ticket_and_seat_holding_collection from './20250315_151022_add_event_schedule_id_to_ticket_and_seat_holding_collection'
+import * as migration_20250318_082022_add_thumbnail_to_event_collection from './20250318_082022_add_thumbnail_to_event_collection'
+import * as migration_20250319_092110_add_phone_number_to_user_collection from './20250319_092110_add_phone_number_to_user_collection'
+import * as migration_20250319_140740_add_status_event_collection from './20250319_140740_add_status_event_collection'
+import * as migration_20250319_193430_drop_not_null_columns_in_event_collection from './20250319_193430_drop_not_null_columns_in_event_collection'
+import * as migration_20250320_035237_add_schedule_image_event_collection from './20250320_035237_add_schedule_image_event_collection'
+import * as migration_20250320_043727_add_promotion_collection from './20250320_043727_add_promotion_collection'
+import * as migration_20250320_045936_add_default_value_for_promotion_collection from './20250320_045936_add_default_value_for_promotion_collection'
 
 export const migrations = [
   {
@@ -106,6 +109,21 @@ export const migrations = [
   {
     up: migration_20250319_193430_drop_not_null_columns_in_event_collection.up,
     down: migration_20250319_193430_drop_not_null_columns_in_event_collection.down,
-    name: '20250319_193430_drop_not_null_columns_in_event_collection'
+    name: '20250319_193430_drop_not_null_columns_in_event_collection',
   },
-];
+  {
+    up: migration_20250320_035237_add_schedule_image_event_collection.up,
+    down: migration_20250320_035237_add_schedule_image_event_collection.down,
+    name: '20250320_035237_add_schedule_image_event_collection',
+  },
+  {
+    up: migration_20250320_043727_add_promotion_collection.up,
+    down: migration_20250320_043727_add_promotion_collection.down,
+    name: '20250320_043727_add_promotion_collection',
+  },
+  {
+    up: migration_20250320_045936_add_default_value_for_promotion_collection.up,
+    down: migration_20250320_045936_add_default_value_for_promotion_collection.down,
+    name: '20250320_045936_add_default_value_for_promotion_collection',
+  },
+]
