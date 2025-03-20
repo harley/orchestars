@@ -27,6 +27,8 @@ import { FAQs } from './collections/FAQ'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { Activities } from './collections/Activities'
 import { SeatHoldings } from './collections/SeatHoldings'
+import { Promotions } from './collections/Promotion'
+import { UserPromotionRedemptions } from './collections/Promotion/UserPromotionRedemtion'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -90,6 +92,8 @@ export default buildConfig({
     Categories,
     Users,
     Events,
+    Promotions,
+    UserPromotionRedemptions,
     Orders,
     OrderItems,
     Payments,
