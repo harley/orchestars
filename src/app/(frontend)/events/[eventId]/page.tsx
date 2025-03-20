@@ -63,6 +63,7 @@ const EventDetailPage = async (props: {
           <EventBanner event={eventDetail} />
           {isUpcoming && <UpcomingSaleBanner />}
 
+
           <DetailDescriptionClient event={eventDetail} />
           {isOpenForSales && (
             <SeatReservationClient

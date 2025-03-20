@@ -112,6 +112,11 @@ export const Events: CollectionConfig = {
           name: 'date',
         },
         {
+          type: 'upload',
+          relationTo: 'media',
+          name: 'scheduleImage',
+        },
+        {
           type: 'array',
           name: 'details',
           fields: [
