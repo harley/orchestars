@@ -1,10 +1,10 @@
 import React from 'react'
 import { format } from 'date-fns'
-import { Calendar } from '@/components/ui/calendar'
+// import { Calendar } from '@/components/ui/calendar'
 import { Button } from '@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
-import { CalendarIcon } from 'lucide-react'
+// import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+// import { cn } from '@/lib/utils'
+// import { CalendarIcon } from 'lucide-react'
 import { Event } from '@/payload-types'
 
 interface DateSelectorProps {
@@ -15,21 +15,21 @@ interface DateSelectorProps {
 
 const DateSelector: React.FC<DateSelectorProps> = ({ schedules, selectedDate, onDateSelect }) => {
   // Convert schedule dates to Date objects for the calendar
-  const availableDates = schedules
-    .filter((schedule) => schedule.date)
-    .map((schedule) => new Date(schedule.date as string))
+  // const availableDates = schedules
+  //   .filter((schedule) => schedule.date)
+  //   .map((schedule) => new Date(schedule.date as string))
 
-  const isDateAvailable = (date: Date) => {
-    return availableDates.some(
-      (availableDate) => availableDate.toDateString() === date.toDateString(),
-    )
-  }
+  // const isDateAvailable = (date: Date) => {
+  //   return availableDates.some(
+  //     (availableDate) => availableDate.toDateString() === date.toDateString(),
+  //   )
+  // }
 
   return (
     <div className="w-full mb-8">
       <h3 className="text-xl font-bold mb-4">Chọn ngày bạn muốn tham dự</h3>
       <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
-        <Popover>
+        {/* <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
@@ -52,7 +52,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({ schedules, selectedDate, on
               className={cn('p-3 pointer-events-auto')}
             />
           </PopoverContent>
-        </Popover>
+        </Popover> */}
 
         <div className="flex flex-wrap gap-2 justify-center">
           {schedules.map((schedule) => (

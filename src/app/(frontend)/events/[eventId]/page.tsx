@@ -4,7 +4,7 @@ import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 import PageClient from './page.client'
 import EventBanner from '@/components/EventDetail/EventBanner'
-import Schedule from '@/components/EventDetail/Schedule'
+// import Schedule from '@/components/EventDetail/Schedule'
 import TermCondition from '@/components/EventDetail/TermCondition'
 import SeatReservationClient from '@/components/EventDetail/SeatReservation/Component.client'
 import FeaturedPerformers from '@/components/EventDetail/FeaturedPerformers/Component'
@@ -63,7 +63,6 @@ const EventDetailPage = async (props: {
           <EventBanner event={eventDetail} />
           {isUpcoming && <UpcomingSaleBanner />}
 
-
           <DetailDescriptionClient event={eventDetail} />
           {isOpenForSales && (
             <SeatReservationClient
@@ -75,7 +74,7 @@ const EventDetailPage = async (props: {
           <FeaturedPerformers />
           {!isUpcoming && (
             <>
-              {!!eventDetail.schedules?.length && <Schedule schedules={eventDetail.schedules} />}
+              {/* {!!esventDetail.schedules?.length && <Schedule schedules={eventDetail.schedules} />} */}
               {eventDetail.eventTermsAndConditions && (
                 <TermCondition termCondition={eventDetail.eventTermsAndConditions} />
               )}
