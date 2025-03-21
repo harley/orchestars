@@ -3,6 +3,7 @@ import { PaginatedDocs } from 'payload'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { unstable_cache } from 'next/cache'
+import { EVENT_STATUS } from '@/collections/Events/constants/status'
 
 export const fetchOngoingPaginatedDocs = async () => {
   try {
@@ -11,7 +12,12 @@ export const fetchOngoingPaginatedDocs = async () => {
     const result = await payload
       .find({
         collection: 'events',
-        where: { endDatetime: { greater_than_equal: new Date() } },
+        where: {
+          endDatetime: { greater_than_equal: new Date() },
+          status: {
+            in: [EVENT_STATUS.published_upcoming.value, EVENT_STATUS.published_open_sales.value],
+          },
+        },
         sort: 'startDatetime',
         limit: 10,
       })
@@ -74,7 +80,12 @@ export const fetchPastEvents = async () => {
     const result = await payload
       .find({
         collection: 'events',
-        where: { endDatetime: { less_than: new Date() } },
+        where: {
+          endDatetime: { less_than: new Date() },
+          status: {
+            in: [EVENT_STATUS.completed.value, EVENT_STATUS.published_open_sales.value],
+          },
+        },
         sort: '-startDatetime',
         limit: 50,
       })
