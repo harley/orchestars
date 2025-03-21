@@ -11,7 +11,12 @@ const DetailDescriptionClient = ({ event }: { event: Event }) => {
   return (
     <section className="py-12 bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h3 className="text-xl font-bold mb-4">Giới Thiệu</h3>
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
+            Giới Thiệu
+          </h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
+        </div>
         <div
           className={`relative overflow-hidden transition-all duration-300 ease-in-out ${
             isExpanded ? 'max-h-full' : 'max-h-40'

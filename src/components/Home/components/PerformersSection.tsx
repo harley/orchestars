@@ -110,9 +110,13 @@ const PerformersSection = ({ performers }: { performers: Performer[] }) => {
       />
 
       <div className="container mx-auto px-6 md:px-10">
-        <h2 className="text-3xl md:text-4xl font-display font-bold mb-6 text-center bg-clip-text text-black">
-          Nghệ Sĩ Nổi Bật
-        </h2>
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
+            Nghệ Sĩ Nổi Bật
+          </h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
+        </div>
+
         <p className="text-muted-foreground text-center mb-16 max-w-2xl mx-auto text-lg">
           Trải nghiệm những màn trình diễn đáng nhớ từ các nghệ sĩ tài năng, mang đến âm thanh độc
           đáo và năng lượng cuốn hút trên sân khấu của chúng tôi.
