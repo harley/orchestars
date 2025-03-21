@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { revalidateTag } from 'next/cache'
 
 export const FAQs: CollectionConfig = {
   slug: 'faqs',
@@ -33,4 +34,17 @@ export const FAQs: CollectionConfig = {
       required: false,
     },
   ],
+  hooks: {
+    afterChange: [
+      ({ doc, req: { payload, context } }) => {
+        if (!context.disableRevalidate) {
+          payload.logger.info(`Revalidating faq`)
+
+          revalidateTag('event-faqs')
+        }
+
+        return doc
+      },
+    ],
+  },
 }

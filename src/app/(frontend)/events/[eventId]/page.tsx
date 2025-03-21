@@ -10,12 +10,12 @@ import SeatReservationClient from '@/components/EventDetail/SeatReservation/Comp
 import FeaturedPerformers from '@/components/EventDetail/FeaturedPerformers/Component'
 import FAQ from '@/components/EventDetail/FAQ/Component'
 import DetailDescriptionClient from '@/components/EventDetail/DetailDescription/Component.client'
-import { fetchEvent } from './actions'
+import { getEventCached } from './actions'
 import UpcomingSaleBanner from '@/components/EventDetail/UpcomingSale'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
 
 // export const dynamic = 'force-dynamic'
-export const revalidate = 60
+export const revalidate = 3600
 export const dynamicParams = true
 
 const EventDetailPage = async (props: {
@@ -27,7 +27,7 @@ const EventDetailPage = async (props: {
 
   const eventSlug = params.eventId
 
-  const eventDetail = await fetchEvent({ slug: eventSlug })
+  const eventDetail = await getEventCached({ slug: eventSlug })()
 
   if (!eventDetail) {
     return notFound()

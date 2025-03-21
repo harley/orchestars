@@ -1,31 +1,37 @@
 import { PaginatedDocs } from 'payload'
-import { stringify } from 'qs-esm'
 
-import { APP_BASE_URL } from '@/config/app'
+import configPromise from '@payload-config'
+import { getPayload } from 'payload'
+import { unstable_cache } from 'next/cache'
 
 export const fetchOngoingPaginatedDocs = async () => {
   try {
-    const stringifiedQuery = stringify(
-      {
+    console.log('fetching OngoingPaginatedDocs')
+    const payload = await getPayload({ config: configPromise })
+    const result = await payload
+      .find({
+        collection: 'events',
         where: { endDatetime: { greater_than_equal: new Date() } },
+        sort: 'startDatetime',
         limit: 10,
-      },
-      { addQueryPrefix: true },
-    )
+      })
+      .then((res) => res)
+      .catch(
+        () =>
+          ({
+            docs: [],
+            hasNextPage: false,
+            hasPrevPage: false,
+            limit: 10,
+            totalDocs: 0,
+            totalPages: 0,
+            pagingCounter: 0,
+          }) as PaginatedDocs,
+      )
 
-    const req = await fetch(`${APP_BASE_URL}/api/events${stringifiedQuery}`, {
-      method: 'GET',
-      next: { tags: ['home-events'] },
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = await req.json()
-
-    return data
-  } catch (err) {
-    console.log(err)
+    return result
+  } catch (error) {
+    console.error('Error while fetching fetchOngoingPaginatedDocs', error)
 
     return {
       docs: [],
@@ -41,109 +47,112 @@ export const fetchOngoingPaginatedDocs = async () => {
 
 export const fetchPerformers = async () => {
   try {
-    const stringifiedQuery = stringify(
-      {
+    console.log('fetching Performers')
+    const payload = await getPayload({ config: configPromise })
+    const result = await payload
+      .find({
+        collection: 'performers',
         where: { status: { equals: 'active' } },
         sort: 'displayOrder',
         limit: 50,
-      },
-      { addQueryPrefix: true },
-    )
+      })
+      .then((res) => res.docs)
+      .catch(() => [])
 
-    const req = await fetch(`${APP_BASE_URL}/api/performers?${stringifiedQuery}`, {
-      method: 'GET',
-      next: { tags: ['home-performers'] },
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = await req.json()
+    return result
+  } catch (error) {
+    console.error('Error while fetching fetchPerformers', error)
 
-    return data.docs || []
-  } catch (err) {
-    console.log(err)
     return []
   }
 }
 
 export const fetchPastEvents = async () => {
   try {
-    const stringifiedQuery = stringify(
-      {
+    console.log('fetching PastEvents')
+    const payload = await getPayload({ config: configPromise })
+    const result = await payload
+      .find({
+        collection: 'events',
         where: { endDatetime: { less_than: new Date() } },
         sort: '-startDatetime',
         limit: 50,
-      },
-      { addQueryPrefix: true },
-    )
-    const req = await fetch(`${APP_BASE_URL}/api/events${stringifiedQuery}`, {
-      method: 'GET',
-      next: { tags: ['home-events'] },
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = await req.json()
+      })
+      .then((res) => res.docs)
+      .catch(() => [])
 
-    return data.docs || []
-  } catch (err) {
-    console.log(err)
+    return result
+  } catch (error) {
+    console.error('Error while fetching fetchPastEvents', error)
+
     return []
   }
 }
 
 export const fetchPartners = async () => {
   try {
-    const stringifiedQuery = stringify(
-      {
+    console.log('fetching Partners')
+    const payload = await getPayload({ config: configPromise })
+    const result = await payload
+      .find({
+        collection: 'partners',
         limit: 50,
-      },
-      { addQueryPrefix: true },
-    )
-    const req = await fetch(`${APP_BASE_URL}/api/partners${stringifiedQuery}`, {
-      method: 'GET',
-      next: { tags: ['home-partners'] },
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = await req.json()
+      })
+      .then((res) => res.docs)
+      .catch(() => [])
 
-    return data.docs
-  } catch (err) {
-    console.log(err)
+    return result
+  } catch (error) {
+    console.error('Error while fetching fetchPartners', error)
+
     return []
   }
 }
 
 export const fetchActivities = async () => {
   try {
-    const stringifiedQuery = stringify(
-      {
+    console.log('fetching Activities')
+    const payload = await getPayload({ config: configPromise })
+    const result = await payload
+      .find({
+        collection: 'activities',
         where: {
           status: { equals: 'active' },
         },
         limit: 1,
-      },
-      { addQueryPrefix: true },
-    )
+      })
+      .then((res) => res.docs?.[0])
+      .catch(() => undefined)
 
-    const req = await fetch(`${APP_BASE_URL}/api/activities${stringifiedQuery}`, {
-      method: 'GET',
-      next: { tags: ['home-activities'] },
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = await req.json()
+    return result
+  } catch (error) {
+    console.error('Error while fetching fetchActivities', error)
 
-    return data.docs?.[0]
-  } catch (err) {
-    console.log(err)
     return undefined
   }
 }
+
+export const getOngoingPaginatedDocsCached = () =>
+  unstable_cache(async () => fetchOngoingPaginatedDocs(), [], {
+    tags: ['home-events'],
+  })
+
+export const getPerformersCached = () =>
+  unstable_cache(async () => fetchPerformers(), [], {
+    tags: ['home-performers'],
+  })
+
+export const getPastEventsCached = () =>
+  unstable_cache(async () => fetchPastEvents(), [], {
+    tags: ['home-events'],
+  })
+
+export const getPartnersCached = () =>
+  unstable_cache(async () => fetchPartners(), [], {
+    tags: ['home-partners'],
+  })
+
+export const getActivitiesCached = () =>
+  unstable_cache(async () => fetchActivities(), [], {
+    tags: ['home-activities'],
+  })

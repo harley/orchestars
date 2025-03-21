@@ -4,7 +4,7 @@ import type { CollectionConfig } from 'payload'
 export const Partners: CollectionConfig = {
   slug: 'partners',
   access: {
-    read: () => true,
+    // read: () => true,
   },
   admin: {
     useAsTitle: 'name',
@@ -49,9 +49,14 @@ export const Partners: CollectionConfig = {
   ],
   hooks: {
     afterChange: [
-      () => {
-        // revalidate home data on client side
-        revalidateTag('home-partners')
+      ({ doc, req: { payload, context } }) => {
+        if (!context.disableRevalidate) {
+          payload.logger.info(`Revalidating home-partners`)
+
+          revalidateTag('home-partners')
+        }
+
+        return doc
       },
     ],
   },

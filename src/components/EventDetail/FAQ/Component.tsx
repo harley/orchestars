@@ -2,18 +2,11 @@
 
 import React from 'react'
 
-import { getPayload } from 'payload'
-import config from '@/payload.config'
 import FAQClient from './Component.client'
+import { getFAQCached } from './actions'
 
 const FAQ = async () => {
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
-
-  const faqs = await payload
-    .find({ collection: 'faqs', where: { status: { equals: 'active' } }, limit: 50 })
-    .then((res) => res.docs)
-    .catch(() => [])
+  const faqs = await getFAQCached()()
 
   if (!faqs?.length) return null
 

@@ -13,7 +13,7 @@ import { EVENT_STATUSES } from './constants/status'
 export const Events: CollectionConfig = {
   slug: 'events',
   access: {
-    read: () => true,
+    // read: () => true,
   },
   admin: {
     useAsTitle: 'title',
@@ -256,10 +256,16 @@ export const Events: CollectionConfig = {
   ],
   hooks: {
     afterChange: [
-      () => {
+      ({ doc, req: { payload, context } }) => {
         // revalidate home data on client side
-        revalidateTag('home-events')
-        revalidateTag('event-detail')
+        if (!context.disableRevalidate) {
+          payload.logger.info(`Revalidating event`)
+
+          revalidateTag('home-events')
+          revalidateTag(`event-detail:${doc.slug}`)
+        }
+
+        return doc
       },
     ],
   },

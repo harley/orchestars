@@ -401,6 +401,7 @@ const ConfirmOrderWithTicketClassModal = ({
                       </Button>
                       <Button
                         variant="outline"
+                        type="button"
                         className="cursor-pointer"
                         onClick={() => onCloseModal()}
                         disabled={isSubmitting}
@@ -435,6 +436,7 @@ const ConfirmOrderWithTicketClassModal = ({
                         Xác nhận và Qua trang thanh toán
                       </Button>
                       <Button
+                        type="button"
                         variant="outline"
                         className="cursor-pointer"
                         onClick={() => onCloseModal()}

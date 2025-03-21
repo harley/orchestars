@@ -1,12 +1,15 @@
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
-import { APP_BASE_URL } from '@/config/app'
-import { stringify } from 'qs-esm'
-import { cache } from 'react'
+import configPromise from '@payload-config'
+import { getPayload } from 'payload'
+import { unstable_cache } from 'next/cache'
 
-export const fetchEvent = cache(async ({ slug }: { slug: string }) => {
+async function getEventDetail(slug: string) {
   try {
-    const stringifiedQuery = stringify(
-      {
+    console.log('fetching event detail by slug:', slug)
+    const payload = await getPayload({ config: configPromise })
+    const event = await payload
+      .find({
+        collection: 'events',
         where: {
           slug: { equals: slug },
           status: {
@@ -18,23 +21,19 @@ export const fetchEvent = cache(async ({ slug }: { slug: string }) => {
           },
         },
         limit: 1,
-      },
-      { addQueryPrefix: true },
-    )
+      })
+      .then((res) => res.docs?.[0])
+      .catch(() => null)
 
-    const req = await fetch(`${APP_BASE_URL}/api/events${stringifiedQuery}`, {
-      method: 'GET',
-      next: { tags: ['event-detail'] },
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = await req.json()
+    return event
+  } catch (error) {
+    console.error('Error while fetching event detail', error)
 
-    return data.docs?.[0]
-  } catch (err) {
-    console.log(err)
-    return undefined
+    return null
   }
-})
+}
+
+export const getEventCached = ({ slug }: { slug: string }) =>
+  unstable_cache(async () => getEventDetail(slug), [slug], {
+    tags: [`event-detail:${slug}`],
+  })
