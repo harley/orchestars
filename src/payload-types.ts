@@ -843,6 +843,12 @@ export interface Promotion {
   id: number;
   code: string;
   event?: (number | null) | Event;
+  appliedTicketClasses?:
+    | {
+        ticketClass: string;
+        id?: string | null;
+      }[]
+    | null;
   maxRedemptions: number;
   totalUsed?: number | null;
   perUserLimit: number;
@@ -1743,6 +1749,12 @@ export interface EventsSelect<T extends boolean = true> {
 export interface PromotionsSelect<T extends boolean = true> {
   code?: T;
   event?: T;
+  appliedTicketClasses?:
+    | T
+    | {
+        ticketClass?: T;
+        id?: T;
+      };
   maxRedemptions?: T;
   totalUsed?: T;
   perUserLimit?: T;

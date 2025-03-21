@@ -27,6 +27,17 @@ export async function POST(request: NextRequest) {
         where: {
           event: { equals: Number(body.eventId) },
           code: { equals: body.code },
+          status: { equals: 'active' },
+        },
+        select: {
+          id: true,
+          maxRedemptions: true,
+          code: true,
+          appliedTicketClasses: true,
+          perUserLimit: true,
+          discountType: true,
+          discountValue: true,
+          status: true,
         },
       })
       .then((res) => res.docs?.[0])
