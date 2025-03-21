@@ -215,6 +215,9 @@ importers:
       react-dom:
         specifier: 19.0.0
         version: 19.0.0(react@19.0.0)
+      react-facebook-pixel:
+        specifier: ^1.0.4
+        version: 1.0.4
       react-hook-form:
         specifier: 7.45.4
         version: 7.45.4(react@19.0.0)
@@ -4883,6 +4886,9 @@ packages:
     resolution: {integrity: sha512-GQDxZ5Jd+Aq/qUxbCm1UtzmL/s++V7zKgE8yMktJiCQXCCFZnMZh9ng+6/Ne6PjNSXH0L9CjeOEREfRnq6Duag==}
     peerDependencies:
       react: '>=16.13.1'
+
+  react-facebook-pixel@1.0.4:
+    resolution: {integrity: sha512-givZY8MS0v/mdbRzvcvouBo/j0TtDiu/93f4gIjJXwDDgwlf6bYUiQvb2qcqjluOOD/hIKUQHNYLNsSOnoEklg==}
 
   react-hook-form@7.45.4:
     resolution: {integrity: sha512-HGDV1JOOBPZj10LB3+OZgfDBTn+IeEsNOKiq/cxbQAIbKaiJUe/KV8DBUzsx0Gx/7IG/orWqRRm736JwOfUSWQ==}
@@ -11126,6 +11132,8 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.26.10
       react: 19.0.0
+
+  react-facebook-pixel@1.0.4: {}
 
   react-hook-form@7.45.4(react@19.0.0):
     dependencies:
