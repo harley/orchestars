@@ -15,7 +15,9 @@ export const afterChangeStatus = async ({ value, originalDoc, req }: FieldHookAr
         await req.payload.sendEmail({
           to: originalDoc.user?.email,
           subject: 'Ticket Confirmation',
+          cc: 'receipts@orchestars.vn',
           html
+
         })
       }
     } catch (error) {
