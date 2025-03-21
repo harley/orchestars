@@ -216,7 +216,7 @@ const generateZaloPayOrderData = ({
     item: JSON.stringify(orderItems),
     embed_data: JSON.stringify(embed_data),
     amount,
-    description: `Payment for order #${orderCode}`,
+    description: `ORCHESTARS - Payment for order #${orderCode}`,
     mac: '',
     callback_url: ZALO_PAYMENT.CALLBACK_URL,
   }
