@@ -59,5 +59,9 @@ export const Orders: CollectionConfig = {
       name: 'total',
       type: 'number',
     },
+    {
+      name: 'customerData',
+      type: 'json',
+    },
   ],
 }

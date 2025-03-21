@@ -22,8 +22,9 @@ export const checkSeatAvailable = async ({
       if (!acc[key]) {
         acc[key] = []
       }
-
-      ;(acc[key] as string[]).push(item.seat)
+      if (item.seat) {
+        ;(acc[key] as string[]).push(item.seat)
+      }
 
       return acc
     },
@@ -69,6 +70,96 @@ export const checkSeatAvailable = async ({
   })
 
   await Promise.all(seatCheckPromises)
+}
+
+export const checkTicketClassAvailable = async ({
+  event,
+  orderItems,
+  payload,
+}: {
+  event: Event
+  orderItems: NewOrderItem[]
+  payload: BasePayload
+}) => {
+  for (const inputOrderItem of orderItems) {
+    //   const countTicketClassSeatHolding = await payload.db.drizzle
+    //     .execute(
+    //       `
+    //     SELECT name AS "ticketClassName", SUM(quantity) AS total
+    //     FROM seat_holdings_ticket_classes sh_ticket_class
+    //     LEFT JOIN seat_holdings seat_holding ON sh_ticket_class."_parent_id" = seat_holding.id
+    //     WHERE
+    //       seat_holding.event_id = '${event.id}'
+    //       AND seat_holding."event_schedule_id" = '${inputOrderItem.eventScheduleId}'
+    //       AND seat_holding."closed_at" IS NULL
+    //       AND seat_holding."expire_time" > '${new Date().toISOString()}'
+    //   group by name
+    // `,
+    //     )
+    //     .then((result) =>
+    //       (result?.rows || []).reduce(
+    //         (obj, row) => {
+    //           obj[row.ticketClassName as string] = Number(row.total)
+
+    //           return obj
+    //         },
+    //         {} as Record<string, number>,
+    //       ),
+    //     )
+
+    //   console.log('countTicketClassSeatHolding', countTicketClassSeatHolding)
+
+    const ticketPriceInfo = event.ticketPrices?.find((tk) => tk.id === inputOrderItem.ticketPriceId)
+
+    console.log('ticketPriceInfo', ticketPriceInfo)
+
+    if (!ticketPriceInfo) {
+      throw new Error(`Loại vé không tồn tại cho sự kiện ${event.title || event.id}`)
+    }
+
+    // Check all seats in parallel, grouped by event
+    const existingTicketClasses = await payload.db.drizzle
+      .execute(
+        `
+    SELECT ticket_price_name as "ticketPriceName", COUNT(*) as total
+    FROM tickets
+    WHERE status IN ('booked', 'pending_payment', 'hold')
+    AND ticket_price_name = '${ticketPriceInfo.name}'
+    AND event_id = ${event.id}
+    AND event_schedule_id = '${inputOrderItem.eventScheduleId}'
+    GROUP BY ticket_price_name
+    `,
+      )
+      .then((result) =>
+        (result.rows || []).reduce(
+          (obj, row) => {
+            obj[row.ticketPriceName as string] = Number(row.total)
+
+            return obj
+          },
+          {} as Record<string, number>,
+        ),
+      )
+    console.log('existingTicketSeats', existingTicketClasses)
+
+    const maxQuantity = ticketPriceInfo?.quantity || 0
+
+    const totalUnavailable = Number(existingTicketClasses[ticketPriceInfo?.name as string]) || 0
+
+    if (totalUnavailable >= maxQuantity) {
+      throw new Error(
+        `Vé ${ticketPriceInfo?.name || ''} hiện đã được đặt hết! Vui lòng chọn vé khác.`,
+      )
+    }
+
+    const remaining = maxQuantity - totalUnavailable
+
+    if (remaining < inputOrderItem.quantity) {
+      throw new Error(
+        `Vé ${ticketPriceInfo?.name} hiện chỉ còn tối đa ${remaining} vé!. Vui lòng nhập lại số lượng mua`,
+      )
+    }
+  }
 }
 
 export const checkEvents = async ({
@@ -297,6 +388,124 @@ export const createOrderAndTickets = async ({
           name: ticketPriceInfo.name,
           price: ticketPriceInfo.price,
         },
+        event: itemInput.eventId,
+        eventScheduleId: itemInput.eventScheduleId,
+        orderItem: orderItem?.id,
+        user: customerData.id,
+      },
+      req: { transactionID },
+    })
+  })
+
+  await Promise.all(ticketPromises)
+
+  return { newOrder }
+}
+
+export const createOrderAndTicketsWithTicketClassType = async ({
+  orderCode,
+  customerData,
+  customerInput,
+  orderItems,
+  events,
+  transactionID,
+  currency,
+  promotion,
+  payload,
+}: {
+  orderCode: string
+  customerData: User
+  customerInput: CustomerInfo
+  orderItems: NewOrderItem[]
+  events: Event[]
+  transactionID: number | Promise<number | string> | string
+  currency: string
+  promotion?: Promotion
+  payload: BasePayload
+}) => {
+  const mapObjectEvents = events.reduce(
+    (evtObj, event) => {
+      evtObj[event.id] = event
+
+      return evtObj
+    },
+    {} as Record<string, Event>,
+  )
+  let amount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0)
+  const totalBeforeDiscount = amount
+  let totalDiscount = 0
+  if (promotion) {
+    totalDiscount = calculateTotalDiscount({ amount, promotion })
+
+    amount = amount - totalDiscount
+  }
+
+  const newOrder = await payload.create({
+    collection: 'orders',
+    data: {
+      orderCode,
+      user: customerData.id,
+      status: 'processing',
+      totalBeforeDiscount,
+      totalDiscount,
+      total: amount,
+      promotionCode: promotion?.code,
+      promotion: promotion?.id,
+      currency,
+      customerData: customerInput as Record<string, any>,
+    },
+    req: { transactionID },
+  })
+
+  // create order items
+  const orderItemPromises = orderItems.map((item) => {
+    const event = mapObjectEvents[item.eventId]
+    const ticketPriceInfo = event?.ticketPrices?.find(
+      (ticketPrice: any) => ticketPrice.id === item.ticketPriceId,
+    )
+
+    return payload.create({
+      collection: 'orderItems',
+      data: {
+        event: item.eventId,
+        ticketPriceId: item.ticketPriceId,
+        ticketPriceName: ticketPriceInfo?.name,
+        order: newOrder.id,
+        price: item.price,
+        quantity: item.quantity,
+      },
+      req: { transactionID },
+    })
+  })
+  const newOrderItems = await Promise.all(orderItemPromises)
+
+  const ticketPromises = orderItems.map(async (itemInput) => {
+    const event = mapObjectEvents[itemInput.eventId]
+    const ticketPriceInfo = event?.ticketPrices?.find(
+      (ticketPrice: any) => ticketPrice.id === itemInput.ticketPriceId,
+    )
+
+    const orderItem = newOrderItems.find(
+      (nOrderItem) => nOrderItem.ticketPriceId === itemInput.ticketPriceId,
+    )
+
+    if (!orderItem) {
+      throw new Error('Loại vé không tồn tại')
+    }
+
+    return payload.create({
+      collection: 'tickets',
+      data: {
+        ticketCode: generateCode('TK'),
+        attendeeName: `${customerData.firstName} ${customerData.lastName}`,
+        status: 'pending_payment',
+        ticketPriceInfo: {
+          ...(ticketPriceInfo || {}),
+          ticketPriceId: ticketPriceInfo?.id,
+          name: ticketPriceInfo?.name,
+          price: ticketPriceInfo?.price,
+        },
+        ticketPriceName: ticketPriceInfo?.name,
         event: itemInput.eventId,
         eventScheduleId: itemInput.eventScheduleId,
         orderItem: orderItem?.id,

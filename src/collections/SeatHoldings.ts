@@ -9,7 +9,22 @@ export const SeatHoldings: CollectionConfig = {
     {
       name: 'seatName',
       type: 'text',
-      required: true,
+      required: false,
+    },
+    {
+      name: 'ticketClasses',
+      type: 'array',
+      required: false,
+      fields: [
+        {
+          type: 'text',
+          name: 'name',
+        },
+        {
+          type: 'number',
+          name: 'quantity',
+        },
+      ],
     },
     {
       name: 'event',

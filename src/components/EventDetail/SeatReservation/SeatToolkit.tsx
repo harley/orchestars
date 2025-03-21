@@ -29,7 +29,7 @@ const SeatMapToolkit = ({
   // onSelectSeat,
   unavailableSeats,
 }: {
-  onSelectSeat: (seat: any) => void
+  onSelectSeat?: (seat: any) => void
   unavailableSeats?: string[]
 }) => {
   const [loadingMap, setLoadingMap] = useState(true)

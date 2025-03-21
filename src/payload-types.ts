@@ -817,6 +817,7 @@ export interface Event {
         key?: ('zone1' | 'zone2' | 'zone3' | 'zone4' | 'zone5') | null;
         price?: number | null;
         currency?: string | null;
+        quantity?: number | null;
         id?: string | null;
       }[]
     | null;
@@ -917,6 +918,15 @@ export interface Order {
   totalBeforeDiscount?: number | null;
   totalDiscount?: number | null;
   total?: number | null;
+  customerData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -929,6 +939,7 @@ export interface OrderItem {
   order: number | Order;
   event: number | Event;
   ticketPriceId: string;
+  ticketPriceName?: string | null;
   seat?: string | null;
   quantity: number;
   price: number;
@@ -945,6 +956,7 @@ export interface Ticket {
   user?: (number | null) | User;
   ticketCode?: string | null;
   seat?: string | null;
+  ticketPriceName?: string | null;
   ticketPriceInfo?:
     | {
         [k: string]: unknown;
@@ -967,7 +979,14 @@ export interface Ticket {
  */
 export interface SeatHolding {
   id: number;
-  seatName: string;
+  seatName?: string | null;
+  ticketClasses?:
+    | {
+        name?: string | null;
+        quantity?: number | null;
+        id?: string | null;
+      }[]
+    | null;
   event: number | Event;
   eventScheduleId?: string | null;
   code: string;
@@ -1698,6 +1717,7 @@ export interface EventsSelect<T extends boolean = true> {
         key?: T;
         price?: T;
         currency?: T;
+        quantity?: T;
         id?: T;
       };
   eventLogo?: T;
@@ -1763,6 +1783,7 @@ export interface OrdersSelect<T extends boolean = true> {
   totalBeforeDiscount?: T;
   totalDiscount?: T;
   total?: T;
+  customerData?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1774,6 +1795,7 @@ export interface OrderItemsSelect<T extends boolean = true> {
   order?: T;
   event?: T;
   ticketPriceId?: T;
+  ticketPriceName?: T;
   seat?: T;
   quantity?: T;
   price?: T;
@@ -1815,6 +1837,7 @@ export interface TicketsSelect<T extends boolean = true> {
   user?: T;
   ticketCode?: T;
   seat?: T;
+  ticketPriceName?: T;
   ticketPriceInfo?: T;
   event?: T;
   eventScheduleId?: T;
@@ -1829,6 +1852,13 @@ export interface TicketsSelect<T extends boolean = true> {
  */
 export interface SeatHoldingsSelect<T extends boolean = true> {
   seatName?: T;
+  ticketClasses?:
+    | T
+    | {
+        name?: T;
+        quantity?: T;
+        id?: T;
+      };
   event?: T;
   eventScheduleId?: T;
   code?: T;

@@ -2,21 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import payload from 'payload'
 import CryptoJS from 'crypto-js'
 import config from '@/payload.config'
-import { Order, Promotion, User } from '@/payload-types'
+import { Event, Order, Promotion, User } from '@/payload-types'
 import { generateCode } from '@/utilities/generateCode'
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 import { VIET_QR } from '@/config/payment'
 import { APP_BASE_URL } from '@/config/app'
 import { CustomerInfo, NewInputOrder, BankTransferTransaction } from './types'
 import {
-  checkSeatAvailable,
+  // checkSeatAvailable,
   checkEvents,
   clearSeatHolding,
   createCustomerIfNotExist,
-  createOrderAndTickets,
+  // createOrderAndTickets,
   checkPromotionCode,
   calculateTotalDiscount,
   createUserPromotionRedemption,
+  checkTicketClassAvailable,
+  createOrderAndTicketsWithTicketClassType,
 } from './utils'
 
 export async function POST(request: NextRequest) {
@@ -38,8 +40,11 @@ export async function POST(request: NextRequest) {
     // now support only 1 event
     const eventId = events?.[0]?.id as number
 
-    // check seat available
-    await checkSeatAvailable({ orderItems, payload })
+    // // check seat available
+    // await checkSeatAvailable({ orderItems, payload })
+
+    // check ticket class available
+    await checkTicketClassAvailable({ orderItems, payload, event: events[0] as Event })
 
     const transactionID = await payload.db.beginTransaction()
     if (!transactionID) {
@@ -66,10 +71,22 @@ export async function POST(request: NextRequest) {
         totalDiscount = calculateTotalDiscount({ amount, promotion })
 
         amount = amount - totalDiscount
+
+        amount = +Number(amount).toFixed(0)
       }
 
       // create order
-      const { newOrder } = await createOrderAndTickets({
+      // const { newOrder } = await createOrderAndTickets({
+      //   orderCode,
+      //   customerData,
+      //   orderItems,
+      //   promotion,
+      //   events,
+      //   transactionID,
+      //   currency: order.currency,
+      //   payload,
+      // })
+      const { newOrder } = await createOrderAndTicketsWithTicketClassType({
         orderCode,
         customerData,
         orderItems,
@@ -78,6 +95,7 @@ export async function POST(request: NextRequest) {
         transactionID,
         currency: order.currency,
         payload,
+        customerInput: customer,
       })
 
       // create payment record

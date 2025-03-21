@@ -184,6 +184,12 @@ export const Events: CollectionConfig = {
           name: 'currency',
           defaultValue: 'VND',
         },
+        {
+          type: 'number',
+          min: 0,
+          name: 'quantity',
+          defaultValue: 0,
+        },
       ],
     },
     {

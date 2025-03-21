@@ -22,6 +22,10 @@ export const Tickets: CollectionConfig = {
       type: 'text',
     },
     {
+      name: 'ticketPriceName',
+      type: 'text',
+    },
+    {
       name: 'ticketPriceInfo',
       type: 'json',
     },
