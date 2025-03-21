@@ -20,6 +20,7 @@ import * as migration_20250320_035237_add_schedule_image_event_collection from '
 import * as migration_20250320_043727_add_promotion_collection from './20250320_043727_add_promotion_collection';
 import * as migration_20250320_045936_add_default_value_for_promotion_collection from './20250320_045936_add_default_value_for_promotion_collection';
 import * as migration_20250321_012133_add_fields_to_handle_ticket_class from './20250321_012133_add_fields_to_handle_ticket_class';
+import * as migration_20250321_054031_add_applied_ticket_class_promotion from './20250321_054031_add_applied_ticket_class_promotion';
 
 export const migrations = [
   {
@@ -130,6 +131,11 @@ export const migrations = [
   {
     up: migration_20250321_012133_add_fields_to_handle_ticket_class.up,
     down: migration_20250321_012133_add_fields_to_handle_ticket_class.down,
-    name: '20250321_012133_add_fields_to_handle_ticket_class'
+    name: '20250321_012133_add_fields_to_handle_ticket_class',
+  },
+  {
+    up: migration_20250321_054031_add_applied_ticket_class_promotion.up,
+    down: migration_20250321_054031_add_applied_ticket_class_promotion.down,
+    name: '20250321_054031_add_applied_ticket_class_promotion'
   },
 ];

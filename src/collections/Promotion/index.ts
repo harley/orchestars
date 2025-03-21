@@ -20,6 +20,18 @@ export const Promotions: CollectionConfig = {
       required: false,
     },
     {
+      name: 'appliedTicketClasses',
+      type: 'array',
+      required: false,
+      fields: [
+        {
+          name: 'ticketClass',
+          type: 'text',
+          required: true,
+        },
+      ],
+    },
+    {
       name: 'maxRedemptions',
       type: 'number',
       required: true,

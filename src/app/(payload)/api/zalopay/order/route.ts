@@ -75,10 +75,6 @@ export async function POST(request: NextRequest) {
       // now support only 1 event
       const eventId = events?.[0]?.id as number
 
-      let amount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0)
-
-      const totalBeforeDiscount = amount
-      let totalDiscount = 0
       let promotion: Promotion | undefined
 
       // check promotion code if exist
@@ -89,13 +85,13 @@ export async function POST(request: NextRequest) {
           userId: customerData.id,
           payload,
         })
-
-        totalDiscount = calculateTotalDiscount({ amount, promotion })
-
-        amount = amount - totalDiscount
       }
 
-      amount = +Number(amount).toFixed(0)
+      const { amount, totalBeforeDiscount, totalDiscount } = calculateTotalDiscount({
+        orderItems,
+        promotion,
+        event: events[0] as Event,
+      })
 
       const { zalopayDataOrder } = generateZaloPayOrderData({
         orderCode,

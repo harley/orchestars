@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -139,8 +139,6 @@ const ConfirmOrderWithTicketClassModal = ({
         })
         .then((res) => res.data)
 
-      console.log('result', promotionInfo)
-
       toast({
         title: 'Thành công',
         description: 'Đã áp dụng mã giảm giá',
@@ -159,30 +157,56 @@ const ConfirmOrderWithTicketClassModal = ({
     }
   }
 
+  // refactor this code
+
   const calculateTotal = (() => {
-    return (
-      selectedTicketPrices?.reduce((sum, tk) => {
+    if (promotionInfo) {
+      const appliedTicketClasses = promotionInfo?.appliedTicketClasses || []
+
+      let totalAmountThatAppliedDiscount = 0
+      let totalAmountNotThatAppliedDiscount = 0
+
+      for (const tk of selectedTicketPrices) {
+        const appliedForTicket = appliedTicketClasses.some(
+          (applied) => applied.ticketClass === tk.ticketPrice?.name,
+        )
         const price = tk.ticketPrice?.price || 0
-        sum += price * (Number(tk.quantity) || 0)
+        if (appliedForTicket) {
+          totalAmountThatAppliedDiscount += price * (Number(tk.quantity) || 0)
+        } else {
+          totalAmountNotThatAppliedDiscount += price * (Number(tk.quantity) || 0)
+        }
+      }
 
-        return sum
-      }, 0) || 0
-    )
+      const amountBeforeDiscount =
+        totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount
+
+      if (promotionInfo.discountType === 'percentage') {
+        totalAmountThatAppliedDiscount -=
+          (totalAmountThatAppliedDiscount * promotionInfo.discountValue) / 100
+      } else if (promotionInfo.discountType === 'fixed_amount') {
+        totalAmountThatAppliedDiscount =
+          totalAmountThatAppliedDiscount - promotionInfo.discountValue
+      }
+
+      const amount = totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount
+
+      return {
+        amountBeforeDiscount,
+        amount,
+      }
+    } else {
+      const amount =
+        selectedTicketPrices?.reduce((sum, tk) => {
+          const price = tk.ticketPrice?.price || 0
+          sum += price * (Number(tk.quantity) || 0)
+
+          return sum
+        }, 0) || 0
+
+      return { amountBeforeDiscount: amount, amount }
+    }
   })()
-
-  const calculateTotalWithPromotion = useMemo(() => {
-    if (!promotionInfo) {
-      return calculateTotal
-    }
-
-    if (promotionInfo.discountType === 'percentage') {
-      return calculateTotal - (calculateTotal * promotionInfo.discountValue) / 100
-    } else if (promotionInfo.discountType === 'fixed_amount') {
-      return calculateTotal - promotionInfo.discountValue
-    }
-
-    return calculateTotal
-  }, [calculateTotal, promotionInfo])
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onCloseModal()}>
@@ -314,6 +338,17 @@ const ConfirmOrderWithTicketClassModal = ({
                       Dùng mã
                     </Button>
                   </div>
+                  {!!promotionInfo?.appliedTicketClasses?.length && (
+                    <div className="italic text-sm">
+                      Mã chỉ được áp dụng cho các hạng vé:{' '}
+                      {promotionInfo.appliedTicketClasses.map((tk, idx) => (
+                        <React.Fragment key={idx}>
+                          <b>{tk.ticketClass}</b>
+                          {idx < (promotionInfo.appliedTicketClasses as any).length - 1 && ', '}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {promotionInfo && (
@@ -338,13 +373,13 @@ const ConfirmOrderWithTicketClassModal = ({
                 <div className="flex justify-between items-center mb-6">
                   <span className="text-base font-bold">Tổng số chưa giảm:</span>
                   <span className="text-lg font-bold text-primary">
-                    {formatMoney(calculateTotal)}
+                    {formatMoney(calculateTotal.amountBeforeDiscount)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mb-6">
                   <span className="text-base font-bold">Tổng số tiền thanh toán:</span>
                   <span className="text-lg font-bold text-primary">
-                    {formatMoney(calculateTotalWithPromotion)}
+                    {formatMoney(calculateTotal.amount)}
                   </span>
                 </div>
 

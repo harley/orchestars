@@ -55,9 +55,6 @@ export async function POST(request: NextRequest) {
       // 1 check user info, it not exist, will create a new one
       const customerData = await createCustomerIfNotExist({ customer, transactionID, payload })
 
-      let amount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0)
-      const totalBeforeDiscount = amount
-      let totalDiscount = 0
       let promotion: Promotion | undefined
       // check promotion code if exist
       if (order.promotionCode) {
@@ -67,13 +64,13 @@ export async function POST(request: NextRequest) {
           userId: customerData.id,
           payload,
         })
-
-        totalDiscount = calculateTotalDiscount({ amount, promotion })
-
-        amount = amount - totalDiscount
-
-        amount = +Number(amount).toFixed(0)
       }
+
+      const { amount, totalBeforeDiscount, totalDiscount } = calculateTotalDiscount({
+        orderItems,
+        promotion,
+        event: events[0] as Event,
+      })
 
       // create order
       // const { newOrder } = await createOrderAndTickets({

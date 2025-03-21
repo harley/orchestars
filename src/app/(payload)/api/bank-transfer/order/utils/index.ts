@@ -319,14 +319,11 @@ export const createOrderAndTickets = async ({
     },
     {} as Record<string, any>,
   )
-  let amount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0)
-  const totalBeforeDiscount = amount
-  let totalDiscount = 0
-  if (promotion) {
-    totalDiscount = calculateTotalDiscount({ amount, promotion })
-
-    amount = amount - totalDiscount
-  }
+  const { amount, totalBeforeDiscount, totalDiscount } = calculateTotalDiscount({
+    orderItems,
+    promotion,
+    event: events[0] as Event,
+  })
 
   const newOrder = await payload.create({
     collection: 'orders',
@@ -431,14 +428,12 @@ export const createOrderAndTicketsWithTicketClassType = async ({
     },
     {} as Record<string, Event>,
   )
-  let amount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0)
-  const totalBeforeDiscount = amount
-  let totalDiscount = 0
-  if (promotion) {
-    totalDiscount = calculateTotalDiscount({ amount, promotion })
 
-    amount = amount - totalDiscount
-  }
+  const { amount, totalBeforeDiscount, totalDiscount } = calculateTotalDiscount({
+    orderItems,
+    promotion,
+    event: events[0] as Event,
+  })
 
   const newOrder = await payload.create({
     collection: 'orders',
@@ -606,23 +601,71 @@ export const checkPromotionCode = async ({
   return promotion
 }
 
+// refactor this code
 export const calculateTotalDiscount = ({
-  amount,
+  orderItems,
   promotion,
+  event,
 }: {
-  amount: number
+  orderItems: NewOrderItem[]
   promotion?: Promotion
+  event: Event
 }) => {
-  let totalDiscount = 0
-  if (promotion) {
-    if (promotion.discountType === 'percentage') {
-      totalDiscount = (amount * promotion.discountValue) / 100
-    } else if (promotion.discountType === 'fixed_amount') {
-      totalDiscount = promotion.discountValue
-    }
-  }
+  const calculateTotal = (() => {
+    if (promotion) {
+      const appliedTicketClasses = promotion?.appliedTicketClasses || []
 
-  return totalDiscount
+      let totalAmountThatAppliedDiscount = 0
+      let totalAmountNotThatAppliedDiscount = 0
+
+      for (const orderItem of orderItems) {
+        const ticketPriceInfo = event?.ticketPrices?.find(
+          (ticketPrice: any) => ticketPrice.id === orderItem.ticketPriceId,
+        )
+
+        const appliedForTicket = appliedTicketClasses.some(
+          (applied) => applied.ticketClass === ticketPriceInfo?.name,
+        )
+        const price = orderItem.price || 0
+        if (appliedForTicket) {
+          totalAmountThatAppliedDiscount += price * (Number(orderItem.quantity) || 0)
+        } else {
+          totalAmountNotThatAppliedDiscount += price * (Number(orderItem.quantity) || 0)
+        }
+      }
+
+      const amountBeforeDiscount =
+        totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount
+
+      if (promotion.discountType === 'percentage') {
+        totalAmountThatAppliedDiscount -=
+          (totalAmountThatAppliedDiscount * promotion.discountValue) / 100
+      } else if (promotion.discountType === 'fixed_amount') {
+        totalAmountThatAppliedDiscount = totalAmountThatAppliedDiscount - promotion.discountValue
+      }
+
+      const amountAfterDiscount = totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount
+
+      return {
+        amountBeforeDiscount,
+        amountAfterDiscount,
+      }
+    } else {
+      const amount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0)
+
+      return { amountBeforeDiscount: amount, amountAfterDiscount: amount }
+    }
+  })()
+
+  const totalBeforeDiscount = calculateTotal.amountBeforeDiscount
+  const totalDiscount = calculateTotal.amountBeforeDiscount - calculateTotal.amountAfterDiscount
+  const amount = +Number(calculateTotal.amountAfterDiscount).toFixed(0)
+
+  return {
+    totalBeforeDiscount,
+    totalDiscount,
+    amount,
+  }
 }
 
 export const createUserPromotionRedemption = async ({
