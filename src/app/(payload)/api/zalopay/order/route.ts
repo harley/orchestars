@@ -5,29 +5,27 @@ import payload from 'payload'
 import { format, getTime } from 'date-fns'
 import { ZALO_PAYMENT } from '@/config/payment'
 import config from '@/payload.config'
-import { Order, Promotion, User } from '@/payload-types'
+import { Event, Order, Promotion, User } from '@/payload-types'
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 import { generateCode } from '@/utilities/generateCode'
 import {
   calculateTotalDiscount,
   checkEvents,
   checkPromotionCode,
-  checkSeatAvailable,
+  // checkSeatAvailable,
+  checkTicketClassAvailable,
   clearSeatHolding,
   createCustomerIfNotExist,
-  createOrderAndTickets,
+  // createOrderAndTickets,
+  createOrderAndTicketsWithTicketClassType,
   createUserPromotionRedemption,
 } from '@/app/(payload)/api/bank-transfer/order/utils'
 
-import { CustomerInfo, NewInputOrder } from '@/app/(payload)/api/bank-transfer/order/types'
-interface NewOrderItem {
-  price: number
-  quantity: number
-  seat: string
-  eventId: number
-  ticketPriceId: string
-  eventScheduleId: string
-}
+import {
+  CustomerInfo,
+  NewInputOrder,
+  NewOrderItem,
+} from '@/app/(payload)/api/bank-transfer/order/types'
 
 interface ZaloPayOrder {
   title?: string
@@ -56,11 +54,14 @@ export async function POST(request: NextRequest) {
   try {
     await payload.init({ config })
 
-    // check seat available
-    await checkSeatAvailable({ orderItems, payload })
+    // // check seat available
+    // await checkSeatAvailable({ orderItems, payload })
 
     // check event id, ticket id is exist
     const events = await checkEvents({ orderItems, payload })
+
+    // check ticket class available
+    await checkTicketClassAvailable({ orderItems, payload, event: events[0] as Event })
 
     const transactionID = await payload.db.beginTransaction()
     if (!transactionID) {
@@ -75,6 +76,7 @@ export async function POST(request: NextRequest) {
       const eventId = events?.[0]?.id as number
 
       let amount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0)
+
       const totalBeforeDiscount = amount
       let totalDiscount = 0
       let promotion: Promotion | undefined
@@ -93,6 +95,8 @@ export async function POST(request: NextRequest) {
         amount = amount - totalDiscount
       }
 
+      amount = +Number(amount).toFixed(0)
+
       const { zalopayDataOrder } = generateZaloPayOrderData({
         orderCode,
         amount,
@@ -101,7 +105,17 @@ export async function POST(request: NextRequest) {
       })
 
       // create order
-      const { newOrder } = await createOrderAndTickets({
+      // const { newOrder } = await createOrderAndTickets({
+      //   orderCode,
+      //   customerData,
+      //   orderItems,
+      //   promotion,
+      //   events,
+      //   transactionID,
+      //   currency: order.currency,
+      //   payload,
+      // })
+      const { newOrder } = await createOrderAndTicketsWithTicketClassType({
         orderCode,
         customerData,
         orderItems,
@@ -110,6 +124,7 @@ export async function POST(request: NextRequest) {
         transactionID,
         currency: order.currency,
         payload,
+        customerInput: customer,
       })
 
       // create payment record
