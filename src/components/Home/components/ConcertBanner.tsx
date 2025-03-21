@@ -7,12 +7,12 @@ interface EventBannerProps {
   events: Record<string, any>[]
 }
 
-const ConcertBanner: React.FC<EventBannerProps> = ({ events }) => {
+const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % events.length)
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % events?.length || 0)
     }, 6000)
 
     return () => clearInterval(interval)
