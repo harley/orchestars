@@ -52,11 +52,11 @@ const ConfirmOrderWithTicketClassModal = ({
 
   const paymentMethods: PaymentMethod[] = [
     { id: PAYMENT_METHODS.ZALOPAY, name: 'ZaloPay', icon: <CreditCard className="h-5 w-5" /> },
-    {
-      id: PAYMENT_METHODS.BANK_TRANSFER,
-      name: 'Chuyển khoản ngân hàng (quét mã QR)',
-      icon: <CreditCard className="h-5 w-5" />,
-    },
+    // {
+    //   id: PAYMENT_METHODS.BANK_TRANSFER,
+    //   name: 'Chuyển khoản ngân hàng (quét mã QR)',
+    //   icon: <CreditCard className="h-5 w-5" />,
+    // },
   ]
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>(

@@ -221,7 +221,7 @@ const checkTicketClassAvailable = async ({
       (Number(existingTicketClasses[inputTicketClass?.name]) || 0)
 
     if (totalUnavailable >= maxQuantity) {
-      throw new Error(`Vé ${inputTicketClass} hiện đã được đặt hết! Vui lòng chọn vé khác.`)
+      throw new Error(`Vé ${inputTicketClass.name} hiện đã được đặt hết! Vui lòng chọn vé khác.`)
     }
 
     const remaining = maxQuantity - totalUnavailable
