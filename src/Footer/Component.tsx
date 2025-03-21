@@ -23,9 +23,9 @@ export async function Footer() {
                 </span>
               </div>
             </Link>
-            <p className="text-muted-foreground max-w-sm mx-auto text-[13px]">
+            <pre className="text-muted-foreground max-w-sm mx-auto  text-left text-[13px] whitespace-pre-wrap font-montserrat">
               {footerData?.description}
-            </p>
+            </pre>
           </div>
 
           {/* Left Column - Address and Contact */}
@@ -63,9 +63,9 @@ export async function Footer() {
                 </span>
               </div>
             </Link>
-            <p className="text-muted-foreground max-w-sm mx-auto text-[13px]">
+            <pre className="text-muted-foreground max-w-sm text-[13px] mx-auto text-left whitespace-pre-wrap font-montserrat">
               {footerData?.description}
-            </p>
+            </pre>
           </div>
 
           {/* Right Column - Social Links */}
@@ -78,7 +78,7 @@ export async function Footer() {
             </h3>
 
             {!!footerData?.navItems?.length && (
-              <div className="flex flex-wrap md:justify-end justify-center md:text-right text-center flex-col gap-6 text-[13px]">
+              <div className="flex flex-wrap md:justify-end justify-center md:text-right text-center flex-col gap-2 text-[13px]">
                 {footerData.navItems.map((navItem, index) => (
                   <Link
                     key={index}
