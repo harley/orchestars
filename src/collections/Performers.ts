@@ -4,7 +4,7 @@ import type { CollectionConfig } from 'payload'
 export const Performers: CollectionConfig = {
   slug: 'performers',
   access: {
-    read: () => true,
+    // read: () => true,
   },
   admin: {
     useAsTitle: 'name',
@@ -60,9 +60,14 @@ export const Performers: CollectionConfig = {
   ],
   hooks: {
     afterChange: [
-      () => {
-        // revalidate home data on client side
-        revalidateTag('home-performers')
+      ({ doc, req: { payload, context } }) => {
+        if (!context.disableRevalidate) {
+          payload.logger.info(`Revalidating home-performers`)
+
+          revalidateTag('home-performers')
+        }
+
+        return doc
       },
     ],
   },

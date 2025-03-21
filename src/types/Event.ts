@@ -26,6 +26,7 @@ export type Event = {
     name: string
     price: number
     currency: string
+    quantity: number
   }>
   eventLogo?: {
     id: number
@@ -34,6 +35,12 @@ export type Event = {
     [k: string]: any
   }
   eventBanner?: {
+    id: number
+    alt: string
+    url: string
+    [k: string]: any
+  }
+  eventThumbnail?: {
     id: number
     alt: string
     url: string

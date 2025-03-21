@@ -4,7 +4,7 @@ import type { CollectionConfig } from 'payload'
 export const Activities: CollectionConfig = {
   slug: 'activities',
   access: {
-    read: () => true,
+    // read: () => true,
   },
   admin: {
     useAsTitle: 'mainTitle',
@@ -62,9 +62,14 @@ export const Activities: CollectionConfig = {
   ],
   hooks: {
     afterChange: [
-      () => {
-        // revalidate home data on client side
-        revalidateTag('home-activities')
+      ({ doc, req: { payload, context } }) => {
+        if (!context.disableRevalidate) {
+          payload.logger.info(`Revalidating home-activities`)
+
+          revalidateTag('home-activities')
+        }
+
+        return doc
       },
     ],
   },
