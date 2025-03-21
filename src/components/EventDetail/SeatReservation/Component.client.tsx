@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast'
 import { Loader2, XCircle } from 'lucide-react'
 import { isSameDay } from 'date-fns'
 import { TicketPrice } from '../types'
-import SeatMapToolkit from './SeatToolkit'
+// import SeatMapToolkit from './SeatToolkit'
 // import ConfirmOrderModal from './ConfirmOrderModal'
 import { Event } from '@/payload-types'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
@@ -20,6 +20,7 @@ import TicketPrices from './TicketPrices'
 import { formatMoney } from '@/utilities/formatMoney'
 import { useFieldArray, useForm } from 'react-hook-form'
 import ConfirmOrderWithTicketClassModal from './ConfirmOrderWithTicketClassModal'
+import Image from 'next/image'
 
 export interface TicketPriceSelectedFormValues {
   ticketPrices: Array<{
@@ -30,7 +31,7 @@ export interface TicketPriceSelectedFormValues {
 
 const SeatReservationClient = ({
   event,
-  unavailableSeats,
+  // unavailableSeats,
 }: {
   event: Event
   unavailableSeats?: string[]
@@ -276,51 +277,30 @@ const SeatReservationClient = ({
         event={event}
       /> */}
 
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-gray-100">
         <div className="container mx-auto px-4">
           <div className="w-full max-w-4xl mx-auto">
-            <div className="relative">
-              {loadingScheduleMap && (
-                <div className="absolute z-50 top-[30%] left-1/2 -translate-x-1/2 p-5 bg-gray-100/30 rounded-md flex flex-col items-center justify-center gap-2">
-                  <Loader2 className="w-12 h-12 animate-spin" />
-                  <span>Đang tải...</span>
-                </div>
-              )}
+            <form onSubmit={handleSubmitTicketPriceForm(onSubmitTicketPriceForm)}>
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
+                  Đặt chỗ
+                </h2>
+                <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
+              </div>
+
               <DateSelector
                 schedules={event.schedules || []}
                 selectedDate={selectedSchedule?.date ? new Date(selectedSchedule?.date) : undefined}
                 onDateSelect={handleDateSelect}
               />
 
-              {!!selectedSchedule ? (
-                <SeatMapToolkit
-                  // onSelectSeat={handleSeatSelect}
-                  unavailableSeats={unavailableSeats}
-                />
-              ) : (
-                <div className="text-center py-8 bg-gray-100 rounded-lg">
-                  <p className="text-lg text-gray-600">
-                    Vui lòng chọn ngày tham dự để xem sơ đồ chọn ghế
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="w-full max-w-4xl mx-auto">
-            <form onSubmit={handleSubmitTicketPriceForm(onSubmitTicketPriceForm)}>
-              <h2 className="text-3xl font-bold mb-8 text-center">Đặt chỗ</h2>
               <TicketPrices
                 ticketPrices={event.ticketPrices}
                 ticketPricesSelected={ticketPricesSelected}
                 handleToggleTicketPrice={handleToggleTicketPrice}
               />
 
-              <h2 className="text-3xl font-bold mb-8 text-center mt-4">Vé đã chọn</h2>
+              <h2 className="text-xl font-bold mb-8 text-center mt-4">Vé đã chọn</h2>
               <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                 {/* hidden for inactive seat selection */}
                 {/* <div className="bg-white p-6 rounded-lg shadow-md relative">
@@ -456,6 +436,41 @@ const SeatReservationClient = ({
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="w-full max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
+                Sơ đồ sân khấu
+              </h2>
+              <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
+            </div>
+            <div className="relative">
+              {loadingScheduleMap && (
+                <div className="absolute z-50 top-[30%] left-1/2 -translate-x-1/2 p-5 bg-gray-100/30 rounded-md flex flex-col items-center justify-center gap-2">
+                  <Loader2 className="w-12 h-12 animate-spin" />
+                  <span>Đang tải...</span>
+                </div>
+              )}
+
+              <Image src={'/images/seat-map.png'} alt="" className="" width={1449} height={1449} />
+              {/* {!!selectedSchedule ? (
+                <SeatMapToolkit
+                  // onSelectSeat={handleSeatSelect}
+                  unavailableSeats={unavailableSeats}
+                />
+              ) : (
+                <div className="text-center py-8 bg-gray-100 rounded-lg">
+                  <p className="text-lg text-gray-600">
+                    Vui lòng chọn ngày tham dự để xem sơ đồ chọn ghế
+                  </p>
+                </div>
+              )} */}
+            </div>
           </div>
         </div>
       </section>

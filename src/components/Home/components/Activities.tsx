@@ -60,7 +60,7 @@ const ActivitiesSection = ({ activity }: { activity: Activity }) => {
     <section className="max-w-6xl mx-auto px-4 py-16">
       {/* Header Section */}
       <div className="grid md:grid-cols-[300px,1fr] gap-3 justify-between mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-800 text-center font-display">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-800 text-center">
           {activity?.mainTitle}
         </h2>
         <p className="text-gray-600 mt-4 md:mt-0 text-center md:text-left">

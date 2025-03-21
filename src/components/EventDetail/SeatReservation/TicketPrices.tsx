@@ -24,7 +24,8 @@ const TicketPrices = ({
 
   return (
     <div className="bg-white rounded-lg p-6 shadow-md mb-8">
-      <h4 className="text-lg font-semibold mb-4 text-center">Thông tin giá vé</h4>
+      <h4 className="text-lg font-semibold mb-2 text-center">Thông tin giá vé</h4>
+      <div className="text-sm italic text-center mb-4">Vui lòng nhấn vào vé bên dưới để mua</div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {ticketPrices?.map((tkPrice) => (
           <div

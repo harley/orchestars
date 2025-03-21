@@ -39,7 +39,12 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }
   return (
     <section className="py-20 ">
       <div className="container mx-auto px-6 md:px-10">
-        <h2 className="text-3xl md:text-4xl font-display font-bold mb-12 text-center">{title}</h2>
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
+            {title}
+          </h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
+        </div>
 
         <div className="space-y-20">
           {onGoingPaginatedDocs?.docs?.map((evt, index) => (
@@ -73,8 +78,12 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }
                   index % 2 === 0 ? 'md:order-2' : 'md:order-1',
                 )}
               >
-                <h3 className="text-2xl md:text-3xl font-display font-bold mb-3">{evt.title}</h3>
-
+                <Link
+                  href={`/events/${evt.slug}`}
+                  className="text-2xl md:text-3xl font-bold mb-3 hover:underline"
+                >
+                  {evt.title}
+                </Link>
                 <div className="flex flex-col sm:flex-row gap-4 text-muted-foreground mb-4">
                   <div className="flex items-center">
                     <Calendar className="h-4 w-4 mr-2" />

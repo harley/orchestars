@@ -27,7 +27,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({ schedules, selectedDate, on
 
   return (
     <div className="w-full mb-8">
-      <h3 className="text-xl font-bold mb-4">Chọn ngày bạn muốn tham dự</h3>
+      <h3 className="text-xl font-bold mb-4 text-center">Chọn ngày bạn muốn tham dự</h3>
       <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
         {/* <Popover>
           <PopoverTrigger asChild>
@@ -57,6 +57,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({ schedules, selectedDate, on
         <div className="flex flex-wrap gap-2 justify-center">
           {schedules.map((schedule) => (
             <Button
+              type="button"
               key={schedule.id}
               variant={
                 selectedDate &&
