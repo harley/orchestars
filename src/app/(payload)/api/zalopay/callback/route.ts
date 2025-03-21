@@ -39,7 +39,11 @@ export async function POST(request: NextRequest) {
       throw new Error('Có lỗi xảy ra! Vui lòng thử lại')
     }
     try {
-      await updatePaymentStatus(payment.id, transactionID)
+      const paymentData = {
+        ...(payment.paymentData as Record<string, any>),
+        callbackData: dataJson,
+      }
+      await updatePaymentStatus(payment.id, transactionID, paymentData)
 
       // No need to update the order status and ticket status here. The status update action runs in the hook of Payment Collection.
       // await updateOrderStatus((payment.order as Order)?.id, transactionID)
@@ -72,6 +76,7 @@ async function findPayment(appTransId: string) {
 async function updatePaymentStatus(
   paymentId: number,
   transactionID: number | Promise<number | string> | string,
+  paymentData: Record<string, any>,
 ) {
   return payload.update({
     collection: 'payments',
@@ -79,6 +84,7 @@ async function updatePaymentStatus(
     data: {
       status: 'paid',
       paidAt: new Date().toISOString(),
+      paymentData: paymentData,
     },
     req: { transactionID },
   })
