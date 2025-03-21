@@ -290,6 +290,7 @@ const createPayment = async ({
       status: 'processing',
       appTransId: zaloPayOrder.app_trans_id,
       paymentData: {
+        ...zaloPayOrder,
         app_trans_id: zaloPayOrder.app_trans_id,
         app_id: ZALO_PAYMENT.APP_ID,
         app_time: zaloPayOrder.app_time,

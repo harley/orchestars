@@ -41,7 +41,7 @@ export async function generateTicketBookEmailHtml(ticketData: TicketData) {
           <p><strong>Xin chào Quý Khách,</strong><br />
           <em>Dear Valued Guest,</em></p>
 
-          <p>Imagine Philharmonic Orchestra (IPO) xin cảm ơn bạn đã đặt vé tham dự chương trình hòa nhạc <strong>${ticketData.eventName}</strong>.<br />
+          <p> OrcheStars xin cảm ơn bạn đã đặt vé tham dự chương trình hòa nhạc <strong>${ticketData.eventName}</strong>.<br />
           <em>We appreciate your purchase of tickets to the ${ticketData.eventName} concert.</em></p>
 
           <p><strong>Thông tin vé của bạn:</strong><br />
@@ -51,16 +51,22 @@ export async function generateTicketBookEmailHtml(ticketData: TicketData) {
           <p><strong>Chúng tôi xác nhận bạn đã thanh toán thành công. Thông tin số ghế cụ thể và hạng vé sẽ được cập nhật trong vòng 24–48 giờ làm việc tới.</strong><br />
           <em>Your payment has been successfully confirmed. We will send you the detailed seat and ticket category information within the next 24–48 business hours.</em></p>
 
-          <p>Trong thời gian chờ đợi, bạn có thể theo dõi những cập nhật mới nhất trên <a href="https://www.facebook.com/ImaginePhilharmonic" target="_blank">fanpage chính thức của Imagine Philharmonic Orchestra</a>.<br />
-          <em>While waiting, feel free to check out the latest updates on the <a href="https://www.facebook.com/ImaginePhilharmonic" target="_blank">official Imagine Philharmonic Orchestra fanpage</a>.</em></p>
-
+          <p>
+          Trong thời gian chờ đợi, bạn có thể theo dõi những cập nhật mới nhất trên 
+          <a href="https://www.facebook.com/orchestars" target="_blank">OrcheStars Fanpage</a>.<br />
+          <em>
+            While waiting, feel free to check out the latest updates on the 
+            <a href="https://www.facebook.com/orchestars" target="_blank">OrcheStars Fanpage</a>.
+          </em>
+          </p>
+        
           <p>Hẹn gặp bạn tại hòa nhạc <strong>${ticketData.eventName}</strong>!<br />
           <em>See you at the ${ticketData.eventName} concert.</em></p>
 
           <p>Trân trọng,<br />
           <em>Best regards,</em></p>
 
-          <p>Imagine Philharmonic Orchestra (IPO)</p>
+          <p>OrcheStars </p>
         </div>
       </body>
     </html>
