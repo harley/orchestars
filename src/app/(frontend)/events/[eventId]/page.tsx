@@ -14,9 +14,9 @@ import { getEventCached } from './actions'
 import UpcomingSaleBanner from '@/components/EventDetail/UpcomingSale'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
 
-export const dynamic = 'force-dynamic'
+// export const dynamic = 'force-dynamic'
 export const revalidate = 3600
-// export const dynamicParams = true
+export const dynamicParams = true
 
 const EventDetailPage = async (props: {
   params: Promise<{ eventId: string }>
