@@ -14,82 +14,55 @@ export async function generateTicketBookEmailHtml(ticketData: TicketData) {
           body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
+            color: #000;
           }
           .container {
             max-width: 600px;
             margin: 0 auto;
+            padding: 20px;
           }
-          .header {
-            text-align: center;
-            margin-bottom: 20px;
+          .content p {
+            margin-bottom: 12px;
           }
-          .content {
-            margin-bottom: 20px;
+          strong {
+            font-weight: bold;
           }
-          .terms {
-            font-size: 0.9em;
-            color: #555;
+          a {
+            color: #0a5cd9;
+            text-decoration: none;
           }
-          .qr-code {
-            text-align: center;
-            margin: 20px 0;
+          a:hover {
+            text-decoration: underline;
           }
         </style>
       </head>
       <body>
         <div class="container">
-          <div class="header">
-            <h1>Xin chào Quý Khách,</h1>
-            <h2>Imagine Philharmonic Orchestra (IPO)</h2>
-          </div>
-          <div class="content">
-            <p>
-              Imagine Philharmonic Orchestra (IPO) xin cảm ơn bạn đã đặt vé tham dự
-              chương trình hòa nhạc
-              <strong>${ticketData.eventName}</strong>.
-            </p>
-            <p>
-              We appreciate your purchasing tickets to the
-              <strong>${ticketData.eventName}</strong> concert.
-            </p>
-            <p>
-              <strong>Thông tin vé của bạn như sau:</strong><br />
-              <strong>Your booking details are as follows:</strong>
-            </p>
-            <p>
-              Ticket Code(s): ${ticketData.ticketCode || 'N/A'}<br />
-              <!-- You can insert additional dynamic details here -->
-            </p>
-            <p>
-              Bạn vui lòng xem điều khoản &amp; điều kiện, quy định check-in đính
-              kèm bên dưới và mang theo email vé điện tử có chứa QR code để check-in
-              tại đêm nhạc.<br />
-              Please check the attached terms &amp; conditions and check in. You
-              will need this email ticket containing QR code to check in at the
-              show.
-            </p>
-            <p>
-              Khách hàng có trách nhiệm bảo mật tuyệt đối mã Mã QR Vé điện tử của
-              mình. Trường hợp có nhiều hơn 1 người check-in bằng 1 Mã QR Vé điện
-              tử, BTC sẽ chấp nhận người đầu tiên check-in mã QR Vé đó được tham gia
-              chương trình.<br />
-              Audiences are responsible for keeping the E-Ticket QR code absolutely
-              confidential. In case more than 1 person checks in with 1 e-Ticket QR
-              Code, the Organizing Committee will accept the first person to check
-              in with that QR Code as referenced in the show.
-            </p>
-            <p>
-              Hẹn gặp bạn tại hòa nhạc giao hưởng
-              <strong>${ticketData.eventName}</strong>!<br />
-              See you at the <strong>${ticketData.eventName}</strong> concert!
-            </p>
-            <p>
-              Trân trọng,<br />
-              Best regards,
-            </p>
-          </div>
+          <p><strong>Xin chào Quý Khách,</strong><br />
+          <em>Dear Valued Guest,</em></p>
+
+          <p>Imagine Philharmonic Orchestra (IPO) xin cảm ơn bạn đã đặt vé tham dự chương trình hòa nhạc <strong>${ticketData.eventName}</strong>.<br />
+          <em>We appreciate your purchase of tickets to the ${ticketData.eventName} concert.</em></p>
+
+          <p><strong>Thông tin vé của bạn:</strong><br />
+          <em>Your booking details:</em><br />
+          <strong>Ticket Code: ${ticketData.ticketCode || 'N/A'}</strong></p>
+
+          <p><strong>Chúng tôi xác nhận bạn đã thanh toán thành công. Thông tin số ghế cụ thể và hạng vé sẽ được cập nhật trong vòng 24–48 giờ làm việc tới.</strong><br />
+          <em>Your payment has been successfully confirmed. We will send you the detailed seat and ticket category information within the next 24–48 business hours.</em></p>
+
+          <p>Trong thời gian chờ đợi, bạn có thể theo dõi những cập nhật mới nhất trên <a href="https://www.facebook.com/ImaginePhilharmonic" target="_blank">fanpage chính thức của Imagine Philharmonic Orchestra</a>.<br />
+          <em>While waiting, feel free to check out the latest updates on the <a href="https://www.facebook.com/ImaginePhilharmonic" target="_blank">official Imagine Philharmonic Orchestra fanpage</a>.</em></p>
+
+          <p>Hẹn gặp bạn tại hòa nhạc <strong>${ticketData.eventName}</strong>!<br />
+          <em>See you at the ${ticketData.eventName} concert.</em></p>
+
+          <p>Trân trọng,<br />
+          <em>Best regards,</em></p>
+
+          <p>Imagine Philharmonic Orchestra (IPO)</p>
         </div>
       </body>
     </html>
-    `
+  `
 }
