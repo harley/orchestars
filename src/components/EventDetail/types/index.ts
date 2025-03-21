@@ -44,3 +44,14 @@ export interface PaymentDetails {
   contentBankTransfer: string
   qrDataURL: string
 }
+
+export interface TicketPrice {
+  name?: string
+  /**
+   * Giá trị giảm dần theo khu vực, với Zone 1 là vé đắt nhất.
+   */
+  key?: ('zone1' | 'zone2' | 'zone3' | 'zone4' | 'zone5') | null
+  price?: number
+  currency?: string
+  id?: string
+}

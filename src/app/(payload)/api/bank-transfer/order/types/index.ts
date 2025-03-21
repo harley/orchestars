@@ -8,7 +8,7 @@ export interface CustomerInfo {
 export interface NewOrderItem {
   price: number
   quantity: number
-  seat: string
+  seat?: string
   eventId: number
   ticketPriceId: string
   eventScheduleId: string
@@ -17,6 +17,7 @@ export interface NewOrderItem {
 export interface NewInputOrder {
   currency: string
   orderItems: NewOrderItem[]
+  promotionCode?: string
 }
 
 export interface BankTransferTransaction {

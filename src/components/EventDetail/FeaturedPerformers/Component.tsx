@@ -1,12 +1,13 @@
 'use server'
 
-import { fetchPerformers } from '@/components/Home/actions'
+import { getPerformersCached } from '@/components/Home/actions'
 import PerformersSection from '@/components/Home/components/PerformersSection'
+import { Performer } from '@/types/Performer'
 import React from 'react'
 
 const Performers = async () => {
-  const performers = await fetchPerformers()
-  return <PerformersSection performers={performers} />
+  const performers = await getPerformersCached()()
+  return <PerformersSection performers={performers as Performer[]} />
 }
 
 export default Performers

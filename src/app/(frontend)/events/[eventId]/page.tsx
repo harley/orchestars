@@ -4,18 +4,18 @@ import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 import PageClient from './page.client'
 import EventBanner from '@/components/EventDetail/EventBanner'
-import Schedule from '@/components/EventDetail/Schedule'
+// import Schedule from '@/components/EventDetail/Schedule'
 import TermCondition from '@/components/EventDetail/TermCondition'
 import SeatReservationClient from '@/components/EventDetail/SeatReservation/Component.client'
 import FeaturedPerformers from '@/components/EventDetail/FeaturedPerformers/Component'
 import FAQ from '@/components/EventDetail/FAQ/Component'
 import DetailDescriptionClient from '@/components/EventDetail/DetailDescription/Component.client'
-import { fetchEvent } from './actions'
+import { getEventCached } from './actions'
 import UpcomingSaleBanner from '@/components/EventDetail/UpcomingSale'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
 
 // export const dynamic = 'force-dynamic'
-export const revalidate = 60
+export const revalidate = 3600
 export const dynamicParams = true
 
 const EventDetailPage = async (props: {
@@ -27,7 +27,7 @@ const EventDetailPage = async (props: {
 
   const eventSlug = params.eventId
 
-  const eventDetail = await fetchEvent({ slug: eventSlug })
+  const eventDetail = await getEventCached({ slug: eventSlug })()
 
   if (!eventDetail) {
     return notFound()
@@ -63,18 +63,17 @@ const EventDetailPage = async (props: {
           <EventBanner event={eventDetail} />
           {isUpcoming && <UpcomingSaleBanner />}
 
-          <DetailDescriptionClient event={eventDetail} />
           {isOpenForSales && (
             <SeatReservationClient
               event={eventDetail}
               unavailableSeats={unavailableSeats as string[]}
             />
           )}
-
+          <DetailDescriptionClient event={eventDetail} />
           <FeaturedPerformers />
           {!isUpcoming && (
             <>
-              {!!eventDetail.schedules?.length && <Schedule schedules={eventDetail.schedules} />}
+              {/* {!!esventDetail.schedules?.length && <Schedule schedules={eventDetail.schedules} />} */}
               {eventDetail.eventTermsAndConditions && (
                 <TermCondition termCondition={eventDetail.eventTermsAndConditions} />
               )}

@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { afterChangeStatus } from './hooks/afterChangeStatus'
 
 export const Payments: CollectionConfig = {
   slug: 'payments',
@@ -25,6 +26,27 @@ export const Payments: CollectionConfig = {
     {
       name: 'currency',
       type: 'text',
+    },
+    {
+      name: 'promotion',
+      type: 'relationship',
+      relationTo: 'promotions',
+      required: false,
+    },
+    {
+      name: 'promotionCode',
+      type: 'text',
+      required: false,
+    },
+    {
+      name: 'totalBeforeDiscount',
+      type: 'number',
+      required: false,
+    },
+    {
+      name: 'totalDiscount',
+      type: 'number',
+      required: false,
     },
     {
       name: 'total',
@@ -84,23 +106,7 @@ export const Payments: CollectionConfig = {
         { label: 'Failed', value: 'failed' },
       ],
       hooks: {
-        afterChange: [
-          async ({ value, originalDoc, req }) => {
-            if (value === 'paid' && originalDoc.order) {
-              const orderId = (originalDoc.order?.id || originalDoc.order) as number
-              try {
-                await req.payload.update({
-                  collection: 'orders',
-                  id: orderId,
-                  data: { status: 'completed' },
-                })
-              } catch (error) {
-                console.error('Error updating order status:', error)
-              }
-            }
-            return value
-          },
-        ],
+        afterChange: [afterChangeStatus],
       },
     },
     {

@@ -21,6 +21,11 @@ export const OrderItems: CollectionConfig = {
       required: true,
     },
     {
+      name: 'ticketPriceName',
+      type: 'text',
+      required: false,
+    },
+    {
       name: 'seat',
       type: 'text',
       required: false,

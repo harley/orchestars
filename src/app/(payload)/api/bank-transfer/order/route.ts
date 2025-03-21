@@ -2,18 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import payload from 'payload'
 import CryptoJS from 'crypto-js'
 import config from '@/payload.config'
-import { Order, User } from '@/payload-types'
+import { Event, Order, Promotion, User } from '@/payload-types'
 import { generateCode } from '@/utilities/generateCode'
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 import { VIET_QR } from '@/config/payment'
 import { APP_BASE_URL } from '@/config/app'
 import { CustomerInfo, NewInputOrder, BankTransferTransaction } from './types'
 import {
-  checkSeatAvailable,
+  // checkSeatAvailable,
   checkEvents,
   clearSeatHolding,
   createCustomerIfNotExist,
-  createOrderAndTickets,
+  // createOrderAndTickets,
+  checkPromotionCode,
+  calculateTotalDiscount,
+  createUserPromotionRedemption,
+  checkTicketClassAvailable,
+  createOrderAndTicketsWithTicketClassType,
 } from './utils'
 
 export async function POST(request: NextRequest) {
@@ -32,10 +37,14 @@ export async function POST(request: NextRequest) {
     // check event id, ticket id is exist
     const events = await checkEvents({ orderItems, payload })
 
-    // check seat available
-    await checkSeatAvailable({ orderItems, payload })
+    // now support only 1 event
+    const eventId = events?.[0]?.id as number
 
-    const amount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0)
+    // // check seat available
+    // await checkSeatAvailable({ orderItems, payload })
+
+    // check ticket class available
+    await checkTicketClassAvailable({ orderItems, payload, event: events[0] as Event })
 
     const transactionID = await payload.db.beginTransaction()
     if (!transactionID) {
@@ -46,29 +55,74 @@ export async function POST(request: NextRequest) {
       // 1 check user info, it not exist, will create a new one
       const customerData = await createCustomerIfNotExist({ customer, transactionID, payload })
 
+      let promotion: Promotion | undefined
+      // check promotion code if exist
+      if (order.promotionCode) {
+        promotion = await checkPromotionCode({
+          promotionCode: order.promotionCode,
+          eventId,
+          userId: customerData.id,
+          payload,
+        })
+      }
+
+      const { amount, totalBeforeDiscount, totalDiscount } = calculateTotalDiscount({
+        orderItems,
+        promotion,
+        event: events[0] as Event,
+      })
+
       // create order
-      const { newOrder } = await createOrderAndTickets({
+      // const { newOrder } = await createOrderAndTickets({
+      //   orderCode,
+      //   customerData,
+      //   orderItems,
+      //   promotion,
+      //   events,
+      //   transactionID,
+      //   currency: order.currency,
+      //   payload,
+      // })
+      const { newOrder } = await createOrderAndTicketsWithTicketClassType({
         orderCode,
         customerData,
         orderItems,
+        promotion,
         events,
         transactionID,
         currency: order.currency,
         payload,
+        customerInput: customer,
       })
 
       // create payment record
-      await createPayment({
+      const payment = await createPayment({
         customerData,
         newOrder,
         transactionID,
         currency: order.currency,
+        totalBeforeDiscount,
         amount,
+        promotionId: promotion?.id,
+        promotionCode: promotion?.code,
+        totalDiscount,
         transaction,
       })
 
       // todo write payment history
       // todo send mail
+
+      // save user promotion redemption
+      if (promotion) {
+        await createUserPromotionRedemption({
+          promotion,
+          user: customerData,
+          payment,
+          eventId,
+          transactionID,
+          payload,
+        })
+      }
 
       // Commit the transaction
 
@@ -119,6 +173,10 @@ const createPayment = async ({
   customerData,
   newOrder,
   currency,
+  totalBeforeDiscount,
+  promotionCode,
+  promotionId,
+  totalDiscount,
   amount,
   transaction,
   transactionID,
@@ -126,17 +184,25 @@ const createPayment = async ({
   customerData: User
   newOrder: Order
   currency: string
+  totalBeforeDiscount: number
+  promotionId?: number
+  promotionCode?: string
+  totalDiscount?: number
   amount: number
   transaction: BankTransferTransaction
   transactionID: number | Promise<number | string> | string
 }) => {
-  await payload.create({
+  return await payload.create({
     collection: 'payments',
     data: {
       user: customerData.id,
       order: newOrder.id,
       paymentMethod: PAYMENT_METHODS.BANK_TRANSFER,
       currency,
+      promotionCode,
+      promotion: promotionId,
+      totalBeforeDiscount,
+      totalDiscount,
       total: amount,
       transaction,
       status: 'processing',

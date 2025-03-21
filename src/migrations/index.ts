@@ -16,6 +16,11 @@ import * as migration_20250318_082022_add_thumbnail_to_event_collection from './
 import * as migration_20250319_092110_add_phone_number_to_user_collection from './20250319_092110_add_phone_number_to_user_collection';
 import * as migration_20250319_140740_add_status_event_collection from './20250319_140740_add_status_event_collection';
 import * as migration_20250319_193430_drop_not_null_columns_in_event_collection from './20250319_193430_drop_not_null_columns_in_event_collection';
+import * as migration_20250320_035237_add_schedule_image_event_collection from './20250320_035237_add_schedule_image_event_collection';
+import * as migration_20250320_043727_add_promotion_collection from './20250320_043727_add_promotion_collection';
+import * as migration_20250320_045936_add_default_value_for_promotion_collection from './20250320_045936_add_default_value_for_promotion_collection';
+import * as migration_20250321_012133_add_fields_to_handle_ticket_class from './20250321_012133_add_fields_to_handle_ticket_class';
+import * as migration_20250321_054031_add_applied_ticket_class_promotion from './20250321_054031_add_applied_ticket_class_promotion';
 
 export const migrations = [
   {
@@ -106,6 +111,31 @@ export const migrations = [
   {
     up: migration_20250319_193430_drop_not_null_columns_in_event_collection.up,
     down: migration_20250319_193430_drop_not_null_columns_in_event_collection.down,
-    name: '20250319_193430_drop_not_null_columns_in_event_collection'
+    name: '20250319_193430_drop_not_null_columns_in_event_collection',
+  },
+  {
+    up: migration_20250320_035237_add_schedule_image_event_collection.up,
+    down: migration_20250320_035237_add_schedule_image_event_collection.down,
+    name: '20250320_035237_add_schedule_image_event_collection',
+  },
+  {
+    up: migration_20250320_043727_add_promotion_collection.up,
+    down: migration_20250320_043727_add_promotion_collection.down,
+    name: '20250320_043727_add_promotion_collection',
+  },
+  {
+    up: migration_20250320_045936_add_default_value_for_promotion_collection.up,
+    down: migration_20250320_045936_add_default_value_for_promotion_collection.down,
+    name: '20250320_045936_add_default_value_for_promotion_collection',
+  },
+  {
+    up: migration_20250321_012133_add_fields_to_handle_ticket_class.up,
+    down: migration_20250321_012133_add_fields_to_handle_ticket_class.down,
+    name: '20250321_012133_add_fields_to_handle_ticket_class',
+  },
+  {
+    up: migration_20250321_054031_add_applied_ticket_class_promotion.up,
+    down: migration_20250321_054031_add_applied_ticket_class_promotion.down,
+    name: '20250321_054031_add_applied_ticket_class_promotion'
   },
 ];

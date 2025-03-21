@@ -3,8 +3,10 @@ import { CustomerInfo, NewOrderItem } from '../types'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { generatePassword } from '@/utilities/generatePassword'
-import { Event, User } from '@/payload-types'
+import { Event, Payment, Promotion, User } from '@/payload-types'
 import { generateCode } from '@/utilities/generateCode'
+import { isAfter, isBefore } from 'date-fns'
+import { USER_PROMOTION_REDEMPTION_STATUS } from '@/collections/Promotion/constants/status'
 
 export const checkSeatAvailable = async ({
   orderItems,
@@ -20,8 +22,9 @@ export const checkSeatAvailable = async ({
       if (!acc[key]) {
         acc[key] = []
       }
-
-      ;(acc[key] as string[]).push(item.seat)
+      if (item.seat) {
+        ;(acc[key] as string[]).push(item.seat)
+      }
 
       return acc
     },
@@ -67,6 +70,96 @@ export const checkSeatAvailable = async ({
   })
 
   await Promise.all(seatCheckPromises)
+}
+
+export const checkTicketClassAvailable = async ({
+  event,
+  orderItems,
+  payload,
+}: {
+  event: Event
+  orderItems: NewOrderItem[]
+  payload: BasePayload
+}) => {
+  for (const inputOrderItem of orderItems) {
+    //   const countTicketClassSeatHolding = await payload.db.drizzle
+    //     .execute(
+    //       `
+    //     SELECT name AS "ticketClassName", SUM(quantity) AS total
+    //     FROM seat_holdings_ticket_classes sh_ticket_class
+    //     LEFT JOIN seat_holdings seat_holding ON sh_ticket_class."_parent_id" = seat_holding.id
+    //     WHERE
+    //       seat_holding.event_id = '${event.id}'
+    //       AND seat_holding."event_schedule_id" = '${inputOrderItem.eventScheduleId}'
+    //       AND seat_holding."closed_at" IS NULL
+    //       AND seat_holding."expire_time" > '${new Date().toISOString()}'
+    //   group by name
+    // `,
+    //     )
+    //     .then((result) =>
+    //       (result?.rows || []).reduce(
+    //         (obj, row) => {
+    //           obj[row.ticketClassName as string] = Number(row.total)
+
+    //           return obj
+    //         },
+    //         {} as Record<string, number>,
+    //       ),
+    //     )
+
+    //   console.log('countTicketClassSeatHolding', countTicketClassSeatHolding)
+
+    const ticketPriceInfo = event.ticketPrices?.find((tk) => tk.id === inputOrderItem.ticketPriceId)
+
+    console.log('ticketPriceInfo', ticketPriceInfo)
+
+    if (!ticketPriceInfo) {
+      throw new Error(`Loại vé không tồn tại cho sự kiện ${event.title || event.id}`)
+    }
+
+    // Check all seats in parallel, grouped by event
+    const existingTicketClasses = await payload.db.drizzle
+      .execute(
+        `
+    SELECT ticket_price_name as "ticketPriceName", COUNT(*) as total
+    FROM tickets
+    WHERE status IN ('booked', 'pending_payment', 'hold')
+    AND ticket_price_name = '${ticketPriceInfo.name}'
+    AND event_id = ${event.id}
+    AND event_schedule_id = '${inputOrderItem.eventScheduleId}'
+    GROUP BY ticket_price_name
+    `,
+      )
+      .then((result) =>
+        (result.rows || []).reduce(
+          (obj, row) => {
+            obj[row.ticketPriceName as string] = Number(row.total)
+
+            return obj
+          },
+          {} as Record<string, number>,
+        ),
+      )
+    console.log('existingTicketSeats', existingTicketClasses)
+
+    const maxQuantity = ticketPriceInfo?.quantity || 0
+
+    const totalUnavailable = Number(existingTicketClasses[ticketPriceInfo?.name as string]) || 0
+
+    if (totalUnavailable >= maxQuantity) {
+      throw new Error(
+        `Vé ${ticketPriceInfo?.name || ''} hiện đã được đặt hết! Vui lòng chọn vé khác.`,
+      )
+    }
+
+    const remaining = maxQuantity - totalUnavailable
+
+    if (remaining < inputOrderItem.quantity) {
+      throw new Error(
+        `Vé ${ticketPriceInfo?.name} hiện chỉ còn tối đa ${remaining} vé!. Vui lòng nhập lại số lượng mua`,
+      )
+    }
+  }
 }
 
 export const checkEvents = async ({
@@ -206,6 +299,7 @@ export const createOrderAndTickets = async ({
   events,
   transactionID,
   currency,
+  promotion,
   payload,
 }: {
   orderCode: string
@@ -214,6 +308,7 @@ export const createOrderAndTickets = async ({
   events: Event[]
   transactionID: number | Promise<number | string> | string
   currency: string
+  promotion?: Promotion
   payload: BasePayload
 }) => {
   const mapObjectEvents = events.reduce(
@@ -224,14 +319,23 @@ export const createOrderAndTickets = async ({
     },
     {} as Record<string, any>,
   )
-  const amount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0)
+  const { amount, totalBeforeDiscount, totalDiscount } = calculateTotalDiscount({
+    orderItems,
+    promotion,
+    event: events[0] as Event,
+  })
+
   const newOrder = await payload.create({
     collection: 'orders',
     data: {
       orderCode,
       user: customerData.id,
       status: 'processing',
+      totalBeforeDiscount,
+      totalDiscount,
       total: amount,
+      promotionCode: promotion?.code,
+      promotion: promotion?.id,
       currency,
     },
     req: { transactionID },
@@ -293,4 +397,306 @@ export const createOrderAndTickets = async ({
   await Promise.all(ticketPromises)
 
   return { newOrder }
+}
+
+export const createOrderAndTicketsWithTicketClassType = async ({
+  orderCode,
+  customerData,
+  customerInput,
+  orderItems,
+  events,
+  transactionID,
+  currency,
+  promotion,
+  payload,
+}: {
+  orderCode: string
+  customerData: User
+  customerInput: CustomerInfo
+  orderItems: NewOrderItem[]
+  events: Event[]
+  transactionID: number | Promise<number | string> | string
+  currency: string
+  promotion?: Promotion
+  payload: BasePayload
+}) => {
+  const mapObjectEvents = events.reduce(
+    (evtObj, event) => {
+      evtObj[event.id] = event
+
+      return evtObj
+    },
+    {} as Record<string, Event>,
+  )
+
+  const { amount, totalBeforeDiscount, totalDiscount } = calculateTotalDiscount({
+    orderItems,
+    promotion,
+    event: events[0] as Event,
+  })
+
+  const newOrder = await payload.create({
+    collection: 'orders',
+    data: {
+      orderCode,
+      user: customerData.id,
+      status: 'processing',
+      totalBeforeDiscount,
+      totalDiscount,
+      total: amount,
+      promotionCode: promotion?.code,
+      promotion: promotion?.id,
+      currency,
+      customerData: customerInput as Record<string, any>,
+    },
+    req: { transactionID },
+  })
+
+  // create order items
+  const orderItemPromises = orderItems.map((item) => {
+    const event = mapObjectEvents[item.eventId]
+    const ticketPriceInfo = event?.ticketPrices?.find(
+      (ticketPrice: any) => ticketPrice.id === item.ticketPriceId,
+    )
+
+    return payload.create({
+      collection: 'orderItems',
+      data: {
+        event: item.eventId,
+        ticketPriceId: item.ticketPriceId,
+        ticketPriceName: ticketPriceInfo?.name,
+        order: newOrder.id,
+        price: item.price,
+        quantity: item.quantity,
+      },
+      req: { transactionID },
+    })
+  })
+  const newOrderItems = await Promise.all(orderItemPromises)
+
+  const ticketPromises = orderItems.map(async (itemInput) => {
+    const event = mapObjectEvents[itemInput.eventId]
+    const ticketPriceInfo = event?.ticketPrices?.find(
+      (ticketPrice: any) => ticketPrice.id === itemInput.ticketPriceId,
+    )
+
+    const orderItem = newOrderItems.find(
+      (nOrderItem) => nOrderItem.ticketPriceId === itemInput.ticketPriceId,
+    )
+
+    if (!orderItem) {
+      throw new Error('Loại vé không tồn tại')
+    }
+
+    return payload.create({
+      collection: 'tickets',
+      data: {
+        ticketCode: generateCode('TK'),
+        attendeeName: `${customerData.firstName} ${customerData.lastName}`,
+        status: 'pending_payment',
+        ticketPriceInfo: {
+          ...(ticketPriceInfo || {}),
+          ticketPriceId: ticketPriceInfo?.id,
+          name: ticketPriceInfo?.name,
+          price: ticketPriceInfo?.price,
+        },
+        ticketPriceName: ticketPriceInfo?.name,
+        event: itemInput.eventId,
+        eventScheduleId: itemInput.eventScheduleId,
+        orderItem: orderItem?.id,
+        user: customerData.id,
+      },
+      req: { transactionID },
+    })
+  })
+
+  await Promise.all(ticketPromises)
+
+  return { newOrder }
+}
+
+export const checkPromotionCode = async ({
+  promotionCode,
+  eventId,
+  userId,
+  payload,
+}: {
+  promotionCode: string
+  eventId: number
+  userId: number
+  payload: BasePayload
+}) => {
+  // check promotion exist
+  const promotion = await payload
+    .find({
+      collection: 'promotions',
+      limit: 1,
+      where: {
+        status: { equals: 'active' },
+        event: { equals: eventId },
+        code: { equals: promotionCode },
+      },
+    })
+    .then((res) => res.docs?.[0])
+
+  if (!promotion) {
+    throw new Error(`Mã giảm giá [${promotionCode}] không hợp lệ`)
+  }
+
+  if (!promotion.maxRedemptions) {
+    throw new Error(`Mã giảm giá [${promotion.code}] không hợp lệ`)
+  }
+  const currentTime = new Date()
+  if (promotion.startDate && isAfter(promotion.startDate, currentTime)) {
+    throw new Error(`Không thể dùng mã giảm giá [${promotion.code}] trước thời gian quy định`)
+  }
+
+  if (promotion.endDate && isBefore(promotion.endDate, currentTime)) {
+    throw new Error(`Mã giảm giá [${promotion.code}] đã hết hạn`)
+  }
+  const userPromotionsPendingPayment = await payload
+    .count({
+      collection: 'userPromotionRedemptions',
+      where: {
+        promotion: { equals: promotion.id },
+        status: { equals: 'pending' },
+        expireAt: { greater_than_equal: currentTime.toISOString() },
+      },
+    })
+    .then((res) => res.totalDocs)
+
+  const remainNumberRedemption =
+    promotion.maxRedemptions - (promotion.totalUsed || 0) - userPromotionsPendingPayment
+
+  if (remainNumberRedemption <= 0) {
+    throw new Error(`Mã giảm giá [${promotion.code}] đã hết lượt sử dụng`)
+  }
+
+  const countTotalCurrentUserRedemption = await payload
+    .count({
+      collection: 'userPromotionRedemptions',
+      where: {
+        promotion: { equals: promotion.id },
+        user: { equals: userId },
+        or: [
+          {
+            status: { in: [USER_PROMOTION_REDEMPTION_STATUS.used.value] },
+          },
+          {
+            status: { in: [USER_PROMOTION_REDEMPTION_STATUS.pending.value] },
+            expireAt: { greater_than_equal: currentTime.toISOString() },
+          },
+        ],
+      },
+    })
+    .then((res) => res.totalDocs)
+
+  if (
+    !isNaN(promotion.perUserLimit as number) &&
+    countTotalCurrentUserRedemption >= (promotion.perUserLimit as number)
+  ) {
+    throw new Error(`Bạn đã dùng hết số lượt được áp dụng cho giảm giá [${promotion.code}] này`)
+  }
+
+  return promotion
+}
+
+// refactor this code
+export const calculateTotalDiscount = ({
+  orderItems,
+  promotion,
+  event,
+}: {
+  orderItems: NewOrderItem[]
+  promotion?: Promotion
+  event: Event
+}) => {
+  const calculateTotal = (() => {
+    if (promotion) {
+      const appliedTicketClasses = promotion?.appliedTicketClasses || []
+
+      let totalAmountThatAppliedDiscount = 0
+      let totalAmountNotThatAppliedDiscount = 0
+
+      for (const orderItem of orderItems) {
+        const ticketPriceInfo = event?.ticketPrices?.find(
+          (ticketPrice: any) => ticketPrice.id === orderItem.ticketPriceId,
+        )
+
+        const appliedForTicket = appliedTicketClasses.some(
+          (applied) => applied.ticketClass === ticketPriceInfo?.name,
+        )
+        const price = orderItem.price || 0
+        if (appliedForTicket) {
+          totalAmountThatAppliedDiscount += price * (Number(orderItem.quantity) || 0)
+        } else {
+          totalAmountNotThatAppliedDiscount += price * (Number(orderItem.quantity) || 0)
+        }
+      }
+
+      const amountBeforeDiscount =
+        totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount
+
+      if (promotion.discountType === 'percentage') {
+        totalAmountThatAppliedDiscount -=
+          (totalAmountThatAppliedDiscount * promotion.discountValue) / 100
+      } else if (promotion.discountType === 'fixed_amount') {
+        totalAmountThatAppliedDiscount = totalAmountThatAppliedDiscount - promotion.discountValue
+      }
+
+      const amountAfterDiscount = totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount
+
+      return {
+        amountBeforeDiscount,
+        amountAfterDiscount,
+      }
+    } else {
+      const amount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0)
+
+      return { amountBeforeDiscount: amount, amountAfterDiscount: amount }
+    }
+  })()
+
+  const totalBeforeDiscount = calculateTotal.amountBeforeDiscount
+  const totalDiscount = calculateTotal.amountBeforeDiscount - calculateTotal.amountAfterDiscount
+  const amount = +Number(calculateTotal.amountAfterDiscount).toFixed(0)
+
+  return {
+    totalBeforeDiscount,
+    totalDiscount,
+    amount,
+  }
+}
+
+export const createUserPromotionRedemption = async ({
+  promotion,
+  user,
+  payment,
+  eventId,
+  transactionID,
+  payload,
+}: {
+  promotion: Promotion
+  user: User
+  payment: Payment
+  eventId: number
+  transactionID: number | Promise<number | string> | string
+  payload: BasePayload
+}) => {
+  // expire at 30 minutes
+  const expireAt = new Date()
+  expireAt.setMinutes(expireAt.getMinutes() + 30)
+
+  return payload.create({
+    collection: 'userPromotionRedemptions',
+    data: {
+      promotion: promotion.id,
+      user: user.id,
+      event: eventId,
+      payment: payment.id,
+      expireAt: expireAt.toISOString(),
+      status: 'pending',
+    },
+    req: { transactionID },
+  })
 }

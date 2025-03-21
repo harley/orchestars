@@ -8,22 +8,22 @@ import { Performer } from '@/types/Performer'
 import { Partner } from '@/types/Partner'
 
 import {
-  fetchActivities,
-  fetchOngoingPaginatedDocs,
-  fetchPartners,
-  fetchPastEvents,
-  fetchPerformers,
+  getOngoingPaginatedDocsCached,
+  getPerformersCached,
+  getPastEventsCached,
+  getPartnersCached,
+  getActivitiesCached,
 } from './actions'
 
 const getDataHomePage = cache(async () => {
   try {
     const [eventsData, performerData, pastEventData, partnerData, activitiesData] =
       await Promise.all([
-        fetchOngoingPaginatedDocs(),
-        fetchPerformers(),
-        fetchPastEvents(),
-        fetchPartners(),
-        fetchActivities(),
+        getOngoingPaginatedDocsCached()(),
+        getPerformersCached()(),
+        getPastEventsCached()(),
+        getPartnersCached()(),
+        getActivitiesCached()(),
       ])
 
     const bannerDocs = eventsData.docs
@@ -77,7 +77,7 @@ export async function Home() {
       onGoingPaginatedDocs={onGoingPaginatedDocs}
       partners={partners as Partner[]}
       performers={performers as Performer[]}
-      pastEvents={pastEvents as Event[]}
+      pastEvents={pastEvents as unknown as Event[]}
       activity={activity}
     />
   )

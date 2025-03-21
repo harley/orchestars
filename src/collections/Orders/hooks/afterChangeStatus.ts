@@ -1,9 +1,8 @@
 import { FieldHookArgs } from 'payload'
 import { generateTicketBookEmailHtml } from '@/mail/templates/TicketBookedEmail'
-import { readFile } from 'fs/promises'
-import { join } from 'path'
+
 import { Event, User } from '@/payload-types'
-import { getQRCodeStringBuffer } from '@/utilities/qrCode'
+
 
 export const afterChangeStatus = async ({ value, originalDoc, req }: FieldHookArgs) => {
   // When an order's status is updated to 'completed'
@@ -42,41 +41,22 @@ export const afterChangeStatus = async ({ value, originalDoc, req }: FieldHookAr
       const eventName = (tickets?.[0]?.event as Event)?.title
       if (userEmail) {
         const ticketCodes = tickets.map((tk) => tk?.ticketCode).filter((code) => !!code) as string[]
-        const ticketCodeBuffers = await Promise.all(
-          ticketCodes.map(async (ticketCode) => ({
-            ticketCode,
-            buffer: await getQRCodeStringBuffer(ticketCode),
-          })),
-        )
 
         const html = await generateTicketBookEmailHtml({
           ticketCode: ticketCodes.join(', '),
           eventName: eventName || '',
         })
 
-        const attachments = ticketCodeBuffers.map((tkBf) => ({
-          content: tkBf.buffer,
-          filename: `${tkBf.ticketCode}.png`,
-          cid: `${tkBf.ticketCode}`,
-        }))
-        const attachmentPath = join(process.cwd(), 'public', 'eventTerms.doc')
-        const fileBuffer = await readFile(attachmentPath)
-
-        await req.payload.sendEmail({
-          to: userEmail,
-          subject: 'Ticket Confirmation',
-          html,
-          cc: 'receipts@orchestars.vn',
-          attachDataUrls: true,
-          attachments: [
-            {
-              content: fileBuffer,
-              filename: 'eventTerms.doc',
-              // contentType: 'application/msword',
-            },
-            ...attachments,
-          ],
-        })
+        await req.payload
+          .sendEmail({
+            to: userEmail,
+            cc: 'receipts@orchestars.vn',
+            subject: 'Ticket Confirmation',
+            html
+          })
+          .catch((error) => {
+            console.error('Error while sending mail ticket', error)
+          })
       }
     } catch (error) {
       console.error('Error updating ticket status:', error)

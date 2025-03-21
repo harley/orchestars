@@ -21,7 +21,7 @@ export const Footer: GlobalConfig = {
     },
     {
       name: 'description',
-      type: 'text',
+      type: 'textarea',
       required: false,
     },
     {

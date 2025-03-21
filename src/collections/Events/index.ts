@@ -13,7 +13,7 @@ import { EVENT_STATUSES } from './constants/status'
 export const Events: CollectionConfig = {
   slug: 'events',
   access: {
-    read: () => true,
+    // read: () => true,
   },
   admin: {
     useAsTitle: 'title',
@@ -112,6 +112,11 @@ export const Events: CollectionConfig = {
           name: 'date',
         },
         {
+          type: 'upload',
+          relationTo: 'media',
+          name: 'scheduleImage',
+        },
+        {
           type: 'array',
           name: 'details',
           fields: [
@@ -179,6 +184,12 @@ export const Events: CollectionConfig = {
           name: 'currency',
           defaultValue: 'VND',
         },
+        {
+          type: 'number',
+          min: 0,
+          name: 'quantity',
+          defaultValue: 0,
+        },
       ],
     },
     {
@@ -245,10 +256,16 @@ export const Events: CollectionConfig = {
   ],
   hooks: {
     afterChange: [
-      () => {
+      ({ doc, req: { payload, context } }) => {
         // revalidate home data on client side
-        revalidateTag('home-events')
-        revalidateTag('event-detail')
+        if (!context.disableRevalidate) {
+          payload.logger.info(`Revalidating event`)
+
+          revalidateTag('home-events')
+          revalidateTag(`event-detail:${doc.slug}`)
+        }
+
+        return doc
       },
     ],
   },

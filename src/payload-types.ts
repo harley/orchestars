@@ -72,6 +72,8 @@ export interface Config {
     categories: Category;
     users: User;
     events: Event;
+    promotions: Promotion;
+    userPromotionRedemptions: UserPromotionRedemption;
     orders: Order;
     orderItems: OrderItem;
     payments: Payment;
@@ -98,6 +100,8 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
+    promotions: PromotionsSelect<false> | PromotionsSelect<true>;
+    userPromotionRedemptions: UserPromotionRedemptionsSelect<false> | UserPromotionRedemptionsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     orderItems: OrderItemsSelect<false> | OrderItemsSelect<true>;
     payments: PaymentsSelect<false> | PaymentsSelect<true>;
@@ -788,6 +792,7 @@ export interface Event {
   schedules?:
     | {
         date?: string | null;
+        scheduleImage?: (number | null) | Media;
         details?:
           | {
               time?: string | null;
@@ -812,6 +817,7 @@ export interface Event {
         key?: ('zone1' | 'zone2' | 'zone3' | 'zone4' | 'zone5') | null;
         price?: number | null;
         currency?: string | null;
+        quantity?: number | null;
         id?: string | null;
       }[]
     | null;
@@ -831,30 +837,42 @@ export interface Event {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orders".
+ * via the `definition` "promotions".
  */
-export interface Order {
+export interface Promotion {
   id: number;
-  orderCode?: string | null;
-  user?: (number | null) | User;
-  status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
-  total?: number | null;
-  currency?: string | null;
+  code: string;
+  event?: (number | null) | Event;
+  appliedTicketClasses?:
+    | {
+        ticketClass: string;
+        id?: string | null;
+      }[]
+    | null;
+  maxRedemptions: number;
+  totalUsed?: number | null;
+  perUserLimit: number;
+  discountType: 'percentage' | 'fixed_amount';
+  discountValue: number;
+  startDate: string;
+  endDate: string;
+  status: 'draft' | 'active' | 'disabled';
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orderItems".
+ * via the `definition` "userPromotionRedemptions".
  */
-export interface OrderItem {
+export interface UserPromotionRedemption {
   id: number;
-  order: number | Order;
-  event: number | Event;
-  ticketPriceId: string;
-  seat?: string | null;
-  quantity: number;
-  price: number;
+  promotion: number | Promotion;
+  payment: number | Payment;
+  event?: (number | null) | Event;
+  user: number | User;
+  redeemAt?: string | null;
+  expireAt?: string | null;
+  status: 'pending' | 'used' | 'cancelled';
   updatedAt: string;
   createdAt: string;
 }
@@ -868,6 +886,10 @@ export interface Payment {
   order: number | Order;
   paymentMethod?: string | null;
   currency?: string | null;
+  promotion?: (number | null) | Promotion;
+  promotionCode?: string | null;
+  totalBeforeDiscount?: number | null;
+  totalDiscount?: number | null;
   total: number;
   appTransId?: string | null;
   paymentData?:
@@ -889,6 +911,49 @@ export interface Payment {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  orderCode?: string | null;
+  user?: (number | null) | User;
+  status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
+  currency?: string | null;
+  promotion?: (number | null) | Promotion;
+  promotionCode?: string | null;
+  totalBeforeDiscount?: number | null;
+  totalDiscount?: number | null;
+  total?: number | null;
+  customerData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orderItems".
+ */
+export interface OrderItem {
+  id: number;
+  order: number | Order;
+  event: number | Event;
+  ticketPriceId: string;
+  ticketPriceName?: string | null;
+  seat?: string | null;
+  quantity: number;
+  price: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "tickets".
  */
 export interface Ticket {
@@ -897,6 +962,7 @@ export interface Ticket {
   user?: (number | null) | User;
   ticketCode?: string | null;
   seat?: string | null;
+  ticketPriceName?: string | null;
   ticketPriceInfo?:
     | {
         [k: string]: unknown;
@@ -919,7 +985,14 @@ export interface Ticket {
  */
 export interface SeatHolding {
   id: number;
-  seatName: string;
+  seatName?: string | null;
+  ticketClasses?:
+    | {
+        name?: string | null;
+        quantity?: number | null;
+        id?: string | null;
+      }[]
+    | null;
   event: number | Event;
   eventScheduleId?: string | null;
   code: string;
@@ -1197,6 +1270,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'events';
         value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'promotions';
+        value: number | Promotion;
+      } | null)
+    | ({
+        relationTo: 'userPromotionRedemptions';
+        value: number | UserPromotionRedemption;
       } | null)
     | ({
         relationTo: 'orders';
@@ -1620,6 +1701,7 @@ export interface EventsSelect<T extends boolean = true> {
     | T
     | {
         date?: T;
+        scheduleImage?: T;
         details?:
           | T
           | {
@@ -1641,6 +1723,7 @@ export interface EventsSelect<T extends boolean = true> {
         key?: T;
         price?: T;
         currency?: T;
+        quantity?: T;
         id?: T;
       };
   eventLogo?: T;
@@ -1661,14 +1744,58 @@ export interface EventsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promotions_select".
+ */
+export interface PromotionsSelect<T extends boolean = true> {
+  code?: T;
+  event?: T;
+  appliedTicketClasses?:
+    | T
+    | {
+        ticketClass?: T;
+        id?: T;
+      };
+  maxRedemptions?: T;
+  totalUsed?: T;
+  perUserLimit?: T;
+  discountType?: T;
+  discountValue?: T;
+  startDate?: T;
+  endDate?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "userPromotionRedemptions_select".
+ */
+export interface UserPromotionRedemptionsSelect<T extends boolean = true> {
+  promotion?: T;
+  payment?: T;
+  event?: T;
+  user?: T;
+  redeemAt?: T;
+  expireAt?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders_select".
  */
 export interface OrdersSelect<T extends boolean = true> {
   orderCode?: T;
   user?: T;
   status?: T;
-  total?: T;
   currency?: T;
+  promotion?: T;
+  promotionCode?: T;
+  totalBeforeDiscount?: T;
+  totalDiscount?: T;
+  total?: T;
+  customerData?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1680,6 +1807,7 @@ export interface OrderItemsSelect<T extends boolean = true> {
   order?: T;
   event?: T;
   ticketPriceId?: T;
+  ticketPriceName?: T;
   seat?: T;
   quantity?: T;
   price?: T;
@@ -1695,6 +1823,10 @@ export interface PaymentsSelect<T extends boolean = true> {
   order?: T;
   paymentMethod?: T;
   currency?: T;
+  promotion?: T;
+  promotionCode?: T;
+  totalBeforeDiscount?: T;
+  totalDiscount?: T;
   total?: T;
   appTransId?: T;
   paymentData?: T;
@@ -1717,6 +1849,7 @@ export interface TicketsSelect<T extends boolean = true> {
   user?: T;
   ticketCode?: T;
   seat?: T;
+  ticketPriceName?: T;
   ticketPriceInfo?: T;
   event?: T;
   eventScheduleId?: T;
@@ -1731,6 +1864,13 @@ export interface TicketsSelect<T extends boolean = true> {
  */
 export interface SeatHoldingsSelect<T extends boolean = true> {
   seatName?: T;
+  ticketClasses?:
+    | T
+    | {
+        name?: T;
+        quantity?: T;
+        id?: T;
+      };
   event?: T;
   eventScheduleId?: T;
   code?: T;

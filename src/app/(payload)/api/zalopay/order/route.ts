@@ -5,26 +5,27 @@ import payload from 'payload'
 import { format, getTime } from 'date-fns'
 import { ZALO_PAYMENT } from '@/config/payment'
 import config from '@/payload.config'
-import { Order, User } from '@/payload-types'
+import { Event, Order, Promotion, User } from '@/payload-types'
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 import { generateCode } from '@/utilities/generateCode'
 import {
+  calculateTotalDiscount,
   checkEvents,
-  checkSeatAvailable,
+  checkPromotionCode,
+  // checkSeatAvailable,
+  checkTicketClassAvailable,
   clearSeatHolding,
   createCustomerIfNotExist,
-  createOrderAndTickets,
+  // createOrderAndTickets,
+  createOrderAndTicketsWithTicketClassType,
+  createUserPromotionRedemption,
 } from '@/app/(payload)/api/bank-transfer/order/utils'
 
-import { CustomerInfo, NewInputOrder } from '@/app/(payload)/api/bank-transfer/order/types'
-interface NewOrderItem {
-  price: number
-  quantity: number
-  seat: string
-  eventId: number
-  ticketPriceId: string
-  eventScheduleId: string
-}
+import {
+  CustomerInfo,
+  NewInputOrder,
+  NewOrderItem,
+} from '@/app/(payload)/api/bank-transfer/order/types'
 
 interface ZaloPayOrder {
   title?: string
@@ -53,13 +54,14 @@ export async function POST(request: NextRequest) {
   try {
     await payload.init({ config })
 
-    // check seat available
-    await checkSeatAvailable({ orderItems, payload })
-
-    const { zalopayDataOrder } = generateZaloPayOrderData({ orderCode, orderItems, customer })
+    // // check seat available
+    // await checkSeatAvailable({ orderItems, payload })
 
     // check event id, ticket id is exist
     const events = await checkEvents({ orderItems, payload })
+
+    // check ticket class available
+    await checkTicketClassAvailable({ orderItems, payload, event: events[0] as Event })
 
     const transactionID = await payload.db.beginTransaction()
     if (!transactionID) {
@@ -70,28 +72,81 @@ export async function POST(request: NextRequest) {
       // 1 check user info, it not exist, will create a new one
       const customerData = await createCustomerIfNotExist({ customer, transactionID, payload })
 
-      // 2 check event id, ticket id is exist
-      // 3 check seat is available
+      // now support only 1 event
+      const eventId = events?.[0]?.id as number
+
+      let promotion: Promotion | undefined
+
+      // check promotion code if exist
+      if (order.promotionCode) {
+        promotion = await checkPromotionCode({
+          promotionCode: order.promotionCode,
+          eventId,
+          userId: customerData.id,
+          payload,
+        })
+      }
+
+      const { amount, totalBeforeDiscount, totalDiscount } = calculateTotalDiscount({
+        orderItems,
+        promotion,
+        event: events[0] as Event,
+      })
+
+      const { zalopayDataOrder } = generateZaloPayOrderData({
+        orderCode,
+        amount,
+        orderItems,
+        customer,
+      })
 
       // create order
-      const { newOrder } = await createOrderAndTickets({
+      // const { newOrder } = await createOrderAndTickets({
+      //   orderCode,
+      //   customerData,
+      //   orderItems,
+      //   promotion,
+      //   events,
+      //   transactionID,
+      //   currency: order.currency,
+      //   payload,
+      // })
+      const { newOrder } = await createOrderAndTicketsWithTicketClassType({
         orderCode,
         customerData,
         orderItems,
+        promotion,
         events,
         transactionID,
         currency: order.currency,
         payload,
+        customerInput: customer,
       })
 
       // create payment record
-      await createPayment({
+      const payment = await createPayment({
         customerData,
         newOrder,
+        promotionId: promotion?.id,
+        promotionCode: promotion?.code,
+        totalDiscount,
+        totalBeforeDiscount,
         zaloPayOrder: zalopayDataOrder,
         transactionID,
         currency: order.currency,
       })
+
+      // save user promotion redemption
+      if (promotion) {
+        await createUserPromotionRedemption({
+          promotion,
+          user: customerData,
+          payment,
+          eventId,
+          transactionID,
+          payload,
+        })
+      }
 
       const { result: resultData } = await createZaloPaymentLink({
         zalopayDataOrder,
@@ -110,6 +165,7 @@ export async function POST(request: NextRequest) {
       return nextResponse
     } catch (error) {
       // Rollback the transaction
+      console.error('ZaloPay transaction create order error:', error)
       await payload.db.rollbackTransaction(transactionID)
 
       return NextResponse.json(
@@ -129,9 +185,11 @@ export async function POST(request: NextRequest) {
 const generateZaloPayOrderData = ({
   orderCode,
   orderItems,
+  amount,
   customer,
 }: {
   orderCode: string
+  amount: number
   orderItems: NewOrderItem[]
   customer: CustomerInfo
 }) => {
@@ -141,8 +199,6 @@ const generateZaloPayOrderData = ({
     columninfo: JSON.stringify({ orderCode }),
     promotioninfo: JSON.stringify({}),
   }
-
-  const amount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0)
 
   const app_user = customer.email
 
@@ -160,7 +216,7 @@ const generateZaloPayOrderData = ({
     item: JSON.stringify(orderItems),
     embed_data: JSON.stringify(embed_data),
     amount,
-    description: `Payment for order #${orderCode}`,
+    description: `ORCHESTARS - Payment for order #${orderCode}`,
     mac: '',
     callback_url: ZALO_PAYMENT.CALLBACK_URL,
   }
@@ -187,12 +243,11 @@ const createZaloPaymentLink = async ({ zalopayDataOrder }: { zalopayDataOrder: Z
     params: zalopayDataOrder,
   })
   const resultData = response.data
+  console.log('resultData', resultData)
 
   if (resultData?.return_code === 2) {
     throw new Error(resultData)
   }
-
-  console.log('resultData', resultData)
 
   return {
     result: resultData,
@@ -203,6 +258,10 @@ const createPayment = async ({
   customerData,
   newOrder,
   zaloPayOrder,
+  totalBeforeDiscount,
+  promotionCode,
+  promotionId,
+  totalDiscount,
   transactionID,
   currency,
 }: {
@@ -210,19 +269,28 @@ const createPayment = async ({
   newOrder: Order
   currency: string
   zaloPayOrder: ZaloPayOrder
+  totalBeforeDiscount: number
+  promotionId?: number
+  promotionCode?: string
+  totalDiscount?: number
   transactionID: number | Promise<number | string> | string
 }) => {
-  await payload.create({
+  return await payload.create({
     collection: 'payments',
     data: {
       user: customerData.id,
       order: newOrder.id,
       paymentMethod: PAYMENT_METHODS.ZALOPAY,
       currency,
+      promotionCode,
+      promotion: promotionId,
+      totalBeforeDiscount,
+      totalDiscount,
       total: zaloPayOrder.amount,
       status: 'processing',
       appTransId: zaloPayOrder.app_trans_id,
       paymentData: {
+        ...zaloPayOrder,
         app_trans_id: zaloPayOrder.app_trans_id,
         app_id: ZALO_PAYMENT.APP_ID,
         app_time: zaloPayOrder.app_time,

@@ -39,7 +39,7 @@ export const generateQrPayment = async ({ transactionKey }: { transactionKey: st
           accountName: VIET_QR.ACCOUNT_NAME,
           acqId: VIET_QR.ACQ_ID,
           addInfo,
-          amount,
+          amount: Number(amount).toFixed(0),
           template: VIET_QR.TEMPLATE,
         },
         {
