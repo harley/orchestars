@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { cn } from '@/utilities/ui'
 import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
-import React from 'react'
+import React, { Suspense } from 'react'
 
 // import { AdminBar } from '@/components/AdminBar'
 import { Footer } from '@/Footer/Component'
@@ -19,6 +19,7 @@ import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
 
 import { Analytics } from '@vercel/analytics/next'
+import PixelTracker from '@/components/PixelTracker'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // const { isEnabled } = await draftMode()
@@ -36,7 +37,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               preview: isEnabled,
             }}
           /> */}
-
+          <Suspense fallback={null}>
+            <PixelTracker />
+          </Suspense>
           <Header />
           <EnvironmentIndicator />
           <div className="pt-[72px]">{children}</div>
