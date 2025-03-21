@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Check, CreditCard, Info, X, Loader2 } from 'lucide-react'
+import { Check, Info, X, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { TicketPrice } from '../types'
 import { useToast } from '@/hooks/use-toast'
@@ -17,6 +17,7 @@ import { useSearchParams } from 'next/navigation'
 
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 import { formatMoney } from '@/utilities/formatMoney'
+import ZalopayIcon from '@/components/Icons/Zalopay'
 
 interface PaymentMethod {
   id: string
@@ -51,7 +52,7 @@ const ConfirmOrderWithTicketClassModal = ({
   const eventScheduleId = searchParams.get('eventScheduleId')
 
   const paymentMethods: PaymentMethod[] = [
-    { id: PAYMENT_METHODS.ZALOPAY, name: 'ZaloPay', icon: <CreditCard className="h-5 w-5" /> },
+    { id: PAYMENT_METHODS.ZALOPAY, name: 'Zalopay', icon: <ZalopayIcon /> },
     // {
     //   id: PAYMENT_METHODS.BANK_TRANSFER,
     //   name: 'Chuyển khoản ngân hàng (quét mã QR)',
@@ -293,7 +294,7 @@ const ConfirmOrderWithTicketClassModal = ({
                           className="flex items-center gap-2 cursor-pointer w-full"
                         >
                           {method.icon}
-                          {method.name}
+                          {/* {method.name} */}
                         </Label>
                       </div>
                     ))}
