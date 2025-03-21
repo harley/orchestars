@@ -60,7 +60,7 @@ const ConfirmOrderWithTicketClassModal = ({
   ]
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>(
-    PAYMENT_METHODS.BANK_TRANSFER,
+    PAYMENT_METHODS.ZALOPAY,
   )
 
   const {
