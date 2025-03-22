@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { format as formatDate } from 'date-fns'
 // import { afterChangeStatus } from './hooks/afterChangeStatus'
 
 export const Tickets: CollectionConfig = {
@@ -38,6 +39,36 @@ export const Tickets: CollectionConfig = {
       name: 'eventScheduleId',
       type: 'text',
       required: false,
+    },
+    {
+      name: 'eventDate',
+      type: 'text',
+      virtual: true,
+      admin: {
+        readOnly: true,
+      },
+      hooks: {
+        afterRead: [
+          async ({ req, data }) => {
+            const schedules = await req.payload
+              .findByID({
+                collection: 'events',
+                depth: 0,
+                id: data?.event,
+              })
+              .then((res) => res?.schedules || [])
+              .catch(() => [])
+
+            const scheduleDate = schedules.find((sch) => sch.id === data?.eventScheduleId)?.date
+
+            if (scheduleDate) {
+              return formatDate(scheduleDate, 'dd/MM/yyyy')
+            }
+
+            return null
+          },
+        ],
+      },
     },
     {
       name: 'orderItem',
