@@ -63,5 +63,15 @@ export const Orders: CollectionConfig = {
       name: 'customerData',
       type: 'json',
     },
+    {
+      name: 'expireAt', // order will be expired in time
+      type: 'date',
+      admin: {
+        date: {
+          pickerAppearance: 'dayAndTime',
+          timeFormat: 'HH:mm a',
+        },
+      },
+    },
   ],
 }

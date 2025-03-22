@@ -118,16 +118,20 @@ export const checkTicketClassAvailable = async ({
     }
 
     // Check all seats in parallel, grouped by event
+    const currentTime = new Date().toISOString()
     const existingTicketClasses = await payload.db.drizzle
       .execute(
         `
-    SELECT ticket_price_name as "ticketPriceName", COUNT(*) as total
-    FROM tickets
-    WHERE status IN ('booked', 'pending_payment', 'hold')
-    AND ticket_price_name = '${ticketPriceInfo.name}'
-    AND event_id = ${event.id}
-    AND event_schedule_id = '${inputOrderItem.eventScheduleId}'
-    GROUP BY ticket_price_name
+    SELECT ticket.ticket_price_name as "ticketPriceName", COUNT(*) as total
+    FROM tickets ticket
+    LEFT JOIN order_items order_item ON ticket.order_item_id = order_item.id
+    LEFT JOIN orders ord ON ord.id = order_item.order_id
+    WHERE 
+      ( (ticket.status IN ('booked', 'hold')) OR (ticket.status = 'pending_payment' AND ord.expire_at >= '${currentTime}') )
+      AND ticket.ticket_price_name = '${ticketPriceInfo.name}'
+      AND ticket.event_id = ${event.id}
+      AND ticket.event_schedule_id = '${inputOrderItem.eventScheduleId}'
+    GROUP BY ticket.ticket_price_name
     `,
       )
       .then((result) =>
@@ -408,6 +412,7 @@ export const createOrderAndTicketsWithTicketClassType = async ({
   transactionID,
   currency,
   promotion,
+  expireAt,
   payload,
 }: {
   orderCode: string
@@ -418,6 +423,7 @@ export const createOrderAndTicketsWithTicketClassType = async ({
   transactionID: number | Promise<number | string> | string
   currency: string
   promotion?: Promotion
+  expireAt: Date
   payload: BasePayload
 }) => {
   const mapObjectEvents = events.reduce(
@@ -448,6 +454,7 @@ export const createOrderAndTicketsWithTicketClassType = async ({
       promotion: promotion?.id,
       currency,
       customerData: customerInput as Record<string, any>,
+      expireAt: expireAt.toISOString(),
     },
     req: { transactionID },
   })

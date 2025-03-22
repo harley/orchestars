@@ -83,6 +83,9 @@ export async function POST(request: NextRequest) {
       //   currency: order.currency,
       //   payload,
       // })
+
+      // set expire time in 20 minutes
+      const expireAt = new Date(Date.now() + 20 * 60 * 1000)
       const { newOrder } = await createOrderAndTicketsWithTicketClassType({
         orderCode,
         customerData,
@@ -93,6 +96,7 @@ export async function POST(request: NextRequest) {
         currency: order.currency,
         payload,
         customerInput: customer,
+        expireAt,
       })
 
       // create payment record
@@ -107,6 +111,7 @@ export async function POST(request: NextRequest) {
         promotionCode: promotion?.code,
         totalDiscount,
         transaction,
+        expireAt,
       })
 
       // todo write payment history
@@ -180,6 +185,7 @@ const createPayment = async ({
   amount,
   transaction,
   transactionID,
+  expireAt,
 }: {
   customerData: User
   newOrder: Order
@@ -191,6 +197,7 @@ const createPayment = async ({
   amount: number
   transaction: BankTransferTransaction
   transactionID: number | Promise<number | string> | string
+  expireAt: Date
 }) => {
   return await payload.create({
     collection: 'payments',
@@ -205,6 +212,7 @@ const createPayment = async ({
       totalDiscount,
       total: amount,
       transaction,
+      expireAt: expireAt.toISOString(),
       status: 'processing',
     },
     req: { transactionID },

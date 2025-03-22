@@ -22,6 +22,7 @@ import * as migration_20250320_045936_add_default_value_for_promotion_collection
 import * as migration_20250321_012133_add_fields_to_handle_ticket_class from './20250321_012133_add_fields_to_handle_ticket_class';
 import * as migration_20250321_054031_add_applied_ticket_class_promotion from './20250321_054031_add_applied_ticket_class_promotion';
 import * as migration_20250322_090943_add_table_exports from './20250322_090943_add_table_exports';
+import * as migration_20250322_164956_add_expire_at_column_to_order_and_payment_collections from './20250322_164956_add_expire_at_column_to_order_and_payment_collections';
 
 export const migrations = [
   {
@@ -142,6 +143,11 @@ export const migrations = [
   {
     up: migration_20250322_090943_add_table_exports.up,
     down: migration_20250322_090943_add_table_exports.down,
-    name: '20250322_090943_add_table_exports'
+    name: '20250322_090943_add_table_exports',
+  },
+  {
+    up: migration_20250322_164956_add_expire_at_column_to_order_and_payment_collections.up,
+    down: migration_20250322_164956_add_expire_at_column_to_order_and_payment_collections.down,
+    name: '20250322_164956_add_expire_at_column_to_order_and_payment_collections'
   },
 ];
