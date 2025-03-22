@@ -97,6 +97,10 @@ export interface Config {
     orders: {
       payments: 'payments';
       orderItems: 'orderItems';
+      orderTickets: 'tickets';
+    };
+    orderItems: {
+      ticket: 'tickets';
     };
   };
   collectionsSelect: {
@@ -943,12 +947,12 @@ export interface Order {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
-  ticketCodes?:
-    | {
-        code?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  orderTickets?: {
+    docs?: (number | Ticket)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  Ticketcodes?: string | null;
   status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
   currency?: string | null;
   promotion?: (number | null) | Promotion;
@@ -975,6 +979,11 @@ export interface Order {
 export interface OrderItem {
   id: number;
   order: number | Order;
+  ticket?: {
+    docs?: (number | Ticket)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   event: number | Event;
   ticketPriceId: string;
   ticketPriceName?: string | null;
@@ -1870,12 +1879,8 @@ export interface OrdersSelect<T extends boolean = true> {
   userPhoneNumber?: T;
   payments?: T;
   orderItems?: T;
-  ticketCodes?:
-    | T
-    | {
-        code?: T;
-        id?: T;
-      };
+  orderTickets?: T;
+  Ticketcodes?: T;
   status?: T;
   currency?: T;
   promotion?: T;
@@ -1893,6 +1898,7 @@ export interface OrdersSelect<T extends boolean = true> {
  */
 export interface OrderItemsSelect<T extends boolean = true> {
   order?: T;
+  ticket?: T;
   event?: T;
   ticketPriceId?: T;
   ticketPriceName?: T;

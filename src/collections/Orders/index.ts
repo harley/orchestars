@@ -11,29 +11,6 @@ const getFullNameFromCustomerData = (data?: {
   return [firstName, lastName].filter(Boolean).join(' ');
 };
 
-const populateTicketCodes = async ({  originalDoc, req }: FieldHookArgs) => {
-
-  const ticketCodes: string[] = [];
-
-  try {
-    const orderItems = await req.payload
-      .find({
-        collection: 'orderItems',
-        where: { order: { equals: originalDoc?.id } },
-      })
-      .then((res) => res.docs)
-
-    if (!orderItems?.length) {
-      return
-    }
-
-  } catch (error) {
-    console.error('Error getting ticket:', error)
-  }
-  return ticketCodes;
-}
-
-
 // Common beforeChange hook to clear virtual fields
 const clearField: FieldHook = ({ siblingData, field }) => {
   if (field?.name) {
@@ -61,6 +38,7 @@ export const Orders: CollectionConfig = {
     {
       name: 'userName',
       type: 'text',
+      virtual: true,
       access: { create: () => false, update: () => false },
       admin: { readOnly: true },
       hooks: {
@@ -75,6 +53,7 @@ export const Orders: CollectionConfig = {
     {
       name: 'userEmail',
       type: 'text',
+      virtual: true,
       access: { create: () => false, update: () => false },
       admin: { readOnly: true },
       hooks: {
@@ -89,6 +68,7 @@ export const Orders: CollectionConfig = {
     {
       name: 'userPhoneNumber',
       type: 'text',
+      virtual: true,
       access: { create: () => false, update: () => false },
       admin: { readOnly: true },
       hooks: {
@@ -111,18 +91,51 @@ export const Orders: CollectionConfig = {
       type: 'join',
       collection: 'orderItems',
       on: 'order'
-    },
-    {
-      name: 'ticketCodes',
-      type: 'array',
-      access: { create: () => false, update: () => false },
-      admin: { readOnly: true },
-      fields: [{ name: 'code', type: 'text' }],
-      hooks: {
-        beforeChange: [clearField],
-        afterRead: [populateTicketCodes],
+    },{
+      name: 'orderTickets',
+      type: 'join',
+      collection: 'tickets',
+      on: 'orderItem',
+      admin: {
+        defaultColumns: ['id', 'ticketCode'],
       },
     },
+    {
+      name: 'Ticketcodes',
+      type: 'text',
+      virtual: true,
+      hooks: {
+        afterRead: [
+          async ({ context, originalDoc, req }) => {
+      
+            if (context.triggerAfterLookup === false) {
+              return;
+            }
+    
+            if (Array.isArray(originalDoc?.orderTickets?.docs)) {
+
+              const codes = await Promise.all(
+                originalDoc.orderTickets.docs.map(async (ticketDoc: any) => {
+              
+                  const ticket = await req.payload.findByID({
+                    collection: "tickets",
+                    id: ticketDoc,
+                    context: {
+                      triggerAfterLookup: false,  // Prevent recursive triggers
+                    },
+                  });
+    
+                  return ticket?.ticketCode;
+                })
+              );
+    
+              return codes.join(', ');
+            } 
+          },
+        ],
+      },
+    },    
+
     {
       name: 'status',
       type: 'select',

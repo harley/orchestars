@@ -10,6 +10,12 @@ export const OrderItems: CollectionConfig = {
       required: true,
     },
     {
+      name: 'ticket',
+      type: 'join',
+      collection: 'tickets',
+      on: 'orderItem',
+    },
+    {
       name: 'event',
       type: 'relationship',
       relationTo: 'events',
