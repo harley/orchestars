@@ -90,9 +90,4 @@ export const migrations = [
     down: migration_20250318_082022_add_thumbnail_to_event_collection.down,
     name: '20250318_082022_add_thumbnail_to_event_collection',
   },
-  {
-    up: migration_20250322_092413.up,
-    down: migration_20250322_092413.down,
-    name: '20250322_092413'
-  },
 ];
