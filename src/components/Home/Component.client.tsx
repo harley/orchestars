@@ -42,9 +42,9 @@ const HomeClient = ({
           onGoingPaginatedDocs={onGoingPaginatedDocs}
           title="Sự Kiện Đang Diễn Ra & Sắp Tới"
         />
-        {performers?.length > 0 && <PerformersSection performers={performers} />}
-        {pastEvents?.length > 0 && <PastConcerts events={pastEvents} />}
-        {partners?.length > 0 && <Sponsors partners={partners} />}
+        {performers.length > 0 && <PerformersSection performers={performers} />}
+        {pastEvents.length > 0 && <PastConcerts events={pastEvents} />}
+        {partners.length > 0 && <Sponsors partners={partners} />}
         {activity && <ActivitiesSection activity={activity} />}
       </main>
     </div>

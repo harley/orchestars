@@ -94,16 +94,7 @@ export interface Config {
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {
-    orders: {
-      payments: 'payments';
-      orderItems: 'orderItems';
-      orderTickets: 'tickets';
-    };
-    orderItems: {
-      ticket: 'tickets';
-    };
-  };
+  collectionsJoins: {};
   collectionsSelect: {
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
@@ -929,26 +920,7 @@ export interface Payment {
 export interface Order {
   id: number;
   orderCode?: string | null;
-  user: number | User;
-  userName?: string | null;
-  userEmail?: string | null;
-  userPhoneNumber?: string | null;
-  payments?: {
-    docs?: (number | Payment)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  orderItems?: {
-    docs?: (number | OrderItem)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  orderTickets?: {
-    docs?: (number | Ticket)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  Ticketcodes?: string | null;
+  user?: (number | null) | User;
   status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
   currency?: string | null;
   promotion?: (number | null) | Promotion;
@@ -975,11 +947,6 @@ export interface Order {
 export interface OrderItem {
   id: number;
   order: number | Order;
-  ticket?: {
-    docs?: (number | Ticket)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
   event: number | Event;
   ticketPriceId: string;
   ticketPriceName?: string | null;
@@ -1865,13 +1832,6 @@ export interface UserPromotionRedemptionsSelect<T extends boolean = true> {
 export interface OrdersSelect<T extends boolean = true> {
   orderCode?: T;
   user?: T;
-  userName?: T;
-  userEmail?: T;
-  userPhoneNumber?: T;
-  payments?: T;
-  orderItems?: T;
-  orderTickets?: T;
-  Ticketcodes?: T;
   status?: T;
   currency?: T;
   promotion?: T;
@@ -1889,7 +1849,6 @@ export interface OrdersSelect<T extends boolean = true> {
  */
 export interface OrderItemsSelect<T extends boolean = true> {
   order?: T;
-  ticket?: T;
   event?: T;
   ticketPriceId?: T;
   ticketPriceName?: T;

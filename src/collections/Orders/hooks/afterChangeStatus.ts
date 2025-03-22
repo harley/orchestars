@@ -4,23 +4,16 @@ import { generateTicketBookEmailHtml } from '@/mail/templates/TicketBookedEmail'
 import { Event, User } from '@/payload-types'
 
 
-export const afterChangeStatus = async ({context, value, originalDoc, req }: FieldHookArgs) => {
+export const afterChangeStatus = async ({ value, originalDoc, req }: FieldHookArgs) => {
   // When an order's status is updated to 'completed'
 
   if (value === 'completed' && originalDoc) {
     try {
-      if (context.triggerAfterChange === false) {
-        return
-      }
       const orderItems = await req.payload
         .find({
           collection: 'orderItems',
           where: { order: { equals: originalDoc.id } },
-          context: {
-            triggerAfterChange: false,
-          },
         })
-        
         .then((res) => res.docs)
 
       if (!orderItems?.length) {
@@ -39,7 +32,6 @@ export const afterChangeStatus = async ({context, value, originalDoc, req }: Fie
               data: {
                 status: 'booked',
               },
-
             })
             .then((res) => res.docs?.[0]),
         ),

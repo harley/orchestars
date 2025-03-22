@@ -14,7 +14,6 @@ import { importExportPlugin } from '@payloadcms/plugin-import-export'
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
-import path from 'path'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Orchestars` : 'Orchestars'
@@ -105,14 +104,11 @@ export const plugins: Plugin[] = [
     // Token provided by Vercel once Blob storage is added to your Vercel project
     token: process.env.BLOB_READ_WRITE_TOKEN,
   }),
-
   importExportPlugin({
-    collections: ['orders', 'orderItems', "tickets", "payments", "seatHoldings", "users"],
+    collections: ['orders', 'orderItems', 'tickets', 'payments', 'seatHoldings', 'users'],
     overrideExportCollection: (collection) => {
       collection.admin.group = 'System'
-      collection.upload.staticDir = path.resolve('uploads')
       return collection
     },
-    disableJobsQueue: true,
   }),
 ]
