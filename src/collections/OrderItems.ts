@@ -16,6 +16,12 @@ export const OrderItems: CollectionConfig = {
       required: true,
     },
     {
+      name: 'ticket',
+      type: 'join',
+      collection: 'tickets',
+      on: 'orderItem',
+    },
+    {
       name: 'ticketPriceId',
       type: 'text',
       required: true,

@@ -88,6 +88,6 @@ export const migrations = [
   {
     up: migration_20250318_082022_add_thumbnail_to_event_collection.up,
     down: migration_20250318_082022_add_thumbnail_to_event_collection.down,
-    name: '20250318_082022_add_thumbnail_to_event_collection'
+    name: '20250318_082022_add_thumbnail_to_event_collection',
   },
 ];

@@ -90,7 +90,16 @@ export interface Config {
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    orders: {
+      payments: 'payments';
+      orderItems: 'orderItems';
+      orderTickets: 'tickets';
+    };
+    orderItems: {
+      ticket: 'tickets';
+    };
+  };
   collectionsSelect: {
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
@@ -829,24 +838,28 @@ export interface Order {
   id: number;
   orderCode?: string | null;
   user?: (number | null) | User;
+  userName?: string | null;
+  userEmail?: string | null;
+  userPhoneNumber?: string | null;
+  payments?: {
+    docs?: (number | Payment)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  orderItems?: {
+    docs?: (number | OrderItem)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  orderTickets?: {
+    docs?: (number | Ticket)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  Ticketcodes?: string | null;
   status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
   total?: number | null;
   currency?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orderItems".
- */
-export interface OrderItem {
-  id: number;
-  order: number | Order;
-  event: number | Event;
-  ticketPriceId: string;
-  seat?: string | null;
-  quantity: number;
-  price: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -876,6 +889,26 @@ export interface Payment {
   };
   status: 'processing' | 'canceled' | 'paid' | 'failed';
   paidAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orderItems".
+ */
+export interface OrderItem {
+  id: number;
+  order: number | Order;
+  event: number | Event;
+  ticket?: {
+    docs?: (number | Ticket)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  ticketPriceId: string;
+  seat?: string | null;
+  quantity: number;
+  price: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -1648,6 +1681,13 @@ export interface EventsSelect<T extends boolean = true> {
 export interface OrdersSelect<T extends boolean = true> {
   orderCode?: T;
   user?: T;
+  userName?: T;
+  userEmail?: T;
+  userPhoneNumber?: T;
+  payments?: T;
+  orderItems?: T;
+  orderTickets?: T;
+  Ticketcodes?: T;
   status?: T;
   total?: T;
   currency?: T;
@@ -1661,6 +1701,7 @@ export interface OrdersSelect<T extends boolean = true> {
 export interface OrderItemsSelect<T extends boolean = true> {
   order?: T;
   event?: T;
+  ticket?: T;
   ticketPriceId?: T;
   seat?: T;
   quantity?: T;
