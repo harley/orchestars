@@ -105,7 +105,6 @@ export const plugins: Plugin[] = [
     token: process.env.BLOB_READ_WRITE_TOKEN,
   }),
   importExportPlugin({
-    collections: ['orders', 'orderItems', 'tickets', 'payments', 'seatHoldings', 'users'],
     overrideExportCollection: (collection) => {
       collection.admin.group = 'System'
       return collection
