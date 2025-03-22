@@ -32,6 +32,9 @@ importers:
       '@payloadcms/plugin-form-builder':
         specifier: ^3.29.0
         version: 3.29.0(@types/react@19.0.10)(monaco-editor@0.52.2)(next@15.2.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.4))(payload@3.29.0(graphql@16.10.0)(typescript@5.7.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.3)
+      '@payloadcms/plugin-import-export':
+        specifier: ^3.29.0
+        version: 3.29.0(@payloadcms/ui@3.29.0(@types/react@19.0.10)(monaco-editor@0.52.2)(next@15.2.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.4))(payload@3.29.0(graphql@16.10.0)(typescript@5.7.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.3))(payload@3.29.0(graphql@16.10.0)(typescript@5.7.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@payloadcms/plugin-nested-docs':
         specifier: ^3.29.0
         version: 3.29.0(payload@3.29.0(graphql@16.10.0)(typescript@5.7.3))
@@ -1506,6 +1509,12 @@ packages:
       payload: 3.29.0
       react: ^19.0.0 || ^19.0.0-rc-65a56d0e-20241020
       react-dom: ^19.0.0 || ^19.0.0-rc-65a56d0e-20241020
+
+  '@payloadcms/plugin-import-export@3.29.0':
+    resolution: {integrity: sha512-pLbgfGSiYoyxJ2F9WGLsX+oaVAgivYGaoEJ/NqG/RSPeHQB3MyQeDM15zpwShAqEG3f36QMOiQNfIgKrB7N4CA==}
+    peerDependencies:
+      '@payloadcms/ui': 3.29.0
+      payload: 3.29.0
 
   '@payloadcms/plugin-nested-docs@3.29.0':
     resolution: {integrity: sha512-Q4C9ghU2zEPBwseSMmo9GHhMFDpFxrpNqEQQbunrMGkJCRAy/eU/Jc3iVbH1Ro8tXi0XJ6EGrY3hXI6xJa0BgA==}
@@ -7342,6 +7351,19 @@ snapshots:
       - next
       - supports-color
       - typescript
+
+  '@payloadcms/plugin-import-export@3.29.0(@payloadcms/ui@3.29.0(@types/react@19.0.10)(monaco-editor@0.52.2)(next@15.2.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.4))(payload@3.29.0(graphql@16.10.0)(typescript@5.7.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.3))(payload@3.29.0(graphql@16.10.0)(typescript@5.7.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@faceless-ui/modal': 3.0.0-beta.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@payloadcms/translations': 3.29.0
+      '@payloadcms/ui': 3.29.0(@types/react@19.0.10)(monaco-editor@0.52.2)(next@15.2.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.4))(payload@3.29.0(graphql@16.10.0)(typescript@5.7.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.3)
+      csv-parse: 5.6.0
+      csv-stringify: 6.5.2
+      payload: 3.29.0(graphql@16.10.0)(typescript@5.7.3)
+      qs-esm: 7.0.2
+    transitivePeerDependencies:
+      - react
+      - react-dom
 
   '@payloadcms/plugin-nested-docs@3.29.0(payload@3.29.0(graphql@16.10.0)(typescript@5.7.3))':
     dependencies:

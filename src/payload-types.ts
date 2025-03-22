@@ -54,6 +54,7 @@ export type SupportedTimezones =
   | 'Asia/Singapore'
   | 'Asia/Tokyo'
   | 'Asia/Seoul'
+  | 'Australia/Brisbane'
   | 'Australia/Sydney'
   | 'Pacific/Guam'
   | 'Pacific/Noumea'
@@ -672,6 +673,7 @@ export interface Form {
             label?: string | null;
             width?: number | null;
             defaultValue?: string | null;
+            placeholder?: string | null;
             options?:
               | {
                   label: string;
@@ -803,6 +805,7 @@ export interface Event {
   schedules?:
     | {
         date?: string | null;
+        scheduleImage?: (number | null) | Media;
         details?:
           | {
               time?: string | null;
@@ -827,6 +830,7 @@ export interface Event {
         key?: ('zone1' | 'zone2' | 'zone3' | 'zone4' | 'zone5') | null;
         price?: number | null;
         currency?: string | null;
+        quantity?: number | null;
         id?: string | null;
       }[]
     | null;
@@ -850,30 +854,22 @@ export interface Event {
  */
 export interface Promotion {
   id: number;
-  orderCode?: string | null;
-  user: number | User;
-  userName?: string | null;
-  userEmail?: string | null;
-  userPhoneNumber?: string | null;
-  payments?: {
-    docs?: (number | Payment)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  orderItems?: {
-    docs?: (number | OrderItem)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  ticketCodes?:
+  code: string;
+  event?: (number | null) | Event;
+  appliedTicketClasses?:
     | {
-        code?: string | null;
+        ticketClass: string;
         id?: string | null;
       }[]
     | null;
-  status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
-  total?: number | null;
-  currency?: string | null;
+  maxRedemptions: number;
+  totalUsed?: number | null;
+  perUserLimit: number;
+  discountType: 'percentage' | 'fixed_amount';
+  discountValue: number;
+  startDate: string;
+  endDate: string;
+  status: 'draft' | 'active' | 'disabled';
   updatedAt: string;
   createdAt: string;
 }
@@ -987,21 +983,6 @@ export interface OrderItem {
   event: number | Event;
   ticketPriceId: string;
   ticketPriceName?: string | null;
-  seat?: string | null;
-  quantity: number;
-  price: number;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orderItems".
- */
-export interface OrderItem {
-  id: number;
-  order: number | Order;
-  event: number | Event;
-  ticketPriceId: string;
   seat?: string | null;
   quantity: number;
   price: number;
@@ -1215,7 +1196,7 @@ export interface Export {
   format: 'csv' | 'json';
   limit?: number | null;
   sort?: string | null;
-  drafts?: ('true' | 'false') | null;
+  drafts?: ('yes' | 'no') | null;
   selectionToUse?: ('currentSelection' | 'currentFilters' | 'all') | null;
   fields?: string[] | null;
   collectionSlug: string;
@@ -1362,6 +1343,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'events';
         value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'promotions';
+        value: number | Promotion;
+      } | null)
+    | ({
+        relationTo: 'userPromotionRedemptions';
+        value: number | UserPromotionRedemption;
       } | null)
     | ({
         relationTo: 'orders';
@@ -1789,6 +1778,7 @@ export interface EventsSelect<T extends boolean = true> {
     | T
     | {
         date?: T;
+        scheduleImage?: T;
         details?:
           | T
           | {
@@ -1810,6 +1800,7 @@ export interface EventsSelect<T extends boolean = true> {
         key?: T;
         price?: T;
         currency?: T;
+        quantity?: T;
         id?: T;
       };
   eventLogo?: T;
@@ -2117,6 +2108,7 @@ export interface FormsSelect<T extends boolean = true> {
               label?: T;
               width?: T;
               defaultValue?: T;
+              placeholder?: T;
               options?:
                 | T
                 | {
