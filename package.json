@@ -32,7 +32,6 @@
     "@payloadcms/plugin-form-builder": "^3.29.0",
     "@payloadcms/plugin-import-export": "3.29.0",
     "@payloadcms/plugin-nested-docs": "^3.29.0",
-    "@payloadcms/plugin-import-export": "^3.29.0",
     "@payloadcms/plugin-redirects": "^3.29.0",
     "@payloadcms/plugin-search": "^3.29.0",
     "@payloadcms/plugin-seo": "^3.29.0",
