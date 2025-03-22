@@ -974,6 +974,7 @@ export interface Ticket {
     | null;
   event?: (number | null) | Event;
   eventScheduleId?: string | null;
+  eventDate?: string | null;
   orderItem?: (number | null) | OrderItem;
   status?: ('booked' | 'pending_payment' | 'hold' | 'cancelled') | null;
   updatedAt: string;
@@ -1853,6 +1854,7 @@ export interface TicketsSelect<T extends boolean = true> {
   ticketPriceInfo?: T;
   event?: T;
   eventScheduleId?: T;
+  eventDate?: T;
   orderItem?: T;
   status?: T;
   updatedAt?: T;
