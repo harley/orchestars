@@ -1,6 +1,5 @@
 import type { CollectionConfig, FieldHook } from 'payload'
 import { afterChangeStatus } from './hooks/afterChangeStatus';
-import { FieldHookArgs } from 'payload'
 // Helper to generate afterRead hooks for user fields
 const getFullNameFromCustomerData = (data?: {
   firstName?: string;
