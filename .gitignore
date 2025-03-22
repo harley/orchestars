@@ -57,3 +57,6 @@ next-env.d.ts
 tmp
 
 .secrets
+
+# Supabase temporary files
+supabase/.temp/
