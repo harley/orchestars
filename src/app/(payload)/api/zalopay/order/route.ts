@@ -111,6 +111,10 @@ export async function POST(request: NextRequest) {
       //   currency: order.currency,
       //   payload,
       // })
+
+      // set expire time in 20 minutes
+      const expireAt = new Date(Date.now() + 20 * 60 * 1000)
+
       const { newOrder } = await createOrderAndTicketsWithTicketClassType({
         orderCode,
         customerData,
@@ -121,6 +125,7 @@ export async function POST(request: NextRequest) {
         currency: order.currency,
         payload,
         customerInput: customer,
+        expireAt,
       })
 
       // create payment record
@@ -134,6 +139,7 @@ export async function POST(request: NextRequest) {
         zaloPayOrder: zalopayDataOrder,
         transactionID,
         currency: order.currency,
+        expireAt,
       })
 
       // save user promotion redemption
@@ -263,6 +269,7 @@ const createPayment = async ({
   promotionId,
   totalDiscount,
   transactionID,
+  expireAt,
   currency,
 }: {
   customerData: User
@@ -273,6 +280,7 @@ const createPayment = async ({
   promotionId?: number
   promotionCode?: string
   totalDiscount?: number
+  expireAt: Date
   transactionID: number | Promise<number | string> | string
 }) => {
   return await payload.create({
@@ -289,6 +297,7 @@ const createPayment = async ({
       total: zaloPayOrder.amount,
       status: 'processing',
       appTransId: zaloPayOrder.app_trans_id,
+      expireAt: expireAt.toISOString(),
       paymentData: {
         ...zaloPayOrder,
         app_trans_id: zaloPayOrder.app_trans_id,

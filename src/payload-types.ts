@@ -910,6 +910,7 @@ export interface Payment {
   };
   status: 'processing' | 'canceled' | 'paid' | 'failed';
   paidAt?: string | null;
+  expireAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -937,6 +938,7 @@ export interface Order {
     | number
     | boolean
     | null;
+  expireAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1840,6 +1842,7 @@ export interface OrdersSelect<T extends boolean = true> {
   totalDiscount?: T;
   total?: T;
   customerData?: T;
+  expireAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1881,6 +1884,7 @@ export interface PaymentsSelect<T extends boolean = true> {
       };
   status?: T;
   paidAt?: T;
+  expireAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

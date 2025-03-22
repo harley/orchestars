@@ -188,16 +188,20 @@ const checkTicketClassAvailable = async ({
   console.log('countTicketClass', countTicketClass)
 
   // Check all seats in parallel, grouped by event
+  const currentTime = new Date().toISOString()
   const existingTicketClasses = await payload.db.drizzle
     .execute(
       `
-    SELECT ticket_price_name as "ticketPriceName", COUNT(*) as total
-    FROM tickets
-    WHERE status IN ('booked', 'pending_payment', 'hold')
-    AND ticket_price_name = ANY('{"${arrTicketPriceNames.join('","')}"}')
-    AND event_id = ${body.eventId}
-    AND event_schedule_id = '${body.eventScheduleId}'
-    GROUP BY ticket_price_name
+    SELECT ticket.ticket_price_name as "ticketPriceName", COUNT(*) as total
+    FROM tickets ticket
+    LEFT JOIN order_items order_item ON ticket.order_item_id = order_item.id
+    LEFT JOIN orders ord ON ord.id = order_item.order_id
+    WHERE 
+      ( (ticket.status IN ('booked', 'hold')) OR (ticket.status = 'pending_payment' AND ord.expire_at >= '${currentTime}') )
+      AND ticket.ticket_price_name = ANY('{"${arrTicketPriceNames.join('","')}"}')
+      AND ticket.event_id = ${body.eventId}
+      AND ticket.event_schedule_id = '${body.eventScheduleId}'
+    GROUP BY ticket.ticket_price_name
     `,
     )
     .then((result) =>

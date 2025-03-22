@@ -114,5 +114,15 @@ export const Payments: CollectionConfig = {
       type: 'date',
       required: false,
     },
+    {
+      name: 'expireAt', // payment will be expired in time
+      type: 'date',
+      admin: {
+        date: {
+          pickerAppearance: 'dayAndTime',
+          timeFormat: 'HH:mm a',
+        },
+      },
+    },
   ],
 }
