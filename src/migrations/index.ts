@@ -13,6 +13,7 @@ import * as migration_20250314_124747_add_key_ticket_price_for_event_collectin f
 import * as migration_20250314_624747_modify_schedule_date_varchar_to_date_type from './20250314_624747_modify_schedule_date_varchar_to_date_type';
 import * as migration_20250315_151022_add_event_schedule_id_to_ticket_and_seat_holding_collection from './20250315_151022_add_event_schedule_id_to_ticket_and_seat_holding_collection';
 import * as migration_20250318_082022_add_thumbnail_to_event_collection from './20250318_082022_add_thumbnail_to_event_collection';
+import * as migration_20250322_092413 from './20250322_092413';
 
 export const migrations = [
   {
@@ -88,6 +89,11 @@ export const migrations = [
   {
     up: migration_20250318_082022_add_thumbnail_to_event_collection.up,
     down: migration_20250318_082022_add_thumbnail_to_event_collection.down,
-    name: '20250318_082022_add_thumbnail_to_event_collection'
+    name: '20250318_082022_add_thumbnail_to_event_collection',
+  },
+  {
+    up: migration_20250322_092413.up,
+    down: migration_20250322_092413.down,
+    name: '20250322_092413'
   },
 ];
