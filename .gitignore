@@ -60,3 +60,4 @@ tmp
 
 # Supabase temporary files
 supabase/.temp/
+supabase/.bin/
