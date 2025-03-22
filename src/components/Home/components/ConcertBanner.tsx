@@ -12,22 +12,22 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events }) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % events.length)
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % events?.length)
     }, 6000)
 
     return () => clearInterval(interval)
-  }, [events.length])
+  }, [events?.length])
 
   const handleDotClick = (index: number) => {
     setCurrentIndex(index)
   }
 
   const handlePrev = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + events.length) % events.length)
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + events?.length) % events?.length)
   }
 
   const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % events.length)
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % events?.length)
   }
 
   return (

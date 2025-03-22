@@ -9,7 +9,7 @@ const Sponsors: React.FC<SponsorsProps> = ({ partners = [] }) => {
   const sectionRef = useRef<HTMLDivElement>(null)
   const [currentPage, setCurrentPage] = useState(0)
   const sponsorsPerPage = 5
-  const totalPages = Math.max(1, Math.ceil(partners.length / sponsorsPerPage))
+  const totalPages = Math.max(1, Math.ceil(partners?.length / sponsorsPerPage))
 
   // Animation for section entrance
   useEffect(() => {
