@@ -929,7 +929,26 @@ export interface Payment {
 export interface Order {
   id: number;
   orderCode?: string | null;
-  user?: (number | null) | User;
+  user: number | User;
+  userName?: string | null;
+  userEmail?: string | null;
+  userPhoneNumber?: string | null;
+  payments?: {
+    docs?: (number | Payment)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  orderItems?: {
+    docs?: (number | OrderItem)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  ticketCodes?:
+    | {
+        code?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
   currency?: string | null;
   promotion?: (number | null) | Promotion;

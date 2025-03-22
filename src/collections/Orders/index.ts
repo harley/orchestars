@@ -1,42 +1,38 @@
 import type { CollectionConfig, FieldHook } from 'payload'
 import { afterChangeStatus } from './hooks/afterChangeStatus';
-
+import { FieldHookArgs } from 'payload'
 // Helper to generate afterRead hooks for user fields
-const generateUserFieldAfterRead = (getValue: (user: any) => string): FieldHook => async ({ data, req }) => {
-  if (data?.user) {
-    const user = await req.payload.findByID({ collection: 'users', id: data?.user });
-    return user ? getValue(user) : '';
-  }
-  return '';
+const getFullNameFromCustomerData = (data?: {
+  firstName?: string;
+  lastName?: string;
+}) => {
+  if (!data) return '';
+  const { firstName = '', lastName = '' } = data;
+  return [firstName, lastName].filter(Boolean).join(' ');
 };
 
-const getTicketCodesFromOrderItems: FieldHook = async ({ data, req }) => {
-  if (!data?.id) return [];
-
-  const orderItems = await req.payload.find({
-    collection: 'orderItems',
-    where: {
-      order: { equals: data.id },
-    },
-  });
-
-  if (orderItems.docs.length === 0) return [];
+const populateTicketCodes = async ({  originalDoc, req }: FieldHookArgs) => {
 
   const ticketCodes: string[] = [];
 
-  for (const item of orderItems.docs) {
-    const tickets = await req.payload.find({
-      collection: 'tickets',
-      where: {
-        orderItem: { equals: item.id },
-      },
-    });
+  try {
+    const orderItems = await req.payload
+      .find({
+        collection: 'orderItems',
+        where: { order: { equals: originalDoc?.id } },
+      })
+      .then((res) => res.docs)
 
-    tickets.docs?.forEach((ticket) => {
-      if (ticket?.ticketCode) ticketCodes.push(ticket.ticketCode);
-    });
+    if (!orderItems?.length) {
+      return
+    }
+
+  } catch (error) {
+    console.error('Error getting ticket:', error)
   }
+  return ticketCodes;
 }
+
 
 // Common beforeChange hook to clear virtual fields
 const clearField: FieldHook = ({ siblingData, field }) => {
@@ -49,7 +45,7 @@ export const Orders: CollectionConfig = {
   slug: 'orders',
   admin: {
     useAsTitle: 'orderCode',
-    defaultColumns: ['orderCode', 'userName', 'userEmail', 'userPhoneNumber', 'status', 'total'],
+    defaultColumns: ['orderCode', 'status', 'total'],
   },
   fields: [
     {
@@ -69,7 +65,11 @@ export const Orders: CollectionConfig = {
       admin: { readOnly: true },
       hooks: {
         beforeChange: [clearField],
-        afterRead: [generateUserFieldAfterRead((user) => `${user.firstName || ''} ${user.lastName || ''}`.trim())],
+        afterRead: [
+          ({ data }) => {
+            return getFullNameFromCustomerData(data?.customerData);
+          },
+        ],
       },
     },
     {
@@ -79,7 +79,11 @@ export const Orders: CollectionConfig = {
       admin: { readOnly: true },
       hooks: {
         beforeChange: [clearField],
-        afterRead: [generateUserFieldAfterRead((user) => user.email || '')],
+        afterRead: [
+          ({ data }) => {
+            return data?.customerData?.email || '';
+          },
+        ],
       },
     },
     {
@@ -90,9 +94,9 @@ export const Orders: CollectionConfig = {
       hooks: {
         beforeChange: [clearField],
         afterRead: [
-          generateUserFieldAfterRead(
-            (user) => user.phoneNumber || user.phoneNumbers?.find((p: { isUsing: any; }) => p.isUsing)?.phone || ''
-          ),
+          ({ data }) => {
+            return data?.customerData?.phoneNumber || '';
+          },
         ],
       },
     },
@@ -112,16 +116,11 @@ export const Orders: CollectionConfig = {
       name: 'ticketCodes',
       type: 'array',
       access: { create: () => false, update: () => false },
-      admin: { readOnly: true},
-      fields: [
-        {
-          name: 'code',
-          type: 'text',
-        },
-      ],
+      admin: { readOnly: true },
+      fields: [{ name: 'code', type: 'text' }],
       hooks: {
         beforeChange: [clearField],
-        afterRead: [getTicketCodesFromOrderItems],
+        afterRead: [populateTicketCodes],
       },
     },
     {
@@ -172,6 +171,7 @@ export const Orders: CollectionConfig = {
       type: 'json',
     },
   ],
+
 };
 
 export default Orders;
