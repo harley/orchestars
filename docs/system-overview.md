@@ -103,28 +103,51 @@ collections: {
 
 ### 4. Integration Points
 
-- **Payment Processing**: [To be implemented]
-  - Payment gateway integration
-  - Multiple payment methods support
-  - Refund handling
-  - Transaction logging
+- **Payment Processing**:
+  - Integration with ZaloPay payment gateway
+  - Implementation follows ZaloPay v2 API documentation
+  - Payment flow:
+    1. Create payment order
+    2. Redirect to ZaloPay gateway
+    3. Handle payment callback
+  - Transaction data stored in payments collection
 
-- **External Ticket Sales**: Future integration planned
-  - Real-time inventory sync
-  - Cross-platform reporting
-  - Unified seat allocation
+- **Communication**:
+  - Email notifications for primary communication
+  - Phone numbers stored for customer support only
+  - No active phone verification required
+  - Email service: [TBD - specify current email service]
 
-- **Email Notifications**: [To be implemented]
-  - Purchase confirmations
-  - Ticket delivery
-  - Event updates
-  - Marketing communications
+### 5. Business Rules
 
-- **Analytics & Reporting**:
-  - Sales tracking
-  - Inventory monitoring
-  - User behavior analysis
-  - Performance metrics
+#### Event Status Management
+```typescript
+type EventStatus = 'draft' | 'published_upcoming' | 'published_open_sales' | 'completed' | 'cancelled'
+```
+- Status changes managed manually by admin
+- No automatic status transitions
+- Supports full event lifecycle management
+
+#### Seat Allocation System
+- Flexible seat assignment model:
+  - Seats are optional in the schema
+  - Similar to airline boarding model
+  - Seats can be assigned/updated post-purchase
+- Zone Capacity Management:
+  - Strict enforcement of zone capacity limits
+  - Validation against ticket pricing tiers
+  - Real-time inventory tracking per zone
+
+#### Ticket Zone Configuration
+```typescript
+ticketPrices: {
+  name: string
+  key: 'zone1' | 'zone2' | 'zone3' | 'zone4' | 'zone5'  // Price tiers
+  price: number
+  currency: string
+  quantity: number
+}[]
+```
 
 ## Key Features
 
