@@ -2,7 +2,6 @@ import { BasePayload } from 'payload'
 import { CustomerInfo, NewOrderItem } from '../types'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { generatePassword } from '@/utilities/generatePassword'
 import { Event, Payment, Promotion, User } from '@/payload-types'
 import { generateCode } from '@/utilities/generateCode'
 import { isAfter, isBefore } from 'date-fns'
@@ -264,7 +263,6 @@ export const createCustomerIfNotExist = async ({
         phoneNumbers: [
           { isUsing: true, createdAt: new Date().toISOString(), phone: customer.phoneNumber },
         ],
-        password: generatePassword(),
         role: 'customer',
       },
       req: { transactionID },
