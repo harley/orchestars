@@ -29,6 +29,7 @@ import { Activities } from './collections/Activities'
 import { SeatHoldings } from './collections/SeatHoldings'
 import { Promotions } from './collections/Promotion'
 import { UserPromotionRedemptions } from './collections/Promotion/UserPromotionRedemtion'
+import Admins from './collections/Admins'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -54,7 +55,7 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
-    user: Users.slug,
+    user: 'admins',
     livePreview: {
       breakpoints: [
         {
@@ -103,6 +104,7 @@ export default buildConfig({
     Performers,
     Activities,
     FAQs,
+    Admins,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],

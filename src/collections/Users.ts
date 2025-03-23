@@ -5,8 +5,13 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
   },
-  auth: true,
   fields: [
+    {
+      name: 'email',
+      type: 'email',
+      required: true,
+      index: true,
+    },
     // Email added by default
     {
       name: 'phoneNumber', // default phone number
@@ -56,15 +61,8 @@ export const Users: CollectionConfig = {
     {
       name: 'role',
       type: 'select',
+      defaultValue: 'customer',
       options: [
-        {
-          label: 'Admin',
-          value: 'admin',
-        },
-        {
-          label: 'Super Admin',
-          value: 'super-admin',
-        },
         {
           label: 'Customer',
           value: 'customer',
