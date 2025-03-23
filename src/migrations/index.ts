@@ -23,6 +23,8 @@ import * as migration_20250321_012133_add_fields_to_handle_ticket_class from './
 import * as migration_20250321_054031_add_applied_ticket_class_promotion from './20250321_054031_add_applied_ticket_class_promotion';
 import * as migration_20250322_090943_add_table_exports from './20250322_090943_add_table_exports';
 import * as migration_20250322_164956_add_expire_at_column_to_order_and_payment_collections from './20250322_164956_add_expire_at_column_to_order_and_payment_collections';
+import * as migration_20250323_112122_create_admin from './20250323_112122_create_admin';
+import * as migration_20250323_112852_cleanup_users from './20250323_112852_cleanup_users';
 
 export const migrations = [
   {
@@ -148,6 +150,16 @@ export const migrations = [
   {
     up: migration_20250322_164956_add_expire_at_column_to_order_and_payment_collections.up,
     down: migration_20250322_164956_add_expire_at_column_to_order_and_payment_collections.down,
-    name: '20250322_164956_add_expire_at_column_to_order_and_payment_collections'
+    name: '20250322_164956_add_expire_at_column_to_order_and_payment_collections',
+  },
+  {
+    up: migration_20250323_112122_create_admin.up,
+    down: migration_20250323_112122_create_admin.down,
+    name: '20250323_112122_create_admin',
+  },
+  {
+    up: migration_20250323_112852_cleanup_users.up,
+    down: migration_20250323_112852_cleanup_users.down,
+    name: '20250323_112852_cleanup_users'
   },
 ];
