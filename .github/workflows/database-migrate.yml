@@ -1,0 +1,42 @@
+name: Database Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run migrations on'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: '9.15.5'
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run database migrations
+        run: pnpm migrate
+        env:
+          DATABASE_URI: ${{ github.event.inputs.environment == 'production' && secrets.PRODUCTION_DATABASE_URI || secrets.STAGING_DATABASE_URI }}
+          PAYLOAD_SECRET: ${{ github.event.inputs.environment == 'production' && secrets.PRODUCTION_PAYLOAD_SECRET || secrets.STAGING_PAYLOAD_SECRET }} 
