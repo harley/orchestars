@@ -122,7 +122,7 @@ export const checkTicketClassAvailable = async ({
     const existingTicketClasses = await payload.db.drizzle
       .execute(
         `
-    SELECT ticket.ticket_price_name as "ticketPriceName", COUNT(*) as total
+    SELECT ticket.ticket_price_name as "ticketPriceName", SUM(order_item.quantity) as total
     FROM tickets ticket
     LEFT JOIN order_items order_item ON ticket.order_item_id = order_item.id
     LEFT JOIN orders ord ON ord.id = order_item.order_id
