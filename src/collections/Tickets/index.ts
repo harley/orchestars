@@ -74,6 +74,41 @@ export const Tickets: CollectionConfig = {
       name: 'orderItem',
       type: 'relationship',
       relationTo: 'orderItems',
+      maxDepth: 1,
+      hasMany: false,
+    },
+    {
+      name: "order",
+      type: 'relationship',
+      relationTo: 'orders',
+      maxDepth: 1,
+      hasMany: false,
+    },
+    {
+      name: "orderCode",
+      type: 'text',
+      virtual: true,
+      hooks: {
+        afterRead: [
+          async ({ context, originalDoc, req }) => {
+    
+            if (context.triggerAfterLookup === false) {
+              return;
+            }
+
+            if (originalDoc?.order) {
+                const order = await req.payload.findByID({
+                  collection: "orders",
+                  id: originalDoc?.order,
+                  context: {
+                    triggerAfterLookup: false, // Prevent recursive triggers
+                  },
+                });
+                return order?.orderCode;
+              }
+            }
+        ],
+      },
     },
     {
       name: 'status',
