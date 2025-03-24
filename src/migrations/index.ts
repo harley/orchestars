@@ -25,6 +25,7 @@ import * as migration_20250322_090943_add_table_exports from './20250322_090943_
 import * as migration_20250322_164956_add_expire_at_column_to_order_and_payment_collections from './20250322_164956_add_expire_at_column_to_order_and_payment_collections';
 import * as migration_20250323_112122_create_admin from './20250323_112122_create_admin';
 import * as migration_20250323_112852_cleanup_users from './20250323_112852_cleanup_users';
+import * as migration_20250324_081044_add_orders_to_tickets from './20250324_081044_add_orders_to_tickets';
 
 export const migrations = [
   {
@@ -160,6 +161,11 @@ export const migrations = [
   {
     up: migration_20250323_112852_cleanup_users.up,
     down: migration_20250323_112852_cleanup_users.down,
-    name: '20250323_112852_cleanup_users'
+    name: '20250323_112852_cleanup_users',
+  },
+  {
+    up: migration_20250324_081044_add_orders_to_tickets.up,
+    down: migration_20250324_081044_add_orders_to_tickets.down,
+    name: '20250324_081044_add_orders_to_tickets'
   },
 ];
