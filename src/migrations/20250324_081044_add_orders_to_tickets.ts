@@ -1,21 +1,5 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
-export async function fillTicketOrderIds({ db }: MigrateUpArgs): Promise<void> {
-  await db.execute(sql`
-  UPDATE "tickets" AS t
-  SET "order_id" = subquery."order_id"
-  FROM (
-    SELECT t2.id AS ticket_id, oi.order_id
-    FROM "tickets" t2
-    JOIN "order_items" oi ON oi.id = t2.order_item_id
-    WHERE t2.order_id IS NULL
-  ) AS subquery
-  WHERE t.id = subquery.ticket_id;
-  
-  `);
-}
-
-
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
    ALTER TABLE "tickets" ADD COLUMN "order_id" integer;
@@ -29,7 +13,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "tickets_order_idx" ON "tickets" USING btree ("order_id");
   ALTER TABLE "users" DROP COLUMN IF EXISTS "role";
   DROP TYPE "public"."enum_users_role";`)
-  await fillTicketOrderIds({ db, payload, req });
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
