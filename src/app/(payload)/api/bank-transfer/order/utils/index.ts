@@ -6,6 +6,8 @@ import { Event, Payment, Promotion, User } from '@/payload-types'
 import { generateCode } from '@/utilities/generateCode'
 import { isAfter, isBefore } from 'date-fns'
 import { USER_PROMOTION_REDEMPTION_STATUS } from '@/collections/Promotion/constants/status'
+import { ORDER_STATUS } from '@/collections/Orders/constants'
+import { EVENT_STATUS } from '@/collections/Events/constants/status'
 
 export const checkSeatAvailable = async ({
   orderItems,
@@ -121,17 +123,27 @@ export const checkTicketClassAvailable = async ({
     const existingTicketClasses = await payload.db.drizzle
       .execute(
         `
-    SELECT ticket.ticket_price_name as "ticketPriceName", SUM(order_item.quantity) as total
-    FROM tickets ticket
-    LEFT JOIN order_items order_item ON ticket.order_item_id = order_item.id
-    LEFT JOIN orders ord ON ord.id = order_item.order_id
-    WHERE 
-      ( (ticket.status IN ('booked', 'hold')) OR (ticket.status = 'pending_payment' AND ord.expire_at >= '${currentTime}') )
-      AND ticket.ticket_price_name = '${ticketPriceInfo.name}'
-      AND ticket.event_id = ${event.id}
-      AND ticket.event_schedule_id = '${inputOrderItem.eventScheduleId}'
-    GROUP BY ticket.ticket_price_name
-    `,
+        SELECT 
+          ticket.ticket_price_name AS "ticketPriceName", SUM(order_item.quantity) AS total
+        FROM order_items order_item
+        INNER JOIN orders ord  ON ord.id = order_item.order_id
+        INNER JOIN (
+            SELECT DISTINCT ON (order_item_id) * FROM tickets tk where tk.event_id=${event.id} ORDER BY order_item_id, id
+        ) ticket 
+            ON ticket.order_item_id = order_item.id
+
+        WHERE 
+            ( 
+              (ord.status = '${ORDER_STATUS.completed.value}')
+              OR
+              (ord.status = '${ORDER_STATUS.processing.value}' AND ord.expire_at >= '${currentTime}')
+            )
+            AND order_item.event_id = ${event.id}
+            AND ticket.ticket_price_name = '${ticketPriceInfo.name}'
+            AND ticket.event_schedule_id = '${inputOrderItem.eventScheduleId}'
+
+        GROUP BY ticket.ticket_price_name
+      `,
       )
       .then((result) =>
         (result.rows || []).reduce(
@@ -184,6 +196,21 @@ export const checkEvents = async ({
   }
 
   for (const event of events) {
+    if (event.status !== EVENT_STATUS.published_open_sales.value) {
+      switch (event.status) {
+        case EVENT_STATUS.draft.value:
+          throw new Error('Sự kiện không tồn tại')
+        case EVENT_STATUS.published_upcoming.value:
+          throw new Error('Sự kiện chưa được mở bán')
+        case EVENT_STATUS.completed.value:
+          throw new Error('Sự kiện đã đóng bán')
+        case EVENT_STATUS.cancelled.value:
+          throw new Error('Sự kiện đã bị hủy')
+        default:
+          throw new Error('Sự kiện không tồn tại')
+      }
+    }
+
     const hasValidTicket = orderItems.some((oItem) => {
       if (oItem.eventId !== event.id) return false
 
@@ -380,6 +407,7 @@ export const createOrderAndTickets = async ({
         attendeeName: `${customerData.firstName} ${customerData.lastName}`,
         seat: itemInput.seat,
         status: 'pending_payment',
+        ticketPriceName: ticketPriceInfo.name,
         ticketPriceInfo: {
           ticketPriceId: ticketPriceInfo.id,
           name: ticketPriceInfo.name,
@@ -389,6 +417,7 @@ export const createOrderAndTickets = async ({
         eventScheduleId: itemInput.eventScheduleId,
         orderItem: orderItem?.id,
         user: customerData.id,
+        order: newOrder.id,
       },
       req: { transactionID },
     })
@@ -491,26 +520,35 @@ export const createOrderAndTicketsWithTicketClassType = async ({
       throw new Error('Loại vé không tồn tại')
     }
 
-    return payload.create({
-      collection: 'tickets',
-      data: {
-        ticketCode: generateCode('TK'),
-        attendeeName: `${customerData.firstName} ${customerData.lastName}`,
-        status: 'pending_payment',
-        ticketPriceInfo: {
-          ...(ticketPriceInfo || {}),
-          ticketPriceId: ticketPriceInfo?.id,
-          name: ticketPriceInfo?.name,
-          price: ticketPriceInfo?.price,
-        },
-        ticketPriceName: ticketPriceInfo?.name,
-        event: itemInput.eventId,
-        eventScheduleId: itemInput.eventScheduleId,
-        orderItem: orderItem?.id,
-        user: customerData.id,
-      },
-      req: { transactionID },
-    })
+    const promises = []
+
+    for (let i = 1; i <= orderItem.quantity; i++) {
+      promises.push(
+        payload.create({
+          collection: 'tickets',
+          data: {
+            ticketCode: generateCode('TK'),
+            attendeeName: `${customerData.firstName} ${customerData.lastName}`,
+            status: 'pending_payment',
+            ticketPriceInfo: {
+              ...(ticketPriceInfo || {}),
+              ticketPriceId: ticketPriceInfo?.id,
+              name: ticketPriceInfo?.name,
+              price: ticketPriceInfo?.price,
+            },
+            ticketPriceName: ticketPriceInfo?.name,
+            event: itemInput.eventId,
+            eventScheduleId: itemInput.eventScheduleId,
+            orderItem: orderItem?.id,
+            user: customerData.id,
+            order: newOrder.id,
+          },
+          req: { transactionID },
+        }),
+      )
+    }
+
+    return Promise.all(promises)
   })
 
   await Promise.all(ticketPromises)
