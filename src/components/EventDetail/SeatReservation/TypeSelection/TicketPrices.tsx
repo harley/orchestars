@@ -1,8 +1,8 @@
 import { Event } from '@/payload-types'
 import React from 'react'
-import { categories } from '../data/seat-maps/categories'
+import { categories } from '@/components/EventDetail/data/seat-maps/categories'
 import { formatMoney } from '@/utilities/formatMoney'
-import { TicketPrice } from '../types'
+import { TicketPrice } from '@/components/EventDetail/data/types'
 
 interface TicketPricesProps {
   ticketPrices: Event['ticketPrices']

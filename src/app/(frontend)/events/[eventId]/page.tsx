@@ -6,7 +6,7 @@ import PageClient from './page.client'
 import EventBanner from '@/components/EventDetail/EventBanner'
 // import Schedule from '@/components/EventDetail/Schedule'
 import TermCondition from '@/components/EventDetail/TermCondition'
-import SeatReservationClient from '@/components/EventDetail/SeatReservation/Component.client'
+import SeatReservationCli from '@/components/EventDetail/SeatReservation/Component.client'
 import FeaturedPerformers from '@/components/EventDetail/FeaturedPerformers/Component'
 import FAQ from '@/components/EventDetail/FAQ/Component'
 import DetailDescriptionClient from '@/components/EventDetail/DetailDescription/Component.client'
@@ -64,7 +64,7 @@ const EventDetailPage = async (props: {
           {isUpcoming && <UpcomingSaleBanner />}
 
           {isOpenForSales && (
-            <SeatReservationClient
+            <SeatReservationCli
               event={eventDetail}
               unavailableSeats={unavailableSeats as string[]}
             />

@@ -1,15 +1,15 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Check, CreditCard, Info, X, Loader2 } from 'lucide-react'
+import { Check, Info, X, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { SelectedSeat } from '../types'
+import { TicketPrice } from '@/components/EventDetail/types'
 import { useToast } from '@/hooks/use-toast'
 import axios from 'axios'
 import { Event, Promotion } from '@/payload-types'
@@ -17,6 +17,7 @@ import { useSearchParams } from 'next/navigation'
 
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 import { formatMoney } from '@/utilities/formatMoney'
+import ZalopayIcon from '@/components/Icons/Zalopay'
 
 interface PaymentMethod {
   id: string
@@ -32,61 +33,26 @@ type FormValues = {
   transactionCode?: string
 }
 
-const ConfirmOrderModal = ({
+const ConfirmOrderWithTicketClassModal = ({
   event,
   isOpen,
   onCloseModal,
-  selectedSeats,
+  selectedTicketPrices,
 }: {
   event: Event
   isOpen: boolean
   onCloseModal: (options?: { resetSeat?: boolean }) => void
-  selectedSeats: SelectedSeat[]
+  selectedTicketPrices: Array<{
+    ticketPrice: TicketPrice
+    quantity: number
+  }>
 }) => {
   const { toast } = useToast()
   const searchParams = useSearchParams()
   const eventScheduleId = searchParams.get('eventScheduleId')
 
-  const ticketSelected = useMemo(() => {
-    return selectedSeats.reduce(
-      (obj, item) => {
-        const ticketId = item?.ticketPrice?.id
-        if (!obj[ticketId]) {
-          obj[ticketId] = {
-            id: ticketId,
-            ticketName: item.ticketPrice?.name,
-            seats: [],
-            total: 0,
-            quantity: 0,
-            currency: item.ticketPrice?.currency,
-          }
-        }
-        obj[ticketId].seats.push(item.label)
-        obj[ticketId].total += item.ticketPrice?.price || 0
-        obj[ticketId].quantity += 1
-
-        return obj
-      },
-      {} as Record<
-        string,
-        {
-          id: string
-          ticketName: string
-          seats: string[]
-          total: number
-          quantity: number
-          currency?: string
-        }
-      >,
-    )
-  }, [selectedSeats])
-
   const paymentMethods: PaymentMethod[] = [
-    // { id: 'vnpay', name: 'Banking Application (VNPay)', icon: <CreditCard className="h-5 w-5" /> },
-    { id: PAYMENT_METHODS.ZALOPAY, name: 'ZaloPay', icon: <CreditCard className="h-5 w-5" /> },
-    // { id: 'vietqr', name: 'VietQR', icon: <QrCode className="h-5 w-5" /> },
-    // { id: 'momo', name: 'Momo Wallet', icon: <CreditCard className="h-5 w-5" /> },
-    // { id: 'card', name: 'International Payment Card', icon: <CreditCard className="h-5 w-5" /> },
+    { id: PAYMENT_METHODS.ZALOPAY, name: 'Zalopay', icon: <ZalopayIcon /> },
     // {
     //   id: PAYMENT_METHODS.BANK_TRANSFER,
     //   name: 'Chuyển khoản ngân hàng (quét mã QR)',
@@ -95,7 +61,7 @@ const ConfirmOrderModal = ({
   ]
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>(
-    PAYMENT_METHODS.BANK_TRANSFER,
+    PAYMENT_METHODS.ZALOPAY,
   )
 
   const {
@@ -117,18 +83,15 @@ const ConfirmOrderModal = ({
         order: {
           currency: 'VND',
           promotionCode,
-          orderItems: selectedSeats.map((seat) => ({
-            price: seat.ticketPrice?.price || 0,
-            quantity: 1,
-            seat: seat.label,
-            eventId: seat.eventId,
-            ticketPriceId: seat.ticketPrice.id,
+          orderItems: selectedTicketPrices.map((sltTkPrice) => ({
+            price: sltTkPrice.ticketPrice?.price || 0,
+            quantity: sltTkPrice.quantity,
+            eventId: event.id,
+            ticketPriceId: sltTkPrice.ticketPrice.id,
             eventScheduleId: eventScheduleId,
           })),
         },
       }
-      console.log('bodyData', bodyData)
-      debugger
 
       const result = await axios
         .post(`/api/${selectedPaymentMethod}/order`, bodyData)
@@ -151,6 +114,7 @@ const ConfirmOrderModal = ({
         title: 'Thao tác không thành công',
         description: messageError,
         variant: 'destructive',
+        duration: 5000,
       })
     }
   }
@@ -176,8 +140,6 @@ const ConfirmOrderModal = ({
         })
         .then((res) => res.data)
 
-      console.log('result', promotionInfo)
-
       toast({
         title: 'Thành công',
         description: 'Đã áp dụng mã giảm giá',
@@ -196,23 +158,56 @@ const ConfirmOrderModal = ({
     }
   }
 
-  const calculateTotal = useMemo(() => {
-    return Object.values(ticketSelected).reduce((sum, tk) => sum + tk.total, 0) || 0
-  }, [ticketSelected])
+  // refactor this code
 
-  const calculateTotalWithPromotion = useMemo(() => {
-    if (!promotionInfo) {
-      return calculateTotal
+  const calculateTotal = (() => {
+    if (promotionInfo) {
+      const appliedTicketClasses = promotionInfo?.appliedTicketClasses || []
+
+      let totalAmountThatAppliedDiscount = 0
+      let totalAmountNotThatAppliedDiscount = 0
+
+      for (const tk of selectedTicketPrices) {
+        const appliedForTicket = appliedTicketClasses.some(
+          (applied) => applied.ticketClass === tk.ticketPrice?.name,
+        )
+        const price = tk.ticketPrice?.price || 0
+        if (appliedForTicket) {
+          totalAmountThatAppliedDiscount += price * (Number(tk.quantity) || 0)
+        } else {
+          totalAmountNotThatAppliedDiscount += price * (Number(tk.quantity) || 0)
+        }
+      }
+
+      const amountBeforeDiscount =
+        totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount
+
+      if (promotionInfo.discountType === 'percentage') {
+        totalAmountThatAppliedDiscount -=
+          (totalAmountThatAppliedDiscount * promotionInfo.discountValue) / 100
+      } else if (promotionInfo.discountType === 'fixed_amount') {
+        totalAmountThatAppliedDiscount =
+          totalAmountThatAppliedDiscount - promotionInfo.discountValue
+      }
+
+      const amount = totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount
+
+      return {
+        amountBeforeDiscount,
+        amount,
+      }
+    } else {
+      const amount =
+        selectedTicketPrices?.reduce((sum, tk) => {
+          const price = tk.ticketPrice?.price || 0
+          sum += price * (Number(tk.quantity) || 0)
+
+          return sum
+        }, 0) || 0
+
+      return { amountBeforeDiscount: amount, amount }
     }
-
-    if (promotionInfo.discountType === 'percentage') {
-      return calculateTotal - (calculateTotal * promotionInfo.discountValue) / 100
-    } else if (promotionInfo.discountType === 'fixed_amount') {
-      return calculateTotal - promotionInfo.discountValue
-    }
-
-    return calculateTotal
-  }, [calculateTotal, promotionInfo])
+  })()
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onCloseModal()}>
@@ -299,7 +294,7 @@ const ConfirmOrderModal = ({
                           className="flex items-center gap-2 cursor-pointer w-full"
                         >
                           {method.icon}
-                          {method.name}
+                          {/* {method.name} */}
                         </Label>
                       </div>
                     ))}
@@ -314,11 +309,13 @@ const ConfirmOrderModal = ({
                 <div className="mb-6">
                   <h3 className="font-medium text-lg mb-2">Thông tin vé</h3>
                   <Separator className="my-4" />
-                  <h4 className="font-medium mb-2">Ghế đã chọn:</h4>
-                  {selectedSeats.map((seat) => (
-                    <div key={seat.id} className="flex justify-between mb-2">
-                      <span>Ghế {seat.label}</span>
-                      <span>{formatMoney(seat.ticketPrice?.price || 0)}</span>
+                  <h4 className="font-medium mb-2">Vé đã chọn:</h4>
+                  {selectedTicketPrices.map((tkPrice, idx) => (
+                    <div key={idx} className="flex justify-between mb-2">
+                      <span>Vé {tkPrice.ticketPrice?.name}</span>
+                      <span>
+                        {tkPrice.quantity} x {formatMoney(tkPrice.ticketPrice?.price || 0)}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -342,6 +339,17 @@ const ConfirmOrderModal = ({
                       Dùng mã
                     </Button>
                   </div>
+                  {!!promotionInfo?.appliedTicketClasses?.length && (
+                    <div className="italic text-sm">
+                      Mã chỉ được áp dụng cho các hạng vé:{' '}
+                      {promotionInfo.appliedTicketClasses.map((tk, idx) => (
+                        <React.Fragment key={idx}>
+                          <b>{tk.ticketClass}</b>
+                          {idx < (promotionInfo.appliedTicketClasses as any).length - 1 && ', '}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {promotionInfo && (
@@ -366,13 +374,13 @@ const ConfirmOrderModal = ({
                 <div className="flex justify-between items-center mb-6">
                   <span className="text-base font-bold">Tổng số chưa giảm:</span>
                   <span className="text-lg font-bold text-primary">
-                    {formatMoney(calculateTotal)}
+                    {formatMoney(calculateTotal.amountBeforeDiscount)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mb-6">
                   <span className="text-base font-bold">Tổng số tiền thanh toán:</span>
                   <span className="text-lg font-bold text-primary">
-                    {formatMoney(calculateTotalWithPromotion)}
+                    {formatMoney(calculateTotal.amount)}
                   </span>
                 </div>
 
@@ -393,6 +401,7 @@ const ConfirmOrderModal = ({
                       </Button>
                       <Button
                         variant="outline"
+                        type="button"
                         className="cursor-pointer"
                         onClick={() => onCloseModal()}
                         disabled={isSubmitting}
@@ -427,6 +436,7 @@ const ConfirmOrderModal = ({
                         Xác nhận và Qua trang thanh toán
                       </Button>
                       <Button
+                        type="button"
                         variant="outline"
                         className="cursor-pointer"
                         onClick={() => onCloseModal()}
@@ -453,4 +463,4 @@ const ConfirmOrderModal = ({
   )
 }
 
-export default ConfirmOrderModal
+export default ConfirmOrderWithTicketClassModal
