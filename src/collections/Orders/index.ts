@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { afterChangeStatus } from './hooks/afterChangeStatus'
+import { ORDER_STATUSES } from './constants'
 
 export const Orders: CollectionConfig = {
   slug: 'orders',
@@ -20,12 +21,7 @@ export const Orders: CollectionConfig = {
       name: 'status',
       type: 'select',
       defaultValue: 'processing',
-      options: [
-        { label: 'Processing', value: 'processing' },
-        { label: 'Canceled', value: 'canceled' },
-        { label: 'Completed', value: 'completed' },
-        { label: 'Failed', value: 'failed' },
-      ],
+      options: ORDER_STATUSES,
       hooks: {
         afterChange: [afterChangeStatus],
       },
