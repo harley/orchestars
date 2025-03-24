@@ -59,18 +59,6 @@ export const Users: CollectionConfig = {
       required: false,
     },
     {
-      name: 'role',
-      type: 'select',
-      defaultValue: 'customer',
-      options: [
-        {
-          label: 'Customer',
-          value: 'customer',
-        },
-      ],
-      required: false,
-    },
-    {
       name: 'lastActive',
       type: 'date',
       required: false,
