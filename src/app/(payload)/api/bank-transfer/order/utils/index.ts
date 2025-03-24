@@ -7,6 +7,7 @@ import { generateCode } from '@/utilities/generateCode'
 import { isAfter, isBefore } from 'date-fns'
 import { USER_PROMOTION_REDEMPTION_STATUS } from '@/collections/Promotion/constants/status'
 import { ORDER_STATUS } from '@/collections/Orders/constants'
+import { EVENT_STATUS } from '@/collections/Events/constants/status'
 
 export const checkSeatAvailable = async ({
   orderItems,
@@ -195,6 +196,21 @@ export const checkEvents = async ({
   }
 
   for (const event of events) {
+    if (event.status !== EVENT_STATUS.published_open_sales.value) {
+      switch (event.status) {
+        case EVENT_STATUS.draft.value:
+          throw new Error('Sự kiện không tồn tại')
+        case EVENT_STATUS.published_upcoming.value:
+          throw new Error('Sự kiện chưa được mở bán')
+        case EVENT_STATUS.completed.value:
+          throw new Error('Sự kiện đã đóng bán')
+        case EVENT_STATUS.cancelled.value:
+          throw new Error('Sự kiện đã bị hủy')
+        default:
+          throw new Error('Sự kiện không tồn tại')
+      }
+    }
+
     const hasValidTicket = orderItems.some((oItem) => {
       if (oItem.eventId !== event.id) return false
 
