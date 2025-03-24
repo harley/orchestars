@@ -6,6 +6,7 @@ import { Event, Payment, Promotion, User } from '@/payload-types'
 import { generateCode } from '@/utilities/generateCode'
 import { isAfter, isBefore } from 'date-fns'
 import { USER_PROMOTION_REDEMPTION_STATUS } from '@/collections/Promotion/constants/status'
+import { ORDER_STATUS } from '@/collections/Orders/constants'
 
 export const checkSeatAvailable = async ({
   orderItems,
@@ -121,17 +122,27 @@ export const checkTicketClassAvailable = async ({
     const existingTicketClasses = await payload.db.drizzle
       .execute(
         `
-    SELECT ticket.ticket_price_name as "ticketPriceName", SUM(order_item.quantity) as total
-    FROM tickets ticket
-    LEFT JOIN order_items order_item ON ticket.order_item_id = order_item.id
-    LEFT JOIN orders ord ON ord.id = order_item.order_id
-    WHERE 
-      ( (ticket.status IN ('booked', 'hold')) OR (ticket.status = 'pending_payment' AND ord.expire_at >= '${currentTime}') )
-      AND ticket.ticket_price_name = '${ticketPriceInfo.name}'
-      AND ticket.event_id = ${event.id}
-      AND ticket.event_schedule_id = '${inputOrderItem.eventScheduleId}'
-    GROUP BY ticket.ticket_price_name
-    `,
+        SELECT 
+          ticket.ticket_price_name AS "ticketPriceName", SUM(order_item.quantity) AS total
+        FROM order_items order_item
+        INNER JOIN orders ord  ON ord.id = order_item.order_id
+        INNER JOIN (
+            SELECT DISTINCT ON (order_item_id) * FROM tickets tk where tk.event_id=${event.id} ORDER BY order_item_id, id
+        ) ticket 
+            ON ticket.order_item_id = order_item.id
+
+        WHERE 
+            ( 
+              (ord.status = '${ORDER_STATUS.completed.value}')
+              OR
+              (ord.status = '${ORDER_STATUS.processing.value}' AND ord.expire_at >= '${currentTime}')
+            )
+            AND order_item.event_id = ${event.id}
+            AND ticket.ticket_price_name = '${ticketPriceInfo.name}'
+            AND ticket.event_schedule_id = '${inputOrderItem.eventScheduleId}'
+
+        GROUP BY ticket.ticket_price_name
+      `,
       )
       .then((result) =>
         (result.rows || []).reduce(
@@ -491,26 +502,34 @@ export const createOrderAndTicketsWithTicketClassType = async ({
       throw new Error('Loại vé không tồn tại')
     }
 
-    return payload.create({
-      collection: 'tickets',
-      data: {
-        ticketCode: generateCode('TK'),
-        attendeeName: `${customerData.firstName} ${customerData.lastName}`,
-        status: 'pending_payment',
-        ticketPriceInfo: {
-          ...(ticketPriceInfo || {}),
-          ticketPriceId: ticketPriceInfo?.id,
-          name: ticketPriceInfo?.name,
-          price: ticketPriceInfo?.price,
-        },
-        ticketPriceName: ticketPriceInfo?.name,
-        event: itemInput.eventId,
-        eventScheduleId: itemInput.eventScheduleId,
-        orderItem: orderItem?.id,
-        user: customerData.id,
-      },
-      req: { transactionID },
-    })
+    const promises = []
+
+    for (let i = 1; i <= orderItem.quantity; i++) {
+      promises.push(
+        payload.create({
+          collection: 'tickets',
+          data: {
+            ticketCode: generateCode('TK'),
+            attendeeName: `${customerData.firstName} ${customerData.lastName}`,
+            status: 'pending_payment',
+            ticketPriceInfo: {
+              ...(ticketPriceInfo || {}),
+              ticketPriceId: ticketPriceInfo?.id,
+              name: ticketPriceInfo?.name,
+              price: ticketPriceInfo?.price,
+            },
+            ticketPriceName: ticketPriceInfo?.name,
+            event: itemInput.eventId,
+            eventScheduleId: itemInput.eventScheduleId,
+            orderItem: orderItem?.id,
+            user: customerData.id,
+          },
+          req: { transactionID },
+        }),
+      )
+    }
+
+    return Promise.all(promises)
   })
 
   await Promise.all(ticketPromises)
