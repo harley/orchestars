@@ -407,6 +407,7 @@ export const createOrderAndTickets = async ({
         attendeeName: `${customerData.firstName} ${customerData.lastName}`,
         seat: itemInput.seat,
         status: 'pending_payment',
+        ticketPriceName: ticketPriceInfo.name,
         ticketPriceInfo: {
           ticketPriceId: ticketPriceInfo.id,
           name: ticketPriceInfo.name,
@@ -416,6 +417,7 @@ export const createOrderAndTickets = async ({
         eventScheduleId: itemInput.eventScheduleId,
         orderItem: orderItem?.id,
         user: customerData.id,
+        order: newOrder.id,
       },
       req: { transactionID },
     })
@@ -539,6 +541,7 @@ export const createOrderAndTicketsWithTicketClassType = async ({
             eventScheduleId: itemInput.eventScheduleId,
             orderItem: orderItem?.id,
             user: customerData.id,
+            order: newOrder.id,
           },
           req: { transactionID },
         }),
