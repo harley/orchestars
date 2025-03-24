@@ -256,14 +256,12 @@ export const createCustomerIfNotExist = async ({
     // create new user
     customerData = await payload.create({
       collection: 'users',
-      // quick fix for generate default password, need to update later
       data: {
         ...customer,
         phoneNumber: customer.phoneNumber, // is using
         phoneNumbers: [
           { isUsing: true, createdAt: new Date().toISOString(), phone: customer.phoneNumber },
         ],
-        role: 'customer',
       },
       req: { transactionID },
     })
