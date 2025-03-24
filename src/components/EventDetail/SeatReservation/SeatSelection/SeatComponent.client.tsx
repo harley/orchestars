@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/hooks/use-toast'
-import { Loader2, XCircle } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { isSameDay } from 'date-fns'
 import { SeatToolKitItem, SelectedSeat, TicketPrice } from '@/components/EventDetail/types'
 import SeatMapToolkit from './SeatToolkit'
