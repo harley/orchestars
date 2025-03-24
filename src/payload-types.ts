@@ -414,7 +414,6 @@ export interface User {
   username?: string | null;
   firstName?: string | null;
   lastName?: string | null;
-  role?: 'customer' | null;
   lastActive?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -977,6 +976,8 @@ export interface Ticket {
   eventScheduleId?: string | null;
   eventDate?: string | null;
   orderItem?: (number | null) | OrderItem;
+  order?: (number | null) | Order;
+  orderCode?: string | null;
   status?: ('booked' | 'pending_payment' | 'hold' | 'cancelled') | null;
   updatedAt: string;
   createdAt: string;
@@ -1740,7 +1741,6 @@ export interface UsersSelect<T extends boolean = true> {
   username?: T;
   firstName?: T;
   lastName?: T;
-  role?: T;
   lastActive?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1917,6 +1917,8 @@ export interface TicketsSelect<T extends boolean = true> {
   eventScheduleId?: T;
   eventDate?: T;
   orderItem?: T;
+  order?: T;
+  orderCode?: T;
   status?: T;
   updatedAt?: T;
   createdAt?: T;
