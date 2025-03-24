@@ -74,6 +74,15 @@ export const Tickets: CollectionConfig = {
       name: 'orderItem',
       type: 'relationship',
       relationTo: 'orderItems',
+      maxDepth: 1,
+      hasMany: false,
+    },
+    {
+      name: "order",
+      type: 'relationship',
+      relationTo: 'orders',
+      maxDepth: 1,
+      hasMany: false,
     },
     {
       name: 'status',
