@@ -14,6 +14,8 @@ import { getEventCached } from './actions'
 import UpcomingSaleBanner from '@/components/EventDetail/UpcomingSale'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
 import { checkBookedOrPendingPaymentSeats } from '@/app/(payload)/api/bank-transfer/order/utils'
+import { getSeatHoldings } from '@/app/(payload)/api/seat-holding/seat/utils'
+import { cookies } from 'next/headers'
 
 // export const dynamic = 'force-dynamic'
 export const revalidate = 3600
@@ -47,6 +49,18 @@ const EventDetailPage = async (props: {
       eventScheduleId: searchParams.eventScheduleId,
       payload,
     }).then((seats) => seats.map((s) => s.seatName))
+
+    const cookieStore = await cookies()
+    const seatHoldingCode = cookieStore.get('seatHoldingCode')?.value
+
+    const seatHoldings = await getSeatHoldings({
+      eventId: eventDetail.id,
+      eventScheduleId: searchParams.eventScheduleId,
+      payload,
+      notEqualSeatHoldingCode: seatHoldingCode,
+    })
+
+    unavailableSeats = [...unavailableSeats, ...seatHoldings]
   }
 
   return (
