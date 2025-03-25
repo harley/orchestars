@@ -15,6 +15,32 @@ export const Tickets: CollectionConfig = {
       relationTo: 'users',
     },
     {
+      name: 'userEmail',
+      type: 'text',
+      virtual: true,
+      admin: {
+        readOnly: true,
+      },
+      hooks: {
+        afterRead: [
+          async ({ req, data }) => {
+            if (!data?.user) return null
+
+            const user = await req.payload
+              .findByID({
+                collection: 'users',
+                depth: 0,
+                id: data.user,
+              })
+              .then((res) => res)
+              .catch(() => null)
+
+            return user?.email || null
+          },
+        ],
+      },
+    },
+    {
       name: 'ticketCode',
       type: 'text',
     },
