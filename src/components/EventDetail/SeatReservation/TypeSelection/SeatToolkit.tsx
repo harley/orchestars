@@ -4,7 +4,7 @@ import SeatToolkit from '@mezh-hq/react-seat-toolkit'
 import { Armchair, Loader2 } from 'lucide-react'
 import seatsJson from '@/components/EventDetail/data/seat-maps/seats.json'
 import texts from '@/components/EventDetail/data/seat-maps/texts.json'
-import { categories } from '../data/seat-maps/categories'
+import { categories } from '@/components/EventDetail/data/seat-maps/categories'
 import {
   Dialog,
   DialogContent,
@@ -52,53 +52,6 @@ const SeatMapToolkit = ({
     }
   }, [unavailableSeats])
 
-  // const handleSeatClick = (seat: any) => {
-  //   const seatRowChar = seat.label[0];
-  //   const seatNumber = parseInt(seat.id.split('-')[1]);
-
-  //   const selectedSeatNumbersInRow = seats
-  //   .filter((s) => s.status === 'Reserved' && s.label?.[0] === seatRowChar)
-  //   .map((s) => parseInt(s.id.split('-')[1] ?? '0', 10));
-
-  //   const isSelectedSeatAdjacentToAnySeatInSeatsOnRow = selectedSeatNumbersInRow.length === 0 ||
-  //   selectedSeatNumbersInRow.some((num) => Math.abs(num - seatNumber) === 1);
-  //   if (
-  //     seat.status === SeatStatus.Available &&
-  //     !isSelectedSeatAdjacentToAnySeatInSeatsOnRow
-  //   ) {
-  //     setShowModal(true)
-  //     return
-  //   }
-
-  //   if (seat.status !== SeatStatus.Unavailable && seat.status !== SeatStatus.Locked ) {
-  //     onSelectSeat(seat)
-  //     setSeats((prevSeats) => {
-  //       return prevSeats.map((s) => {
-  //         const seatNewStatus = () =>{
-  //           if (s.status === SeatStatus.Reserved) {
-  //             return SeatStatus.Available
-  //           }
-  //           else if (isSelectedSeatAdjacentToAnySeatInSeatsOnRow) {
-  //             return SeatStatus.Reserved
-  //           } else {
-  //             return SeatStatus.Available
-  //           }
-  //         }
-  //         if (
-  //           s.id === seat.id &&
-  //           s.status !== SeatStatus.Unavailable &&
-  //           s.status !== SeatStatus.Locked
-  //         ) {
-  //           return {
-  //             ...s,
-  //             status: seatNewStatus(),
-  //           }
-  //         }
-  //         return s
-  //       })
-  //     })
-  //   }
-  // }
 
   return (
     <div className="relative">
@@ -121,11 +74,6 @@ const SeatMapToolkit = ({
             },
           },
         }}
-        events={
-          {
-            // onSeatClick: handleSeatClick,
-          }
-        }
         data={{
           name: 'Categorized Example',
           categories: categories,
