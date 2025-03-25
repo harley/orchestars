@@ -13,6 +13,7 @@ import DetailDescriptionClient from '@/components/EventDetail/DetailDescription/
 import { getEventCached } from './actions'
 import UpcomingSaleBanner from '@/components/EventDetail/UpcomingSale'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
+import { checkBookedOrPendingPaymentSeats } from '@/app/(payload)/api/bank-transfer/order/utils'
 
 // export const dynamic = 'force-dynamic'
 export const revalidate = 3600
@@ -40,19 +41,12 @@ const EventDetailPage = async (props: {
   if (searchParams.eventScheduleId && !isUpcoming) {
     const payloadConfig = await config
     const payload = await getPayload({ config: payloadConfig })
-    unavailableSeats = await payload
-      .find({
-        collection: 'tickets',
-        where: {
-          status: { in: ['booked', 'pending_payment', 'hold'] },
-          event: { equals: eventDetail.id },
-          eventScheduleId: { equals: searchParams.eventScheduleId },
-        },
-        select: { seat: true },
-        limit: 1000,
-      })
-      .then((res) => res.docs.map((tk) => tk.seat as string).filter((exist) => !!exist))
-      .catch(() => [])
+
+    unavailableSeats = await checkBookedOrPendingPaymentSeats({
+      eventId: eventDetail.id,
+      eventScheduleId: searchParams.eventScheduleId,
+      payload,
+    }).then((seats) => seats.map((s) => s.seatName))
   }
 
   return (

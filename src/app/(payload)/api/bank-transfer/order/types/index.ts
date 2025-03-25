@@ -14,6 +14,8 @@ export interface NewOrderItem {
   eventScheduleId: string
 }
 
+export type NewOrderItemWithBookingType = Required<NewOrderItem>
+
 export interface NewInputOrder {
   currency: string
   orderItems: NewOrderItem[]

@@ -7,9 +7,9 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Check, CreditCard, Info, X, Loader2 } from 'lucide-react'
+import { Check, Info, X, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { SelectedSeat } from '../types'
+import { SelectedSeat } from '../../types'
 import { useToast } from '@/hooks/use-toast'
 import axios from 'axios'
 import { Event, Promotion } from '@/payload-types'
@@ -17,6 +17,7 @@ import { useSearchParams } from 'next/navigation'
 
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 import { formatMoney } from '@/utilities/formatMoney'
+import ZalopayIcon from '@/components/Icons/Zalopay'
 
 interface PaymentMethod {
   id: string
@@ -82,11 +83,7 @@ const ConfirmOrderModal = ({
   }, [selectedSeats])
 
   const paymentMethods: PaymentMethod[] = [
-    // { id: 'vnpay', name: 'Banking Application (VNPay)', icon: <CreditCard className="h-5 w-5" /> },
-    { id: PAYMENT_METHODS.ZALOPAY, name: 'ZaloPay', icon: <CreditCard className="h-5 w-5" /> },
-    // { id: 'vietqr', name: 'VietQR', icon: <QrCode className="h-5 w-5" /> },
-    // { id: 'momo', name: 'Momo Wallet', icon: <CreditCard className="h-5 w-5" /> },
-    // { id: 'card', name: 'International Payment Card', icon: <CreditCard className="h-5 w-5" /> },
+    { id: PAYMENT_METHODS.ZALOPAY, name: '', icon: <ZalopayIcon /> },
     // {
     //   id: PAYMENT_METHODS.BANK_TRANSFER,
     //   name: 'Chuyển khoản ngân hàng (quét mã QR)',
@@ -95,7 +92,7 @@ const ConfirmOrderModal = ({
   ]
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>(
-    PAYMENT_METHODS.BANK_TRANSFER,
+    PAYMENT_METHODS.ZALOPAY,
   )
 
   const {
@@ -113,7 +110,7 @@ const ConfirmOrderModal = ({
         transaction: {
           code: transactionCode,
         },
-
+        bookingType: 'seat',
         order: {
           currency: 'VND',
           promotionCode,
@@ -127,8 +124,6 @@ const ConfirmOrderModal = ({
           })),
         },
       }
-      console.log('bodyData', bodyData)
-      debugger
 
       const result = await axios
         .post(`/api/${selectedPaymentMethod}/order`, bodyData)
