@@ -110,32 +110,34 @@ export const Tickets: CollectionConfig = {
       maxDepth: 1,
       hasMany: false,
     },
-    // {
-    //   name: "orderCode",
-    //   type: 'text',
-    //   virtual: true,
-    //   hooks: {
-    //     afterRead: [
-    //       async ({ context, originalDoc, req }) => {
+    {
+      name: "orderCode",
+      type: 'text',
+      virtual: true,
+      admin: {
+        readOnly: true,
+      },
+      hooks: {
+        afterRead: [
+          async ({ req, data }) => {
+            if (data?.order) {
+              const order = await req.payload
+                .findByID({
+                  collection: 'orders',
+                  depth: 0,
+                  id: data.order,
+                })
+                .then((res) => res?.orderCode)
+                .catch(() => null)
 
-    //         if (context.triggerAfterLookup === false) {
-    //           return;
-    //         }
+              return order
+            }
 
-    //         if (originalDoc?.order) {
-    //             const order = await req.payload.findByID({
-    //               collection: "orders",
-    //               id: originalDoc?.order,
-    //               context: {
-    //                 triggerAfterLookup: false, // Prevent recursive triggers
-    //               },
-    //             });
-    //             return order?.orderCode;
-    //           }
-    //         }
-    //     ],
-    //   },
-    // },
+            return null
+          }
+        ],
+      },
+    },
     {
       name: 'status',
       type: 'select',
