@@ -960,6 +960,7 @@ export interface Ticket {
   id: number;
   attendeeName?: string | null;
   user?: (number | null) | User;
+  userEmail?: string | null;
   ticketCode?: string | null;
   seat?: string | null;
   ticketPriceName?: string | null;
@@ -1908,6 +1909,7 @@ export interface PaymentsSelect<T extends boolean = true> {
 export interface TicketsSelect<T extends boolean = true> {
   attendeeName?: T;
   user?: T;
+  userEmail?: T;
   ticketCode?: T;
   seat?: T;
   ticketPriceName?: T;
