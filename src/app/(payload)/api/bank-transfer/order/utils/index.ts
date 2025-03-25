@@ -708,9 +708,9 @@ export const calculateTotalDiscount = ({
         )
 
         // Apply to all tickets if appliedTicketClasses is empty
-        const appliedForTicket = appliedTicketClasses.length === 0 || appliedTicketClasses.some(
-          (applied) => applied.ticketClass === ticketPriceInfo?.name,
-        )
+        const appliedForTicket =
+          appliedTicketClasses.length === 0 ||
+          appliedTicketClasses.some((applied) => applied.ticketClass === ticketPriceInfo?.name)
         const price = orderItem.price || 0
         if (appliedForTicket) {
           totalAmountThatAppliedDiscount += price * (Number(orderItem.quantity) || 0)
@@ -775,9 +775,9 @@ export const calculateTotalDiscountBookingTypeSeat = ({
         )
 
         // Apply to all tickets if appliedTicketClasses is empty
-        const appliedForTicket = appliedTicketClasses.length === 0 || appliedTicketClasses.some(
-          (applied) => applied.ticketClass === ticketPriceInfo?.name,
-        )
+        const appliedForTicket =
+          appliedTicketClasses.length === 0 ||
+          appliedTicketClasses.some((applied) => applied.ticketClass === ticketPriceInfo?.name)
         const price = ticketPriceInfo?.price || 0
         const quantity = 1 // for booking type seat, quantity always 1
         if (appliedForTicket) {
@@ -1001,6 +1001,8 @@ export const checkRemainingQuantitySeats = async ({
 
     console.log('countQuantityTickets', countQuantityTickets)
 
+    console.log('seatsByDateTicketClassName', seatsByDateTicketClassName)
+
     for (const dateTicketClass of seatsByDateTicketClassName) {
       const exist = countQuantityTickets.find(
         (c) =>
@@ -1018,6 +1020,12 @@ export const checkRemainingQuantitySeats = async ({
         if (remaining < dateTicketClass.quantity) {
           throw new Error(
             `Ghế hạng vé [${dateTicketClass.ticketPriceName}] cho ngày đã chọn chỉ còn tối đa ${remaining} vé! Vui lòng chọn lại`,
+          )
+        }
+      } else {
+        if (dateTicketClass.quantity > dateTicketClass.totalTicketQuantity) {
+          throw new Error(
+            `Ghế hạng vé [${dateTicketClass.ticketPriceName}] cho ngày đã chọn chỉ còn tối đa ${dateTicketClass.totalTicketQuantity} vé! Vui lòng chọn lại`,
           )
         }
       }
