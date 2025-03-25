@@ -6,8 +6,8 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     UPDATE payload_jobs 
     SET task_slug = 
       CASE 
-        WHEN task_slug = 'inline' THEN 'inline'
-        WHEN task_slug = 'schedulePublish' THEN 'schedulePublish'
+        WHEN task_slug = 'inline' THEN 'inline'::enum_payload_jobs_task_slug
+        WHEN task_slug = 'schedulePublish' THEN 'schedulePublish'::enum_payload_jobs_task_slug
         ELSE NULL 
       END;
   `)
