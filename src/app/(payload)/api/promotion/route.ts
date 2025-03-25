@@ -47,12 +47,9 @@ export async function POST(request: NextRequest) {
     if (!promotion) {
       throw new Error('Mã giảm giá không hợp lệ')
     }
-
-    // maxRedemptions can be 0 which is falsy but valid
-    if (promotion.maxRedemptions === undefined || promotion.maxRedemptions === null) {
-      throw new Error('Mã giảm giá không hợp lệ - Chưa cấu hình số lượt sử dụng tối đa')
+    if (!promotion.maxRedemptions || promotion.maxRedemptions < 1) {
+      throw new Error('Mã giảm giá đã hết lượt sử dụng')
     }
-
     const currentTime = new Date()
     if (promotion.startDate && isAfter(promotion.startDate, currentTime)) {
       throw new Error('Không thể dùng mã giảm giá trước thời gian quy định')
