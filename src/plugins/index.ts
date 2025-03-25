@@ -109,5 +109,6 @@ export const plugins: Plugin[] = [
       collection.admin.group = 'System'
       return collection
     },
+    disableJobsQueue: true,
   }),
 ]
