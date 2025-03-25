@@ -3,6 +3,7 @@ import payload, { Where } from 'payload'
 import config from '@/payload.config'
 import { generatePassword } from '@/utilities/generatePassword'
 import { headers } from 'next/headers'
+import { checkBookedOrPendingPaymentSeats } from '../../bank-transfer/order/utils'
 
 type SeatHoldingRequest = {
   seatName: string
@@ -162,51 +163,34 @@ const checkSeatAvailable = async (body: SeatHoldingRequest) => {
     })
     .then((res) => res.docs)
 
+  console.log('existingSeats', existingSeats)
+
   if (existingSeats?.length) {
-    const unavailableSeats = existingSeats.map((ext) => ext.seatName).join(', ')
+    const unavailableSeats = existingSeats
+      .map((ext) =>
+        (ext.seatName || '')
+          .split(',')
+          .filter((seatName: string) => arrSeatNames.includes(seatName))
+          .join(','),
+      )
+      .join(', ')
     throw new Error(
       `Ghế [${unavailableSeats}] đang được giữ bởi người khác! Vui lòng chọn ghế khác`,
     )
   }
 
   // Check all seats in parallel, grouped by event
-  const existingTicketSeats = await payload
-    .find({
-      collection: 'tickets',
-      limit: arrSeatNames.length,
-      where: {
-        and: [
-          {
-            status: {
-              in: ['booked', 'pending_payment', 'hold'],
-            },
-          },
-          {
-            seat: {
-              in: arrSeatNames,
-            },
-          },
-          {
-            event: {
-              equals: Number(body.eventId),
-            },
-          },
-          {
-            eventScheduleId: {
-              equals: body.eventScheduleId,
-            },
-          },
-        ],
-      },
-      select: {
-        id: true,
-        seat: true,
-      },
-    })
-    .then((res) => res.docs)
+  const existingTicketSeats = await checkBookedOrPendingPaymentSeats({
+    eventId: Number(body.eventId),
+    eventScheduleId: body.eventScheduleId,
+    seats: arrSeatNames,
+    payload,
+  })
+
+  console.log('existingTicketSeats', existingTicketSeats)
 
   if (existingTicketSeats?.length > 0) {
-    const unavailableSeats = existingTicketSeats.map((ticket) => ticket.seat).join(', ')
+    const unavailableSeats = existingTicketSeats.map((ticket) => ticket.seatName).join(', ')
     throw new Error(`Ghế ${unavailableSeats} hiện đã được đặt. Vui lòng chọn ghế khác.`)
   }
 }

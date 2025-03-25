@@ -30,8 +30,10 @@ const TicketPrices = ({
         {ticketPrices?.map((tkPrice) => (
           <div
             key={tkPrice.id}
-            onClick={() => handlePriceSelect(tkPrice as TicketPrice)}
-            className={`flex items-center p-3 rounded-md border cursor-pointer
+            onClick={
+              handleToggleTicketPrice ? () => handlePriceSelect(tkPrice as TicketPrice) : undefined
+            }
+            className={`flex items-center p-3 rounded-md border ${!!handleToggleTicketPrice ? 'cursor-pointer' : ''} 
               ${
                 ticketPricesSelected?.some((slted) => slted.ticketPrice?.id === tkPrice.id)
                   ? 'border-blue-500 bg-blue-50'

@@ -3,7 +3,6 @@ import { generateTicketBookEmailHtml } from '@/mail/templates/TicketBookedEmail'
 
 import { Event, User } from '@/payload-types'
 
-
 export const afterChangeStatus = async ({ value, originalDoc, req }: FieldHookArgs) => {
   // When an order's status is updated to 'completed'
 
@@ -47,16 +46,16 @@ export const afterChangeStatus = async ({ value, originalDoc, req }: FieldHookAr
           eventName: eventName || '',
         })
 
-        await req.payload
-          .sendEmail({
-            to: userEmail,
-            cc: 'receipts@orchestars.vn',
-            subject: 'Ticket Confirmation',
-            html
-          })
-          .catch((error) => {
-            console.error('Error while sending mail ticket', error)
-          })
+        // await req.payload
+        //   .sendEmail({
+        //     to: userEmail,
+        //     cc: 'receipts@orchestars.vn',
+        //     subject: 'Ticket Confirmation',
+        //     html
+        //   })
+        //   .catch((error) => {
+        //     console.error('Error while sending mail ticket', error)
+        //   })
       }
     } catch (error) {
       console.error('Error updating ticket status:', error)
