@@ -1,4 +1,3 @@
-// import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
@@ -91,22 +90,19 @@ export const plugins: Plugin[] = [
       },
     },
   }),
-  // payloadCloudPlugin(),
-  vercelBlobStorage({
-    enabled: true, // Optional, defaults to true
-    // Specify which collections should use Vercel Blob
-    collections: {
-      media: true,
-      exports: true // Configure Vercel Blob storage for the exports collection
-    },
-    // Token provided by Vercel once Blob storage is added to your Vercel project
-    token: process.env.BLOB_READ_WRITE_TOKEN,
-  }),
   importExportPlugin({
     overrideExportCollection: (collection) => {
       collection.admin.group = 'System'
       return collection
     },
     disableJobsQueue: true,
+  }),
+  vercelBlobStorage({
+    enabled: true,
+    collections: {
+      media: true,
+      exports: true,
+    },
+    token: process.env.BLOB_READ_WRITE_TOKEN,
   }),
 ]
