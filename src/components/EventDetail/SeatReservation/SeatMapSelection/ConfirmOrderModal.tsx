@@ -279,7 +279,7 @@ const ConfirmOrderModal = ({
 
                 <Separator className="my-6" />
 
-                <h2 className="text-xl font-semibold mb-4">Chọn phương thức thanh toán</h2>
+                <h2 className="text-xl font-semibold mb-4">Thanh Toán Trang Tiếp Theo (QR/Thẻ)</h2>
 
                 <RadioGroup value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
                   <div className="space-y-2">

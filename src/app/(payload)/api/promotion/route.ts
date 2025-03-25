@@ -19,14 +19,14 @@ export async function POST(request: NextRequest) {
 
     await payload.init({ config })
 
-    // check promotion exist
+    // check promotion exist - case insensitive
     const promotion = await payload
       .find({
         collection: 'promotions',
         limit: 1,
         where: {
           event: { equals: Number(body.eventId) },
-          code: { equals: body.code },
+          code: { equals: body.code.toUpperCase() },
           status: { equals: 'active' },
         },
         select: {
@@ -38,14 +38,18 @@ export async function POST(request: NextRequest) {
           discountType: true,
           discountValue: true,
           status: true,
+          startDate: true,
+          endDate: true,
         },
       })
       .then((res) => res.docs?.[0])
 
-    if (!promotion || !promotion.maxRedemptions) {
+    if (!promotion) {
       throw new Error('Mã giảm giá không hợp lệ')
     }
-
+    if (!promotion.maxRedemptions || promotion.maxRedemptions < 1) {
+      throw new Error('Mã giảm giá đã hết lượt sử dụng')
+    }
     const currentTime = new Date()
     if (promotion.startDate && isAfter(promotion.startDate, currentTime)) {
       throw new Error('Không thể dùng mã giảm giá trước thời gian quy định')

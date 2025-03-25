@@ -610,7 +610,7 @@ export const checkPromotionCode = async ({
   userId: number
   payload: BasePayload
 }) => {
-  // check promotion exist
+  // check promotion exist - case insensitive
   const promotion = await payload
     .find({
       collection: 'promotions',
@@ -618,7 +618,7 @@ export const checkPromotionCode = async ({
       where: {
         status: { equals: 'active' },
         event: { equals: eventId },
-        code: { equals: promotionCode },
+        code: { equals: promotionCode.toUpperCase() },
       },
     })
     .then((res) => res.docs?.[0])
@@ -707,7 +707,8 @@ export const calculateTotalDiscount = ({
           (ticketPrice: any) => ticketPrice.id === orderItem.ticketPriceId,
         )
 
-        const appliedForTicket = appliedTicketClasses.some(
+        // Apply to all tickets if appliedTicketClasses is empty
+        const appliedForTicket = appliedTicketClasses.length === 0 || appliedTicketClasses.some(
           (applied) => applied.ticketClass === ticketPriceInfo?.name,
         )
         const price = orderItem.price || 0
@@ -773,7 +774,8 @@ export const calculateTotalDiscountBookingTypeSeat = ({
           (ticketPrice: any) => ticketPrice.id === orderItem.ticketPriceId,
         )
 
-        const appliedForTicket = appliedTicketClasses.some(
+        // Apply to all tickets if appliedTicketClasses is empty
+        const appliedForTicket = appliedTicketClasses.length === 0 || appliedTicketClasses.some(
           (applied) => applied.ticketClass === ticketPriceInfo?.name,
         )
         const price = ticketPriceInfo?.price || 0
