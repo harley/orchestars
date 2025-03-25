@@ -610,7 +610,7 @@ export const checkPromotionCode = async ({
   userId: number
   payload: BasePayload
 }) => {
-  // check promotion exist
+  // check promotion exist - case insensitive
   const promotion = await payload
     .find({
       collection: 'promotions',
@@ -618,7 +618,7 @@ export const checkPromotionCode = async ({
       where: {
         status: { equals: 'active' },
         event: { equals: eventId },
-        code: { equals: promotionCode },
+        code: { equals: promotionCode.toUpperCase() },
       },
     })
     .then((res) => res.docs?.[0])
