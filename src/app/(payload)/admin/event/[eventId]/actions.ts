@@ -4,39 +4,51 @@ import { getPayload } from 'payload'
 import config from '../../../../../payload.config'
 
 export async function getTicketsForSchedule(eventId: string, scheduleId: string) {
-  const payload = await getPayload({
-    config,
-  })
+  try {
+    const payload = await getPayload({
+      config,
+    })
 
-  console.log('Fetching tickets for schedule:', { eventId, scheduleId })
+    console.log('Fetching tickets for schedule:', { eventId, scheduleId })
 
-  const result = await payload.db.drizzle.execute(`
-    SELECT 
-      ticket.id,
-      ticket.attendee_name AS "attendeeName",
-      ticket.ticket_code AS "ticketCode",
-      ticket.seat,
-      ticket.ticket_price_name AS "ticketPriceName",
-      ticket.status,
-      ord.expire_at AS "expire_at",
-      ticket.created_at AS "createdAt",
-      ticket.updated_at AS "updatedAt"
-    FROM tickets ticket
-    LEFT JOIN orders ord ON ord.id = ticket.order_id
-    WHERE 
-      ticket.event_id = ${Number(eventId)}
-      AND ticket.event_schedule_id = '${scheduleId}'
-    ORDER BY 
-      CASE 
-        WHEN ticket.seat IS NULL THEN 1 
-        ELSE 0 
-      END,
-      ticket.seat
-  `)
+    const result = await payload.db.drizzle.execute(`
+      SELECT 
+        ticket.id,
+        ticket.attendee_name AS "attendeeName",
+        ticket.ticket_code AS "ticketCode",
+        ticket.seat,
+        ticket.ticket_price_name AS "ticketPriceName",
+        ticket.status,
+        ord.expire_at AS "expire_at",
+        ord.promotion_code AS "promotionCode",
+        ticket.created_at AS "createdAt",
+        ticket.updated_at AS "updatedAt"
+      FROM tickets ticket
+      LEFT JOIN orders ord ON ord.id = ticket.order_id
+      WHERE 
+        ticket.event_id = ${Number(eventId)}
+        AND ticket.event_schedule_id = '${scheduleId}'
+      ORDER BY 
+        CASE 
+          WHEN ticket.seat IS NULL THEN 1 
+          ELSE 0 
+        END,
+        ticket.seat
+    `)
 
-  console.log('Total tickets found:', result.rows.length)
+    console.log('Total tickets found:', result.rows.length)
 
-  return result.rows
+    // Transform the data to match the expected format
+    const tickets = result.rows.map((ticket) => ({
+      ...ticket,
+      order: ticket.promotionCode ? { promotion_code: ticket.promotionCode } : undefined,
+    }))
+
+    return tickets
+  } catch (error) {
+    console.error('Error fetching tickets:', error)
+    return []
+  }
 }
 
 export async function assignSeatToTicket(ticketId: string, seat: string | null) {

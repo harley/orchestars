@@ -42,6 +42,9 @@ interface Ticket {
   ticketCode: string
   attendeeName: string
   expire_at?: string
+  order?: {
+    promotion_code: string | null
+  }
 }
 
 interface Props {
@@ -513,7 +516,25 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                               </div>
                             ) : (
                               <>
-                                <span>{ticket.seat || '-'}</span>
+                                <div
+                                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                >
+                                  <span>{ticket.seat || '-'}</span>
+                                  {ticket.order?.promotion_code && (
+                                    <span
+                                      style={{
+                                        fontSize: '0.75rem',
+                                        padding: '0.125rem 0.375rem',
+                                        border: '1px dashed #6b7280',
+                                        borderRadius: '4px',
+                                        color: '#6b7280',
+                                        backgroundColor: 'transparent',
+                                      }}
+                                    >
+                                      {ticket.order.promotion_code}
+                                    </span>
+                                  )}
+                                </div>
                                 {ticket.seat ? (
                                   <button
                                     onClick={async () => {
