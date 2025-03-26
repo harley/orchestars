@@ -39,23 +39,36 @@ export const afterChangeStatus = async ({ value, originalDoc, req }: FieldHookAr
       const userEmail = (tickets?.[0]?.user as User)?.email
       const eventName = (tickets?.[0]?.event as Event)?.title
       if (userEmail) {
-        const ticketCodes = tickets.map((tk) => tk?.ticketCode).filter((code) => !!code) as string[]
-
-        const html = await generateTicketBookEmailHtml({
-          ticketCode: ticketCodes.join(', '),
-          eventName: eventName || '',
-        })
-
-        await req.payload
-          .sendEmail({
-            to: userEmail,
-            cc: 'receipts@orchestars.vn',
-            subject: 'Ticket Confirmation',
-            html,
-          })
-          .catch((error) => {
-            console.error('Error while sending mail ticket', error)
-          })
+        const ticketData = tickets
+          .filter((tk) => !!tk?.ticketCode)
+          .map((tk) => ({
+            ticketCode: tk?.ticketCode as string,
+            seat: tk?.seat as string,
+            eventDate: tk?.eventDate as string,
+          }));
+      
+        // Loop through the ticket data and send an email with a delay of 1 second for each ticket
+        for (const data of ticketData) {
+          const html = await generateTicketBookEmailHtml({
+            ticketCode: data.ticketCode,
+            seat: data.seat,
+            eventName: eventName || '',
+            eventDate: data.eventDate,
+          });
+      
+          await new Promise((resolve) => setTimeout(resolve, 1000));  // Delay of 1 second
+      
+          await req.payload
+            .sendEmail({
+              to: userEmail,
+              cc: 'receipts@orchestars.vn',
+              subject: 'Ticket Confirmation',
+              html,
+            })
+            .catch((error) => {
+              console.error('Error while sending mail ticket', error);
+            });
+        }      
       }
     } catch (error) {
       console.error('Error updating ticket status:', error)

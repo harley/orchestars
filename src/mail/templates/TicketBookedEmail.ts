@@ -1,6 +1,8 @@
 export interface TicketData {
   ticketCode?: string
+  seat?: string
   eventName: string
+  eventDate?: string
 }
 
 export async function generateTicketBookEmailHtml(ticketData: TicketData) {
@@ -41,26 +43,28 @@ export async function generateTicketBookEmailHtml(ticketData: TicketData) {
           <p><strong>Xin chào Quý Khách,</strong><br />
           <em>Dear Valued Guest,</em></p>
 
-          <p> OrcheStars xin cảm ơn bạn đã đặt vé tham dự chương trình hòa nhạc <strong>${ticketData.eventName}</strong>.<br />
-          <em>We appreciate your purchase of tickets to the ${ticketData.eventName} concert.</em></p>
+          <p> OrcheStars xin cảm ơn bạn đã <strong>đặt hàng thành công</strong> cho chương trình hòa nhạc <strong>${ticketData.eventName}</strong>.<br />
+          <em>We appreciate your successful order for the ${ticketData.eventName} concert.</em></p>
 
           <p><strong>Thông tin vé của bạn:</strong><br />
-          <em>Your booking details:</em><br />
-          <strong>Ticket Code: ${ticketData.ticketCode || 'N/A'}</strong></p>
-
-          <p><strong>Chúng tôi xác nhận bạn đã thanh toán thành công. Thông tin số ghế cụ thể và hạng vé sẽ được cập nhật trong vòng 24–48 giờ làm việc tới.</strong><br />
-          <em>Your payment has been successfully confirmed. We will send you the detailed seat and ticket category information within the next 24–48 business hours.</em></p>
-
+          <em>Your Booking Details:</em></p>
+          <ul>
+            <li> Mã vé | Ticket Code: ${ticketData.ticketCode || 'N/A'}</li>
+            ${ticketData?.seat ? `<li>Số ghế | Seat Number: ${ticketData.seat}</li>` : ''}
+            ${ticketData?.eventDate ? `<li>Thời gian | Time: ${ticketData?.eventDate || 'N/A'}</li>` : ''}
+            <li>Địa điểm | Venue: Nhà hát Quân Đội – 140 Cộng Hòa, Phường 4, Quận Tân Bình, TP.HCM</li>
+          </ul>
           <p>
-          Trong thời gian chờ đợi, bạn có thể theo dõi những cập nhật mới nhất trên 
+
+          Trong lúc chờ đến ngày diễn ra chương trình, bạn có thể theo dõi những cập nhật mới nhất trên 
           <a href="https://www.facebook.com/orchestars" target="_blank">OrcheStars Fanpage</a>.<br />
           <em>
-            While waiting, feel free to check out the latest updates on the 
+          In the meantime, feel free to check out the latest updates on our
             <a href="https://www.facebook.com/orchestars" target="_blank">OrcheStars Fanpage</a>.
           </em>
           </p>
         
-          <p>Hẹn gặp bạn tại hòa nhạc <strong>${ticketData.eventName}</strong>!<br />
+          <p>Hẹn gặp bạn tại hòa nhạc ${ticketData.eventName}!<br />
           <em>See you at the ${ticketData.eventName} concert.</em></p>
 
           <p>Trân trọng,<br />
