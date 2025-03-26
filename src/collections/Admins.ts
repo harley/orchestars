@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { isAdminOrSuperAdmin, isSuperAdmin } from '@/access/isAdminOrSuperAdmin'
 
 const Admins: CollectionConfig = {
   slug: 'admins',
@@ -7,6 +8,21 @@ const Admins: CollectionConfig = {
     group: 'System',
   },
   auth: true, // Enable authentication for this collection
+  access: {
+    read: ({ req: { user } }) => {
+      if (!user) return false
+      if (user.role === 'super-admin') return true
+      return {
+        id: {
+          equals: user.id,
+        },
+      }
+    },
+    create: isSuperAdmin,
+    update: isSuperAdmin,
+    delete: isSuperAdmin,
+    admin: isAdminOrSuperAdmin,
+  },
   fields: [
     // Email added by default by auth: true
     {
@@ -25,6 +41,10 @@ const Admins: CollectionConfig = {
       required: true,
       defaultValue: 'admin',
       options: [
+        {
+          label: 'Event Admin',
+          value: 'event-admin',
+        },
         {
           label: 'Admin',
           value: 'admin',
