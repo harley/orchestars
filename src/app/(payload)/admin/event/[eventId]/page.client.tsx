@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { format, formatDistanceToNow } from 'date-fns'
-import { getTicketsForSchedule } from './actions'
+import { getTicketsForSchedule, assignSeatToTicket } from './actions'
 
 interface Event {
   id: string
@@ -44,25 +44,14 @@ interface Props {
   event: Event
 }
 
-const sortSeats = (a: Ticket, b: Ticket) => {
-  if (!a.seat || !b.seat) return 0
-  const aRow = a.seat.match(/[A-Z]+/)?.[0] || ''
-  const bRow = b.seat.match(/[A-Z]+/)?.[0] || ''
-  const aNum = parseInt(a.seat.match(/\d+/)?.[0] || '0')
-  const bNum = parseInt(b.seat.match(/\d+/)?.[0] || '0')
-
-  if (aRow === bRow) {
-    return aNum - bNum
-  }
-  return aRow.localeCompare(bRow)
-}
-
 const AdminEventClient: React.FC<Props> = ({ event }) => {
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null)
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(false)
   const [editingSeatId, setEditingSeatId] = useState<number | null>(null)
   const [newSeatValue, setNewSeatValue] = useState('')
+  const [assignError, setAssignError] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const handleScheduleClick = async (scheduleId: string) => {
     setSelectedScheduleId(scheduleId)
@@ -81,16 +70,38 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
     setEditingSeatId(ticketId)
     const ticket = tickets.find((t) => t.id === ticketId)
     setNewSeatValue(ticket?.seat || '')
+    setAssignError(null)
+    setTimeout(() => {
+      inputRef.current?.focus()
+    }, 0)
   }
 
-  const handleSeatSubmit = (ticketId: number) => {
-    // TODO: Implement backend call
-    console.log('Assigning seat', newSeatValue, 'to ticket', ticketId)
-    setEditingSeatId(null)
-    setNewSeatValue('')
+  const handleSeatSubmit = async (ticketId: number) => {
+    try {
+      setAssignError(null)
+      const result = await assignSeatToTicket(ticketId, newSeatValue, event.id, selectedScheduleId!)
+
+      if (result.error) {
+        setAssignError(result.error)
+        return
+      }
+
+      setTickets((prevTickets) => {
+        return prevTickets.map((ticket) => {
+          if (ticket.id === ticketId) {
+            return { ...ticket, seat: newSeatValue }
+          }
+          return ticket
+        })
+      })
+
+      setEditingSeatId(null)
+      setNewSeatValue('')
+    } catch (error: any) {
+      setAssignError(error.message || 'Failed to assign seat')
+    }
   }
 
-  // Add this helper function to group tickets by row
   const groupTicketsByRow = (tickets: Ticket[]) => {
     const groups = tickets.reduce(
       (acc, ticket) => {
@@ -104,16 +115,16 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
       {} as Record<string, Ticket[]>,
     )
 
-    // Sort each group by seat number
     Object.keys(groups).forEach((row) => {
-      groups[row].sort((a, b) => {
-        const aNum = parseInt(a.seat?.match(/\d+/)?.[0] || '0', 10)
-        const bNum = parseInt(b.seat?.match(/\d+/)?.[0] || '0', 10)
-        return aNum - bNum
-      })
+      if (groups[row]) {
+        groups[row].sort((a, b) => {
+          const aNum = parseInt(a.seat?.match(/\d+/)?.[0] || '0', 10)
+          const bNum = parseInt(b.seat?.match(/\d+/)?.[0] || '0', 10)
+          return aNum - bNum
+        })
+      }
     })
 
-    // Sort the rows alphabetically, but put '-' at the end
     return Object.entries(groups).sort(([a], [b]) => {
       if (a === '-') return 1
       if (b === '-') return -1
@@ -163,7 +174,8 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                     marginTop: '0.5rem',
                     padding: '0.5rem',
                     cursor: 'pointer',
-                    backgroundColor: selectedScheduleId === schedule.id ? '#f0f0f0' : 'transparent',
+                    backgroundColor: selectedScheduleId === schedule.id ? '#374151' : 'transparent',
+                    color: selectedScheduleId === schedule.id ? 'white' : 'inherit',
                     borderRadius: '4px',
                   }}
                   onClick={() => handleScheduleClick(schedule.id)}
@@ -176,7 +188,9 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                       <p>
                         {detail.time} - {detail.name}
                       </p>
-                      <p style={{ color: 'gray' }}>{detail.description}</p>
+                      <p style={{ color: selectedScheduleId === schedule.id ? '#d1d5db' : 'gray' }}>
+                        {detail.description}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -286,9 +300,19 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                             {editingSeatId === ticket.id ? (
                               <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
                                 <input
+                                  ref={inputRef}
                                   type="text"
                                   value={newSeatValue}
                                   onChange={(e) => setNewSeatValue(e.target.value.toUpperCase())}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      handleSeatSubmit(ticket.id)
+                                    } else if (e.key === 'Escape') {
+                                      setEditingSeatId(null)
+                                      setNewSeatValue('')
+                                      setAssignError(null)
+                                    }
+                                  }}
                                   style={{
                                     width: '80px',
                                     padding: '0.25rem',
@@ -296,8 +320,8 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                                     border: '1px solid #ddd',
                                     borderRadius: '4px',
                                     backgroundColor: '#f8fafc',
+                                    color: '#1a1a1a',
                                   }}
-                                  pattern="[A-Z][0-9]+"
                                 />
                                 <button
                                   onClick={() => handleSeatSubmit(ticket.id)}
@@ -333,6 +357,11 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                               </>
                             )}
                           </div>
+                          {assignError && editingSeatId === ticket.id && (
+                            <div style={{ color: '#ef4444', fontSize: '0.875rem' }}>
+                              {assignError}
+                            </div>
+                          )}
                           <div
                             style={{
                               display: 'flex',
