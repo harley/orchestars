@@ -18,15 +18,32 @@ Payload CMS serves as our headless CMS and application framework, providing:
 - Admin UI for content management
 - Database schema management
 - REST and GraphQL APIs
-- Authentication system
+- Authentication system with dedicated Admins collection
 - Access control
 - File storage and management
 
 Key Benefits:
 - Type-safe development with auto-generated TypeScript types
 - Built-in versioning and drafts
-- Extensible admin UI
+- Extensible admin UI with custom components
 - Flexible access control patterns
+- HTTP-only cookie based authentication
+
+### 2. Admin Interface
+
+The admin interface is built using Payload's custom component system, allowing for:
+- Custom pages and views (e.g., `/admin/event/[eventId]` for ticket/seat management)
+- Extended functionality beyond default CRUD operations
+- Seamless integration with Payload's authentication
+- Consistent design using Payload's CSS library
+- Server and Client component support
+
+Admin users are managed through a dedicated `Admins` collection with:
+- Email/password authentication
+- Role-based access (admin, super-admin)
+- Activity tracking (lastActive)
+- Secure session management
+- Profile fields (firstName, lastName)
 
 ### 2. Event Management System
 
@@ -73,6 +90,9 @@ Key Benefits:
 Key collections in Payload CMS:
 ```typescript
 collections: {
+  // Admin & Authentication
+  admins: Admin                   // Admin users with authentication
+  
   // Event Management
   events: Event                    // Event details and configuration
   performers: Performer           // Artists and performers
@@ -193,9 +213,13 @@ ticketPrices: {
 ## Security Measures
 
 - **Authentication**:
-  - Phone verification required
-  - Session management
+  - Payload's built-in authentication for admin users
+  - HTTP-only cookie based session management
+  - Phone verification for customers
   - Rate limiting on auth endpoints
+  - Role-based access control (admin vs super-admin)
+  - Secure password hashing and salting
+  - Session timeout configuration
 
 - **Data Protection**:
   - Input validation
@@ -212,7 +236,8 @@ ticketPrices: {
 
 ### API Access
 - REST and GraphQL endpoints available
-- Authentication required for protected routes
+- Authentication using Payload's built-in system
+- Role-based access control for admin endpoints
 - Rate limiting applied [To be implemented]
 - API versioning strategy
 - Error handling standards
