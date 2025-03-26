@@ -1,15 +1,19 @@
 'use server'
 
 import { getPayload } from 'payload'
-import config from '../../../../../payload.config'
+import config from '@/payload.config'
+
+interface TicketCounts {
+  [ticketPriceName: string]: {
+    [scheduleId: string]: number
+  }
+}
 
 export async function getTicketsForSchedule(eventId: string, scheduleId: string) {
   try {
     const payload = await getPayload({
       config,
     })
-
-    console.log('Fetching tickets for schedule:', { eventId, scheduleId })
 
     const result = await payload.db.drizzle.execute(`
       SELECT 
@@ -35,8 +39,6 @@ export async function getTicketsForSchedule(eventId: string, scheduleId: string)
         END,
         ticket.seat
     `)
-
-    console.log('Total tickets found:', result.rows.length)
 
     // Transform the data to match the expected format
     const tickets = result.rows.map((ticket) => ({
@@ -72,14 +74,11 @@ export async function assignSeatToTicket(ticketId: string, seat: string | null) 
   }
 }
 
-export async function getBookedTicketsCounts(eventId: string) {
+export async function getBookedTicketsCounts(eventId: string): Promise<TicketCounts> {
   const payload = await getPayload({
     config,
   })
 
-  console.log('Fetching booked tickets for event:', eventId)
-
-  const currentTime = new Date().toISOString()
   const result = await payload.db.drizzle.execute(`
     SELECT 
       ticket.ticket_price_name AS "ticketPriceName",
@@ -94,22 +93,18 @@ export async function getBookedTicketsCounts(eventId: string) {
     ORDER BY ticket.ticket_price_name, ticket.event_schedule_id
   `)
 
-  console.log('SQL query result:', result.rows)
-
   // Transform the result into the expected format
-  const countsByScheduleAndPrice = result.rows.reduce(
-    (acc: Record<string, Record<string, number>>, row: any) => {
-      const { ticketPriceName, eventScheduleId, count } = row
-      if (!acc[ticketPriceName]) {
-        acc[ticketPriceName] = {}
-      }
-      acc[ticketPriceName][eventScheduleId] = Number(count)
-      return acc
-    },
-    {},
-  )
+  const countsByScheduleAndPrice = result.rows.reduce<TicketCounts>((acc, row) => {
+    const ticketPriceName = row.ticketPriceName as string
+    const eventScheduleId = row.eventScheduleId as string
+    const count = Number(row.count)
 
-  console.log('Final counts:', JSON.stringify(countsByScheduleAndPrice, null, 2))
+    if (!acc[ticketPriceName]) {
+      acc[ticketPriceName] = {}
+    }
+    acc[ticketPriceName][eventScheduleId] = count
+    return acc
+  }, {})
 
   return countsByScheduleAndPrice
 }
