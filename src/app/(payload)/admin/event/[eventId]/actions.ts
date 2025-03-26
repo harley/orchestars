@@ -2,6 +2,7 @@
 
 import { getPayload } from 'payload'
 import config from '@/payload.config'
+import { sql } from '@payloadcms/db-postgres/drizzle'
 
 interface TicketCounts {
   [ticketPriceName: string]: {
@@ -15,7 +16,7 @@ export async function getTicketsForSchedule(eventId: string, scheduleId: string)
       config,
     })
 
-    const result = await payload.db.drizzle.execute(`
+    const result = await payload.db.drizzle.execute(sql`
       SELECT 
         ticket.id,
         ticket.attendee_name AS "attendeeName",
@@ -31,7 +32,7 @@ export async function getTicketsForSchedule(eventId: string, scheduleId: string)
       LEFT JOIN orders ord ON ord.id = ticket.order_id
       WHERE 
         ticket.event_id = ${Number(eventId)}
-        AND ticket.event_schedule_id = '${scheduleId}'
+        AND ticket.event_schedule_id = ${scheduleId}
       ORDER BY 
         CASE 
           WHEN ticket.seat IS NULL THEN 1 
@@ -79,7 +80,7 @@ export async function getBookedTicketsCounts(eventId: string): Promise<TicketCou
     config,
   })
 
-  const result = await payload.db.drizzle.execute(`
+  const result = await payload.db.drizzle.execute(sql`
     SELECT 
       ticket.ticket_price_name AS "ticketPriceName",
       ticket.event_schedule_id AS "eventScheduleId",
