@@ -5,6 +5,7 @@ import sharp from 'sharp' // sharp-import
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
+import type { CustomView } from 'payload/config'
 
 import { Categories } from './collections/Categories'
 import { Media } from './collections/Media'
@@ -50,6 +51,17 @@ export default buildConfig({
     components: {
       graphics: {
         Logo: '/components/Logo/Logo#Logo',
+      },
+      views: {
+        Event: {
+          path: 'app/(payload)/admin/event/[eventId]/page.client',
+          Component: (async () => {
+            const { default: Component } = await import(
+              './app/(payload)/admin/event/[eventId]/page.client'
+            )
+            return Component
+          }) as CustomView['Component'],
+        },
       },
     },
     importMap: {
