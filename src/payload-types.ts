@@ -1087,7 +1087,7 @@ export interface Admin {
   id: number;
   firstName: string;
   lastName: string;
-  role: 'admin' | 'super-admin';
+  role: 'event-admin' | 'admin' | 'super-admin';
   lastActive?: string | null;
   updatedAt: string;
   createdAt: string;
