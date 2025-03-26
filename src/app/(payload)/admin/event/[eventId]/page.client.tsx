@@ -21,13 +21,15 @@ interface Event {
       description: string
     }>
   }>
-  ticketPrices?: Array<{
-    name: string
-    key: 'zone1' | 'zone2' | 'zone3' | 'zone4' | 'zone5'
-    price: number
-    currency: string
-    quantity: number
-  }>
+  ticketPrices?: Array<TicketPrice>
+}
+
+interface TicketPrice {
+  name: string
+  key: 'zone1' | 'zone2' | 'zone3' | 'zone4' | 'zone5'
+  price: number
+  currency: string
+  quantity: number
 }
 
 interface Ticket {
@@ -51,41 +53,54 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(
     searchParams.get('scheduleId'),
   )
+  const [selectedTicketPrice, setSelectedTicketPrice] = useState<string | null>(null)
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(false)
   const [editingSeatId, setEditingSeatId] = useState<number | null>(null)
   const [newSeatValue, setNewSeatValue] = useState('')
   const [assignError, setAssignError] = useState<string | null>(null)
-  const [bookedCounts, setBookedCounts] = useState<Record<string, number>>({})
+  const [bookedCounts, setBookedCounts] = useState<Record<string, Record<string, number>>>({})
+  const [bookedCountsLoading, setBookedCountsLoading] = useState(true)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const loadBookedCounts = async () => {
-      const counts = await getBookedTicketsCounts(event.id)
-      setBookedCounts(counts)
+      setBookedCountsLoading(true)
+      try {
+        console.log('Loading booked counts for event:', event.id)
+        const counts = await getBookedTicketsCounts(event.id)
+        console.log('Received booked counts:', counts)
+        setBookedCounts(counts || {})
+      } catch (error) {
+        console.error('Error loading booked counts:', error)
+      } finally {
+        setBookedCountsLoading(false)
+      }
     }
     loadBookedCounts()
   }, [event.id])
 
   useEffect(() => {
-    if (selectedScheduleId) {
-      handleScheduleClick(selectedScheduleId)
+    const loadInitialData = async () => {
+      if (selectedScheduleId) {
+        setLoading(true)
+        try {
+          const ticketDocs = await getTicketsForSchedule(event.id, selectedScheduleId)
+          setTickets(ticketDocs as unknown as Ticket[])
+        } catch (error) {
+          console.error('Error loading tickets:', error)
+        } finally {
+          setLoading(false)
+        }
+      }
     }
-  }, []) // Load initial data if scheduleId is in URL
+    loadInitialData()
+  }, [selectedScheduleId, event.id])
 
   const handleScheduleClick = async (scheduleId: string) => {
     setSelectedScheduleId(scheduleId)
-    setLoading(true)
     // Update URL with selected schedule
     router.push(`?scheduleId=${scheduleId}`, { scroll: false })
-    try {
-      const ticketDocs = await getTicketsForSchedule(event.id, scheduleId)
-      setTickets(ticketDocs as unknown as Ticket[])
-    } catch (error) {
-      console.error('Error loading tickets:', error)
-    } finally {
-      setLoading(false)
-    }
   }
 
   const handleSeatEdit = (ticketId: number) => {
@@ -152,6 +167,40 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
       if (b === '-') return -1
       return a.localeCompare(b)
     })
+  }
+
+  const handleTicketPriceClick = (ticketName: string) => {
+    setSelectedTicketPrice(selectedTicketPrice === ticketName ? null : ticketName)
+  }
+
+  const filteredTickets = selectedTicketPrice
+    ? tickets.filter((ticket) => ticket.ticketPriceName === selectedTicketPrice)
+    : tickets
+
+  const formatBookedCount = (ticket: TicketPrice) => {
+    if (!event.schedules) return `0 / ${ticket.quantity}`
+    if (bookedCountsLoading) return 'Loading...'
+
+    const counts = event.schedules.map((schedule) => {
+      const count = bookedCounts[ticket.name]?.[schedule.id] || 0
+      return count
+    })
+
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          color: 'inherit',
+          fontSize: '0.875rem',
+          fontFamily: 'monospace',
+          opacity: bookedCountsLoading ? 0.5 : 1,
+        }}
+      >
+        {counts.join(' | ')} | {ticket.quantity}
+      </div>
+    )
   }
 
   return (
@@ -227,14 +276,38 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                 {event.ticketPrices.map((ticket, index) => (
                   <div
                     key={index}
-                    style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                    onClick={() => handleTicketPriceClick(ticket.name)}
+                    style={{
+                      padding: '1rem',
+                      border: '1px solid #374151',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      backgroundColor: selectedTicketPrice === ticket.name ? '#374151' : 'white',
+                      color: selectedTicketPrice === ticket.name ? 'white' : '#1a1a1a',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                    }}
                   >
-                    <h3 style={{ fontWeight: 'bold' }}>{ticket.name}</h3>
-                    <p style={{ whiteSpace: 'nowrap' }}>
+                    <h3
+                      style={{
+                        fontWeight: 'bold',
+                        color: selectedTicketPrice === ticket.name ? 'white' : '#1a1a1a',
+                      }}
+                    >
+                      {ticket.name}
+                    </h3>
+                    <p
+                      style={{
+                        whiteSpace: 'nowrap',
+                        color: selectedTicketPrice === ticket.name ? 'white' : '#4a4a4a',
+                      }}
+                    >
                       {ticket.price.toLocaleString()} {ticket.currency}
                     </p>
-                    <p>
-                      {bookedCounts[ticket.name] || 0} / {ticket.quantity}
+                    <p
+                      style={{ color: selectedTicketPrice === ticket.name ? '#d1d5db' : '#666666' }}
+                    >
+                      {formatBookedCount(ticket)}
                     </p>
                   </div>
                 ))}
@@ -248,13 +321,38 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
       <div style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
         {selectedScheduleId ? (
           <>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-              Tickets for{' '}
-              {format(
-                new Date(event.schedules?.find((s) => s.id === selectedScheduleId)?.date || ''),
-                'dd/MM/yyyy',
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '1rem',
+              }}
+            >
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>
+                Tickets for{' '}
+                {format(
+                  new Date(event.schedules?.find((s) => s.id === selectedScheduleId)?.date || ''),
+                  'dd/MM/yyyy',
+                )}
+              </h2>
+              {selectedTicketPrice && (
+                <button
+                  onClick={() => setSelectedTicketPrice(null)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: '#ef4444',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  Clear Filter
+                </button>
               )}
-            </h2>
+            </div>
             {loading ? (
               <div
                 style={{
@@ -268,7 +366,7 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                {groupTicketsByRow(tickets).map(([row, rowTickets]) => (
+                {groupTicketsByRow(filteredTickets).map(([row, rowTickets]) => (
                   <div key={row}>
                     <div
                       style={{

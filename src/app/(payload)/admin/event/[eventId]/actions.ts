@@ -67,19 +67,39 @@ export async function getBookedTicketsCounts(eventId: string) {
     config,
   })
 
+  console.log('Fetching booked tickets for event:', eventId)
+
+  const currentTime = new Date().toISOString()
   const result = await payload.db.drizzle.execute(`
-    SELECT
-      ticket_price_name,
-      COUNT(*) as booked_count
-    FROM tickets
-    WHERE
-      event_id = ${eventId}
-      AND status = 'booked'
-    GROUP BY ticket_price_name
+    SELECT 
+      ticket.ticket_price_name AS "ticketPriceName",
+      ticket.event_schedule_id AS "eventScheduleId",
+      COUNT(*) as count
+    FROM tickets ticket
+    INNER JOIN orders ord ON ord.id = ticket.order_id
+    WHERE 
+      ticket.event_id = ${Number(eventId)}
+      AND ticket.status = 'booked'
+    GROUP BY ticket.ticket_price_name, ticket.event_schedule_id
+    ORDER BY ticket.ticket_price_name, ticket.event_schedule_id
   `)
 
-  return result.rows.reduce((acc: Record<string, number>, row: any) => {
-    acc[row.ticket_price_name] = Number(row.booked_count)
-    return acc
-  }, {})
+  console.log('SQL query result:', result.rows)
+
+  // Transform the result into the expected format
+  const countsByScheduleAndPrice = result.rows.reduce(
+    (acc: Record<string, Record<string, number>>, row: any) => {
+      const { ticketPriceName, eventScheduleId, count } = row
+      if (!acc[ticketPriceName]) {
+        acc[ticketPriceName] = {}
+      }
+      acc[ticketPriceName][eventScheduleId] = Number(count)
+      return acc
+    },
+    {},
+  )
+
+  console.log('Final counts:', JSON.stringify(countsByScheduleAndPrice, null, 2))
+
+  return countsByScheduleAndPrice
 }
