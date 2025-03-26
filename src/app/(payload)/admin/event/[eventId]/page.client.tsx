@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { format, formatDistanceToNow } from 'date-fns'
-import { getTicketsForSchedule, assignSeatToTicket } from './actions'
+import { getTicketsForSchedule, assignSeatToTicket, getBookedTicketsCounts } from './actions'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface Event {
   id: string
@@ -45,17 +46,38 @@ interface Props {
 }
 
 const AdminEventClient: React.FC<Props> = ({ event }) => {
-  const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null)
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(
+    searchParams.get('scheduleId'),
+  )
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(false)
   const [editingSeatId, setEditingSeatId] = useState<number | null>(null)
   const [newSeatValue, setNewSeatValue] = useState('')
   const [assignError, setAssignError] = useState<string | null>(null)
+  const [bookedCounts, setBookedCounts] = useState<Record<string, number>>({})
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const loadBookedCounts = async () => {
+      const counts = await getBookedTicketsCounts(event.id)
+      setBookedCounts(counts)
+    }
+    loadBookedCounts()
+  }, [event.id])
+
+  useEffect(() => {
+    if (selectedScheduleId) {
+      handleScheduleClick(selectedScheduleId)
+    }
+  }, []) // Load initial data if scheduleId is in URL
 
   const handleScheduleClick = async (scheduleId: string) => {
     setSelectedScheduleId(scheduleId)
     setLoading(true)
+    // Update URL with selected schedule
+    router.push(`?scheduleId=${scheduleId}`, { scroll: false })
     try {
       const ticketDocs = await getTicketsForSchedule(event.id, scheduleId)
       setTickets(ticketDocs as unknown as Ticket[])
@@ -208,10 +230,12 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                     style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '4px' }}
                   >
                     <h3 style={{ fontWeight: 'bold' }}>{ticket.name}</h3>
-                    <p>
+                    <p style={{ whiteSpace: 'nowrap' }}>
                       {ticket.price.toLocaleString()} {ticket.currency}
                     </p>
-                    <p>Available: {ticket.quantity}</p>
+                    <p>
+                      {bookedCounts[ticket.name] || 0} / {ticket.quantity}
+                    </p>
                   </div>
                 ))}
               </div>

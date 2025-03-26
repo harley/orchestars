@@ -61,3 +61,25 @@ export async function assignSeatToTicket(
     return { error: error.message }
   }
 }
+
+export async function getBookedTicketsCounts(eventId: string) {
+  const payload = await getPayload({
+    config,
+  })
+
+  const result = await payload.db.drizzle.execute(`
+    SELECT
+      ticket_price_name,
+      COUNT(*) as booked_count
+    FROM tickets
+    WHERE
+      event_id = ${eventId}
+      AND status = 'booked'
+    GROUP BY ticket_price_name
+  `)
+
+  return result.rows.reduce((acc: Record<string, number>, row: any) => {
+    acc[row.ticket_price_name] = Number(row.booked_count)
+    return acc
+  }, {})
+}
