@@ -1,64 +1,62 @@
 'use server'
 
 import { getPayload } from 'payload'
-import config from '@/payload.config'
+import config from '../../../../../payload.config'
 
 export async function getTicketsForSchedule(eventId: string, scheduleId: string) {
   const payload = await getPayload({
     config,
   })
 
-  const result = await payload.find({
-    collection: 'tickets',
-    where: {
-      event: { equals: eventId },
-      eventScheduleId: { equals: scheduleId },
-    },
-  })
+  console.log('Fetching tickets for schedule:', { eventId, scheduleId })
 
-  return result.docs
+  const result = await payload.db.drizzle.execute(`
+    SELECT 
+      ticket.id,
+      ticket.attendee_name AS "attendeeName",
+      ticket.ticket_code AS "ticketCode",
+      ticket.seat,
+      ticket.ticket_price_name AS "ticketPriceName",
+      ticket.status,
+      ord.expire_at AS "expire_at",
+      ticket.created_at AS "createdAt",
+      ticket.updated_at AS "updatedAt"
+    FROM tickets ticket
+    LEFT JOIN orders ord ON ord.id = ticket.order_id
+    WHERE 
+      ticket.event_id = ${Number(eventId)}
+      AND ticket.event_schedule_id = '${scheduleId}'
+    ORDER BY 
+      CASE 
+        WHEN ticket.seat IS NULL THEN 1 
+        ELSE 0 
+      END,
+      ticket.seat
+  `)
+
+  console.log('Total tickets found:', result.rows.length)
+
+  return result.rows
 }
 
-export async function assignSeatToTicket(
-  ticketId: number,
-  seat: string,
-  eventId: string,
-  scheduleId: string,
-) {
+export async function assignSeatToTicket(ticketId: string, seat: string | null) {
   try {
     const payload = await getPayload({
       config,
     })
 
-    // Check if seat is already taken
-    const existingSeats = await payload.find({
-      collection: 'tickets',
-      where: {
-        event: { equals: eventId },
-        eventScheduleId: { equals: scheduleId },
-        seat: { equals: seat },
-        status: {
-          not_equals: 'cancelled',
-        },
-      },
-    })
-
-    if (existingSeats.docs.length > 0) {
-      throw new Error(`Seat ${seat} is already taken`)
-    }
-
-    // Update the ticket with the new seat
     await payload.update({
       collection: 'tickets',
       id: ticketId,
       data: {
-        seat,
+        seat: seat ? seat.toUpperCase() : null,
       },
     })
 
     return { success: true }
-  } catch (error: any) {
-    return { error: error.message }
+  } catch (error) {
+    console.error('Error updating seat:', error)
+    return { error: 'Failed to update seat' }
   }
 }
 

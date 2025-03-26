@@ -33,13 +33,14 @@ interface TicketPrice {
 }
 
 interface Ticket {
-  id: number
-  attendeeName: string
-  userEmail: string
-  ticketCode: string
-  seat: string
+  id: string
   ticketPriceName: string
   status: 'booked' | 'pending_payment' | 'hold' | 'cancelled'
+  seat: string | null
+  userEmail?: string
+  eventScheduleId: string
+  ticketCode: string
+  attendeeName: string
   expire_at?: string
 }
 
@@ -56,12 +57,13 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
   const [selectedTicketPrice, setSelectedTicketPrice] = useState<string | null>(null)
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(false)
-  const [editingSeatId, setEditingSeatId] = useState<number | null>(null)
+  const [editingSeatId, setEditingSeatId] = useState<string | null>(null)
   const [newSeatValue, setNewSeatValue] = useState('')
   const [assignError, setAssignError] = useState<string | null>(null)
   const [bookedCounts, setBookedCounts] = useState<Record<string, Record<string, number>>>({})
   const [bookedCountsLoading, setBookedCountsLoading] = useState(true)
   const inputRef = useRef<HTMLInputElement>(null)
+  const rowRefs = useRef<Record<string, HTMLDivElement>>({})
 
   useEffect(() => {
     const loadBookedCounts = async () => {
@@ -103,7 +105,7 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
     router.push(`?scheduleId=${scheduleId}`, { scroll: false })
   }
 
-  const handleSeatEdit = (ticketId: number) => {
+  const handleSeatEdit = (ticketId: string) => {
     setEditingSeatId(ticketId)
     const ticket = tickets.find((t) => t.id === ticketId)
     setNewSeatValue(ticket?.seat || '')
@@ -113,45 +115,83 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
     }, 0)
   }
 
-  const handleSeatSubmit = async (ticketId: number) => {
+  const scrollToRow = (rowId: string) => {
+    const element = rowRefs.current[rowId]
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
+  const handleSeatSubmit = async (ticketId: string) => {
     try {
-      setAssignError(null)
-      const result = await assignSeatToTicket(ticketId, newSeatValue, event.id, selectedScheduleId!)
+      const trimmedSeat = newSeatValue.trim()
+
+      const existingTicket = tickets.find(
+        (t) => t.id !== ticketId && t.seat?.toUpperCase() === trimmedSeat.toUpperCase(),
+      )
+
+      if (existingTicket && trimmedSeat) {
+        setAssignError('Seat is already taken')
+        return
+      }
+
+      const result = await assignSeatToTicket(ticketId, trimmedSeat || null)
 
       if (result.error) {
         setAssignError(result.error)
         return
       }
 
-      setTickets((prevTickets) => {
-        return prevTickets.map((ticket) => {
-          if (ticket.id === ticketId) {
-            return { ...ticket, seat: newSeatValue }
+      // Update local state
+      setTickets(
+        tickets.map((t) => {
+          if (t.id === ticketId) {
+            return { ...t, seat: trimmedSeat ? trimmedSeat.toUpperCase() : null }
           }
-          return ticket
-        })
-      })
+          return t
+        }),
+      )
 
       setEditingSeatId(null)
       setNewSeatValue('')
-    } catch (error: any) {
-      setAssignError(error.message || 'Failed to assign seat')
+      setAssignError(null)
+
+      // Scroll to the appropriate row
+      if (trimmedSeat) {
+        const row = trimmedSeat.match(/[A-Z]+/)?.[0]
+        if (row) {
+          scrollToRow(row)
+        }
+      } else {
+        scrollToRow('-')
+      }
+    } catch (error) {
+      console.error('Error updating seat:', error)
+      setAssignError('Failed to update seat')
     }
   }
 
   const groupTicketsByRow = (tickets: Ticket[]) => {
     const groups = tickets.reduce(
       (acc, ticket) => {
-        const row = ticket.seat?.match(/[A-Z]+/)?.[0] || '-'
-        if (!acc[row]) {
-          acc[row] = []
+        if (ticket.status === 'cancelled') {
+          if (!acc['cancelled']) {
+            acc['cancelled'] = []
+          }
+          acc['cancelled'].push(ticket)
+        } else {
+          const row = ticket.seat?.match(/[A-Z]+/)?.[0] || '-'
+          if (!acc[row]) {
+            acc[row] = []
+          }
+          acc[row].push(ticket)
         }
-        acc[row].push(ticket)
         return acc
       },
       {} as Record<string, Ticket[]>,
     )
 
+    // Sort tickets within each group
     Object.keys(groups).forEach((row) => {
       if (groups[row]) {
         groups[row].sort((a, b) => {
@@ -162,7 +202,10 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
       }
     })
 
+    // Sort groups with specific order: regular rows alphabetically, then unassigned, then cancelled
     return Object.entries(groups).sort(([a], [b]) => {
+      if (a === 'cancelled') return 1
+      if (b === 'cancelled') return -1
       if (a === '-') return 1
       if (b === '-') return -1
       return a.localeCompare(b)
@@ -367,7 +410,12 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 {groupTicketsByRow(filteredTickets).map(([row, rowTickets]) => (
-                  <div key={row}>
+                  <div
+                    key={row}
+                    ref={(el) => {
+                      if (el) rowRefs.current[row] = el
+                    }}
+                  >
                     <div
                       style={{
                         fontSize: '0.875rem',
@@ -376,7 +424,11 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                         marginBottom: '0.5rem',
                       }}
                     >
-                      {row === '-' ? 'Unassigned' : `Row ${row}`}
+                      {row === 'cancelled'
+                        ? 'Cancelled'
+                        : row === '-'
+                          ? 'Unassigned'
+                          : `Row ${row}`}
                     </div>
                     <div
                       style={{
@@ -462,20 +514,54 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                             ) : (
                               <>
                                 <span>{ticket.seat || '-'}</span>
-                                <button
-                                  onClick={() => handleSeatEdit(ticket.id)}
-                                  style={{
-                                    padding: '0.25rem 0.75rem',
-                                    backgroundColor: '#374151',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.875rem',
-                                  }}
-                                >
-                                  Assign
-                                </button>
+                                {ticket.seat ? (
+                                  <button
+                                    onClick={async () => {
+                                      const result = await assignSeatToTicket(ticket.id, null)
+                                      if (result.success) {
+                                        setTickets(
+                                          tickets.map((t) => {
+                                            if (t.id === ticket.id) {
+                                              return { ...t, seat: null }
+                                            }
+                                            return t
+                                          }),
+                                        )
+                                        scrollToRow('-')
+                                      } else {
+                                        setAssignError('Failed to unassign seat')
+                                      }
+                                    }}
+                                    style={{
+                                      padding: '0.25rem 0.75rem',
+                                      backgroundColor: '#e5e7eb',
+                                      color: '#4b5563',
+                                      border: 'none',
+                                      borderRadius: '4px',
+                                      cursor: 'pointer',
+                                      fontSize: '0.875rem',
+                                    }}
+                                  >
+                                    Unassign
+                                  </button>
+                                ) : (
+                                  (ticket.status === 'booked' || ticket.status === 'hold') && (
+                                    <button
+                                      onClick={() => handleSeatEdit(ticket.id)}
+                                      style={{
+                                        padding: '0.25rem 0.75rem',
+                                        backgroundColor: '#374151',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        fontSize: '0.875rem',
+                                      }}
+                                    >
+                                      Assign
+                                    </button>
+                                  )
+                                )}
                               </>
                             )}
                           </div>
@@ -493,11 +579,53 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                               fontSize: '0.875rem',
                             }}
                           >
-                            <div>{ticket.ticketPriceName}</div>
-                            <div>{ticket.ticketCode}</div>
-                            <div>{ticket.attendeeName || '-'}</div>
+                            <div
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                              }}
+                            >
+                              <span>{ticket.ticketCode}</span>
+                              <span style={{ color: '#666' }}>{ticket.ticketPriceName}</span>
+                            </div>
+                            <div
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                              }}
+                            >
+                              <span>{ticket.attendeeName || '-'}</span>
+                              <div
+                                style={{
+                                  padding: '0.25rem 0.5rem',
+                                  borderRadius: '4px',
+                                  fontWeight: 'bold',
+                                  fontSize: '0.75rem',
+                                  textTransform: 'uppercase',
+                                  backgroundColor:
+                                    ticket.status === 'booked'
+                                      ? '#22c55e'
+                                      : ticket.status === 'pending_payment'
+                                        ? '#f97316'
+                                        : ticket.status === 'hold'
+                                          ? '#ef4444'
+                                          : '#94a3b8',
+                                  color: 'white',
+                                  maxWidth: '80px',
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                }}
+                              >
+                                {ticket.status.replace('_', ' ')}
+                              </div>
+                            </div>
                             {ticket.status !== 'booked' && ticket.expire_at && (
-                              <div style={{ fontSize: '0.75rem', color: '#666' }}>
+                              <div
+                                style={{ fontSize: '0.75rem', color: '#666', textAlign: 'right' }}
+                              >
                                 {formatDistanceToNow(new Date(ticket.expire_at), {
                                   addSuffix: true,
                                   includeSeconds: true,
@@ -511,28 +639,6 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                                   .replace(' second', 's')}
                               </div>
                             )}
-                            <div
-                              style={{
-                                marginTop: '0.25rem',
-                                padding: '0.25rem',
-                                borderRadius: '4px',
-                                textAlign: 'center',
-                                fontWeight: 'bold',
-                                fontSize: '0.75rem',
-                                textTransform: 'uppercase',
-                                backgroundColor:
-                                  ticket.status === 'booked'
-                                    ? '#22c55e'
-                                    : ticket.status === 'pending_payment'
-                                      ? '#f97316'
-                                      : ticket.status === 'hold'
-                                        ? '#ef4444'
-                                        : '#94a3b8',
-                                color: 'white',
-                              }}
-                            >
-                              {ticket.status.replace('_', ' ')}
-                            </div>
                           </div>
                         </div>
                       ))}
