@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect } from 'react'
 import { format, formatDistanceToNow } from 'date-fns'
 import { getTicketsForSchedule, assignSeatToTicket, getBookedTicketsCounts } from './actions'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { categories } from '@/components/EventDetail/data/seat-maps/categories'
+import { formatMoney } from '@/utilities/formatMoney'
 
 interface Event {
   id: string
@@ -243,14 +245,13 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '0.5rem',
           color: 'inherit',
-          fontSize: '0.875rem',
+          fontSize: '0.75rem',
           fontFamily: 'monospace',
           opacity: bookedCountsLoading ? 0.5 : 1,
         }}
       >
-        {counts.join(' | ')} | {ticket.quantity}
+        {counts.join('|')}/{ticket.quantity}
       </div>
     )
   }
@@ -262,7 +263,7 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
         style={{
           width: '300px',
           borderRight: '1px solid #ddd',
-          padding: '2rem',
+          padding: '1rem',
           overflowY: 'auto',
         }}
       >
@@ -288,49 +289,74 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
 
           {event.schedules && event.schedules.length > 0 && (
             <div>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Schedules</h2>
-              {event.schedules.map((schedule) => (
-                <div
-                  key={schedule.id}
-                  style={{
-                    marginLeft: '1rem',
-                    marginTop: '0.5rem',
-                    padding: '0.5rem',
-                    cursor: 'pointer',
-                    backgroundColor: selectedScheduleId === schedule.id ? '#374151' : 'transparent',
-                    color: selectedScheduleId === schedule.id ? 'white' : 'inherit',
-                    borderRadius: '4px',
-                  }}
-                  onClick={() => handleScheduleClick(schedule.id)}
-                >
-                  <h3 style={{ fontWeight: 'bold' }}>
-                    {format(new Date(schedule.date), 'dd/MM/yyyy')}
-                  </h3>
-                  {schedule.details?.map((detail, detailIndex) => (
-                    <div key={detailIndex} style={{ marginLeft: '1rem' }}>
-                      <p>
-                        {detail.time} - {detail.name}
-                      </p>
-                      <p style={{ color: selectedScheduleId === schedule.id ? '#d1d5db' : 'gray' }}>
-                        {detail.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ))}
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0' }}>
+                Schedules
+              </h2>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: '0.25rem',
+                  marginBottom: '1rem',
+                }}
+              >
+                {event.schedules.map((schedule) => (
+                  <div
+                    key={schedule.id}
+                    style={{
+                      padding: '0.5rem',
+                      border: '1px solid #374151',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      backgroundColor: selectedScheduleId === schedule.id ? '#374151' : 'white',
+                      color: selectedScheduleId === schedule.id ? 'white' : '#1a1a1a',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                    }}
+                    onClick={() => handleScheduleClick(schedule.id)}
+                  >
+                    <h3
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: '0.875rem',
+                        marginBottom: '0',
+                        color: selectedScheduleId === schedule.id ? 'white' : '#1a1a1a',
+                      }}
+                    >
+                      {format(new Date(schedule.date), 'dd/MM')}
+                    </h3>
+                    <p
+                      style={{
+                        color: selectedScheduleId === schedule.id ? '#d1d5db' : '#666666',
+                        fontSize: '0.75rem',
+                        fontFamily: 'monospace',
+                      }}
+                    >
+                      {Object.values(bookedCounts).reduce(
+                        (sum, counts) => sum + (counts[schedule.id] || 0),
+                        0,
+                      )}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
           {event.ticketPrices && event.ticketPrices.length > 0 && (
             <div>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Ticket Prices</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0' }}>
+                Ticket Prices
+              </h2>
+              <div
+                style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.25rem' }}
+              >
                 {event.ticketPrices.map((ticket, index) => (
                   <div
                     key={index}
                     onClick={() => handleTicketPriceClick(ticket.name)}
                     style={{
-                      padding: '1rem',
+                      padding: '0.25rem',
                       border: '1px solid #374151',
                       borderRadius: '4px',
                       cursor: 'pointer',
@@ -338,12 +364,28 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                       color: selectedTicketPrice === ticket.name ? 'white' : '#1a1a1a',
                       transition: 'all 0.2s ease',
                       boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                      position: 'relative',
                     }}
                   >
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '0.75rem',
+                        right: '0.75rem',
+                        width: '0.75rem',
+                        height: '0.75rem',
+                        borderRadius: '50%',
+                        backgroundColor: categories.find((c) => c.id === ticket.key)?.color,
+                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                      }}
+                    />
                     <h3
                       style={{
                         fontWeight: 'bold',
                         color: selectedTicketPrice === ticket.name ? 'white' : '#1a1a1a',
+                        fontSize: '0.875rem',
+                        marginBottom: '0.25rem',
+                        paddingRight: '1.25rem',
                       }}
                     >
                       {ticket.name}
@@ -352,12 +394,17 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                       style={{
                         whiteSpace: 'nowrap',
                         color: selectedTicketPrice === ticket.name ? 'white' : '#4a4a4a',
+                        fontSize: '0.875rem',
+                        marginBottom: '0.25rem',
                       }}
                     >
-                      {ticket.price.toLocaleString()} {ticket.currency}
+                      {formatMoney(ticket.price, ticket.currency)}
                     </p>
                     <p
-                      style={{ color: selectedTicketPrice === ticket.name ? '#d1d5db' : '#666666' }}
+                      style={{
+                        color: selectedTicketPrice === ticket.name ? '#d1d5db' : '#666666',
+                        fontSize: '0.75rem',
+                      }}
                     >
                       {formatBookedCount(ticket)}
                     </p>
