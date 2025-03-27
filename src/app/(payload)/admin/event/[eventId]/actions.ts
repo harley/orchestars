@@ -109,3 +109,47 @@ export async function getBookedTicketsCounts(eventId: string): Promise<TicketCou
 
   return countsByScheduleAndPrice
 }
+
+export const getSeatHoldings = async (eventId: string, scheduleId: string) => {
+  'use server'
+
+  try {
+    const payload = await getPayload({
+      config,
+    })
+
+    const now = new Date().toISOString()
+    const res = await payload.find({
+      collection: 'seatHoldings',
+      where: {
+        and: [
+          {
+            event: {
+              equals: eventId,
+            },
+          },
+          {
+            eventScheduleId: {
+              equals: scheduleId,
+            },
+          },
+          {
+            expire_time: {
+              greater_than: now,
+            },
+          },
+          {
+            closedAt: {
+              equals: null,
+            },
+          },
+        ],
+      },
+    })
+
+    return res.docs
+  } catch (error) {
+    console.error('Error fetching seat holdings:', error)
+    return []
+  }
+}
