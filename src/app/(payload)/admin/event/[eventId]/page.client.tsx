@@ -256,6 +256,14 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
     )
   }
 
+  const getTotalCapacity = () => {
+    return event.ticketPrices?.reduce((sum, tp) => sum + (tp.quantity || 0), 0) || 0
+  }
+
+  const getBookedCountForSchedule = (scheduleId: string) => {
+    return Object.values(bookedCounts).reduce((sum, counts) => sum + (counts[scheduleId] || 0), 0)
+  }
+
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
       {/* Sidebar */}
@@ -332,10 +340,7 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                         fontFamily: 'monospace',
                       }}
                     >
-                      {Object.values(bookedCounts).reduce(
-                        (sum, counts) => sum + (counts[schedule.id] || 0),
-                        0,
-                      )}
+                      {getBookedCountForSchedule(schedule.id)}/{getTotalCapacity()}
                     </p>
                   </div>
                 ))}
