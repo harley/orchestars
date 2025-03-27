@@ -98,14 +98,17 @@ export const checkSeatAvailable = async ({
     })
 
     if (seatHoldings?.length) {
-      const earliestSeatHolding = seatHoldings.reduce((earliest, current) =>
-        new Date(current.expire_time as string) < new Date(earliest.expire_time as string)
-          ? current
-          : earliest,
+      const initValue = seatHoldings[0]
+      const earliestSeatHolding = seatHoldings.reduce(
+        (earliest, current) =>
+          new Date(current.expire_time as string) < new Date(earliest?.expire_time as string)
+            ? current
+            : earliest,
+        initValue,
       )
 
-      if (earliestSeatHolding.code !== seatHoldingCode) {
-        const filterSeatsInput = earliestSeatHolding.seatName
+      if (earliestSeatHolding?.code !== seatHoldingCode) {
+        const filterSeatsInput = earliestSeatHolding?.seatName
           ?.split(',')
           ?.filter((s) => seats.includes(s))
 

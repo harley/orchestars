@@ -5,57 +5,45 @@ import { BasePayload, Where } from 'payload'
 export const getExistingSeatHolding = async ({
   eventId,
   eventScheduleId,
-  notEqualSeatHoldingCode,
   inSeats,
   payload,
 }: {
   eventId: number
   eventScheduleId: string
-  notEqualSeatHoldingCode?: string
   inSeats?: string[]
   payload: BasePayload
 }) => {
   const currentTime = new Date().toISOString()
-  const conditions: Where = {
-    event: { equals: Number(eventId) },
-    eventScheduleId: { equals: eventScheduleId },
-    closedAt: { exists: false },
-    expire_time: { greater_than: currentTime },
-  }
 
-  if (notEqualSeatHoldingCode) {
-    conditions.code = { not_equals: notEqualSeatHoldingCode }
-  }
-
+  let strInSeatsQuery = ''
   if (inSeats?.length) {
-    conditions.seatName = { in: inSeats }
+    strInSeatsQuery = `AND EXISTS (
+                    SELECT 1 FROM unnest(string_to_array(sh.seat_name, ',')) AS seat(value) 
+                    WHERE trim(value) =  ANY('{"${inSeats.join('","')}"}')
+                  )`
   }
 
   const existingSeats = await payload.db.drizzle
     .execute(
-      `
+      sql`
     SELECT sh.id, sh.seat_name as "seatName", sh.code, sh.expire_time
       FROM seat_holdings sh
       WHERE 
         sh.event_id = ${Number(eventId)}
-        AND sh.event_schedule_id = '${eventScheduleId}'
+        AND sh.event_schedule_id = ${eventScheduleId}
         AND sh.closed_at IS NULL
-        AND sh.expire_time >= '${currentTime}'
-        ${notEqualSeatHoldingCode ? sql` AND sh.code != '${notEqualSeatHoldingCode}'` : ''}
-        ${
-          inSeats?.length
-            ? ` AND EXISTS (
-                    SELECT 1 FROM unnest(string_to_array(sh.seat_name, ',')) AS seat(value) 
-                    WHERE trim(value) =  ANY('{"${inSeats.join('","')}"}')
-                  )`
-            : ''
-        }   
+        AND sh.expire_time >= ${currentTime}
+        ${sql.raw(strInSeatsQuery)}
   `,
     )
-    .then((res) => res.rows as unknown as SeatHolding[])
-    .catch(() => [])
+    .then((res) => res.rows)
+    .catch((error) => {
+      console.error('Error getting existing seat holdings:', error)
 
-  return existingSeats
+      return []
+    })
+
+  return existingSeats as unknown as SeatHolding[]
 }
 
 export const getSeatHoldings = async ({
