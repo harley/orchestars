@@ -8,6 +8,7 @@ import { isAfter, isBefore } from 'date-fns'
 import { USER_PROMOTION_REDEMPTION_STATUS } from '@/collections/Promotion/constants/status'
 import { ORDER_STATUS } from '@/collections/Orders/constants'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
+import { getExistingSeatHolding } from '@/app/(payload)/api/seat-holding/seat/utils'
 
 export const checkBookedOrPendingPaymentSeats = async ({
   eventId,
@@ -77,9 +78,45 @@ export const checkSeatAvailable = async ({
     {} as Record<string, string[]>,
   )
 
+  const cookieStore = await cookies()
+  const seatHoldingCode = cookieStore.get('seatHoldingCode')?.value
+
+  // seat holding code of requesting user
+  if (!seatHoldingCode) {
+    throw new Error('Phiên chữ chỗ đã hết hạn! Vui lòng chọn lại ghế và thực hiện lại')
+  }
+
   // Check all seats in parallel, grouped by event
   const seatCheckPromises = Object.entries(seatsByEvent).map(async ([key, seats]) => {
     const [eventId, eventScheduleId] = key.split('|')
+
+    const seatHoldings = await getExistingSeatHolding({
+      eventId: Number(eventId),
+      eventScheduleId: eventScheduleId as string,
+      payload,
+      inSeats: seats,
+    })
+
+    if (seatHoldings?.length) {
+      const initValue = seatHoldings[0]
+      const earliestSeatHolding = seatHoldings.reduce(
+        (earliest, current) =>
+          new Date(current.expire_time as string) < new Date(earliest?.expire_time as string)
+            ? current
+            : earliest,
+        initValue,
+      )
+
+      if (earliestSeatHolding?.code !== seatHoldingCode) {
+        const filterSeatsInput = earliestSeatHolding?.seatName
+          ?.split(',')
+          ?.filter((s) => seats.includes(s))
+
+        throw new Error(
+          `Ghế ${filterSeatsInput} đang được giữ bởi người khác! Vui lòng chọn ghế khác`,
+        )
+      }
+    }
 
     const existingSeats = await checkBookedOrPendingPaymentSeats({
       eventId: Number(eventId),
