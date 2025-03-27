@@ -51,6 +51,11 @@ export default buildConfig({
       graphics: {
         Logo: '/components/Logo/Logo#Logo',
       },
+      views: {
+        dashboard: {
+          Component: '@/AdminViews/Dashboard/Component',
+        },
+      },
     },
     importMap: {
       baseDir: path.resolve(dirname),
