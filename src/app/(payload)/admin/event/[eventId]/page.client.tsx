@@ -67,6 +67,7 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
   const [bookedCountsLoading, setBookedCountsLoading] = useState(true)
   const inputRef = useRef<HTMLInputElement>(null)
   const rowRefs = useRef<Record<string, HTMLDivElement>>({})
+  const [loadingTicketId, setLoadingTicketId] = useState<string | null>(null)
 
   useEffect(() => {
     const loadBookedCounts = async () => {
@@ -127,6 +128,7 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
 
   const handleSeatSubmit = async (ticketId: string) => {
     try {
+      setLoadingTicketId(ticketId)
       const trimmedSeat = newSeatValue.trim()
 
       const existingTicket = tickets.find(
@@ -135,6 +137,7 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
 
       if (existingTicket && trimmedSeat) {
         setAssignError('Seat is already taken')
+        setLoadingTicketId(null)
         return
       }
 
@@ -142,6 +145,7 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
 
       if (result.error) {
         setAssignError(result.error)
+        setLoadingTicketId(null)
         return
       }
 
@@ -158,6 +162,7 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
       setEditingSeatId(null)
       setNewSeatValue('')
       setAssignError(null)
+      setLoadingTicketId(null)
 
       // Scroll to the appropriate row
       if (trimmedSeat) {
@@ -171,6 +176,7 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
     } catch (error) {
       console.error('Error updating seat:', error)
       setAssignError('Failed to update seat')
+      setLoadingTicketId(null)
     }
   }
 
@@ -508,10 +514,13 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: '4px',
-                                    cursor: 'pointer',
+                                    cursor:
+                                      loadingTicketId === ticket.id ? 'not-allowed' : 'pointer',
+                                    opacity: loadingTicketId === ticket.id ? 0.7 : 1,
                                   }}
+                                  disabled={loadingTicketId === ticket.id}
                                 >
-                                  Save
+                                  {loadingTicketId === ticket.id ? 'Assigning...' : 'Save'}
                                 </button>
                               </div>
                             ) : (
@@ -538,6 +547,7 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                                 {ticket.seat ? (
                                   <button
                                     onClick={async () => {
+                                      setLoadingTicketId(ticket.id)
                                       const result = await assignSeatToTicket(ticket.id, null)
                                       if (result.success) {
                                         setTickets(
@@ -552,6 +562,7 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                                       } else {
                                         setAssignError('Failed to unassign seat')
                                       }
+                                      setLoadingTicketId(null)
                                     }}
                                     style={{
                                       padding: '0.25rem 0.75rem',
@@ -559,11 +570,14 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                                       color: '#4b5563',
                                       border: 'none',
                                       borderRadius: '4px',
-                                      cursor: 'pointer',
+                                      cursor:
+                                        loadingTicketId === ticket.id ? 'not-allowed' : 'pointer',
+                                      opacity: loadingTicketId === ticket.id ? 0.7 : 1,
                                       fontSize: '0.875rem',
                                     }}
+                                    disabled={loadingTicketId === ticket.id}
                                   >
-                                    Unassign
+                                    {loadingTicketId === ticket.id ? 'Unassigning...' : 'Unassign'}
                                   </button>
                                 ) : (
                                   (ticket.status === 'booked' || ticket.status === 'hold') && (
@@ -575,11 +589,14 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                                         color: 'white',
                                         border: 'none',
                                         borderRadius: '4px',
-                                        cursor: 'pointer',
+                                        cursor:
+                                          loadingTicketId === ticket.id ? 'not-allowed' : 'pointer',
+                                        opacity: loadingTicketId === ticket.id ? 0.7 : 1,
                                         fontSize: '0.875rem',
                                       }}
+                                      disabled={loadingTicketId === ticket.id}
                                     >
-                                      Assign
+                                      {loadingTicketId === ticket.id ? 'Assigning...' : 'Assign'}
                                     </button>
                                   )
                                 )}
