@@ -2,10 +2,17 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { format, formatDistanceToNow } from 'date-fns'
-import { getTicketsForSchedule, assignSeatToTicket, getBookedTicketsCounts } from './actions'
+import {
+  getTicketsForSchedule,
+  assignSeatToTicket,
+  getBookedTicketsCounts,
+  getSeatHoldings,
+} from './actions'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { categories } from '@/components/EventDetail/data/seat-maps/categories'
 import { formatMoney } from '@/utilities/formatMoney'
+import seats from '@/components/EventDetail/data/seat-maps/seats.json'
+import type { SeatHolding } from '@/payload-types'
 
 interface Event {
   id: string
@@ -70,6 +77,7 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const rowRefs = useRef<Record<string, HTMLDivElement>>({})
   const [loadingTicketId, setLoadingTicketId] = useState<string | null>(null)
+  const [seatHoldings, setSeatHoldings] = useState<SeatHolding[]>([])
 
   useEffect(() => {
     const loadBookedCounts = async () => {
@@ -105,6 +113,20 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
     loadInitialData()
   }, [selectedScheduleId, event.id])
 
+  useEffect(() => {
+    const loadSeatHoldings = async () => {
+      if (selectedScheduleId) {
+        try {
+          const holdings = await getSeatHoldings(event.id, selectedScheduleId)
+          setSeatHoldings(holdings)
+        } catch (error) {
+          console.error('Error loading seat holdings:', error)
+        }
+      }
+    }
+    loadSeatHoldings()
+  }, [selectedScheduleId, event.id])
+
   const handleScheduleClick = async (scheduleId: string) => {
     setSelectedScheduleId(scheduleId)
     // Update URL with selected schedule
@@ -137,8 +159,16 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
         (t) => t.id !== ticketId && t.seat?.toUpperCase() === trimmedSeat.toUpperCase(),
       )
 
-      if (existingTicket && trimmedSeat) {
-        setAssignError('Seat is already taken')
+      // Get held seats
+      const heldSeats = seatHoldings.flatMap(
+        (holding) => holding.seatName?.split(',').map((s) => s.trim()) || [],
+      )
+
+      // Check if seat is held
+      const isHeld = heldSeats.includes(trimmedSeat)
+
+      if ((existingTicket || isHeld) && trimmedSeat) {
+        setAssignError(isHeld ? 'Seat is currently reserved' : 'Seat is already taken')
         setLoadingTicketId(null)
         return
       }
@@ -264,6 +294,69 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
     return Object.values(bookedCounts).reduce((sum, counts) => sum + (counts[scheduleId] || 0), 0)
   }
 
+  const getSeatsForRow = (row: string, tickets: Ticket[]) => {
+    // Get all seats for this row from seats.json
+    const rowSeats = seats
+      .filter((seat) => seat.label.startsWith(row))
+      .sort((a, b) => {
+        const aNum = parseInt(a.label.replace(row, ''))
+        const bNum = parseInt(b.label.replace(row, ''))
+        return aNum - bNum
+      })
+
+    // Get taken seats in this row
+    const takenSeats = tickets.filter((t) => t.seat?.startsWith(row)).map((t) => t.seat)
+
+    // Get held seats in this row
+    const heldSeats = seatHoldings
+      .flatMap((holding) => holding.seatName?.split(',').map((s) => s.trim()) || [])
+      .filter((seat) => seat.startsWith(row))
+
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '0.25rem',
+          marginTop: '0.5rem',
+          fontSize: '0.75rem',
+          fontFamily: 'monospace',
+        }}
+      >
+        {rowSeats.map((seat) => {
+          const isTaken = takenSeats.includes(seat.label)
+          const isHeld = heldSeats.includes(seat.label)
+          const ticketPrice = event.ticketPrices?.find((tp) => tp.key === seat.category)
+          const color = categories.find((c) => c.id === seat.category)?.color
+
+          return (
+            <span
+              key={seat.id}
+              style={{
+                padding: '0.125rem 0.25rem',
+                borderRadius: '2px',
+                backgroundColor: isTaken ? '#e5e7eb' : isHeld ? '#fef3c7' : color + '20',
+                color: isTaken ? '#9ca3af' : isHeld ? '#92400e' : color,
+                border: `1px solid ${isTaken ? '#d1d5db' : isHeld ? '#f59e0b' : color + '40'}`,
+                cursor: 'default',
+                fontSize: '0.75rem',
+              }}
+              title={
+                isTaken
+                  ? `${seat.label} - ${ticketPrice?.name || seat.category} (Taken)`
+                  : isHeld
+                    ? `${seat.label} - ${ticketPrice?.name || seat.category} (Reserved)`
+                    : `${seat.label} - ${ticketPrice?.name || seat.category} (Available)`
+              }
+            >
+              {seat.label}
+            </span>
+          )
+        })}
+      </div>
+    )
+  }
+
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
       {/* Sidebar */}
@@ -273,151 +366,212 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
           borderRight: '1px solid #ddd',
           padding: '1rem',
           overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-          {event.title}
-        </h1>
-        <div className="space-y-4">
-          <div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Description</h2>
-            <p>{event.description}</p>
-          </div>
-
-          <div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Location</h2>
-            <p>{event.eventLocation}</p>
-          </div>
-
-          <div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Dates</h2>
-            <p>Start: {new Date(event.startDatetime).toLocaleString()}</p>
-            <p>End: {new Date(event.endDatetime).toLocaleString()}</p>
-          </div>
-
-          {event.schedules && event.schedules.length > 0 && (
+        <div style={{ flex: 1 }}>
+          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+            {event.title}
+          </h1>
+          <div className="space-y-4">
             <div>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0' }}>
-                Schedules
-              </h2>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gap: '0.25rem',
-                  marginBottom: '1rem',
-                }}
-              >
-                {event.schedules.map((schedule) => (
-                  <div
-                    key={schedule.id}
-                    style={{
-                      padding: '0.5rem',
-                      border: '1px solid #374151',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      backgroundColor: selectedScheduleId === schedule.id ? '#374151' : 'white',
-                      color: selectedScheduleId === schedule.id ? 'white' : '#1a1a1a',
-                      transition: 'all 0.2s ease',
-                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                    }}
-                    onClick={() => handleScheduleClick(schedule.id)}
-                  >
-                    <h3
-                      style={{
-                        fontWeight: 'bold',
-                        fontSize: '0.875rem',
-                        marginBottom: '0',
-                        color: selectedScheduleId === schedule.id ? 'white' : '#1a1a1a',
-                      }}
-                    >
-                      {format(new Date(schedule.date), 'dd/MM')}
-                    </h3>
-                    <p
-                      style={{
-                        color: selectedScheduleId === schedule.id ? '#d1d5db' : '#666666',
-                        fontSize: '0.75rem',
-                        fontFamily: 'monospace',
-                      }}
-                    >
-                      {getBookedCountForSchedule(schedule.id)}/{getTotalCapacity()}
-                    </p>
-                  </div>
-                ))}
-              </div>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Dates</h2>
+              <p>Start: {new Date(event.startDatetime).toLocaleString()}</p>
+              <p>End: {new Date(event.endDatetime).toLocaleString()}</p>
             </div>
-          )}
 
-          {event.ticketPrices && event.ticketPrices.length > 0 && (
-            <div>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0' }}>
-                Ticket Prices
-              </h2>
-              <div
-                style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.25rem' }}
-              >
-                {event.ticketPrices.map((ticket, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleTicketPriceClick(ticket.name)}
-                    style={{
-                      padding: '0.25rem',
-                      border: '1px solid #374151',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      backgroundColor: selectedTicketPrice === ticket.name ? '#374151' : 'white',
-                      color: selectedTicketPrice === ticket.name ? 'white' : '#1a1a1a',
-                      transition: 'all 0.2s ease',
-                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                      position: 'relative',
-                    }}
-                  >
+            {event.schedules && event.schedules.length > 0 && (
+              <div>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0' }}>
+                  Schedules
+                </h2>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    gap: '0.25rem',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  {event.schedules.map((schedule) => (
                     <div
+                      key={schedule.id}
                       style={{
-                        position: 'absolute',
-                        top: '0.75rem',
-                        right: '0.75rem',
-                        width: '0.75rem',
-                        height: '0.75rem',
-                        borderRadius: '50%',
-                        backgroundColor: categories.find((c) => c.id === ticket.key)?.color,
+                        padding: '0.5rem',
+                        border: '1px solid #374151',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        backgroundColor: selectedScheduleId === schedule.id ? '#374151' : 'white',
+                        color: selectedScheduleId === schedule.id ? 'white' : '#1a1a1a',
+                        transition: 'all 0.2s ease',
                         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
                       }}
-                    />
-                    <h3
-                      style={{
-                        fontWeight: 'bold',
-                        color: selectedTicketPrice === ticket.name ? 'white' : '#1a1a1a',
-                        fontSize: '0.875rem',
-                        marginBottom: '0.25rem',
-                        paddingRight: '1.25rem',
-                      }}
+                      onClick={() => handleScheduleClick(schedule.id)}
                     >
-                      {ticket.name}
-                    </h3>
-                    <p
-                      style={{
-                        whiteSpace: 'nowrap',
-                        color: selectedTicketPrice === ticket.name ? 'white' : '#4a4a4a',
-                        fontSize: '0.875rem',
-                        marginBottom: '0.25rem',
-                      }}
-                    >
-                      {formatMoney(ticket.price, ticket.currency)}
-                    </p>
-                    <p
-                      style={{
-                        color: selectedTicketPrice === ticket.name ? '#d1d5db' : '#666666',
-                        fontSize: '0.75rem',
-                      }}
-                    >
-                      {formatBookedCount(ticket)}
-                    </p>
-                  </div>
-                ))}
+                      <h3
+                        style={{
+                          fontWeight: 'bold',
+                          fontSize: '0.875rem',
+                          marginBottom: '0',
+                          color: selectedScheduleId === schedule.id ? 'white' : '#1a1a1a',
+                        }}
+                      >
+                        {format(new Date(schedule.date), 'dd/MM')}
+                      </h3>
+                      <p
+                        style={{
+                          color: selectedScheduleId === schedule.id ? '#d1d5db' : '#666666',
+                          fontSize: '0.75rem',
+                          fontFamily: 'monospace',
+                        }}
+                      >
+                        {getBookedCountForSchedule(schedule.id)}/{getTotalCapacity()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
+            )}
+
+            {event.ticketPrices && event.ticketPrices.length > 0 && (
+              <div>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0' }}>
+                  Ticket Prices
+                </h2>
+                <div
+                  style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.25rem' }}
+                >
+                  {event.ticketPrices.map((ticket, index) => (
+                    <div
+                      key={index}
+                      onClick={() => handleTicketPriceClick(ticket.name)}
+                      style={{
+                        padding: '0.25rem',
+                        border: '1px solid #374151',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        backgroundColor: selectedTicketPrice === ticket.name ? '#374151' : 'white',
+                        color: selectedTicketPrice === ticket.name ? 'white' : '#1a1a1a',
+                        transition: 'all 0.2s ease',
+                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                        position: 'relative',
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '0.75rem',
+                          right: '0.75rem',
+                          width: '0.75rem',
+                          height: '0.75rem',
+                          borderRadius: '50%',
+                          backgroundColor: categories.find((c) => c.id === ticket.key)?.color,
+                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                        }}
+                      />
+                      <h3
+                        style={{
+                          fontWeight: 'bold',
+                          color: selectedTicketPrice === ticket.name ? 'white' : '#1a1a1a',
+                          fontSize: '0.875rem',
+                          marginBottom: '0.25rem',
+                          paddingRight: '1.25rem',
+                        }}
+                      >
+                        {ticket.name}
+                      </h3>
+                      <p
+                        style={{
+                          whiteSpace: 'nowrap',
+                          color: selectedTicketPrice === ticket.name ? 'white' : '#4a4a4a',
+                          fontSize: '0.875rem',
+                          marginBottom: '0.25rem',
+                        }}
+                      >
+                        {formatMoney(ticket.price, ticket.currency)}
+                      </p>
+                      <p
+                        style={{
+                          color: selectedTicketPrice === ticket.name ? '#d1d5db' : '#666666',
+                          fontSize: '0.75rem',
+                        }}
+                      >
+                        {formatBookedCount(ticket)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Legend */}
+        <div
+          style={{
+            borderTop: '1px solid #ddd',
+            paddingTop: '1rem',
+            marginTop: '1rem',
+          }}
+        >
+          <h3
+            style={{
+              fontSize: '0.875rem',
+              fontWeight: 'bold',
+              marginBottom: '0.5rem',
+              color: '#666',
+            }}
+          >
+            Seat Status
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span
+                style={{
+                  padding: '0.125rem 0.25rem',
+                  borderRadius: '2px',
+                  backgroundColor: '#e5e7eb',
+                  color: '#9ca3af',
+                  border: '1px solid #d1d5db',
+                  fontSize: '0.75rem',
+                }}
+              >
+                A1
+              </span>
+              <span style={{ fontSize: '0.75rem', color: '#666' }}>Taken</span>
             </div>
-          )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span
+                style={{
+                  padding: '0.125rem 0.25rem',
+                  borderRadius: '2px',
+                  backgroundColor: '#fef3c7',
+                  color: '#92400e',
+                  border: '1px solid #f59e0b',
+                  fontSize: '0.75rem',
+                }}
+              >
+                A1
+              </span>
+              <span style={{ fontSize: '0.75rem', color: '#666' }}>Reserved</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span
+                style={{
+                  padding: '0.125rem 0.25rem',
+                  borderRadius: '2px',
+                  backgroundColor: '#fff',
+                  color: '#1a1a1a',
+                  border: '1px solid #374151',
+                  fontSize: '0.75rem',
+                }}
+              >
+                A1
+              </span>
+              <span style={{ fontSize: '0.75rem', color: '#666' }}>Available</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -491,11 +645,13 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
                           ? 'Unassigned'
                           : `Row ${row}`}
                     </div>
+                    {row !== 'cancelled' && row !== '-' && getSeatsForRow(row, rowTickets)}
                     <div
                       style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
                         gap: '0.5rem',
+                        marginTop: row !== 'cancelled' && row !== '-' ? '0.5rem' : 0,
                       }}
                     >
                       {rowTickets.map((ticket) => (
