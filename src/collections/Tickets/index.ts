@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { format as formatDate } from 'date-fns'
+import { TICKET_STATUSES } from './constants'
 // import { afterChangeStatus } from './hooks/afterChangeStatus'
 
 export const Tickets: CollectionConfig = {
@@ -111,7 +112,7 @@ export const Tickets: CollectionConfig = {
       hasMany: false,
     },
     {
-      name: "orderCode",
+      name: 'orderCode',
       type: 'text',
       virtual: true,
       admin: {
@@ -134,31 +135,14 @@ export const Tickets: CollectionConfig = {
             }
 
             return null
-          }
+          },
         ],
       },
     },
     {
       name: 'status',
       type: 'select',
-      options: [
-        {
-          label: 'Booked', //  The seat has been paid for and confirmed
-          value: 'booked',
-        },
-        {
-          label: 'Pending Payment', // The seat is held while payment is being processed
-          value: 'pending_payment',
-        },
-        {
-          label: 'Hold', // The seat is hold while pending user continue to pay
-          value: 'hold',
-        },
-        {
-          label: 'Cancelled', // The seat has been cancelled by user: eg user has not paid for this ticket
-          value: 'cancelled',
-        },
-      ],
+      options: TICKET_STATUSES,
       required: false,
       hooks: {
         // afterChange: [afterChangeStatus],

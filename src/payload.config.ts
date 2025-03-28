@@ -3,7 +3,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 
 import sharp from 'sharp' // sharp-import
 import path from 'path'
-import { buildConfig, PayloadRequest } from 'payload'
+import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { Categories } from './collections/Categories'
@@ -30,6 +30,7 @@ import { SeatHoldings } from './collections/SeatHoldings'
 import { Promotions } from './collections/Promotion'
 import { UserPromotionRedemptions } from './collections/Promotion/UserPromotionRedemtion'
 import Admins from './collections/Admins'
+import { updatePaymentStatus } from './collections/Payments/jobs/updatePaymentStatus'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -122,20 +123,41 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
+  onInit: async (payload) => {
+    payload.jobs
+      .run()
+      .then(() => console.log('Initialized cron job'))
+      .catch((err) => {
+        console.error('Error while initializing cron job', err)
+      })
+  },
   jobs: {
-    access: {
-      run: ({ req }: { req: PayloadRequest }): boolean => {
-        // Allow logged in users to execute this endpoint (default)
-        if (req.user) return true
+    // access: {
+    //   run: ({ req }: { req: PayloadRequest }): boolean => {
+    //     // Allow logged in users to execute this endpoint (default)
+    //     if (req.user) return true
 
-        // If there is no logged in user, then check
-        // for the Vercel Cron secret to be present as an
-        // Authorization header:
-        const authHeader = req.headers.get('authorization')
-        return authHeader === `Bearer ${process.env.CRON_SECRET}`
-      },
-    },
+    //     console.log('Initializing cron job')
+    //     // If there is no logged in user, then check
+    //     // for the Vercel Cron secret to be present as an
+    //     // Authorization header:
+    //     const authHeader = req.headers.get('authorization')
+    //     return authHeader === `Bearer ${process.env.CRON_SECRET}`
+    //   },
+    // },
     tasks: [],
+    autoRun: [
+      {
+        cron: '*/5 * * * *', // Runs every 5 minutes
+        limit: 2, // limit jobs to process each run
+        queue: 'updatePaymentStatus', // name of the queue
+      },
+    ],
+    shouldAutoRun: async (payload) => {
+      updatePaymentStatus({ payload })
+
+      return true
+    },
   },
   email: resendAdapter({
     defaultFromAddress: 'info@orchestars.vn',

@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { afterChangeStatus } from './hooks/afterChangeStatus'
+import { PAYMENT_STATUSES } from './constants'
 
 export const Payments: CollectionConfig = {
   slug: 'payments',
@@ -99,12 +100,7 @@ export const Payments: CollectionConfig = {
       name: 'status',
       type: 'select',
       required: true,
-      options: [
-        { label: 'Processing', value: 'processing' },
-        { label: 'Canceled', value: 'canceled' },
-        { label: 'Paid', value: 'paid' },
-        { label: 'Failed', value: 'failed' },
-      ],
+      options: PAYMENT_STATUSES,
       hooks: {
         afterChange: [afterChangeStatus],
       },
