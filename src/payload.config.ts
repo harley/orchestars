@@ -123,14 +123,14 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  onInit: async (payload) => {
-    payload.jobs
-      .run()
-      .then(() => console.log('Initialized cron job'))
-      .catch((err) => {
-        console.error('Error while initializing cron job', err)
-      })
-  },
+  // onInit: async (payload) => {
+  //   payload.jobs
+  //     .run()
+  //     .then(() => console.log('Initialized cron job'))
+  //     .catch((err) => {
+  //       console.error('Error while initializing cron job', err)
+  //     })
+  // },
   jobs: {
     access: {
       run: ({ req }: { req: PayloadRequest }): boolean => {
