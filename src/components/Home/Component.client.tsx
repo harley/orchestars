@@ -38,10 +38,7 @@ const HomeClient = ({
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow">
         <ConcertBanner events={bannerDocs} />
-        <ConcertList
-          onGoingPaginatedDocs={onGoingPaginatedDocs}
-          title="Sự Kiện Đang Diễn Ra & Sắp Tới"
-        />
+        <ConcertList onGoingPaginatedDocs={onGoingPaginatedDocs} />
         {performers?.length > 0 && <PerformersSection performers={performers} />}
         {pastEvents?.length > 0 && <PastConcerts events={pastEvents} />}
         {partners?.length > 0 && <Sponsors partners={partners} />}

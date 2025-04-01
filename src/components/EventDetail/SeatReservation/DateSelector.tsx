@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 // import { cn } from '@/lib/utils'
 // import { CalendarIcon } from 'lucide-react'
 import { Event } from '@/payload-types'
+import { useTranslate } from '@/providers/I18n/client'
 
 interface DateSelectorProps {
   schedules: NonNullable<Event['schedules']>
@@ -14,6 +15,8 @@ interface DateSelectorProps {
 }
 
 const DateSelector: React.FC<DateSelectorProps> = ({ schedules, selectedDate, onDateSelect }) => {
+  const { t } = useTranslate()
+
   // Convert schedule dates to Date objects for the calendar
   // const availableDates = schedules
   //   .filter((schedule) => schedule.date)
@@ -27,7 +30,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({ schedules, selectedDate, on
 
   return (
     <div className="w-full mb-8">
-      <h3 className="text-xl font-bold mb-4 text-center">Chọn ngày bạn muốn tham dự</h3>
+      <h3 className="text-xl font-bold mb-4 text-center">{t('event.selectDateToAttend')}</h3>
       <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
         {/* <Popover>
           <PopoverTrigger asChild>

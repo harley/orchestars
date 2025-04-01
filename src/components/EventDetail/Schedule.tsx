@@ -2,7 +2,8 @@ import { Event, Media } from '@/payload-types'
 import React from 'react'
 import { format as dateFnsFormat, isValid } from 'date-fns'
 import EventScheduleImage from '@/components/EventDetail/EventScheduleImage'
-  
+import { useTranslate } from '@/providers/I18n/client'
+
 interface ScheduleItem {
   id: string
   date: string
@@ -16,6 +17,7 @@ interface ScheduleItem {
 }
 
 const Schedule = ({ schedules }: { schedules: Event['schedules'] }) => {
+  const { t } = useTranslate()
   const _schedules = (schedules as ScheduleItem[])
     ?.filter((sch) => !!sch)
     .map((sch) => sch as unknown as ScheduleItem)
@@ -23,7 +25,7 @@ const Schedule = ({ schedules }: { schedules: Event['schedules'] }) => {
   return (
     <section className="py-12 bg-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-8 text-center">Lịch trình</h2>
+        <h2 className="text-3xl font-bold mb-8 text-center">{t('event.schedule')}</h2>
 
         <div className="max-w-3xl mx-auto">
           {_schedules.map((schedule, idx) => (

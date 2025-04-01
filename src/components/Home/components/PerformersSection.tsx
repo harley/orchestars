@@ -4,6 +4,7 @@ import React, { useRef, useEffect } from 'react'
 import { Music, Users } from 'lucide-react'
 import { Performer } from '@/types/Performer'
 import { cn } from '@/utilities/ui'
+import { useTranslate } from '@/providers/I18n/client'
 
 const PerformerCard: React.FC<{ performer: Performer; index: number }> = ({ performer, index }) => {
   return (
@@ -45,6 +46,7 @@ const PerformerCard: React.FC<{ performer: Performer; index: number }> = ({ perf
 }
 
 const PerformersSection = ({ performers }: { performers: Performer[] }) => {
+  const { t } = useTranslate()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -112,14 +114,13 @@ const PerformersSection = ({ performers }: { performers: Performer[] }) => {
       <div className="container mx-auto px-6 md:px-10">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
-            Nghệ Sĩ Nổi Bật
+            {t('home.outstandingPerformers')}
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
         </div>
 
         <p className="text-muted-foreground text-center mb-16 max-w-2xl mx-auto text-lg">
-          Trải nghiệm những màn trình diễn đáng nhớ từ các nghệ sĩ tài năng, mang đến âm thanh độc
-          đáo và năng lượng cuốn hút trên sân khấu của chúng tôi.
+          {t('home.outstandingPerformersDescription')}
         </p>
 
         <div className="relative">

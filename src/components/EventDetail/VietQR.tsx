@@ -2,8 +2,11 @@
 
 import React from 'react'
 import { PaymentDetails } from './types'
+import { useTranslate } from '@/providers/I18n/client'
 
 const VietQR = ({ paymentDetails }: { paymentDetails: PaymentDetails }) => {
+  const { t } = useTranslate()
+
   return (
     <div className="text-center">
       <div className="relative w-[350px] h-[350px]">
@@ -22,15 +25,12 @@ const VietQR = ({ paymentDetails }: { paymentDetails: PaymentDetails }) => {
         ) : (
           <>
             <div className="absolute z-50 top-[30%] left-1/2 -translate-x-1/2 p-5 bg-gray-100/30 rounded-md flex flex-col items-center justify-center gap-2">
-              <span className="text-xs">
-                Có lỗi xảy ra khi hiển thị mã QR. Vui lòng tải lại trang hoặc bạn có thể nhập thông
-                tin chuyển khoản bên cạnh để tiến hành thanh toán
-              </span>
+              <span className="text-xs">{t('event.qrError')}</span>
             </div>
           </>
         )}
       </div>
-      <p className="mt-1 text-sm font-semibold italic">Quét mã này để chuyển tiền</p>
+      <p className="mt-1 text-sm font-semibold italic">{t('event.scanQRToTransfer')}</p>
     </div>
   )
 }

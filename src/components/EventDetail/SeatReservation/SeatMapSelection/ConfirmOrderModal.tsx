@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast'
 import axios from 'axios'
 import { Event, Promotion } from '@/payload-types'
 import { useSearchParams } from 'next/navigation'
+import { useTranslate } from '@/providers/I18n/client'
 
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 import { formatMoney } from '@/utilities/formatMoney'
@@ -44,6 +45,7 @@ const ConfirmOrderModal = ({
   onCloseModal: (options?: { resetSeat?: boolean }) => void
   selectedSeats: SelectedSeat[]
 }) => {
+  const { t } = useTranslate()
   const { toast } = useToast()
   const searchParams = useSearchParams()
   const eventScheduleId = searchParams.get('eventScheduleId')
@@ -141,9 +143,9 @@ const ConfirmOrderModal = ({
     } catch (error: any) {
       console.log('error, ', error)
 
-      const messageError = error?.response?.data?.message || 'Có lỗi xảy ra! Vui lòng thử lại'
+      const messageError = error?.response?.data?.message || t('message.errorOccurred')
       toast({
-        title: 'Thao tác không thành công',
+        title: t('message.operationFailed'),
         description: messageError,
         variant: 'destructive',
       })
@@ -158,8 +160,8 @@ const ConfirmOrderModal = ({
     try {
       if (!promotionCode) {
         return toast({
-          title: 'Thất bại',
-          description: 'Vui lòng nhập mã giảm giá',
+          title: t('message.promotionFailed'),
+          description: t('message.enterPromoCode'),
           variant: 'destructive',
         })
       }
@@ -174,15 +176,15 @@ const ConfirmOrderModal = ({
       console.log('result', promotionInfo)
 
       toast({
-        title: 'Thành công',
-        description: 'Đã áp dụng mã giảm giá',
+        title: t('message.promotionSuccess'),
+        description: t('message.promotionApplied'),
       })
 
       setPromotionInfo(promotionInfo)
     } catch (error: any) {
-      const messageError = error?.response?.data?.message || 'Mã giảm giá không hợp lệ'
+      const messageError = error?.response?.data?.message || t('message.invalidPromoCode')
       toast({
-        title: 'Thất bại',
+        title: t('message.promotionFailed'),
         description: messageError,
         variant: 'destructive',
       })
@@ -214,7 +216,9 @@ const ConfirmOrderModal = ({
       <DialogContent className="max-w-[90vw] w-full mx-auto my-4 h-[90vh] overflow-y-auto top-0 left-0 bottom-0 right-0 translate-x-0 translate-y-0">
         <DialogHeader>
           <DialogTitle className="text-center text-xl">
-            <h1 className="text-3xl font-bold text-center mb-8">Xác Nhận Đặt Vé Và Thanh Toán</h1>
+            <h1 className="text-3xl font-bold text-center mb-8">
+              {t('event.confirmOrderAndPayment')}
+            </h1>
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(handleConfirm)}>
@@ -222,14 +226,14 @@ const ConfirmOrderModal = ({
             <div className="grid md:grid-cols-2 gap-8">
               {/* Left Column - User Info & Payment Methods */}
               <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4">Thông tin người nhận vé</h2>
+                <h2 className="text-xl font-semibold mb-4">{t('event.recipientInfo')}</h2>
 
                 <div className="space-y-4 mb-6">
                   <div>
-                    <Label htmlFor="lastName">Họ *</Label>
+                    <Label htmlFor="lastName">{t('event.lastName')} *</Label>
                     <Input
-                      placeholder="Nhập họ của bạn"
-                      {...register('lastName', { required: 'Họ không được để trống' })}
+                      placeholder={t('event.enterLastName')}
+                      {...register('lastName', { required: t('event.lastNameRequired') })}
                     />
                     {errors.lastName?.message && (
                       <p className="text-red-500">{errors.lastName.message}</p>
@@ -237,21 +241,21 @@ const ConfirmOrderModal = ({
                   </div>
 
                   <div>
-                    <Label htmlFor="firstName">Tên *</Label>
+                    <Label htmlFor="firstName">{t('event.firstName')} *</Label>
                     <Input
-                      placeholder="Nhập tên của bạn"
-                      {...register('firstName', { required: 'Tên không được để trống' })}
+                      placeholder={t('event.enterFirstName')}
+                      {...register('firstName', { required: t('event.firstNameRequired') })}
                     />
                     {errors.firstName?.message && (
                       <p className="text-red-500">{errors.firstName.message}</p>
                     )}
                   </div>
                   <div>
-                    <Label htmlFor="phone">Số điện thoại *</Label>
+                    <Label htmlFor="phone">{t('event.phoneNumber')} *</Label>
                     <Input
-                      placeholder="Nhập số điện thoại"
+                      placeholder={t('event.enterPhoneNumber')}
                       {...register('phoneNumber', {
-                        required: 'Số điện thoại không được để trống',
+                        required: t('event.phoneNumberRequired'),
                       })}
                     />
                     {errors.phoneNumber?.message && (
@@ -260,14 +264,14 @@ const ConfirmOrderModal = ({
                   </div>
 
                   <div>
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email">{t('event.email')} *</Label>
                     <Input
-                      placeholder="Nhập email"
+                      placeholder={t('event.enterEmail')}
                       {...register('email', {
-                        required: 'Email không được để trống',
+                        required: t('event.emailRequired'),
                         pattern: {
                           value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                          message: 'Email không đúng định dạng',
+                          message: t('event.emailInvalidFormat'),
                         },
                       })}
                     />
@@ -279,7 +283,7 @@ const ConfirmOrderModal = ({
 
                 <Separator className="my-6" />
 
-                <h2 className="text-xl font-semibold mb-4">Thanh Toán Trang Tiếp Theo (QR/Thẻ)</h2>
+                <h2 className="text-xl font-semibold mb-4">{t('event.selectPaymentMethod')}</h2>
 
                 <RadioGroup value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
                   <div className="space-y-2">
@@ -304,27 +308,29 @@ const ConfirmOrderModal = ({
 
               {/* Right Column - Order Summary */}
               <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4">Tóm tắt đơn hàng</h2>
+                <h2 className="text-xl font-semibold mb-4">{t('event.orderSummary')}</h2>
 
                 <div className="mb-6">
-                  <h3 className="font-medium text-lg mb-2">Thông tin vé</h3>
+                  <h3 className="font-medium text-lg mb-2">{t('event.ticketInfo')}</h3>
                   <Separator className="my-4" />
-                  <h4 className="font-medium mb-2">Ghế đã chọn:</h4>
+                  <h4 className="font-medium mb-2">{t('event.selectedSeats')}:</h4>
                   {selectedSeats.map((seat) => (
                     <div key={seat.id} className="flex justify-between mb-2">
-                      <span>Ghế {seat.label}</span>
+                      <span>
+                        {t('event.seat')} {seat.label}
+                      </span>
                       <span>{formatMoney(seat.ticketPrice?.price || 0)}</span>
                     </div>
                   ))}
                 </div>
 
                 <div className="mb-6">
-                  <Label htmlFor="promoCode">Nhập mã giảm giá</Label>
+                  <Label htmlFor="promoCode">{t('event.enterPromoCode')}</Label>
                   <div className="grid md:grid-cols-[1fr,100px] gap-[2px]">
                     <Input
                       value={promotionCode}
                       onChange={(e) => setPromotionCode(e.target.value)}
-                      placeholder="Mã giảm giá"
+                      placeholder={t('event.promoCode')}
                     />
                     <Button
                       disabled={isSubmitting || isSubmittingPromotionForm}
@@ -334,7 +340,7 @@ const ConfirmOrderModal = ({
                       size="sm"
                       className="whitespace-nowrap border border-[#1390d6]  px-3 h-[40px] bg-[#1390d6] hover:bg-[#169eeb] !text-white"
                     >
-                      Dùng mã
+                      {t('event.applyCode')}
                     </Button>
                   </div>
                 </div>
@@ -344,7 +350,9 @@ const ConfirmOrderModal = ({
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <Check className="h-5 w-5 text-green-600" />
-                        <span className="font-medium">Mã giảm giá: {promotionCode}</span>
+                        <span className="font-medium">
+                          {t('event.promoCode')}: {promotionCode}
+                        </span>
                       </div>
                       <span className="text-green-600 font-medium">
                         {promotionInfo.discountType === 'percentage'
@@ -359,13 +367,13 @@ const ConfirmOrderModal = ({
 
                 {/* Total Amount */}
                 <div className="flex justify-between items-center mb-6">
-                  <span className="text-base font-bold">Tổng số chưa giảm:</span>
+                  <span className="text-base font-bold">{t('event.totalBeforeDiscount')}:</span>
                   <span className="text-lg font-bold text-primary">
                     {formatMoney(calculateTotal)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mb-6">
-                  <span className="text-base font-bold">Tổng số tiền thanh toán:</span>
+                  <span className="text-base font-bold">{t('event.totalAfterDiscount')}:</span>
                   <span className="text-lg font-bold text-primary">
                     {formatMoney(calculateTotalWithPromotion)}
                   </span>
@@ -384,7 +392,7 @@ const ConfirmOrderModal = ({
                         ) : (
                           <Check className="mr-2 h-4 w-4" />
                         )}
-                        Xác nhận và Thanh toán
+                        {t('event.confirmAndPay')}
                       </Button>
                       <Button
                         variant="outline"
@@ -392,16 +400,12 @@ const ConfirmOrderModal = ({
                         onClick={() => onCloseModal()}
                         disabled={isSubmitting}
                       >
-                        <X className="mr-2 h-4 w-4" /> Đóng
+                        <X className="mr-2 h-4 w-4" /> {t('event.close')}
                       </Button>
                     </div>
                     <div className="mt-4 flex items-start gap-2 text-sm text-gray-500">
                       <Info className="h-5 w-5 flex-shrink-0 text-gray-400" />
-                      <p>
-                        Bằng việc nhấn vào {'"Xác nhận và Thanh toán"'}, bạn đồng ý với Điều khoản
-                        Dịch vụ và Chính sách Bảo mật của chúng tôi. Vé của bạn sẽ được gửi qua
-                        email sau khi thanh toán thành công.
-                      </p>
+                      <p>{t('event.paymentTerms')}</p>
                     </div>
                   </>
                 )}
@@ -419,7 +423,7 @@ const ConfirmOrderModal = ({
                         ) : (
                           <Check className="mr-2 h-4 w-4" />
                         )}
-                        Xác nhận và Qua trang thanh toán
+                        {t('event.confirmAndGoToPayment')}
                       </Button>
                       <Button
                         variant="outline"
@@ -427,15 +431,12 @@ const ConfirmOrderModal = ({
                         onClick={() => onCloseModal()}
                         disabled={isSubmitting || isSubmittingPromotionForm}
                       >
-                        <X className="mr-2 h-4 w-4" /> Đóng
+                        <X className="mr-2 h-4 w-4" /> {t('event.close')}
                       </Button>
                     </div>
                     <div className="mt-4 flex items-start gap-2 text-sm text-gray-500">
                       <Info className="h-5 w-5 flex-shrink-0 text-gray-400" />
-                      <p>
-                        Vé của bạn sẽ được gửi qua email sau khi chúng tôi xác nhận thanh toán thành
-                        công.
-                      </p>
+                      <p>{t('event.bankTransferTerms')}</p>
                     </div>
                   </>
                 )}

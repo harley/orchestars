@@ -1,6 +1,7 @@
 import React from 'react'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
+import { t } from '@/providers/I18n/server'
 
 const UpcomingSaleBanner = () => {
   return (
@@ -13,15 +14,12 @@ const UpcomingSaleBanner = () => {
                 variant="outline"
                 className="bg-amber-100 text-amber-800 border-amber-300 text-[18px] py-2 px-4"
               >
-                Sắp mở bán
+                {t('event.upcomingSale')}
               </Badge>
-              <AlertTitle className="text-amber-800 !mb-0">Bạn đã sẵn sàng chưa?</AlertTitle>
+              <AlertTitle className="text-amber-800 !mb-0">{t('event.areYouReady')}</AlertTitle>
             </div>
             <AlertDescription className="text-amber-700">
-              <p>
-                Cơ hội không thể bỏ lỡ! Vé sẽ chính thức mở bán trong thời gian tới. Hãy sẵn sàng để
-                sở hữu tấm vé của bạn và trải nghiệm sự kiện đáng mong chờ nhất!
-              </p>
+              <p>{t('event.opportunityMessage')}</p>
             </AlertDescription>
           </div>
         </div>

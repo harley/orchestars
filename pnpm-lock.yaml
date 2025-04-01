@@ -53,6 +53,9 @@ importers:
       '@payloadcms/storage-vercel-blob':
         specifier: ^3.30.0
         version: 3.30.0(@types/react@19.0.10)(monaco-editor@0.52.2)(next@15.2.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.4))(payload@3.30.0(graphql@16.10.0)(typescript@5.7.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.3)
+      '@payloadcms/translations':
+        specifier: ^3.31.0
+        version: 3.31.0
       '@payloadcms/ui':
         specifier: ^3.30.0
         version: 3.30.0(@types/react@19.0.10)(monaco-editor@0.52.2)(next@15.2.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.4))(payload@3.30.0(graphql@16.10.0)(typescript@5.7.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.3)
@@ -1559,6 +1562,9 @@ packages:
 
   '@payloadcms/translations@3.30.0':
     resolution: {integrity: sha512-m7tZBT4pPB2IPhm05vZNbTBNjCvMOnzkrmkbvmSl4FHnJNvViAfwn6PA8SOE2+2uQo8GxwMmtHvHWYfUxuxd5Q==}
+
+  '@payloadcms/translations@3.31.0':
+    resolution: {integrity: sha512-vjbBuHJUZ04R7wkOR1+QhZRO1xG7bvkLgx6zoiKZZmvItqiPA5ZWsyrq3NFhviOH26dH2tOdnO+RLPuaElkWFg==}
 
   '@payloadcms/ui@3.30.0':
     resolution: {integrity: sha512-6WllKAssnPdE8+NoiLlr/1ziqtDdcnW1VKCHuLtDbNhxotABk6TjubJKQ37vebyZGdN0t3S3JPiYGa264Z6uOg==}
@@ -7464,6 +7470,10 @@ snapshots:
       - typescript
 
   '@payloadcms/translations@3.30.0':
+    dependencies:
+      date-fns: 4.1.0
+
+  '@payloadcms/translations@3.31.0':
     dependencies:
       date-fns: 4.1.0
 
