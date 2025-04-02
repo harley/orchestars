@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { getCookie, setCookie } from '@/utilities/clientCookies'
+import { DEFAULT_FALLBACK_LOCALE } from '@/config/app'
 
 type Language = {
   code: string
@@ -26,7 +27,7 @@ interface LanguageSwitcherProps {
 }
 
 const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
-  const locale = getCookie('next-locale') || 'vi'
+  const locale = getCookie('next-locale') || DEFAULT_FALLBACK_LOCALE
 
   const currentLanguage = useMemo(() => {
     return languages.find((l) => l.code === (locale as string)) || (languages[0] as Language)

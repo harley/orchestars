@@ -1,9 +1,10 @@
 import { cookies, headers } from 'next/headers'
 import { i18n as i18nPayloadConfig } from '@/payload-config/i18n'
 import { translate } from '../utils'
+import { DEFAULT_FALLBACK_LOCALE } from '@/config/app'
 
 const COOKIE_NAME = 'next-locale'
-const DEFAULT_LOCALE = i18nPayloadConfig?.fallbackLanguage || 'vi'
+const DEFAULT_LOCALE = i18nPayloadConfig?.fallbackLanguage || DEFAULT_FALLBACK_LOCALE
 
 export async function getLocale() {
   const headersList = await headers()
