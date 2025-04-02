@@ -72,6 +72,7 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    'checkin-records': CheckinRecord;
     events: Event;
     promotions: Promotion;
     userPromotionRedemptions: UserPromotionRedemption;
@@ -102,6 +103,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    'checkin-records': CheckinRecordsSelect<false> | CheckinRecordsSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     promotions: PromotionsSelect<false> | PromotionsSelect<true>;
     userPromotionRedemptions: UserPromotionRedemptionsSelect<false> | UserPromotionRedemptionsSelect<true>;
@@ -762,6 +764,21 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "checkin-records".
+ */
+export interface CheckinRecord {
+  id: number;
+  event: number | Event;
+  ticket: number | Ticket;
+  ticketCode: string;
+  eventScheduleId?: string | null;
+  checkInTime?: string | null;
+  checkedInBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
 export interface Event {
@@ -830,6 +847,81 @@ export interface Event {
     showBannerLocation?: boolean | null;
   };
   status?: ('draft' | 'published_upcoming' | 'published_open_sales' | 'completed' | 'cancelled') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tickets".
+ */
+export interface Ticket {
+  id: number;
+  attendeeName?: string | null;
+  user?: (number | null) | User;
+  userEmail?: string | null;
+  ticketCode?: string | null;
+  seat?: string | null;
+  ticketPriceName?: string | null;
+  ticketPriceInfo?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  event?: (number | null) | Event;
+  eventScheduleId?: string | null;
+  eventDate?: string | null;
+  orderItem?: (number | null) | OrderItem;
+  order?: (number | null) | Order;
+  orderCode?: string | null;
+  status?: ('booked' | 'pending_payment' | 'hold' | 'cancelled') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orderItems".
+ */
+export interface OrderItem {
+  id: number;
+  order: number | Order;
+  event: number | Event;
+  ticketPriceId: string;
+  ticketPriceName?: string | null;
+  seat?: string | null;
+  quantity: number;
+  price: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  orderCode?: string | null;
+  user?: (number | null) | User;
+  status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
+  currency?: string | null;
+  promotion?: (number | null) | Promotion;
+  promotionCode?: string | null;
+  totalBeforeDiscount?: number | null;
+  totalDiscount?: number | null;
+  total?: number | null;
+  customerData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  expireAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -905,81 +997,6 @@ export interface Payment {
   status: 'processing' | 'canceled' | 'paid' | 'failed';
   paidAt?: string | null;
   expireAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orders".
- */
-export interface Order {
-  id: number;
-  orderCode?: string | null;
-  user?: (number | null) | User;
-  status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
-  currency?: string | null;
-  promotion?: (number | null) | Promotion;
-  promotionCode?: string | null;
-  totalBeforeDiscount?: number | null;
-  totalDiscount?: number | null;
-  total?: number | null;
-  customerData?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  expireAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orderItems".
- */
-export interface OrderItem {
-  id: number;
-  order: number | Order;
-  event: number | Event;
-  ticketPriceId: string;
-  ticketPriceName?: string | null;
-  seat?: string | null;
-  quantity: number;
-  price: number;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tickets".
- */
-export interface Ticket {
-  id: number;
-  attendeeName?: string | null;
-  user?: (number | null) | User;
-  userEmail?: string | null;
-  ticketCode?: string | null;
-  seat?: string | null;
-  ticketPriceName?: string | null;
-  ticketPriceInfo?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  event?: (number | null) | Event;
-  eventScheduleId?: string | null;
-  eventDate?: string | null;
-  orderItem?: (number | null) | OrderItem;
-  order?: (number | null) | Order;
-  orderCode?: string | null;
-  status?: ('booked' | 'pending_payment' | 'hold' | 'cancelled') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1326,6 +1343,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'checkin-records';
+        value: number | CheckinRecord;
       } | null)
     | ({
         relationTo: 'events';
@@ -1743,6 +1764,20 @@ export interface UsersSelect<T extends boolean = true> {
   firstName?: T;
   lastName?: T;
   lastActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "checkin-records_select".
+ */
+export interface CheckinRecordsSelect<T extends boolean = true> {
+  event?: T;
+  ticket?: T;
+  ticketCode?: T;
+  eventScheduleId?: T;
+  checkInTime?: T;
+  checkedInBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
