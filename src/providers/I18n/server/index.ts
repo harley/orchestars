@@ -3,7 +3,7 @@ import { i18n as i18nPayloadConfig } from '@/payload-config/i18n'
 import { translate } from '../utils'
 
 const COOKIE_NAME = 'next-locale'
-const DEFAULT_LOCALE = i18nPayloadConfig?.fallbackLanguage || 'en'
+const DEFAULT_LOCALE = i18nPayloadConfig?.fallbackLanguage || 'vi'
 
 export async function getLocale() {
   const headersList = await headers()

@@ -1,3 +1,6 @@
+'use client'
+
+import { useTranslate } from '@/providers/I18n/client'
 import { Partner } from '@/types/Partner'
 import React, { useRef, useEffect, useState } from 'react'
 
@@ -6,6 +9,7 @@ interface SponsorsProps {
 }
 
 const Sponsors: React.FC<SponsorsProps> = ({ partners = [] }) => {
+  const { t } = useTranslate()
   const sectionRef = useRef<HTMLDivElement>(null)
   const [currentPage, setCurrentPage] = useState(0)
   const sponsorsPerPage = 5
@@ -48,7 +52,7 @@ const Sponsors: React.FC<SponsorsProps> = ({ partners = [] }) => {
       <div className="container mx-auto px-6 md:px-10">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
-            Nhà Tài Trợ Và Đối Tác
+            {t('home.sponsorsAndPartners')}
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
         </div>

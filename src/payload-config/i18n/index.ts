@@ -9,7 +9,7 @@ export const i18n: Config['i18n'] = {
     en: extraEnLanguage,
     vi: extraViLanguage,
   },
-  fallbackLanguage: 'en',
+  fallbackLanguage: 'vi',
   supportedLanguages: {
     en: en as any,
     vi: vi as any,

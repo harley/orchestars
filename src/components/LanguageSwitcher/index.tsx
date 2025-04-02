@@ -26,7 +26,7 @@ interface LanguageSwitcherProps {
 }
 
 const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
-  const locale = getCookie('next-locale') || 'en'
+  const locale = getCookie('next-locale') || 'vi'
 
   const currentLanguage = useMemo(() => {
     return languages.find((l) => l.code === (locale as string)) || (languages[0] as Language)
