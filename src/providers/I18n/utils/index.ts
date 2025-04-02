@@ -1,4 +1,6 @@
 export const translate = (key: string, messages: Record<string, any>) => {
+  if (!key || !messages) return key
+
   // Handle nested keys like 'user.greeting'
   const parts = key.split('.')
   let result = messages

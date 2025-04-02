@@ -313,10 +313,12 @@ const ConfirmOrderWithTicketClassModal = ({
                 <div className="mb-6">
                   <h3 className="font-medium text-lg mb-2">{t('event.ticketInfo')}</h3>
                   <Separator className="my-4" />
-                  <h4 className="font-medium mb-2">{t('event.selectedTickets')}:</h4>
+                  <h4 className="font-medium mb-2">{t('seatSelection.selectedTickets')}:</h4>
                   {selectedTicketPrices.map((tkPrice, idx) => (
                     <div key={idx} className="flex justify-between mb-2">
-                      <span>Vé {tkPrice.ticketPrice?.name}</span>
+                      <span>
+                        {t('event.ticket')} {tkPrice.ticketPrice?.name}
+                      </span>
                       <span>
                         {tkPrice.quantity} x {formatMoney(tkPrice.ticketPrice?.price || 0)}
                       </span>

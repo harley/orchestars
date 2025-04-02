@@ -1,9 +1,10 @@
 import React from 'react'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { t } from '@/providers/I18n/server'
+import { getLocale, t } from '@/providers/I18n/server'
 
-const UpcomingSaleBanner = () => {
+const UpcomingSaleBanner = async () => {
+  const locale = await getLocale()
   return (
     <section className="mt-6 mb-6">
       <Alert className="bg-amber-50 border-amber-200 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ">
@@ -14,12 +15,14 @@ const UpcomingSaleBanner = () => {
                 variant="outline"
                 className="bg-amber-100 text-amber-800 border-amber-300 text-[18px] py-2 px-4"
               >
-                {t('event.upcomingSale')}
+                {t('event.upcomingSale', locale)}
               </Badge>
-              <AlertTitle className="text-amber-800 !mb-0">{t('event.areYouReady')}</AlertTitle>
+              <AlertTitle className="text-amber-800 !mb-0">
+                {t('event.areYouReady', locale)}
+              </AlertTitle>
             </div>
             <AlertDescription className="text-amber-700">
-              <p>{t('event.opportunityMessage')}</p>
+              <p>{t('event.opportunityMessage', locale)}</p>
             </AlertDescription>
           </div>
         </div>

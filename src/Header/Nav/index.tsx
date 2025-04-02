@@ -100,7 +100,11 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
         </nav>
         <div className="flex items-center md:hidden">
           <LanguageSwitcher className="mr-4" />
-          <button className="text-white focus:outline-none">
+          <button
+            className="text-white focus:outline-none"
+            aria-label="Toggle menu"
+            aria-expanded="false"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"

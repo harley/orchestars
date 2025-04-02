@@ -23,14 +23,19 @@ export async function getLocale() {
 // Function to load messages for the current locale
 export async function getMessages() {
   const locale = await getLocale()
-  const messages = (i18nPayloadConfig?.translations as any)?.[locale]
+
+  const messages = i18nPayloadConfig?.translations
+    ? (i18nPayloadConfig.translations as any)?.[locale]
+    : undefined
 
   return messages || {}
 }
 
 // Helper function to translate a key
-export async function t(key: string) {
-  const messages = await getMessages()
+export function t(key: string, locale: string) {
+  const messages = i18nPayloadConfig?.translations
+    ? (i18nPayloadConfig.translations as any)?.[locale]
+    : undefined
 
   return translate(key, messages)
 }
