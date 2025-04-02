@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 export const CheckInRecords: CollectionConfig = {
-  slug: 'checkin-records',
+  slug: 'checkinRecords',
   timestamps: true,
   access: {
     read: () => true,
