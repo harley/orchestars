@@ -1,5 +1,5 @@
 {
-  "id": "4c13679c-d614-48d6-b963-a6f10e248d1c",
+  "id": "de8606db-1e77-4047-a748-e769b74cf774",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -5068,6 +5068,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "ticket_id": {
           "name": "ticket_id",
           "type": "integer",
@@ -5119,6 +5125,21 @@
           "columns": [
             {
               "expression": "event_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "checkin_records_user_idx": {
+          "name": "checkin_records_user_idx",
+          "columns": [
+            {
+              "expression": "user_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -5197,6 +5218,19 @@
           "tableTo": "events",
           "columnsFrom": [
             "event_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "checkin_records_user_id_users_id_fk": {
+          "name": "checkin_records_user_id_users_id_fk",
+          "tableFrom": "checkin_records",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
           ],
           "columnsTo": [
             "id"

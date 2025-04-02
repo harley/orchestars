@@ -21,6 +21,12 @@ export const CheckInRecords: CollectionConfig = {
       required: true,
     },
     {
+      name: 'user',
+      type: 'relationship',
+      relationTo: 'users',
+      required: true,
+    },
+    {
       name: 'ticket',
       type: 'relationship',
       relationTo: 'tickets',

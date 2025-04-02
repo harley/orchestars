@@ -769,6 +769,7 @@ export interface Form {
 export interface CheckinRecord {
   id: number;
   event: number | Event;
+  user: number | User;
   ticket: number | Ticket;
   ticketCode: string;
   eventScheduleId?: string | null;
@@ -1773,6 +1774,7 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface CheckinRecordsSelect<T extends boolean = true> {
   event?: T;
+  user?: T;
   ticket?: T;
   ticketCode?: T;
   eventScheduleId?: T;

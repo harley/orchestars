@@ -5,6 +5,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
    CREATE TABLE IF NOT EXISTS "checkin_records" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"event_id" integer NOT NULL,
+  	"user_id" integer NOT NULL,
   	"ticket_id" integer NOT NULL,
   	"ticket_code" varchar NOT NULL,
   	"event_schedule_id" varchar,
@@ -22,6 +23,12 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   END $$;
   
   DO $$ BEGIN
+   ALTER TABLE "checkin_records" ADD CONSTRAINT "checkin_records_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
+  EXCEPTION
+   WHEN duplicate_object THEN null;
+  END $$;
+  
+  DO $$ BEGIN
    ALTER TABLE "checkin_records" ADD CONSTRAINT "checkin_records_ticket_id_tickets_id_fk" FOREIGN KEY ("ticket_id") REFERENCES "public"."tickets"("id") ON DELETE set null ON UPDATE no action;
   EXCEPTION
    WHEN duplicate_object THEN null;
@@ -34,6 +41,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   END $$;
   
   CREATE INDEX IF NOT EXISTS "checkin_records_event_idx" ON "checkin_records" USING btree ("event_id");
+  CREATE INDEX IF NOT EXISTS "checkin_records_user_idx" ON "checkin_records" USING btree ("user_id");
   CREATE UNIQUE INDEX IF NOT EXISTS "checkin_records_ticket_idx" ON "checkin_records" USING btree ("ticket_id");
   CREATE INDEX IF NOT EXISTS "checkin_records_checked_in_by_idx" ON "checkin_records" USING btree ("checked_in_by_id");
   CREATE INDEX IF NOT EXISTS "checkin_records_updated_at_idx" ON "checkin_records" USING btree ("updated_at");
