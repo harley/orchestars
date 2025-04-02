@@ -11,6 +11,7 @@ import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
+import { CheckInRecords } from './collections/CheckInRecords'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { plugins } from './plugins'
@@ -100,6 +101,7 @@ export default buildConfig({
     Media,
     Categories,
     Users,
+    CheckInRecords,
     Events,
     Promotions,
     UserPromotionRedemptions,

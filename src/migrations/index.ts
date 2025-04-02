@@ -28,6 +28,7 @@ import * as migration_20250323_112852_cleanup_users from './20250323_112852_clea
 import * as migration_20250324_081044_add_orders_to_tickets from './20250324_081044_add_orders_to_tickets';
 import * as migration_20250325_045037_update_task_slug from './20250325_045037_update_task_slug';
 import * as migration_20250327_015955_add_event_admin_role from './20250327_015955_add_event_admin_role';
+import * as migration_20250402_085734_add_checkin_orders_table from './20250402_085734_add_checkin_orders_table';
 
 export const migrations = [
   {
@@ -178,6 +179,11 @@ export const migrations = [
   {
     up: migration_20250327_015955_add_event_admin_role.up,
     down: migration_20250327_015955_add_event_admin_role.down,
-    name: '20250327_015955_add_event_admin_role'
+    name: '20250327_015955_add_event_admin_role',
+  },
+  {
+    up: migration_20250402_085734_add_checkin_orders_table.up,
+    down: migration_20250402_085734_add_checkin_orders_table.down,
+    name: '20250402_085734_add_checkin_orders_table'
   },
 ];
