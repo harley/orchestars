@@ -1,7 +1,8 @@
+import { DEFAULT_FALLBACK_LOCALE } from '@/config/app'
 import { Config } from 'payload'
 
 export const localization: Config['localization'] = {
-  defaultLocale: 'en',
+  defaultLocale: DEFAULT_FALLBACK_LOCALE,
   fallback: true,
   locales: [
     {
