@@ -72,7 +72,7 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
-    'checkin-records': CheckinRecord;
+    checkinRecords: CheckinRecord;
     events: Event;
     promotions: Promotion;
     userPromotionRedemptions: UserPromotionRedemption;
@@ -103,7 +103,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
-    'checkin-records': CheckinRecordsSelect<false> | CheckinRecordsSelect<true>;
+    checkinRecords: CheckinRecordsSelect<false> | CheckinRecordsSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     promotions: PromotionsSelect<false> | PromotionsSelect<true>;
     userPromotionRedemptions: UserPromotionRedemptionsSelect<false> | UserPromotionRedemptionsSelect<true>;
@@ -764,7 +764,7 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "checkin-records".
+ * via the `definition` "checkinRecords".
  */
 export interface CheckinRecord {
   id: number;
@@ -1346,7 +1346,7 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
-        relationTo: 'checkin-records';
+        relationTo: 'checkinRecords';
         value: number | CheckinRecord;
       } | null)
     | ({
@@ -1770,7 +1770,7 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "checkin-records_select".
+ * via the `definition` "checkinRecords_select".
  */
 export interface CheckinRecordsSelect<T extends boolean = true> {
   event?: T;
