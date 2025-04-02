@@ -17,6 +17,7 @@ import { EnvironmentIndicator } from '@/components/EnvironmentIndicator'
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
+import { getLocale } from '@/providers/I18n/server'
 
 import { Analytics } from '@vercel/analytics/next'
 import PixelTracker from '@/components/PixelTracker'
@@ -24,8 +25,14 @@ import PixelTracker from '@/components/PixelTracker'
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // const { isEnabled } = await draftMode()
 
+  const lang = await getLocale()
+
   return (
-    <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
+    <html
+      className={cn(GeistSans.variable, GeistMono.variable)}
+      lang={lang}
+      suppressHydrationWarning
+    >
       <head>
         {/* <InitTheme /> */}
         <link href="/favicon.ico" rel="icon" sizes="32x32" />

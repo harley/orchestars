@@ -21,6 +21,7 @@ import { formatMoney } from '@/utilities/formatMoney'
 import { useFieldArray, useForm } from 'react-hook-form'
 import ConfirmOrderWithTicketClassModal from './ConfirmOrderWithTicketClassModal'
 import Image from 'next/image'
+import { useTranslate } from '@/providers/I18n/client'
 
 export interface TicketPriceSelectedFormValues {
   ticketPrices: Array<{
@@ -36,6 +37,7 @@ const TicketClassSelection = ({
   event: Event
   unavailableSeats?: string[]
 }) => {
+  const { t } = useTranslate()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -205,10 +207,9 @@ const TicketClassSelection = ({
 
   const onSubmitTicketPriceForm = async (data: TicketPriceSelectedFormValues) => {
     try {
-      console.log('data', data)
       if (!data.ticketPrices?.length) {
         return toast({
-          title: 'Vui lòng chọn vé',
+          title: t('event.pleaseSelectTicket'),
           variant: 'destructive',
           duration: 3000,
         })
@@ -216,7 +217,7 @@ const TicketClassSelection = ({
 
       if (!selectedSchedule) {
         return toast({
-          title: 'Vui lòng chọn ngày',
+          title: t('event.pleaseChooseAttendingDate'),
           variant: 'destructive',
           duration: 3000,
         })
@@ -244,8 +245,7 @@ const TicketClassSelection = ({
     } catch (error: any) {
       console.log('error', error)
       toast({
-        title:
-          error?.response?.data?.message || 'Có lỗi xảy ra khi tiến hành giữ chỗ và thanh toán',
+        title: error?.response?.data?.message || t('message.errorHoldingSeat'),
         variant: 'destructive',
         duration: 3000,
       })
@@ -283,7 +283,7 @@ const TicketClassSelection = ({
             <form onSubmit={handleSubmitTicketPriceForm(onSubmitTicketPriceForm)}>
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
-                  Đặt chỗ
+                  {t('seatSelection.booking')}
                 </h2>
                 <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
               </div>
@@ -300,7 +300,9 @@ const TicketClassSelection = ({
                 handleToggleTicketPrice={handleToggleTicketPrice}
               />
 
-              <h2 className="text-xl font-bold mb-8 text-center mt-4">Vé đã chọn</h2>
+              <h2 className="text-xl font-bold mb-8 text-center mt-4">
+                {t('seatSelection.selectedTickets')}
+              </h2>
               <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                 {/* hidden for inactive seat selection */}
                 {/* <div className="bg-white p-6 rounded-lg shadow-md relative">
@@ -339,7 +341,7 @@ const TicketClassSelection = ({
                 <div className="bg-white p-6 rounded-lg shadow-md relative">
                   {!ticketPricesSelected?.length ? (
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                      Vui lòng chọn vé
+                      {t('event.pleaseSelectTicket')}
                     </div>
                   ) : (
                     watchTicketPricesSelected.map((field, index) => (
@@ -358,12 +360,15 @@ const TicketClassSelection = ({
                             <div className="w-24">
                               <Input
                                 {...registerTicketPriceForm(`ticketPrices.${index}.quantity`, {
-                                  required: 'Vui lòng nhập số vé',
+                                  required: t('event.enterTicketQuantity'),
                                   validate: {
-                                    isNumber: (v) => !isNaN(Number(v)) || 'Vui lòng nhập số',
-                                    isPositive: (v) => Number(v) > 0 || 'Số lượng phải lớn hơn 0',
+                                    isNumber: (v) =>
+                                      !isNaN(Number(v)) || t('event.quantityMustBeNumber'),
+                                    isPositive: (v) =>
+                                      Number(v) > 0 || t('event.quantityMustBePositive'),
                                     isInteger: (v) =>
-                                      Number.isInteger(Number(v)) || 'Số lượng phải là số nguyên',
+                                      Number.isInteger(Number(v)) ||
+                                      t('event.quantityMustBeInteger'),
                                   },
                                 })}
                                 type="text"
@@ -409,7 +414,7 @@ const TicketClassSelection = ({
 
                   <Separator className="my-4" />
                   <div className="flex justify-between font-bold text-xl">
-                    <span>Tổng</span>
+                    <span>{t('event.total')}</span>
                     <span>{formatMoney(calculateTotalTicketPrices())}</span>
                   </div>
 
@@ -431,7 +436,7 @@ const TicketClassSelection = ({
                     {isSubmittingTicketPriceForm && (
                       <Loader2 className={'my-28 h-16 w-16 text-primary/60 animate-spin'} />
                     )}
-                    Giữ chỗ và Thanh toán
+                    {t('event.holdAndPay')}
                   </Button>
                 </div>
               </div>
@@ -445,7 +450,7 @@ const TicketClassSelection = ({
           <div className="w-full max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
-                Sơ đồ sân khấu
+                {t('event.stageMap')}
               </h2>
               <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
             </div>
@@ -453,7 +458,7 @@ const TicketClassSelection = ({
               {loadingScheduleMap && (
                 <div className="absolute z-50 top-[30%] left-1/2 -translate-x-1/2 p-5 bg-gray-100/30 rounded-md flex flex-col items-center justify-center gap-2">
                   <Loader2 className="w-12 h-12 animate-spin" />
-                  <span>Đang tải...</span>
+                  <span>{t('common.loading')}</span>
                 </div>
               )}
 

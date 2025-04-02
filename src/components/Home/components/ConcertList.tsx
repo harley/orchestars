@@ -5,13 +5,15 @@ import { format as dateFnsFormat } from 'date-fns'
 import { PaginatedDocs } from 'payload'
 import { cn } from '@/utilities/ui'
 import Link from 'next/link'
+import { useTranslate } from '@/providers/I18n/client'
 interface ConcertListProps {
   onGoingPaginatedDocs: PaginatedDocs
-  title: string
 }
 
-const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }) => {
+const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs }) => {
   const elementsRef = useRef<(HTMLDivElement | null)[]>([])
+
+  const { t } = useTranslate()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,7 +43,7 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }
       <div className="container mx-auto px-6 md:px-10">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
-            {title}
+            {t('home.onGoingEvent')}
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
         </div>
@@ -115,7 +117,7 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, title }
                     href={`/events/${evt.slug}`}
                     className="text-sm px-4 py-2 bg-gray-800 text-white hover:bg-gray-800/90 shadow-subtle relative cursor-pointer rounded-lg font-medium inline-flex items-center justify-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/20"
                   >
-                    Đặt vé
+                    {t('home.bookTicket')}
                   </Link>
                 </div>
               </div>

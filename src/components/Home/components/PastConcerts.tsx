@@ -2,11 +2,13 @@ import React, { useRef, useEffect } from 'react'
 import { Calendar, MapPin } from 'lucide-react'
 import { Event } from '@/types/Event'
 import { format as dateFnsFormat } from 'date-fns'
+import { useTranslate } from '@/providers/I18n/client'
 interface PastConcertsProps {
   events: Event[]
 }
 
 const PastConcerts: React.FC<PastConcertsProps> = ({ events }) => {
+  const { t } = useTranslate()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const cardsRef = useRef<(HTMLDivElement | null)[]>([])
 
@@ -45,7 +47,7 @@ const PastConcerts: React.FC<PastConcertsProps> = ({ events }) => {
     <section className="py-20">
       <div className="container mx-auto px-6 md:px-10">
         <div className="flex justify-between items-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold">Sự Kiện Đã Diễn Ra</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">{t('home.pastEvents')}</h2>
 
           <div className="flex space-x-2">
             <button

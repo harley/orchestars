@@ -3,6 +3,7 @@ import React from 'react'
 import { categories } from '../data/seat-maps/categories'
 import { formatMoney } from '@/utilities/formatMoney'
 import { TicketPrice } from '../types'
+import { useTranslate } from '@/providers/I18n/client'
 
 interface TicketPricesProps {
   ticketPrices: Event['ticketPrices']
@@ -18,14 +19,17 @@ const TicketPrices = ({
   ticketPricesSelected,
   handleToggleTicketPrice,
 }: TicketPricesProps) => {
+  const { t } = useTranslate()
   const handlePriceSelect = (tkPrice: TicketPrice) => {
     handleToggleTicketPrice?.(tkPrice)
   }
 
   return (
     <div className="bg-white rounded-lg p-6 shadow-md mb-8">
-      <h4 className="text-lg font-semibold mb-2 text-center">Thông tin giá vé</h4>
-      <div className="text-sm italic text-center mb-4">Vui lòng nhấn vào vé bên dưới để mua</div>
+      <h4 className="text-lg font-semibold mb-2 text-center">{t('event.ticketInformation')}</h4>
+      <div className="text-sm italic text-center mb-4">
+        {t('event.pleaseClickOnTheTicketToBuy')}
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {ticketPrices?.map((tkPrice) => (
           <div

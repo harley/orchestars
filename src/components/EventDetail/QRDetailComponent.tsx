@@ -3,15 +3,15 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-import { Check, Loader2 } from 'lucide-react'
+import { Check, Loader2, Copy } from 'lucide-react'
 
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import VietQR from './VietQR'
-import { Copy } from 'lucide-react'
 import { PaymentDetails } from './types'
+import { useTranslate } from '@/providers/I18n/client'
 
 type FormValues = {
   transactionCode?: string
@@ -19,6 +19,7 @@ type FormValues = {
 }
 
 const QRDetailComponent = ({ paymentDetails }: { paymentDetails: PaymentDetails }) => {
+  const { t } = useTranslate()
   const { toast } = useToast()
   const router = useRouter()
   const {
@@ -49,7 +50,7 @@ const QRDetailComponent = ({ paymentDetails }: { paymentDetails: PaymentDetails 
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text)
     toast({
-      title: `Đã sao chép ${label}`,
+      title: `${t('event.copied')} ${label}`,
       duration: 2000,
     })
   }
@@ -59,28 +60,24 @@ const QRDetailComponent = ({ paymentDetails }: { paymentDetails: PaymentDetails 
   const handleConfirmPayment = async () => {
     await mockPending()
     toast({
-      title: 'Xác nhận yêu cầu của bạn',
-      description:
-        'Cảm ơn bạn! Chúng tôi sẽ sớm xác nhận và gửi thông tin chi tiết đến email của bạn trong vòng 24 giờ',
+      title: t('event.confirmRequest'),
+      description: t('event.confirmMessage'),
       duration: 5000,
     })
     setTimeout(() => {
       router.push('/')
     }, 1000)
   }
+
   const allowTransactionInput = false
   return (
     <div className="bg-white p-4 rounded-md shadow-md m-4">
-      <h2 className="text-center text-xl font-semibold mb-6">
-        Thanh toán qua chuyển khoản ngân hàng
-      </h2>
+      <h2 className="text-center text-xl font-semibold mb-6">{t('event.bankTransferPayment')}</h2>
       {/* 2-column layout on medium+ screens */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Left Column: QR code approach */}
         <div className="border p-4 rounded-md">
-          <h3 className="text-lg font-semibold mb-2">
-            Cách 1: Mở app ngân hàng / Ví và quét mã QR
-          </h3>
+          <h3 className="text-lg font-semibold mb-2">{t('event.qrCodeMethod')}</h3>
           <div className="flex justify-center mb-4">
             {/* The QR code component */}
             <VietQR paymentDetails={paymentDetails} />
@@ -92,25 +89,25 @@ const QRDetailComponent = ({ paymentDetails }: { paymentDetails: PaymentDetails 
             onClick={handleDownloadQR}
             disabled={!paymentDetails?.qrDataURL}
           >
-            Tải ảnh QR
+            {t('event.downloadQR')}
           </Button>
         </div>
 
         {/* Right Column: Manual bank transfer approach */}
         <div className="border p-4 rounded-md">
-          <h3 className="text-lg font-semibold mb-2">
-            Cách 2: Chuyển khoản thủ công theo thông tin
-          </h3>
+          <h3 className="text-lg font-semibold mb-2">{t('event.manualTransferMethod')}</h3>
           <div className="space-y-3">
             {/* Nội dung CK */}
             <div className="grid grid-cols-3 gap-2 bg-gray-50 p-2 rounded shadow items-center">
-              <div className="col-span-1 text-sm text-gray-500">Nội dung CK:</div>
+              <div className="col-span-1 text-sm text-gray-500">{t('event.transferContent')}:</div>
               <div className="col-span-2 flex items-center justify-between">
                 <p className="font-medium text-sm">{paymentDetails?.contentBankTransfer}</p>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleCopy(paymentDetails?.contentBankTransfer, 'nội dung CK')}
+                  onClick={() =>
+                    handleCopy(paymentDetails?.contentBankTransfer, t('event.transferContent'))
+                  }
                   style={{ marginLeft: '4px' }}
                 >
                   <Copy />
@@ -120,13 +117,13 @@ const QRDetailComponent = ({ paymentDetails }: { paymentDetails: PaymentDetails 
 
             {/* Ngân hàng */}
             <div className="grid grid-cols-3 gap-2 bg-gray-50 p-2 rounded shadow items-center">
-              <div className="col-span-1 text-sm text-gray-500">Ngân hàng:</div>
+              <div className="col-span-1 text-sm text-gray-500">{t('event.bank')}:</div>
               <div className="col-span-2 flex items-center justify-between">
                 <p className="font-medium text-sm">{paymentDetails?.bankName}</p>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleCopy(paymentDetails?.bankName, 'tên ngân hàng')}
+                  onClick={() => handleCopy(paymentDetails?.bankName, t('event.bank'))}
                   style={{ marginLeft: '4px' }}
                 >
                   <Copy />
@@ -136,13 +133,13 @@ const QRDetailComponent = ({ paymentDetails }: { paymentDetails: PaymentDetails 
 
             {/* Thụ hưởng */}
             <div className="grid grid-cols-3 gap-2 bg-gray-50 p-2 rounded shadow items-center">
-              <div className="col-span-1 text-sm text-gray-500">Thụ hưởng:</div>
+              <div className="col-span-1 text-sm text-gray-500">{t('event.beneficiary')}:</div>
               <div className="col-span-2 flex items-center justify-between">
                 <p className="font-medium text-sm">{paymentDetails?.accountName}</p>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleCopy(paymentDetails?.accountName, 'tên chủ tài khoản')}
+                  onClick={() => handleCopy(paymentDetails?.accountName, t('event.beneficiary'))}
                   style={{ marginLeft: '4px' }}
                 >
                   <Copy />
@@ -152,13 +149,13 @@ const QRDetailComponent = ({ paymentDetails }: { paymentDetails: PaymentDetails 
 
             {/* Số tài khoản */}
             <div className="grid grid-cols-3 gap-2 bg-gray-50 p-2 rounded shadow items-center">
-              <div className="col-span-1 text-sm text-gray-500">Số tài khoản:</div>
+              <div className="col-span-1 text-sm text-gray-500">{t('event.accountNumber')}:</div>
               <div className="col-span-2 flex items-center justify-between">
                 <p className="font-medium text-sm">{paymentDetails?.accountNo}</p>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleCopy(paymentDetails?.accountNo, 'số tài khoản')}
+                  onClick={() => handleCopy(paymentDetails?.accountNo, t('event.accountNumber'))}
                   style={{ marginLeft: '4px' }}
                 >
                   <Copy />
@@ -168,13 +165,13 @@ const QRDetailComponent = ({ paymentDetails }: { paymentDetails: PaymentDetails 
 
             {/* Số tiền */}
             <div className="grid grid-cols-3 gap-2 bg-gray-50 p-2 rounded shadow items-center">
-              <div className="col-span-1 text-sm text-gray-500">Số tiền:</div>
+              <div className="col-span-1 text-sm text-gray-500">{t('event.amount')}:</div>
               <div className="col-span-2 flex items-center justify-between">
                 <p className="font-medium text-sm">{formatTotalMoney}</p>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleCopy(formatTotalMoney, 'số tiền')}
+                  onClick={() => handleCopy(formatTotalMoney, t('event.amount'))}
                   style={{ marginLeft: '4px' }}
                 >
                   <Copy />
@@ -185,20 +182,17 @@ const QRDetailComponent = ({ paymentDetails }: { paymentDetails: PaymentDetails 
         </div>
       </div>
       {/* Note at the bottom */}
-      <p className="text-sm text-gray-600 mt-4 text-center italic">
-        Lưu ý: Sau khi chuyển khoản thành công. Vui lòng nhấn vào button bên dưới để xác nhận bạn đã
-        chuyển tiền
-      </p>
+      <p className="text-sm text-gray-600 mt-4 text-center italic">{t('event.transferNote')}</p>
       <form onSubmit={handleSubmit(handleConfirmPayment)} className="mt-6">
         {/* Transaction code field */}
         {allowTransactionInput && (
           <div className="mt-6">
-            <Label htmlFor="transactionCode">Mã giao dịch *</Label>
+            <Label htmlFor="transactionCode">{t('event.transactionCode')} *</Label>
             <Input
               id="transactionCode"
-              placeholder="Nhập mã giao dịch"
+              placeholder={t('event.enterTransactionCode')}
               {...register('transactionCode', {
-                required: 'Mã giao dịch không được để trống',
+                required: t('event.transactionCodeRequired'),
               })}
             />
             {errors.transactionCode && (
@@ -209,7 +203,7 @@ const QRDetailComponent = ({ paymentDetails }: { paymentDetails: PaymentDetails 
         {/* Transaction image upload */}
         {allowTransactionInput && (
           <div className="mt-4">
-            <Label htmlFor="transactionImage">Hình ảnh giao dịch *</Label>
+            <Label htmlFor="transactionImage">{t('event.transactionImage')} *</Label>
             <div className="mt-2 flex items-center justify-center w-full">
               <label
                 htmlFor="transaction-image"
@@ -233,9 +227,10 @@ const QRDetailComponent = ({ paymentDetails }: { paymentDetails: PaymentDetails 
                       />
                     </svg>
                     <p className="mb-2 text-sm text-gray-500">
-                      <span className="font-semibold">Bấm để tải ảnh</span> hoặc kéo thả vào đây
+                      <span className="font-semibold">{t('event.clickToUpload')}</span>{' '}
+                      {t('event.dragAndDrop')}
                     </p>
-                    <p className="text-xs text-gray-500">PNG, JPG hoặc JPEG (Tối đa 5MB)</p>
+                    <p className="text-xs text-gray-500">{t('event.imageFormat')}</p>
                   </div>
                 ) : (
                   <img
@@ -273,7 +268,7 @@ const QRDetailComponent = ({ paymentDetails }: { paymentDetails: PaymentDetails 
             ) : (
               <Check className="mr-2 h-4 w-4" />
             )}
-            Tôi xác nhận đã chuyển tiền thành công
+            {t('event.confirmTransfer')}
           </Button>
         </div>
       </form>

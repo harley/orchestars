@@ -14,6 +14,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { useTranslate } from '@/providers/I18n/client'
 
 type SeatItem = {
   id: string
@@ -32,6 +33,7 @@ const SeatMapToolkit = ({
   onSelectSeat?: (seat: any) => void
   unavailableSeats?: string[]
 }) => {
+  const { t } = useTranslate()
   const [loadingMap, setLoadingMap] = useState(true)
   const [seats, setSeats] = useState<SeatItem[]>([])
   const [showModal, setShowModal] = useState(false)
@@ -180,14 +182,14 @@ const SeatMapToolkit = ({
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Không chọn được ghế</DialogTitle>
+            <DialogTitle>{t('seatSelection.cannotSelectSeat')}</DialogTitle>
           </DialogHeader>
           <div>
-            <p>Xin quý khách vui lòng không bỏ trống ghế. </p>
+            <p>{t('seatSelection.noEmptySeats')}</p>
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button onClick={() => setShowModal(false)}>Close</Button>
+              <Button onClick={() => setShowModal(false)}>{t('seatSelection.close')}</Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>

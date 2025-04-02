@@ -18,6 +18,7 @@ import axios from 'axios'
 import DateSelector from '../DateSelector'
 import TicketPrices from '../TicketPrices'
 import { formatMoney } from '@/utilities/formatMoney'
+import { useTranslate } from '@/providers/I18n/client'
 
 export interface TicketPriceSelectedFormValues {
   ticketPrices: Array<{
@@ -37,6 +38,7 @@ const SeatMapSelection = ({
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { toast } = useToast()
+  const { t } = useTranslate()
 
   const [selectedSeats, setSelectedSeats] = useState<SelectedSeat[]>([])
 
@@ -122,7 +124,7 @@ const SeatMapSelection = ({
     try {
       if (!selectedSchedule) {
         return toast({
-          title: 'Vui lòng chọn ngày',
+          title: t('event.pleaseChooseAttendingDate'),
           variant: 'destructive',
           duration: 3000,
         })
@@ -131,7 +133,7 @@ const SeatMapSelection = ({
       const total = calculateTotal()
       if (total === 0) {
         toast({
-          title: 'Vui lòng chọn ghế',
+          title: t('event.pleaseSelectTicket'),
           variant: 'destructive',
         })
         return
@@ -158,8 +160,7 @@ const SeatMapSelection = ({
     } catch (error: any) {
       console.log('error', error)
       toast({
-        title:
-          error?.response?.data?.message || 'Có lỗi xảy ra khi tiến hành giữ chỗ và thanh toán',
+        title: error?.response?.data?.message || t('message.errorHoldingSeatAndPayment'),
         variant: 'destructive',
       })
     } finally {
@@ -189,7 +190,7 @@ const SeatMapSelection = ({
           <div className="w-full max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
-                Đặt chỗ
+                {t('seatSelection.booking')}
               </h2>
               <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
             </div>
@@ -210,7 +211,7 @@ const SeatMapSelection = ({
           <div className="w-full max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
-                Sơ đồ sân khấu
+                {t('seatSelection.stageMap')}
               </h2>
               <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
             </div>
@@ -218,7 +219,7 @@ const SeatMapSelection = ({
               {loadingScheduleMap && (
                 <div className="absolute z-50 top-[30%] left-1/2 -translate-x-1/2 p-5 bg-gray-100/30 rounded-md flex flex-col items-center justify-center gap-2">
                   <Loader2 className="w-12 h-12 animate-spin" />
-                  <span>Đang tải...</span>
+                  <span>{t('common.loading')}</span>
                 </div>
               )}
 
@@ -229,21 +230,20 @@ const SeatMapSelection = ({
                 />
               ) : (
                 <div className="text-center py-8 bg-gray-100 rounded-lg">
-                  <p className="text-lg text-gray-600">
-                    Vui lòng chọn ngày tham dự để xem sơ đồ chọn ghế
-                  </p>
+                  <p className="text-lg text-gray-600">{t('seatSelection.selectDatePrompt')}</p>
                 </div>
               )}
             </div>
           </div>
           <div className="mt-10">
-            <h2 className="text-xl font-bold mb-8 text-center mt-4">Vé đã chọn</h2>
+            <h2 className="text-xl font-bold mb-8 text-center mt-4">
+              {t('seatSelection.selectedTickets')}
+            </h2>
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {/* hidden for inactive seat selection */}
               <div className="bg-white p-6 rounded-lg shadow-md relative">
                 {!Object.values(ticketSelected).length ? (
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    Vui lòng chọn vé
+                    {t('seatSelection.selectTicketsPrompt')}
                   </div>
                 ) : (
                   Object.values(ticketSelected).map((option) => (
@@ -274,14 +274,15 @@ const SeatMapSelection = ({
               </div>
 
               <div className="bg-gray-50 p-6 rounded-lg shadow-md">
-                {/* hidden for inactive seat selection */}
                 {selectedSeats.length > 0 && (
                   <>
-                    <h3 className="text-xl font-bold mb-4">Ghế đã chọn</h3>
+                    <h3 className="text-xl font-bold mb-4">{t('seatSelection.selectedSeats')}</h3>
                     <Separator className="my-4" />
                     {selectedSeats.map((seat) => (
                       <div key={seat.id} className="flex justify-between mb-2">
-                        <span>Ghế {seat.label}</span>
+                        <span>
+                          {t('event.seat')} {seat.label}
+                        </span>
                         <span>
                           {formatMoney(
                             seat.ticketPrice?.price || 0,
@@ -295,7 +296,7 @@ const SeatMapSelection = ({
 
                 <Separator className="my-4" />
                 <div className="flex justify-between font-bold text-xl">
-                  <span>Tổng</span>
+                  <span>{t('seatSelection.total')}</span>
                   <span>{formatMoney(calculateTotal())}</span>
                 </div>
 
@@ -307,7 +308,7 @@ const SeatMapSelection = ({
                   {isLoadingSeatHolding && (
                     <Loader2 className={'my-28 h-16 w-16 text-primary/60 animate-spin'} />
                   )}
-                  Giữ chỗ và Thanh toán
+                  {t('seatSelection.holdAndPay')}
                 </Button>
               </div>
             </div>

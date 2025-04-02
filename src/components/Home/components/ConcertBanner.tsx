@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react'
 import { Calendar, MapPin } from 'lucide-react'
 import { format as dateFnsFormat } from 'date-fns'
 import Link from 'next/link'
+import { useTranslate } from '@/providers/I18n/client'
 
 interface EventBannerProps {
   events: Record<string, any>[]
 }
 
 const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
+  const { t } = useTranslate()
   const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
@@ -88,7 +90,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
                   href={`/events/${evt.slug}`}
                   className=" lg:py-3 lg:px-6 py-1 px-3 shadow-lg bg-slate-100/80 text-black lg:text-base text-[13px] hover:bg-slate-100/100 relative cursor-pointer rounded-lg font-medium inline-flex items-center justify-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/20"
                 >
-                  Xem chi tiết
+                  {t('home.viewDetail')}
                 </Link>
               </div>
             </div>

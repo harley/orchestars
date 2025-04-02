@@ -175,13 +175,13 @@ const handleOrderWithBookingTypeSeat = async ({ body }: { body: Record<string, a
       await clearSeatHolding({ nextResponse, payload })
 
       return nextResponse
-    } catch (error) {
+    } catch (error: any) {
       // Rollback the transaction
       console.error('ZaloPay transaction create order error:', error)
       await payload.db.rollbackTransaction(transactionID)
 
       return NextResponse.json(
-        { message: 'Có lỗi xảy ra! Vui lòng thử lại', error },
+        { message: error?.message || 'Có lỗi xảy ra! Vui lòng thử lại', error },
         { status: 400 },
       )
     }

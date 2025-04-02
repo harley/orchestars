@@ -31,6 +31,8 @@ import { Promotions } from './collections/Promotion'
 import { UserPromotionRedemptions } from './collections/Promotion/UserPromotionRedemtion'
 import Admins from './collections/Admins'
 import { updatePaymentStatus } from './collections/Payments/jobs/updatePaymentStatus'
+import { i18n } from './payload-config/i18n'
+// import { localization } from './payload-config/localization'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -164,4 +166,6 @@ export default buildConfig({
     defaultFromName: 'Orchestars',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
+  i18n,
+  // localization,
 })
