@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
           status: true,
           startDate: true,
           endDate: true,
+          conditions: true,
         },
       })
       .then((res) => res.docs?.[0])
@@ -84,5 +85,48 @@ export async function POST(request: NextRequest) {
       { message: error?.message || 'Có lỗi xảy ra! Vui lòng thử lại' },
       { status: 400 },
     )
+  }
+}
+
+// get public promotions
+
+export async function GET(request: NextRequest, _context: any) {
+  try {
+    const searchParams = request.nextUrl.searchParams
+    await payload.init({ config })
+
+    const eventId = searchParams.get('eventId')
+
+    const currentTime = new Date().toISOString()
+
+    const promotions = await payload
+      .find({
+        collection: 'promotions',
+        limit: 10,
+        where: {
+          event: { equals: Number(eventId) },
+          status: { equals: 'active' },
+          startDate: { less_than_equal: currentTime },
+          endDate: { greater_than_equal: currentTime },
+          isPrivate: { equals: false },
+        },
+        select: {
+          id: true,
+          code: true,
+          appliedTicketClasses: true,
+          perUserLimit: true,
+          discountType: true,
+          discountValue: true,
+          startDate: true,
+          endDate: true,
+          conditions: true,
+        },
+      })
+      .then((res) => res.docs)
+
+    return NextResponse.json(promotions, { status: 200 })
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json([], { status: 200 })
   }
 }

@@ -94,7 +94,13 @@
     "quantityMustBePositive": "Số lượng phải lớn hơn 0",
     "quantityMustBeInteger": "Số lượng phải là số nguyên",
     "nextPagePayment": "Thanh Toán Trang Tiếp Theo (QR/Thẻ)",
-    "ticket": "Vé"
+    "ticket": "Vé",
+    "availablePromotions": "Khuyến mãi có sẵn",
+    "off": "giảm",
+    "currencySymbol": "₫",
+    "requiresMinimumTickets": "Yêu cầu tối thiểu {{count}} vé",
+    "noPromotionsAvailable": "Hiện tại không có khuyến mãi nào",
+    "promotionNotMeetConditions": "Chưa thoả mãn điều kiện tối thiểu để áp dụng mã giảm giá"
   },
   "seatSelection": {
     "booking": "Đặt chỗ",

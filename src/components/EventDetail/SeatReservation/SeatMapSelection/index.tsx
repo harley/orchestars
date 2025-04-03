@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -11,7 +11,7 @@ import { isSameDay } from 'date-fns'
 import { SeatToolKitItem, SelectedSeat, TicketPrice } from '../../types'
 import SeatMapToolkit from './SeatToolkit'
 import ConfirmOrderModal from './ConfirmOrderModal'
-import { Event } from '@/payload-types'
+import { Event, Promotion } from '@/payload-types'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { getCookie, setCookie } from '@/utilities/clientCookies'
 import axios from 'axios'
@@ -170,6 +170,19 @@ const SeatMapSelection = ({
 
   const [isOpenConfirmOrderModal, handleOpenConfirmOrderModal] = useState(false)
 
+  const [promotions, setPromotions] = useState<Promotion[]>([])
+
+  useEffect(() => {
+    fetch(`/api/promotion?eventId=${event.id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setPromotions(data)
+      })
+      .catch((err) => {
+        console.log('Error while fetching promotions', err)
+      })
+  }, [event.id])
+
   return (
     <>
       <ConfirmOrderModal
@@ -183,6 +196,7 @@ const SeatMapSelection = ({
         }}
         selectedSeats={selectedSeats}
         event={event}
+        promotions={promotions}
       />
 
       <section className="py-12 bg-gray-100">

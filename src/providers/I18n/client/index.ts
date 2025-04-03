@@ -8,10 +8,10 @@ export const useTranslate = () => {
   const locale = getCookie('next-locale') || DEFAULT_FALLBACK_LOCALE
 
   const t = useCallback(
-    (key: string) => {
+    (key: string, params?: Record<string, any>) => {
       const messages = (i18nPayloadConfig?.translations as any)?.[locale]
 
-      return translate(key, messages)
+      return translate(key, messages, params)
     },
     [locale],
   )
