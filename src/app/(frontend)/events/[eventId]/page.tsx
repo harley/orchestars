@@ -78,7 +78,7 @@ const EventDetailPage = async (props: {
             />
           )}
           <DetailDescriptionClient event={eventDetail} />
-          <FeaturedPerformers />
+          <FeaturedPerformers eventSlug={eventSlug} />
           {!isUpcoming && (
             <>
               {/* {!!esventDetail.schedules?.length && <Schedule schedules={eventDetail.schedules} />} */}
