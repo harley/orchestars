@@ -19,6 +19,8 @@ import { useTranslate } from '@/providers/I18n/client'
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 import { formatMoney } from '@/utilities/formatMoney'
 import ZalopayIcon from '@/components/Icons/Zalopay'
+import PromotionList from '../PromotionList'
+import { calculateTotalOrder } from './utils/calculateTotal'
 
 interface PaymentMethod {
   id: string
@@ -39,11 +41,13 @@ const ConfirmOrderModal = ({
   isOpen,
   onCloseModal,
   selectedSeats,
+  promotions,
 }: {
   event: Event
   isOpen: boolean
   onCloseModal: (options?: { resetSeat?: boolean }) => void
   selectedSeats: SelectedSeat[]
+  promotions: Promotion[]
 }) => {
   const { t } = useTranslate()
   const { toast } = useToast()
@@ -193,23 +197,7 @@ const ConfirmOrderModal = ({
     }
   }
 
-  const calculateTotal = useMemo(() => {
-    return Object.values(ticketSelected).reduce((sum, tk) => sum + tk.total, 0) || 0
-  }, [ticketSelected])
-
-  const calculateTotalWithPromotion = useMemo(() => {
-    if (!promotionInfo) {
-      return calculateTotal
-    }
-
-    if (promotionInfo.discountType === 'percentage') {
-      return calculateTotal - (calculateTotal * promotionInfo.discountValue) / 100
-    } else if (promotionInfo.discountType === 'fixed_amount') {
-      return calculateTotal - promotionInfo.discountValue
-    }
-
-    return calculateTotal
-  }, [calculateTotal, promotionInfo])
+  const calculateTotal = calculateTotalOrder(promotionInfo, ticketSelected, event)
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onCloseModal()}>
@@ -324,6 +312,16 @@ const ConfirmOrderModal = ({
                   ))}
                 </div>
 
+                <PromotionList
+                  promotions={promotions}
+                  selectedPromotion={promotionInfo}
+                  onSelectPromotion={(promotion) => {
+                    setPromotionInfo(promotion)
+
+                    setPromotionCode(promotion?.code || '')
+                  }}
+                />
+
                 <div className="mb-6">
                   <Label htmlFor="promoCode">{t('event.enterPromoCode')}</Label>
                   <div className="grid md:grid-cols-[1fr,100px] gap-[2px]">
@@ -345,23 +343,36 @@ const ConfirmOrderModal = ({
                   </div>
                 </div>
 
-                {promotionInfo && (
-                  <div className="p-4 border rounded-md bg-green-50">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <Check className="h-5 w-5 text-green-600" />
-                        <span className="font-medium">
-                          {t('event.promoCode')}: {promotionCode}
+                {promotionInfo &&
+                  promotionInfo.code === promotionCode &&
+                  (calculateTotal.canApplyPromoCode ? (
+                    <div className="p-4 border rounded-md bg-green-50">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <Check className="h-5 w-5 text-green-600" />
+                          <span className="font-medium">
+                            {t('event.promoCode')}: {promotionCode}
+                          </span>
+                        </div>
+                        <span className="text-green-600 font-medium">
+                          {promotionInfo.discountType === 'percentage'
+                            ? `${promotionInfo.discountValue}%`
+                            : `${t('event.currencySymbol')}${promotionInfo.discountValue}`}
                         </span>
                       </div>
-                      <span className="text-green-600 font-medium">
-                        {promotionInfo.discountType === 'percentage'
-                          ? `${promotionInfo.discountValue}%`
-                          : formatMoney(promotionInfo.discountValue)}
-                      </span>
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <div className="p-4 border rounded-md bg-red-200">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <X className="h-10 w-10 text-red-600" />
+                          <span className="font-medium text-sm">
+                            {t('event.promotionNotMeetConditions')}: {promotionCode}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
 
                 <Separator className="my-4" />
 
@@ -369,13 +380,13 @@ const ConfirmOrderModal = ({
                 <div className="flex justify-between items-center mb-6">
                   <span className="text-base font-bold">{t('event.totalBeforeDiscount')}:</span>
                   <span className="text-lg font-bold text-primary">
-                    {formatMoney(calculateTotal)}
+                    {formatMoney(calculateTotal.amountBeforeDiscount)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mb-6">
                   <span className="text-base font-bold">{t('event.totalAfterDiscount')}:</span>
                   <span className="text-lg font-bold text-primary">
-                    {formatMoney(calculateTotalWithPromotion)}
+                    {formatMoney(calculateTotal.amount)}
                   </span>
                 </div>
 

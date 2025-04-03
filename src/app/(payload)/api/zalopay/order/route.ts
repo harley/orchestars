@@ -94,6 +94,43 @@ const handleOrderWithBookingTypeSeat = async ({ body }: { body: Record<string, a
           userId: customerData.id,
           payload,
         })
+
+        if (promotion.conditions?.isApplyCondition) {
+          const appliedTicketClasses = promotion?.appliedTicketClasses || []
+
+          const totalQuantityAppliedTicketClasses = orderItems.reduce(
+            (totalQuantity, orderItem) => {
+              const ticketPriceInfo = event?.ticketPrices?.find(
+                (ticketPrice: any) => ticketPrice.id === orderItem.ticketPriceId,
+              )
+
+              const appliedForTicket =
+                appliedTicketClasses.length === 0 ||
+                appliedTicketClasses.some(
+                  (applied) => applied.ticketClass === ticketPriceInfo?.name,
+                )
+
+              const quantity = 1 // for booking type seat, quantity always 1
+
+              if (appliedForTicket) {
+                totalQuantity += quantity
+              }
+
+              return totalQuantity
+            },
+            0,
+          )
+
+          const canApplyPromoCode =
+            !!promotion.conditions.minTickets &&
+            totalQuantityAppliedTicketClasses >= promotion.conditions.minTickets
+
+          if (!canApplyPromoCode) {
+            throw new Error(
+              `Chưa thoả mãn số lượng vé tối thiểu để áp dụng mã giảm giá [${promotion.code}]`,
+            )
+          }
+        }
       }
 
       const { amount, totalBeforeDiscount, totalDiscount } = calculateTotalDiscountBookingTypeSeat({

@@ -35,6 +35,7 @@ export const Promotions: CollectionConfig = {
       name: 'maxRedemptions',
       type: 'number',
       required: true,
+      min: 1,
     },
     {
       name: 'totalUsed',
@@ -45,6 +46,29 @@ export const Promotions: CollectionConfig = {
       type: 'number',
       required: true,
       defaultValue: 1,
+      min: 1,
+    },
+    {
+      name: 'conditions',
+      type: 'group',
+      fields: [
+        {
+          name: 'isApplyCondition',
+          type: 'checkbox',
+          required: false,
+          label: 'Apply Condition',
+        },
+        {
+          name: 'minTickets',
+          type: 'number',
+          required: false,
+          label: 'Minimum Tickets Quantity',
+          min: 1,
+          admin: {
+            placeholder: 'Minimum quantity: 1',
+          },
+        },
+      ],
     },
     {
       name: 'discountType',
@@ -106,6 +130,12 @@ export const Promotions: CollectionConfig = {
           value: 'disabled',
         },
       ],
+    },
+    {
+      name: 'isPrivate',
+      type: 'checkbox',
+      defaultValue: true,
+      label: 'Disable Public Visibility',
     },
   ],
 }

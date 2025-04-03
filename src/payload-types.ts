@@ -943,11 +943,16 @@ export interface Promotion {
   maxRedemptions: number;
   totalUsed?: number | null;
   perUserLimit: number;
+  conditions?: {
+    isApplyCondition?: boolean | null;
+    minTickets?: number | null;
+  };
   discountType: 'percentage' | 'fixed_amount';
   discountValue: number;
   startDate: string;
   endDate: string;
   status: 'draft' | 'active' | 'disabled';
+  isPrivate?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1856,11 +1861,18 @@ export interface PromotionsSelect<T extends boolean = true> {
   maxRedemptions?: T;
   totalUsed?: T;
   perUserLimit?: T;
+  conditions?:
+    | T
+    | {
+        isApplyCondition?: T;
+        minTickets?: T;
+      };
   discountType?: T;
   discountValue?: T;
   startDate?: T;
   endDate?: T;
   status?: T;
+  isPrivate?: T;
   updatedAt?: T;
   createdAt?: T;
 }
