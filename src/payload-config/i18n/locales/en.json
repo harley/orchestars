@@ -125,5 +125,50 @@
     "promotionApplied": "Promo code applied",
     "invalidPromoCode": "Invalid promo code",
     "errorHoldingSeat": "An error occurred while holding the seat and processing the payment"
+  },
+  "errorCode": {
+    "SYS001": "An error occurred! Please try again.",
+    "PROMO001": "The discount code cannot be empty.",
+    "PROMO002": "Invalid discount code.",
+    "PROMO003": "The discount code has reached its usage limit.",
+    "PROMO004": "The discount code cannot be used before the specified time.",
+    "PROMO005": "The discount code has expired.",
+    "PROMO006": "The minimum number of tickets required to apply the discount code has not been met.",
+    "PROMO007": "You have used all available uses for the discount code {{promotionCode}}.",
+    "PROMO008": "The minimum number of tickets required to apply the discount code {{promotionCode}} has not been met.",
+
+    "EVT001": "The event cannot be empty.",
+    "EVT002": "The event does not exist.",
+    "EVT003": "The event is not open for sale.",
+    "EVT004": "The event has been closed for sales.",
+    "EVT005": "The event has been canceled.",
+    "EVT006": "The event participation date cannot be empty.",
+    "EVT007": "Invalid participation date for the event {{eventTitle}}.",
+    "EVT008": "The event ID cannot be empty.",
+    "EVT009": "The event schedule ID cannot be empty.",
+
+    "SEAT001": "The seat cannot be empty.",
+    "SEAT002": "The seat(s) {{seats}} is being held by someone else! Please select another seat.",
+    "SEAT003": "The seat(s) {{seats}} has already been booked. Please select another seat.",
+    "SEAT004": "The seat selection session has expired! Please reselect your seats and try again.",
+    "SEAT005": "Duplicate seat {{seat}} detected! Please check again.",
+
+    "TICK001": "The ticket type cannot be empty.",
+    "TICK002": "The ticket type name cannot be empty.",
+    "TICK003": "The number of tickets must be a positive integer.",
+    "TICK004": "The ticket type does not exist.",
+    "TICK005": "Tickets for {{ticketClass}} are sold out! Please select another ticket.",
+    "TICK006": "Only {{remaining}} tickets are available for {{ticketClass}}! Please adjust the quantity.",
+    "TICK007": "The ticket type does not exist for the event {{eventTitle}}.",
+    "TICK008": "Seats for ticket class {{ticketClass}} on the selected date are sold out! Please choose a different ticket class.",
+    "TICK009": "Only {{remaining}} seats are available for ticket class {{ticketClass}} on the selected date! Please adjust your selection.",
+    "TICK010": "The ticket price ID cannot be empty.",
+
+    "BOOK001": "Invalid booking type.",
+
+    "ORD001": "The order category cannot be empty.",
+    "ORD002": "The order does not exist.",
+    "ORD003": "The order has already been paid.",
+    "ORD004": "The order has expired."
   }
 }

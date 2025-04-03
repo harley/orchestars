@@ -4,6 +4,7 @@ import config from '@/payload.config'
 import { generatePassword } from '@/utilities/generatePassword'
 import { headers } from 'next/headers'
 import { checkBookedOrPendingPaymentSeats } from '../../bank-transfer/order/utils'
+import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
 
 type SeatHoldingRequest = {
   seatName: string
@@ -17,17 +18,14 @@ export async function POST(request: NextRequest) {
   try {
     const body: SeatHoldingRequest = await request.json()
     if (!body.seatName) {
-      return NextResponse.json({ message: 'Ghế ngồi không được để trống' }, { status: 400 })
+      throw new Error('SEAT001')
     }
     if (!body.eventId) {
-      return NextResponse.json({ message: 'Sự kiện không được để trống' }, { status: 400 })
+      throw new Error('EVT001')
     }
 
     if (!body.eventScheduleId) {
-      return NextResponse.json(
-        { message: 'Ngày tham gia sự kiện không được để trống' },
-        { status: 400 },
-      )
+      throw new Error('EVT006')
     }
 
     await payload.init({ config })
@@ -46,13 +44,13 @@ export async function POST(request: NextRequest) {
       .then((evt) => evt)
 
     if (!event) {
-      throw new Error('Sự kiện không tồn tại')
+      throw new Error('EVT002')
     }
 
     const existSchedule = event.schedules?.some((sch) => sch?.id === body.eventScheduleId)
 
     if (!existSchedule) {
-      throw new Error(`Ngày tham dự sự kiện không đúng`)
+      throw new Error('EVT007')
     }
 
     await checkSeatAvailable(body)
@@ -127,10 +125,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ seatHoldingCode, expireTime }, { status: 200 })
   } catch (error: any) {
     console.error('Error occurred while holding seat', error)
-    return NextResponse.json(
-      { message: error?.message || 'Có lỗi xảy ra! Vui lòng thử lại' },
-      { status: 400 },
-    )
+    return NextResponse.json({ message: await handleNextErrorMsgResponse(error) }, { status: 400 })
   }
 }
 
@@ -174,9 +169,7 @@ const checkSeatAvailable = async (body: SeatHoldingRequest) => {
           .join(','),
       )
       .join(', ')
-    throw new Error(
-      `Ghế [${unavailableSeats}] đang được giữ bởi người khác! Vui lòng chọn ghế khác`,
-    )
+    throw new Error(`SEAT002|${JSON.stringify({ seats: unavailableSeats })}`)
   }
 
   // Check all seats in parallel, grouped by event
@@ -191,6 +184,6 @@ const checkSeatAvailable = async (body: SeatHoldingRequest) => {
 
   if (existingTicketSeats?.length > 0) {
     const unavailableSeats = existingTicketSeats.map((ticket) => ticket.seatName).join(', ')
-    throw new Error(`Ghế ${unavailableSeats} hiện đã được đặt. Vui lòng chọn ghế khác.`)
+    throw new Error(`SEAT003|${JSON.stringify({ seats: unavailableSeats })}`)
   }
 }

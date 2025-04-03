@@ -5,6 +5,7 @@ import { generatePassword } from '@/utilities/generatePassword'
 import { headers } from 'next/headers'
 import { Event } from '@/payload-types'
 import { ORDER_STATUS } from '@/collections/Orders/constants'
+import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
 
 type SeatHoldingRequest = {
   ticketClasses: { name: string; quantity: number }[]
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
   try {
     const body: SeatHoldingRequest = await request.json()
     if (!body.ticketClasses?.length) {
-      return NextResponse.json({ message: 'Loại vé không được để trống' }, { status: 400 })
+      throw new Error('TICK001')
     }
 
     // merge duplicate ticket class item
@@ -26,13 +27,10 @@ export async function POST(request: NextRequest) {
 
     for (const ticketClass of body.ticketClasses) {
       if (!ticketClass.name) {
-        return NextResponse.json({ message: 'Tên loại vé không được để trống' }, { status: 400 })
+        throw new Error('TICK002')
       }
       if (!Number.isInteger(ticketClass.quantity) || ticketClass.quantity <= 0) {
-        return NextResponse.json({
-          message: 'Số lượng vé phải là số nguyên dương',
-          status: 400,
-        })
+        throw new Error('TICK003')
       }
 
       mergedTicketClasses[ticketClass.name] =
@@ -45,14 +43,11 @@ export async function POST(request: NextRequest) {
     }))
 
     if (!body.eventId) {
-      return NextResponse.json({ message: 'Sự kiện không được để trống' }, { status: 400 })
+      throw new Error('EVT001')
     }
 
     if (!body.eventScheduleId) {
-      return NextResponse.json(
-        { message: 'Ngày tham gia sự kiện không được để trống' },
-        { status: 400 },
-      )
+      throw new Error('EVT006')
     }
 
     await payload.init({ config })
@@ -72,20 +67,20 @@ export async function POST(request: NextRequest) {
       .then((evt) => evt)
 
     if (!event) {
-      throw new Error('Sự kiện không tồn tại')
+      throw new Error('EVT002')
     }
 
     const existSchedule = event.schedules?.some((sch) => sch?.id === body.eventScheduleId)
 
     if (!existSchedule) {
-      throw new Error(`Ngày tham dự sự kiện không đúng`)
+      throw new Error('EVT007')
     }
 
     // check existing ticket class name
     for (const ticketClass of body.ticketClasses) {
       const existTicketClass = event.ticketPrices?.find((tkP) => tkP.name === ticketClass.name)
       if (!existTicketClass) {
-        throw new Error(`Hạng vé [${ticketClass.name}] không tồn tại`)
+        throw new Error(`TICK004|{"ticketClass":"${ticketClass.name}"}`)
       }
     }
 
@@ -163,10 +158,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ seatHoldingCode, expireTime }, { status: 200 })
   } catch (error: any) {
     console.error('Error occurred while holding seat', error)
-    return NextResponse.json(
-      { message: error?.message || 'Có lỗi xảy ra! Vui lòng thử lại' },
-      { status: 400 },
-    )
+    return NextResponse.json({ message: await handleNextErrorMsgResponse(error) }, { status: 400 })
   }
 }
 
@@ -256,14 +248,14 @@ const checkTicketClassAvailable = async ({
       (Number(existingTicketClasses[inputTicketClass?.name]) || 0)
 
     if (totalUnavailable >= maxQuantity) {
-      throw new Error(`Vé ${inputTicketClass.name} hiện đã được đặt hết! Vui lòng chọn vé khác.`)
+      throw new Error(`TICK005|${JSON.stringify({ ticketClass: inputTicketClass.name })}`)
     }
 
     const remaining = maxQuantity - totalUnavailable
 
     if (remaining < inputTicketClass.quantity) {
       throw new Error(
-        `Vé ${inputTicketClass.name} hiện chỉ còn tối đa ${remaining} vé!. Vui lòng nhập lại số lượng mua`,
+        `TICK006|${JSON.stringify({ ticketClass: inputTicketClass.name, remaining })}`,
       )
     }
   }

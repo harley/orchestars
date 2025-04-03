@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import payload from 'payload'
 import config from '@/payload.config'
 import { isAfter, isBefore } from 'date-fns'
+import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
+
 type SeatHoldingRequest = {
   code: string
   eventId: number
@@ -11,10 +13,10 @@ export async function POST(request: NextRequest) {
   try {
     const body: SeatHoldingRequest = await request.json()
     if (!body.code) {
-      return NextResponse.json({ message: 'Mã giảm giá không được để trống' }, { status: 400 })
+      throw new Error('PROMO001')
     }
     if (!body.eventId) {
-      return NextResponse.json({ message: 'Sự kiện không được để trống' }, { status: 400 })
+      throw new Error('EVTO001')
     }
 
     await payload.init({ config })
@@ -46,18 +48,18 @@ export async function POST(request: NextRequest) {
       .then((res) => res.docs?.[0])
 
     if (!promotion) {
-      throw new Error('Mã giảm giá không hợp lệ')
+      throw new Error('PROMO002')
     }
     if (!promotion.maxRedemptions || promotion.maxRedemptions < 1) {
-      throw new Error('Mã giảm giá đã hết lượt sử dụng')
+      throw new Error('PROMO003')
     }
     const currentTime = new Date()
     if (promotion.startDate && isAfter(promotion.startDate, currentTime)) {
-      throw new Error('Không thể dùng mã giảm giá trước thời gian quy định')
+      throw new Error('PROMO004')
     }
 
     if (promotion.endDate && isBefore(promotion.endDate, currentTime)) {
-      throw new Error('Mã giảm giá đã hết hạn')
+      throw new Error('PROMO005')
     }
 
     const userPromotionsPendingPayment = await payload
@@ -75,16 +77,13 @@ export async function POST(request: NextRequest) {
       promotion.maxRedemptions - (promotion.totalUsed || 0) - userPromotionsPendingPayment
 
     if (remainNumberRedemption <= 0) {
-      throw new Error('Mã giảm giá đã hết lượt sử dụng')
+      throw new Error('PROMO003')
     }
 
     return NextResponse.json(promotion, { status: 200 })
   } catch (error: any) {
     console.error('Error occurred while checking promotion code', error)
-    return NextResponse.json(
-      { message: error?.message || 'Có lỗi xảy ra! Vui lòng thử lại' },
-      { status: 400 },
-    )
+    return NextResponse.json({ message: await handleNextErrorMsgResponse(error) }, { status: 400 })
   }
 }
 
