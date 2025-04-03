@@ -137,7 +137,7 @@ const PerformersSection = ({ performers }: { performers: Performer[] }) => {
               WebkitOverflowScrolling: 'touch',
             }}
           >
-            {performers?.map((performer, index) => (
+            {(performers || []).map((performer, index) => (
               <PerformerCard key={performer.id} performer={performer} index={index} />
             ))}
           </div>
