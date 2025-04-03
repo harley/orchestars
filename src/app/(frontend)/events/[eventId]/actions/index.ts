@@ -2,6 +2,7 @@ import { EVENT_STATUS } from '@/collections/Events/constants/status'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { unstable_cache } from 'next/cache'
+import { fetchPerformers } from '@/components/Home/actions'
 
 async function getEventDetail(slug: string) {
   try {
@@ -36,4 +37,9 @@ async function getEventDetail(slug: string) {
 export const getEventCached = ({ slug }: { slug: string }) =>
   unstable_cache(async () => getEventDetail(slug), [slug], {
     tags: [`event-detail:${slug}`],
+  })
+
+export const getPerformersByEventCached = ({ eventSlug: _eventSlug }: { eventSlug: string }) =>
+  unstable_cache(async () => fetchPerformers(), [], {
+    tags: [`event-performers`],
   })

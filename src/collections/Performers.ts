@@ -65,6 +65,7 @@ export const Performers: CollectionConfig = {
           payload.logger.info(`Revalidating home-performers`)
 
           revalidateTag('home-performers')
+          revalidateTag('event-performers')
         }
 
         return doc
