@@ -714,7 +714,7 @@ export const checkPromotionCode = async ({
     !isNaN(promotion.perUserLimit as number) &&
     countTotalCurrentUserRedemption >= (promotion.perUserLimit as number)
   ) {
-    throw new Error(`PROMO007:${JSON.stringify({ promotionCode: promotion.code })} này`)
+    throw new Error(`PROMO007|${JSON.stringify({ promotionCode: promotion.code })}`)
   }
 
   return promotion
