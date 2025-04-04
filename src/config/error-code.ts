@@ -58,6 +58,7 @@ export const ORDER_ERROR_CODE = {
   ORD002: 'Đơn hàng không tồn tại',
   ORD003: 'Đơn hàng đã được thanh toán',
   ORD004: 'Đơn hàng đã hết hạn thanh toán',
+  ORD005: 'Vui lòng chọn ghế và thực hiện lại thao tác',
 }
 
 export const ERROR_CODES = {

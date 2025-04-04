@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       throw new Error('PROMO001')
     }
     if (!body.eventId) {
-      throw new Error('EVTO001')
+      throw new Error('EVT001')
     }
 
     await payload.init({ config })

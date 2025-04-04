@@ -474,7 +474,7 @@ export const createOrderAndTickets = async ({
     )
 
     if (!orderItem) {
-      throw new Error('Vui lòng chọn ghế và thực hiện lại thao tác')
+      throw new Error('ORD005')
     }
 
     return payload.create({
