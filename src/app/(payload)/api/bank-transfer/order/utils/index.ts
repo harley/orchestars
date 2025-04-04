@@ -83,7 +83,7 @@ export const checkSeatAvailable = async ({
 
   // seat holding code of requesting user
   if (!seatHoldingCode) {
-    throw new Error('Phiên chữ chỗ đã hết hạn! Vui lòng chọn lại ghế và thực hiện lại')
+    throw new Error('SEAT004')
   }
 
   // Check all seats in parallel, grouped by event
@@ -113,7 +113,7 @@ export const checkSeatAvailable = async ({
           ?.filter((s) => seats.includes(s))
 
         throw new Error(
-          `Ghế ${filterSeatsInput} đang được giữ bởi người khác! Vui lòng chọn ghế khác`,
+          `SEAT002|${JSON.stringify({ seats: filterSeatsInput?.join?.(', ') || '' })}`,
         )
       }
     }
@@ -129,7 +129,7 @@ export const checkSeatAvailable = async ({
 
     if (existingSeats.length > 0) {
       const unavailableSeats = existingSeats.map((ticket) => ticket.seatName).join(', ')
-      throw new Error(`Ghế ${unavailableSeats} hiện đã được đặt. Vui lòng chọn ghế khác.`)
+      throw new Error(`SEAT003|${JSON.stringify({ seats: unavailableSeats })}`)
     }
   })
 
@@ -178,7 +178,7 @@ export const checkTicketClassAvailable = async ({
     console.log('ticketPriceInfo', ticketPriceInfo)
 
     if (!ticketPriceInfo) {
-      throw new Error(`Loại vé không tồn tại cho sự kiện ${event.title || event.id}`)
+      throw new Error(`TICK007|${JSON.stringify({ eventTitle: event.title || event.id })}`)
     }
 
     // Check all seats in parallel, grouped by event
@@ -225,16 +225,14 @@ export const checkTicketClassAvailable = async ({
     const totalUnavailable = Number(existingTicketClasses[ticketPriceInfo?.name as string]) || 0
 
     if (totalUnavailable >= maxQuantity) {
-      throw new Error(
-        `Vé ${ticketPriceInfo?.name || ''} hiện đã được đặt hết! Vui lòng chọn vé khác.`,
-      )
+      throw new Error(`TICK005|${JSON.stringify({ ticketClass: ticketPriceInfo?.name || '' })}`)
     }
 
     const remaining = maxQuantity - totalUnavailable
 
     if (remaining < inputOrderItem.quantity) {
       throw new Error(
-        `Vé ${ticketPriceInfo?.name} hiện chỉ còn tối đa ${remaining} vé!. Vui lòng nhập lại số lượng mua`,
+        `TICK006|${JSON.stringify({ ticketClass: ticketPriceInfo?.name, remaining })}`,
       )
     }
   }
@@ -255,22 +253,22 @@ export const checkEvents = async ({
     .then((res) => res.docs)
 
   if (!events.length) {
-    throw new Error('Sự kiện không tồn tại')
+    throw new Error('EVT002')
   }
 
   for (const event of events) {
     if (event.status !== EVENT_STATUS.published_open_sales.value) {
       switch (event.status) {
         case EVENT_STATUS.draft.value:
-          throw new Error('Sự kiện không tồn tại')
+          throw new Error('EVT002')
         case EVENT_STATUS.published_upcoming.value:
-          throw new Error('Sự kiện chưa được mở bán')
+          throw new Error('EVT003')
         case EVENT_STATUS.completed.value:
-          throw new Error('Sự kiện đã đóng bán')
+          throw new Error('EVT004')
         case EVENT_STATUS.cancelled.value:
-          throw new Error('Sự kiện đã bị hủy')
+          throw new Error('EVT005')
         default:
-          throw new Error('Sự kiện không tồn tại')
+          throw new Error('EVT002')
       }
     }
 
@@ -281,7 +279,7 @@ export const checkEvents = async ({
     })
 
     if (!hasValidTicket) {
-      throw new Error(`Loại vé không tồn tại cho sự kiện ${event.title || event.id}`)
+      throw new Error(`TICK007|${JSON.stringify({ eventTitle: event.title || event.id })}`)
     }
 
     const hasValidSchedule = orderItems.some((oItem) => {
@@ -291,7 +289,7 @@ export const checkEvents = async ({
     })
 
     if (!hasValidSchedule) {
-      throw new Error(`Ngày tham gia dự kiện ${event.title || event.id} không đúng`)
+      throw new Error(`EVT007|${JSON.stringify({ eventTitle: event.title || event.id })}`)
     }
   }
 
@@ -445,7 +443,7 @@ export const createOrderAndTickets = async ({
     )
 
     if (!ticketPriceInfo) {
-      throw new Error('Loại vé không hợp lệ')
+      throw new Error('TICK004')
     }
 
     return payload.create({
@@ -476,7 +474,7 @@ export const createOrderAndTickets = async ({
     )
 
     if (!orderItem) {
-      throw new Error('Vui lòng chọn ghế và thực hiện lại thao tác')
+      throw new Error('ORD005')
     }
 
     return payload.create({
@@ -597,7 +595,7 @@ export const createOrderAndTicketsWithTicketClassType = async ({
     )
 
     if (!orderItem) {
-      throw new Error('Loại vé không tồn tại')
+      throw new Error('TICK004')
     }
 
     const promises = []
@@ -661,19 +659,19 @@ export const checkPromotionCode = async ({
     .then((res) => res.docs?.[0])
 
   if (!promotion) {
-    throw new Error(`Mã giảm giá [${promotionCode}] không hợp lệ`)
+    throw new Error('PROMO002')
   }
 
   if (!promotion.maxRedemptions) {
-    throw new Error(`Mã giảm giá [${promotion.code}] không hợp lệ`)
+    throw new Error('PROMO002')
   }
   const currentTime = new Date()
   if (promotion.startDate && isAfter(promotion.startDate, currentTime)) {
-    throw new Error(`Không thể dùng mã giảm giá [${promotion.code}] trước thời gian quy định`)
+    throw new Error('PROMO004')
   }
 
   if (promotion.endDate && isBefore(promotion.endDate, currentTime)) {
-    throw new Error(`Mã giảm giá [${promotion.code}] đã hết hạn`)
+    throw new Error('PROMO005')
   }
   const userPromotionsPendingPayment = await payload
     .count({
@@ -690,7 +688,7 @@ export const checkPromotionCode = async ({
     promotion.maxRedemptions - (promotion.totalUsed || 0) - userPromotionsPendingPayment
 
   if (remainNumberRedemption <= 0) {
-    throw new Error(`Mã giảm giá [${promotion.code}] đã hết lượt sử dụng`)
+    throw new Error('PROMO003')
   }
 
   const countTotalCurrentUserRedemption = await payload
@@ -716,7 +714,7 @@ export const checkPromotionCode = async ({
     !isNaN(promotion.perUserLimit as number) &&
     countTotalCurrentUserRedemption >= (promotion.perUserLimit as number)
   ) {
-    throw new Error(`Bạn đã dùng hết số lượt được áp dụng cho giảm giá [${promotion.code}] này`)
+    throw new Error(`PROMO007:${JSON.stringify({ promotionCode: promotion.code })} này`)
   }
 
   return promotion
@@ -909,28 +907,28 @@ export const validateOrderItemsBookingTypeSeat = ({
 }) => {
   // validate order items
   if (!orderItems?.length) {
-    throw new Error('Order items is required')
+    throw new Error('ORD001')
   }
 
   // Check for duplicate seats
   const seenSeats = new Set<string>()
   orderItems.forEach((item) => {
     if (!item.eventId) {
-      throw new Error('Event ID không được để trống')
+      throw new Error('EVT008')
     }
     if (!item.ticketPriceId) {
-      throw new Error('Ticket Price ID không được để trống')
+      throw new Error('TICK010')
     }
     if (!item.eventScheduleId) {
-      throw new Error('Event schedule ID không được để trống')
+      throw new Error('EVT009')
     }
     if (!item.seat) {
-      throw new Error('Seat không được để trống')
+      throw new Error('SEAT001')
     }
 
     const seatKey = `${item.eventScheduleId}-${item.seat}`
     if (seenSeats.has(seatKey)) {
-      throw new Error(`Ghế ${item.seat} bị lặp! Vui lòng kiểm tra lại`)
+      throw new Error(`SEAT005|${JSON.stringify({ seat: item.seat })}`)
     }
     seenSeats.add(seatKey)
   })
@@ -952,7 +950,7 @@ export const checkRemainingQuantitySeats = async ({
         (tkPrice) => tkPrice.id === orderItem.ticketPriceId,
       )
       if (!ticketPriceInfo) {
-        throw new Error('Loại vé không tồn tại')
+        throw new Error('TICK004')
       }
 
       const ticketPriceId = orderItem.ticketPriceId
@@ -1051,18 +1049,24 @@ export const checkRemainingQuantitySeats = async ({
         const remaining = dateTicketClass.totalTicketQuantity - exist.totalBooked
         if (!remaining) {
           throw new Error(
-            `Ghế hạng vé [${dateTicketClass.ticketPriceName}] cho ngày đã chọn đã được đặt hết! Vui lòng chọn chỗ ngồi hạng vé khác`,
+            `TICK008|${JSON.stringify({ ticketClass: dateTicketClass.ticketPriceName })}`,
           )
         }
         if (remaining < dateTicketClass.quantity) {
           throw new Error(
-            `Ghế hạng vé [${dateTicketClass.ticketPriceName}] cho ngày đã chọn chỉ còn tối đa ${remaining} vé! Vui lòng chọn lại`,
+            `TICK009|${JSON.stringify({
+              ticketClass: dateTicketClass.ticketPriceName,
+              remaining,
+            })}`,
           )
         }
       } else {
         if (dateTicketClass.quantity > dateTicketClass.totalTicketQuantity) {
           throw new Error(
-            `Ghế hạng vé [${dateTicketClass.ticketPriceName}] cho ngày đã chọn chỉ còn tối đa ${dateTicketClass.totalTicketQuantity} vé! Vui lòng chọn lại`,
+            `TICK009|${JSON.stringify({
+              ticketClass: dateTicketClass.ticketPriceName,
+              remaining: dateTicketClass.totalTicketQuantity,
+            })}`,
           )
         }
       }

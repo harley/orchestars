@@ -20,6 +20,7 @@ import {
   checkTicketClassAvailable,
   createOrderAndTicketsWithTicketClassType,
 } from './utils'
+import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     const transactionID = await payload.db.beginTransaction()
     if (!transactionID) {
-      throw new Error('Có lỗi xảy ra! Vui lòng thử lại')
+      throw new Error('SYS001')
     }
 
     try {
@@ -161,16 +162,13 @@ export async function POST(request: NextRequest) {
       await payload.db.rollbackTransaction(transactionID)
 
       return NextResponse.json(
-        { message: 'Có lỗi xảy ra! Vui lòng thử lại', error },
+        { message: await handleNextErrorMsgResponse(error), error },
         { status: 400 },
       )
     }
   } catch (error: any) {
     console.error('bank transfer create order error:', error)
-    return NextResponse.json(
-      { message: error?.message || 'Có lỗi xảy ra! Vui lòng thử lại' },
-      { status: 400 },
-    )
+    return NextResponse.json({ message: await handleNextErrorMsgResponse(error) }, { status: 400 })
   }
 }
 

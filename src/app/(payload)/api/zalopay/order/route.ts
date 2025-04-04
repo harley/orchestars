@@ -25,6 +25,7 @@ import {
   NewOrderItemWithBookingType,
 } from '@/app/(payload)/api/bank-transfer/order/types'
 import { createPayment, createZaloPaymentLink, generateZaloPayOrderData } from './utils'
+import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
 
 enum BOOKING_TYPE {
   ticketClass = 'ticketClass',
@@ -74,7 +75,7 @@ const handleOrderWithBookingTypeSeat = async ({ body }: { body: Record<string, a
 
     const transactionID = await payload.db.beginTransaction()
     if (!transactionID) {
-      throw new Error('Có lỗi xảy ra! Vui lòng thử lại')
+      throw new Error('SYS001')
     }
 
     try {
@@ -126,9 +127,7 @@ const handleOrderWithBookingTypeSeat = async ({ body }: { body: Record<string, a
             totalQuantityAppliedTicketClasses >= promotion.conditions.minTickets
 
           if (!canApplyPromoCode) {
-            throw new Error(
-              `Chưa thoả mãn số lượng vé tối thiểu để áp dụng mã giảm giá [${promotion.code}]`,
-            )
+            throw new Error(`PROMO008|${JSON.stringify({ promotionCode: promotion.code })}`)
           }
         }
       }
@@ -218,16 +217,13 @@ const handleOrderWithBookingTypeSeat = async ({ body }: { body: Record<string, a
       await payload.db.rollbackTransaction(transactionID)
 
       return NextResponse.json(
-        { message: error?.message || 'Có lỗi xảy ra! Vui lòng thử lại', error },
+        { message: await handleNextErrorMsgResponse(error), error },
         { status: 400 },
       )
     }
   } catch (error: any) {
     console.error('ZaloPay create order error:', error)
-    return NextResponse.json(
-      { message: error?.message || 'Có lỗi xảy ra! Vui lòng thử lại' },
-      { status: 400 },
-    )
+    return NextResponse.json({ message: await handleNextErrorMsgResponse(error) }, { status: 400 })
   }
 }
 
@@ -253,7 +249,7 @@ const handleOrderWithBookingTypeTicketClass = async ({ body }: { body: Record<st
 
     const transactionID = await payload.db.beginTransaction()
     if (!transactionID) {
-      throw new Error('Có lỗi xảy ra! Vui lòng thử lại')
+      throw new Error('SYS001')
     }
 
     try {
@@ -353,15 +349,12 @@ const handleOrderWithBookingTypeTicketClass = async ({ body }: { body: Record<st
       await payload.db.rollbackTransaction(transactionID)
 
       return NextResponse.json(
-        { message: 'Có lỗi xảy ra! Vui lòng thử lại', error },
+        { message: await handleNextErrorMsgResponse(error), error },
         { status: 400 },
       )
     }
   } catch (error: any) {
     console.error('ZaloPay create order error:', error)
-    return NextResponse.json(
-      { message: error?.message || 'Có lỗi xảy ra! Vui lòng thử lại' },
-      { status: 400 },
-    )
+    return NextResponse.json({ message: await handleNextErrorMsgResponse(error) }, { status: 400 })
   }
 }

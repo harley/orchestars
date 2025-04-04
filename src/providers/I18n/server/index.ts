@@ -33,10 +33,10 @@ export async function getMessages() {
 }
 
 // Helper function to translate a key
-export function t(key: string, locale: string) {
+export function t(key: string, locale: string, params?: Record<string, any>) {
   const messages = i18nPayloadConfig?.translations
     ? (i18nPayloadConfig.translations as any)?.[locale]
     : undefined
 
-  return translate(key, messages)
+  return translate(key, messages, params)
 }
