@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import '@mezh-hq/react-seat-toolkit/styles'
+// import '@mezh-hq/react-seat-toolkit/styles'
 import SeatToolkit, { SeatStatus } from '@mezh-hq/react-seat-toolkit'
 import { Armchair, Loader2 } from 'lucide-react'
 import seatsJson from '@/components/EventDetail/data/seat-maps/seats.json'

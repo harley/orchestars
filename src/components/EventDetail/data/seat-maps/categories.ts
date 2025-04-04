@@ -14,7 +14,7 @@ export const categories = [
   {
     id: 'zone3',
     name: 'Zone 3',
-    color: '#EADD1C',
+    color: '#d9cc09',
     textColor: '#fff',
   },
   {
