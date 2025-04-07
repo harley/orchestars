@@ -57,7 +57,7 @@ export default buildConfig({
       },
       views: {
         dashboard: {
-          Component: '@/AdminViews/Dashboard/Component',
+          Component: '@/components/AdminViews/Dashboard/Component',
         },
       },
     },
