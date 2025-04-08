@@ -22,7 +22,6 @@ export async function POST(req: NextRequest, { params }: { params: { 'ticket-cod
     const payload = await getPayload({ config })
     const authHeader = req.headers.get('authorization')
     if (!authHeader?.startsWith('JWT ')) {
-      console.log('Missing or invalid authorization header')
       return NextResponse.json(
         { error: 'Unauthorized - Missing or invalid authorization header' },
         { status: 401 },
@@ -35,7 +34,6 @@ export async function POST(req: NextRequest, { params }: { params: { 'ticket-cod
 
     // Get ticket code from URL parameter
     const ticketCode = params['ticket-code']
-    console.log('Looking up ticket with code:', ticketCode)
 
     // Find ticket by code
     const ticket = await payload.find({
@@ -47,22 +45,33 @@ export async function POST(req: NextRequest, { params }: { params: { 'ticket-cod
       },
     })
 
-    if (!ticket.docs.length) {
-      console.log('Ticket not found:', ticketCode)
+    if (!ticket.docs?.length) {
       return NextResponse.json({ error: 'Ticket not found' }, { status: 404 })
     }
 
-    const checkinRecord = await payload.create({
-        collection: 'checkinRecord',
-        data: {
-            ticket: ticket.docs[0].id,
-            checkedInAt: new Date().toISOString(),
-            checkedInBy: 1,
-        }
-      })
-  
+    const ticketDoc = ticket.docs[0]
+    if (!ticketDoc || !ticketDoc.event || !ticketDoc.user || !ticketDoc.ticketCode) {
+      return NextResponse.json(
+        { error: 'Invalid ticket data - Missing required fields' },
+        { status: 400 },
+      )
+    }
 
-    return NextResponse.json({checkinRecord }, { status: 200 })
+    // Create check-in record
+    const checkinRecord = await payload.create({
+      collection: 'checkinRecords',
+      data: {
+        event: ticketDoc.event,
+        user: ticketDoc.user,
+        ticket: ticketDoc.id,
+        ticketCode: ticketDoc.ticketCode,
+        eventScheduleId: ticketDoc.eventScheduleId || null,
+        checkInTime: new Date().toISOString(),
+        checkedInBy: 1, // TODO: Get actual user ID from token
+      },
+    })
+
+    return NextResponse.json({ checkinRecord }, { status: 200 })
   } catch (error) {
     console.error('Check-in error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
