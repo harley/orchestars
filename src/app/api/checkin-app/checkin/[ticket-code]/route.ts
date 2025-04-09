@@ -7,29 +7,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
+import { headers as getHeaders } from 'next/headers'
 // import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 // import { getClientSideURL } from '@/utilities/getURL'
 
 export async function POST(req: NextRequest) {
-  console.log('Check-in request received:', {
-    url: req.url,
-    headers: Object.fromEntries(req.headers.entries()),
-  })
 
   try {
     // Get authorization header
     const payload = await getPayload({ config })
-    const authHeader = req.headers.get('authorization')
-    if (!authHeader?.startsWith('JWT ')) {
+
+    const headers = await getHeaders()
+    const { user } = await payload.auth({ headers })
+
+    if (!user) {
       return NextResponse.json(
-        { error: 'Unauthorized - Missing or invalid authorization header' },
+        { error: 'Unauthorized - Invalid admin user' },
         { status: 401 },
       )
     }
-
-    // Extract token
-    const token = authHeader.split(' ')[1]
-    console.log('Token extracted:', token)
 
     // Get ticket code from URL parameter
     const ticketCode = req.nextUrl.pathname.split('/').pop()
@@ -78,12 +74,12 @@ export async function POST(req: NextRequest) {
       collection: 'checkinRecords',
       data: {
         event: ticketDoc.event,
-        user: ticketDoc.user,
+        user: ticketDoc.user, // Keep the original ticket user
         ticket: ticketDoc,
         ticketCode: ticketDoc.ticketCode,
         eventScheduleId: ticketDoc.eventScheduleId || null,
         checkInTime: new Date().toISOString(),
-        checkedInBy: 3, // Using the admin ID from the token
+        checkedInBy: user.id, // Use the admin's ID who performed check-in
       },
     })
 

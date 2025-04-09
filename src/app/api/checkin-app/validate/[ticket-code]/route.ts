@@ -4,12 +4,13 @@
 // - 404 if ticket not found
 // - 409 if ticket already checked in
 // - 200 if ticket valid and ready for check-in
+// - 300 if multiple ticket found if searched by seat label
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
-// import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
-// import { getClientSideURL } from '@/utilities/getURL'
+import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
+import { getClientSideURL } from '@/utilities/getURL'
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,8 +24,6 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Extract token and ticket code
-    const token = authHeader.split(' ')[1]
     const ticketCode = req.nextUrl.pathname.split('/').pop()
 
     if (!ticketCode) {
