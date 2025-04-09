@@ -22,6 +22,7 @@ export const Events: CollectionConfig = {
     {
       name: 'title',
       type: 'text',
+      localized: true,
     },
     {
       name: 'slug',
@@ -30,10 +31,12 @@ export const Events: CollectionConfig = {
     {
       name: 'description',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'detailDescription',
       type: 'richText',
+      localized: true,
       editor: lexicalEditor({
         features: ({ defaultFeatures }) => [
           ...defaultFeatures,
@@ -147,10 +150,12 @@ export const Events: CollectionConfig = {
     {
       name: 'eventLocation',
       type: 'text',
+      localized: true,
     },
     {
       name: 'eventTermsAndConditions',
       type: 'textarea',
+      localized: true,
     },
     {
       type: 'array',

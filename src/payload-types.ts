@@ -138,7 +138,7 @@ export interface Config {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
   };
-  locale: null;
+  locale: 'en' | 'vi';
   user: Admin & {
     collection: 'admins';
   };
@@ -1206,6 +1206,7 @@ export interface Export {
   format: 'csv' | 'json';
   limit?: number | null;
   sort?: string | null;
+  locale?: ('all' | 'en' | 'vi') | null;
   drafts?: ('yes' | 'no') | null;
   selectionToUse?: ('currentSelection' | 'currentFilters' | 'all') | null;
   fields?: string[] | null;
@@ -2276,6 +2277,7 @@ export interface ExportsSelect<T extends boolean = true> {
   format?: T;
   limit?: T;
   sort?: T;
+  locale?: T;
   drafts?: T;
   selectionToUse?: T;
   fields?: T;
