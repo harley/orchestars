@@ -4,14 +4,18 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { unstable_cache } from 'next/cache'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
+import { DEFAULT_FALLBACK_LOCALE, SupportedLocale } from '@/config/app'
 
-export const fetchOngoingPaginatedDocs = async () => {
+type LocaleQuery = { locale?: SupportedLocale }
+
+export const fetchOngoingPaginatedDocs = async (query?: LocaleQuery) => {
   try {
     console.log('fetching OngoingPaginatedDocs')
     const payload = await getPayload({ config: configPromise })
     const result = await payload
       .find({
         collection: 'events',
+        locale: query?.locale || DEFAULT_FALLBACK_LOCALE,
         where: {
           endDatetime: { greater_than_equal: new Date() },
           status: {
@@ -51,13 +55,14 @@ export const fetchOngoingPaginatedDocs = async () => {
   }
 }
 
-export const fetchPerformers = async () => {
+export const fetchPerformers = async (query?: LocaleQuery) => {
   try {
     console.log('fetching Performers')
     const payload = await getPayload({ config: configPromise })
     const result = await payload
       .find({
         collection: 'performers',
+        locale: query?.locale || DEFAULT_FALLBACK_LOCALE,
         where: { status: { equals: 'active' } },
         sort: 'displayOrder',
         limit: 50,
@@ -73,13 +78,14 @@ export const fetchPerformers = async () => {
   }
 }
 
-export const fetchPastEvents = async () => {
+export const fetchPastEvents = async (query?: LocaleQuery) => {
   try {
     console.log('fetching PastEvents')
     const payload = await getPayload({ config: configPromise })
     const result = await payload
       .find({
         collection: 'events',
+        locale: query?.locale || DEFAULT_FALLBACK_LOCALE,
         where: {
           endDatetime: { less_than: new Date() },
           status: {
@@ -100,13 +106,14 @@ export const fetchPastEvents = async () => {
   }
 }
 
-export const fetchPartners = async () => {
+export const fetchPartners = async (query?: LocaleQuery) => {
   try {
     console.log('fetching Partners')
     const payload = await getPayload({ config: configPromise })
     const result = await payload
       .find({
         collection: 'partners',
+        locale: query?.locale || DEFAULT_FALLBACK_LOCALE,
         limit: 50,
       })
       .then((res) => res.docs)
@@ -120,13 +127,14 @@ export const fetchPartners = async () => {
   }
 }
 
-export const fetchActivities = async () => {
+export const fetchActivities = async (query?: LocaleQuery) => {
   try {
     console.log('fetching Activities')
     const payload = await getPayload({ config: configPromise })
     const result = await payload
       .find({
         collection: 'activities',
+        locale: query?.locale || DEFAULT_FALLBACK_LOCALE,
         where: {
           status: { equals: 'active' },
         },
@@ -143,27 +151,31 @@ export const fetchActivities = async () => {
   }
 }
 
-export const getOngoingPaginatedDocsCached = () =>
-  unstable_cache(async () => fetchOngoingPaginatedDocs(), [], {
-    tags: ['home-events'],
-  })
+export const getOngoingPaginatedDocsCached = (query?: LocaleQuery) =>
+  unstable_cache(
+    async () => fetchOngoingPaginatedDocs(query),
+    [query?.locale || DEFAULT_FALLBACK_LOCALE],
+    {
+      tags: ['home-events'],
+    },
+  )
 
-export const getPerformersCached = () =>
-  unstable_cache(async () => fetchPerformers(), [], {
+export const getPerformersCached = (query?: LocaleQuery) =>
+  unstable_cache(async () => fetchPerformers(query), [query?.locale || DEFAULT_FALLBACK_LOCALE], {
     tags: ['home-performers'],
   })
 
-export const getPastEventsCached = () =>
-  unstable_cache(async () => fetchPastEvents(), [], {
+export const getPastEventsCached = (query?: LocaleQuery) =>
+  unstable_cache(async () => fetchPastEvents(query), [query?.locale || DEFAULT_FALLBACK_LOCALE], {
     tags: ['home-events'],
   })
 
-export const getPartnersCached = () =>
-  unstable_cache(async () => fetchPartners(), [], {
+export const getPartnersCached = (query?: LocaleQuery) =>
+  unstable_cache(async () => fetchPartners(query), [query?.locale || DEFAULT_FALLBACK_LOCALE], {
     tags: ['home-partners'],
   })
 
-export const getActivitiesCached = () =>
-  unstable_cache(async () => fetchActivities(), [], {
+export const getActivitiesCached = (query?: LocaleQuery) =>
+  unstable_cache(async () => fetchActivities(query), [query?.locale || DEFAULT_FALLBACK_LOCALE], {
     tags: ['home-activities'],
   })

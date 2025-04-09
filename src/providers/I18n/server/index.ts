@@ -1,7 +1,7 @@
 import { cookies, headers } from 'next/headers'
 import { i18n as i18nPayloadConfig } from '@/payload-config/i18n'
 import { translate } from '../utils'
-import { DEFAULT_FALLBACK_LOCALE } from '@/config/app'
+import { SupportedLocale, DEFAULT_FALLBACK_LOCALE } from '@/config/app'
 
 const COOKIE_NAME = 'next-locale'
 const DEFAULT_LOCALE = i18nPayloadConfig?.fallbackLanguage || DEFAULT_FALLBACK_LOCALE
@@ -11,14 +11,14 @@ export async function getLocale() {
   const localeFromHeader = headersList.get('x-locale')
 
   if (localeFromHeader) {
-    return localeFromHeader
+    return localeFromHeader as SupportedLocale
   }
 
   // Fallback to cookie
   const cookieStore = await cookies()
   const localeCookie = cookieStore.get(COOKIE_NAME)
 
-  return localeCookie?.value || DEFAULT_LOCALE
+  return (localeCookie?.value as SupportedLocale) || DEFAULT_LOCALE
 }
 
 // Function to load messages for the current locale
