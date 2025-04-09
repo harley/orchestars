@@ -14,16 +14,19 @@ import {
   getPartnersCached,
   getActivitiesCached,
 } from './actions'
+import { getLocale } from '@/providers/I18n/server'
 
 const getDataHomePage = cache(async () => {
   try {
+    const locale = await getLocale()
+
     const [eventsData, performerData, pastEventData, partnerData, activitiesData] =
       await Promise.all([
-        getOngoingPaginatedDocsCached()(),
-        getPerformersCached()(),
-        getPastEventsCached()(),
-        getPartnersCached()(),
-        getActivitiesCached()(),
+        getOngoingPaginatedDocsCached({ locale })(),
+        getPerformersCached({ locale })(),
+        getPastEventsCached({ locale })(),
+        getPartnersCached({ locale })(),
+        getActivitiesCached({ locale })(),
       ])
 
     const bannerDocs = eventsData.docs

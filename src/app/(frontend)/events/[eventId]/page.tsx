@@ -16,6 +16,7 @@ import { EVENT_STATUS } from '@/collections/Events/constants/status'
 import { checkBookedOrPendingPaymentSeats } from '@/app/(payload)/api/bank-transfer/order/utils'
 import { getSeatHoldings } from '@/app/(payload)/api/seat-holding/seat/utils'
 import { cookies } from 'next/headers'
+import { getLocale } from '@/providers/I18n/server'
 
 // export const dynamic = 'force-dynamic'
 export const revalidate = 3600
@@ -30,7 +31,9 @@ const EventDetailPage = async (props: {
 
   const eventSlug = params.eventId
 
-  const eventDetail = await getEventCached({ slug: eventSlug })()
+  const locale = await getLocale()
+
+  const eventDetail = await getEventCached({ slug: eventSlug, locale })()
 
   if (!eventDetail) {
     return notFound()
