@@ -12,9 +12,7 @@ import { EVENT_STATUSES } from './constants/status'
 
 export const Events: CollectionConfig = {
   slug: 'events',
-  access: {
-    // read: () => true,
-  },
+  access: {},
   admin: {
     useAsTitle: 'title',
   },
