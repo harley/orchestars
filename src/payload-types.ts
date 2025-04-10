@@ -774,7 +774,7 @@ export interface CheckinRecord {
   ticketCode: string;
   eventScheduleId?: string | null;
   checkInTime?: string | null;
-  checkedInBy?: (number | null) | User;
+  checkedInBy?: (number | null) | Admin;
   updatedAt: string;
   createdAt: string;
 }
@@ -958,6 +958,27 @@ export interface Promotion {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "admins".
+ */
+export interface Admin {
+  id: number;
+  firstName: string;
+  lastName: string;
+  role: 'event-admin' | 'admin' | 'super-admin';
+  lastActive?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  password?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "userPromotionRedemptions".
  */
 export interface UserPromotionRedemption {
@@ -1101,27 +1122,6 @@ export interface Faq {
   status?: ('active' | 'inactive') | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "admins".
- */
-export interface Admin {
-  id: number;
-  firstName: string;
-  lastName: string;
-  role: 'event-admin' | 'admin' | 'super-admin';
-  lastActive?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  password?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

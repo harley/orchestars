@@ -50,12 +50,13 @@ export async function POST(req: NextRequest) {
       WITH schedule_info AS (
         SELECT 
           e.id as event_id,
-          e.title as event_title,
-          e.event_location as event_location,
+          el.title as event_title,
+          el.event_location as event_location,
           json_agg(es.*) as event_schedules
         FROM events e
+        LEFT JOIN events_locales el ON el._parent_id = e.id AND el._locale = $2
         LEFT JOIN events_schedules es ON es._parent_id = e.id
-        GROUP BY e.id, e.title, e.event_location
+        GROUP BY e.id, el.title, el.event_location
       )
       SELECT 
         t.id,
@@ -73,8 +74,7 @@ export async function POST(req: NextRequest) {
       JOIN schedule_info s ON s.event_id = t.event_id
       LEFT JOIN events_schedules es ON es.id = t.event_schedule_id
       WHERE ${isSearchBySeat ? 't.seat = $1' : 't.ticket_code = $1'}
-    `, [ticketCode])
-
+    `, [ticketCode, "vi"])    
     // Return 404 if no tickets found
     if (!ticketResult.rows.length || !ticketResult.rows[0]) {
       return NextResponse.json({ error: 'Ticket not found' }, { status: 404 })
@@ -85,12 +85,12 @@ export async function POST(req: NextRequest) {
     // If searching by seat label and found multiple tickets
     if (isSearchBySeat && ticketResult.rows.length > 1) {
       // Get check-in records for all found tickets
-      const ticketIds = ticketResult.rows.map(t => t.id)
+      const ticketCodes = ticketResult.rows.map(t => t.ticket_code)
       const checkinRecordsResult = await payload.find({
         collection: 'checkinRecords',
         where: {
-          ticket: {
-            in: ticketIds
+          ticketCode: {
+            in: ticketCodes
           }
         }
       })
