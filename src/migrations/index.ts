@@ -31,6 +31,7 @@ import * as migration_20250327_015955_add_event_admin_role from './20250327_0159
 import * as migration_20250402_085734_add_checkin_orders_table from './20250402_085734_add_checkin_orders_table';
 import * as migration_20250403_034927_add_condition_to_promotion_collection from './20250403_034927_add_condition_to_promotion_collection';
 import * as migration_20250409_081019_add_localization_event_collection from './20250409_081019_add_localization_event_collection';
+import * as migration_20250410_162213_updateLocalization from './20250410_162213_updateLocalization';
 
 export const migrations = [
   {
@@ -196,6 +197,11 @@ export const migrations = [
   {
     up: migration_20250409_081019_add_localization_event_collection.up,
     down: migration_20250409_081019_add_localization_event_collection.down,
-    name: '20250409_081019_add_localization_event_collection'
+    name: '20250409_081019_add_localization_event_collection',
+  },
+  {
+    up: migration_20250410_162213_updateLocalization.up,
+    down: migration_20250410_162213_updateLocalization.down,
+    name: '20250410_162213_updateLocalization'
   },
 ];
