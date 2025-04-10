@@ -30,16 +30,19 @@ export const Performers: CollectionConfig = {
       name: 'genre',
       type: 'text',
       required: false,
+      localized: true,
     },
     {
       name: 'role',
       type: 'text',
       required: false,
+      localized: true,
     },
     {
       name: 'description',
       type: 'text',
       required: false,
+      localized: true,
     },
     {
       name: 'status',

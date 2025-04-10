@@ -5,9 +5,11 @@ import React from 'react'
 import type { Footer } from '@/payload-types'
 import { Facebook, Instagram, Mail, MapPin, Phone, Twitter, Youtube } from 'lucide-react'
 import TikTok from '@/components/Icons/TikTok'
+import { getLocale } from '@/providers/I18n/server'
 
 export async function Footer() {
-  const footerData: Footer = await getCachedGlobal('footer', 1)()
+  const locale = await getLocale()
+  const footerData: Footer = await getCachedGlobal('footer', 1, locale)()
   return (
     <footer className="bg-[#1a1f2c] pt-8 mt-auto">
       <div className="container mx-auto px-6 text-white">
@@ -74,7 +76,7 @@ export async function Footer() {
             style={{ animationDelay: '0.4s' }}
           >
             <h3 className="text-lg font-semibold mb-4 md:text-right text-center">
-              Về công ty chúng tôi
+              {footerData?.aboutUsTitle}
             </h3>
 
             {!!footerData?.navItems?.length && (

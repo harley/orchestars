@@ -14,11 +14,13 @@ export const Activities: CollectionConfig = {
       name: 'mainTitle',
       type: 'text',
       required: true,
+      localized: true,
     },
     {
       name: 'description',
       type: 'text',
       required: false,
+      localized: true,
     },
     {
       name: 'status',
@@ -43,10 +45,12 @@ export const Activities: CollectionConfig = {
         {
           type: 'text',
           name: 'title',
+          localized: true,
         },
         {
           type: 'text',
           name: 'description',
+          localized: true,
         },
         {
           name: 'image',
