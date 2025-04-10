@@ -2,14 +2,14 @@ import { getCachedGlobal } from '@/utilities/getGlobals'
 import Link from 'next/link'
 import React from 'react'
 
-import type { Footer } from '@/payload-types'
+import type { Footer as FooterType } from '@/payload-types'
 import { Facebook, Instagram, Mail, MapPin, Phone, Twitter, Youtube } from 'lucide-react'
 import TikTok from '@/components/Icons/TikTok'
 import { getLocale } from '@/providers/I18n/server'
 
 export async function Footer() {
   const locale = await getLocale()
-  const footerData: Footer = await getCachedGlobal('footer', 1, locale)()
+  const footerData: FooterType = await getCachedGlobal('footer', 1, locale)()
   return (
     <footer className="bg-[#1a1f2c] pt-8 mt-auto">
       <div className="container mx-auto px-6 text-white">
