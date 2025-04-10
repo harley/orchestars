@@ -9,21 +9,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
-import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
-import { getClientSideURL } from '@/utilities/getURL'
+import { headers as getHeaders } from 'next/headers'
 
 export async function POST(req: NextRequest) {
   try {
     // Get authorization header
     const payload = await getPayload({ config })
-    const authHeader = req.headers.get('authorization')
-    if (!authHeader?.startsWith('JWT ')) {
+    const headers = await getHeaders()
+    const { user } = await payload.auth({ headers })
+
+    if (!user) {
       return NextResponse.json(
-        { error: 'Unauthorized - Missing or invalid authorization header' },
+        { error: 'Unauthorized - Invalid admin user' },
         { status: 401 },
       )
     }
-
     const ticketCode = req.nextUrl.pathname.split('/').pop()
 
     if (!ticketCode) {
@@ -74,15 +74,14 @@ export async function POST(req: NextRequest) {
       LEFT JOIN events_schedules es ON es.id = t.event_schedule_id
       WHERE ${isSearchBySeat ? 't.seat = $1' : 't.ticket_code = $1'}
     `, [ticketCode])
-    
-
-    console.log(ticketResult.rows)
 
     // Return 404 if no tickets found
-    if (!ticketResult.rows.length) {
+    if (!ticketResult.rows.length || !ticketResult.rows[0]) {
       return NextResponse.json({ error: 'Ticket not found' }, { status: 404 })
     }
 
+    // Get the first matching ticket
+    const ticketDoc = ticketResult.rows[0]
     // If searching by seat label and found multiple tickets
     if (isSearchBySeat && ticketResult.rows.length > 1) {
       // Get check-in records for all found tickets
@@ -118,10 +117,6 @@ export async function POST(req: NextRequest) {
         )
     }
 
-    // Get the first matching ticket
-    const ticketDoc = ticketResult.rows[0]
-
-    console.log(ticketDoc)
     // Find any existing check-in record for this ticket
     const checkinRecordResult = await payload.find({
       collection: 'checkinRecords',

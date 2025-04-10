@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { headers as getHeaders } from 'next/headers'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const payload = await getPayload({ config })
     const headers = await getHeaders()
