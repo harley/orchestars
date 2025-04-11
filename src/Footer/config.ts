@@ -18,16 +18,19 @@ export const Footer: GlobalConfig = {
       name: 'title',
       type: 'text',
       required: false,
+      localized: true,
     },
     {
       name: 'description',
       type: 'textarea',
       required: false,
+      localized: true,
     },
     {
       name: 'address',
       type: 'text',
       required: false,
+      localized: true,
     },
     {
       name: 'email',
@@ -77,12 +80,21 @@ export const Footer: GlobalConfig = {
       type: 'text',
       required: false,
       defaultValue: 'Contact Us',
+      localized: true,
     },
     {
       name: 'connectUsTitle',
       type: 'text',
       required: false,
       defaultValue: 'Connect with us',
+      localized: true,
+    },
+    {
+      name: 'aboutUsTitle',
+      type: 'text',
+      required: false,
+      defaultValue: 'About Us',
+      localized: true,
     },
     {
       name: 'navItems',
