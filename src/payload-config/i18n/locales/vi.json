@@ -9,7 +9,9 @@
     "sponsorsAndPartners": "Nhà Tài Trợ Và Đối Tác"
   },
   "common": {
-    "loading": "Đang tải..."
+    "loading": "Đang tải...",
+    "tryAgain": "Thử lại",
+    "goHome": "Về trang chủ"
   },
   "event": {
     "chooseAttendingDate": "Chọn ngày bạn muốn tham dự",
@@ -171,5 +173,13 @@
     "ORD003": "Đơn hàng đã được thanh toán",
     "ORD004": "Đơn hàng đã hết hạn thanh toán",
     "ORD005": "Vui lòng chọn ghế và thực hiện lại thao tác"
+  },
+  "error": {
+    "title": "Rất tiếc! Đã xảy ra lỗi",
+    "description": "Đừng lo, chúng tôi đã ghi nhận lỗi và sẽ sớm khắc phục. Bạn có thể nhấn thử lại hoặc quay về trang chủ.",
+    "tryingAgain": "Đang thử lại",
+    "tryingAgainDescription": "Đang cố gắng khôi phục từ lỗi",
+    "goingHome": "Đang về trang chủ",
+    "goingHomeDescription": "Đang chuyển hướng về trang chủ"
   }
 }
