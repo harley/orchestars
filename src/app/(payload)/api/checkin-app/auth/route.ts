@@ -18,11 +18,11 @@ function isBase64(str: string) {
 }
 
 function base64UrlToBase64(base64Url: string): string {
-  let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
   while (base64.length % 4 !== 0) {
-    base64 += '=';
+    base64 += '='
   }
-  return base64;
+  return base64
 }
 
 function decrypt(encryptedBase64: string): string {
@@ -46,7 +46,6 @@ function decrypt(encryptedBase64: string): string {
     // Extract IV from the beginning of the encrypted data
     const iv = encryptedBuffer.subarray(0, IV_LENGTH)
     const encryptedContent = encryptedBuffer.subarray(IV_LENGTH)
-
 
     // Create decipher
     const keyBuffer = Buffer.from(KEY).slice(0, 16)
@@ -84,7 +83,6 @@ export async function POST(req: NextRequest) {
     try {
       email = decrypt(encryptedEmail)
       password = decrypt(encryptedPassword)
-
     } catch (err) {
       const error = err as Error
       return NextResponse.json(
@@ -120,6 +118,7 @@ export async function POST(req: NextRequest) {
     // Return user data and token
     return NextResponse.json({
       token: result.token,
+      user: result.user,
     })
   } catch (err) {
     const error = err as Error

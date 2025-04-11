@@ -57,7 +57,7 @@ export const CheckInRecords: CollectionConfig = {
     {
       name: 'checkedInBy',
       type: 'relationship',
-      relationTo: 'users',
+      relationTo: 'admins',
       required: false,
     },
   ],
