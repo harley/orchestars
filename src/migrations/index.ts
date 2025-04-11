@@ -32,6 +32,7 @@ import * as migration_20250402_085734_add_checkin_orders_table from './20250402_
 import * as migration_20250403_034927_add_condition_to_promotion_collection from './20250403_034927_add_condition_to_promotion_collection';
 import * as migration_20250409_081019_add_localization_event_collection from './20250409_081019_add_localization_event_collection';
 import * as migration_20250410_162213_updateLocalization from './20250410_162213_updateLocalization';
+import * as migration_20250411_061402_update_checkin_records_table from './20250411_061402_update_checkin_records_table';
 
 export const migrations = [
   {
@@ -202,6 +203,11 @@ export const migrations = [
   {
     up: migration_20250410_162213_updateLocalization.up,
     down: migration_20250410_162213_updateLocalization.down,
-    name: '20250410_162213_updateLocalization'
+    name: '20250410_162213_updateLocalization',
+  },
+  {
+    up: migration_20250411_061402_update_checkin_records_table.up,
+    down: migration_20250411_061402_update_checkin_records_table.down,
+    name: '20250411_061402_update_checkin_records_table'
   },
 ];
