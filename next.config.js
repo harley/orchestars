@@ -22,6 +22,7 @@ const nextConfig = {
   },
   reactStrictMode: true,
   redirects,
+  transpilePackages: ['@mezh-hq/react-seat-toolkit'],
 }
 
 export default withPayload(nextConfig, { devBundleServerPackages: false })

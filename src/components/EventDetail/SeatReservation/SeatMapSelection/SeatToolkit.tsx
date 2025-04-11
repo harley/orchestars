@@ -100,7 +100,7 @@ const SeatMapToolkit = ({
   }
 
   return (
-    <div className="relative">
+    <div className="relative md:p-0 p-6">
       {loadingMap && (
         <div className="absolute z-50 top-[30%] left-1/2 -translate-x-1/2 p-5 bg-gray-100/30 rounded-md flex flex-col items-center justify-center gap-2">
           <Loader2 className="w-12 h-12 animate-spin" />
