@@ -9,7 +9,9 @@
     "sponsorsAndPartners": "Sponsors & Partners"
   },
   "common": {
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "tryAgain": "Try Again",
+    "goHome": "Go Home"
   },
   "event": {
     "chooseAttendingDate": "Choose Your Attending Date",
@@ -171,5 +173,13 @@
     "ORD003": "The order has already been paid",
     "ORD004": "The order has expired",
     "ORD005": "Please select your seat and try again"
+  },
+  "error": {
+    "title": "Oops! Something went wrong",
+    "description": "Don't worry, we've recorded the error and will fix it soon. You can click retry or return to the homepage.",
+    "tryingAgain": "Trying again",
+    "tryingAgainDescription": "Attempting to recover from the error",
+    "goingHome": "Going home",
+    "goingHomeDescription": "Navigating to the home page"
   }
 }
