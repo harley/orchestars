@@ -24,6 +24,7 @@ export const Partners: CollectionConfig = {
       name: 'description',
       type: 'text',
       required: false,
+      localized: true,
     },
     {
       name: 'link',

@@ -19,6 +19,7 @@ export const Header: GlobalConfig = {
       name: 'title',
       type: 'text',
       required: false,
+      localized: true,
     },
     {
       name: 'navItems',

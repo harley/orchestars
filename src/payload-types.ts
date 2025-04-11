@@ -2410,6 +2410,7 @@ export interface Footer {
     | null;
   contactTitle?: string | null;
   connectUsTitle?: string | null;
+  aboutUsTitle?: string | null;
   navItems?:
     | {
         link: {
@@ -2478,6 +2479,7 @@ export interface FooterSelect<T extends boolean = true> {
       };
   contactTitle?: T;
   connectUsTitle?: T;
+  aboutUsTitle?: T;
   navItems?:
     | T
     | {

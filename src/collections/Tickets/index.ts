@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { format as formatDate } from 'date-fns'
 import { TICKET_STATUSES } from './constants'
-// import { afterChangeStatus } from './hooks/afterChangeStatus'
+import { afterChangeSeat } from './hooks/afterChangeSeat'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
@@ -48,6 +48,9 @@ export const Tickets: CollectionConfig = {
     {
       name: 'seat',
       type: 'text',
+      hooks: {
+        afterChange: [afterChangeSeat],
+      },
     },
     {
       name: 'ticketPriceName',
