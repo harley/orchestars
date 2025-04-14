@@ -5,6 +5,14 @@ import { afterChangeSeat } from './hooks/afterChangeSeat'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
+
+  admin: {
+    components: {
+      edit: {
+        SaveButton: '@/components/Tickets/Actions/SendMailButton',
+      },
+    },
+  },
   fields: [
     {
       name: 'attendeeName',

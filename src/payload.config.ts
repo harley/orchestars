@@ -34,6 +34,7 @@ import Admins from './collections/Admins'
 import { updatePaymentStatus } from './collections/Payments/jobs/updatePaymentStatus'
 import { i18n } from './payload-config/i18n'
 import { localization } from './payload-config/localization'
+import { Emails } from './collections/Emails'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -115,6 +116,7 @@ export default buildConfig({
     Activities,
     FAQs,
     Admins,
+    Emails,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],

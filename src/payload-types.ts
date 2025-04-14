@@ -86,6 +86,7 @@ export interface Config {
     activities: Activity;
     faqs: Faq;
     admins: Admin;
+    emails: Email;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -117,6 +118,7 @@ export interface Config {
     activities: ActivitiesSelect<false> | ActivitiesSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     admins: AdminsSelect<false> | AdminsSelect<true>;
+    emails: EmailsSelect<false> | EmailsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -1125,6 +1127,34 @@ export interface Faq {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "emails".
+ */
+export interface Email {
+  id: number;
+  user?: (number | null) | User;
+  event?: (number | null) | Event;
+  ticket?: (number | null) | Ticket;
+  to: string;
+  cc?: string | null;
+  subject: string;
+  html?: string | null;
+  text?: string | null;
+  provider?: string | null;
+  extraData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  sentAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1406,6 +1436,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'admins';
         value: number | Admin;
+      } | null)
+    | ({
+        relationTo: 'emails';
+        value: number | Email;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -2076,6 +2110,25 @@ export interface AdminsSelect<T extends boolean = true> {
   hash?: T;
   loginAttempts?: T;
   lockUntil?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "emails_select".
+ */
+export interface EmailsSelect<T extends boolean = true> {
+  user?: T;
+  event?: T;
+  ticket?: T;
+  to?: T;
+  cc?: T;
+  subject?: T;
+  html?: T;
+  text?: T;
+  provider?: T;
+  extraData?: T;
+  sentAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
