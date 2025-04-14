@@ -2,13 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 export const Emails: CollectionConfig = {
   slug: 'emails',
-  access: {
-    // read: ({ req: { user } }) => user?.role === 'admin',
-    read: () => true,
-    create: () => false,
-    update: () => false,
-    delete: () => false,
-  },
+  // access: {},
   admin: {
     useAsTitle: 'subject',
   },
