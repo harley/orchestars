@@ -26,6 +26,9 @@ export const SendMailButton: React.FC = () => {
           return { ...data, allowSendMailAfterChanged: true } as unknown as any
         },
       })
+    } catch (error) {
+      // Show error message
+      console.error('Failed to send email:', error)
     } finally {
       setLoading(false)
     }
