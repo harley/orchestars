@@ -155,7 +155,7 @@ export default buildConfig({
     autoRun: [
       {
         cron: '*/5 * * * *', // Runs every 5 minutes
-        limit: 2, // limit jobs to process each run
+        limit: 1, // limit jobs to process each run
         queue: 'updatePaymentStatus', // name of the queue
       },
     ],
