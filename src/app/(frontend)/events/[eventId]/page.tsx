@@ -19,7 +19,7 @@ import { cookies } from 'next/headers'
 import { getLocale } from '@/providers/I18n/server'
 
 // export const dynamic = 'force-dynamic'
-export const revalidate = 3600
+export const revalidate = 86400 // 24 hours
 export const dynamicParams = true
 
 const EventDetailPage = async (props: {

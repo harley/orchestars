@@ -157,25 +157,30 @@ export const getOngoingPaginatedDocsCached = (query?: LocaleQuery) =>
     [query?.locale || DEFAULT_FALLBACK_LOCALE],
     {
       tags: ['home-events'],
+      revalidate: 86400, // 24 hours
     },
   )
 
 export const getPerformersCached = (query?: LocaleQuery) =>
   unstable_cache(async () => fetchPerformers(query), [query?.locale || DEFAULT_FALLBACK_LOCALE], {
     tags: ['home-performers'],
+    revalidate: 86400, // 24 hours
   })
 
 export const getPastEventsCached = (query?: LocaleQuery) =>
   unstable_cache(async () => fetchPastEvents(query), [query?.locale || DEFAULT_FALLBACK_LOCALE], {
     tags: ['home-events'],
+    revalidate: 86400, // 24 hours
   })
 
 export const getPartnersCached = (query?: LocaleQuery) =>
   unstable_cache(async () => fetchPartners(query), [query?.locale || DEFAULT_FALLBACK_LOCALE], {
     tags: ['home-partners'],
+    revalidate: 86400, // 24 hours
   })
 
 export const getActivitiesCached = (query?: LocaleQuery) =>
   unstable_cache(async () => fetchActivities(query), [query?.locale || DEFAULT_FALLBACK_LOCALE], {
     tags: ['home-activities'],
+    revalidate: 86400, // 24 hours
   })
