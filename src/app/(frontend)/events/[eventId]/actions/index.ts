@@ -42,6 +42,7 @@ export const getEventCached = ({ slug, locale }: { slug: string; locale?: Suppor
     [`${locale || DEFAULT_FALLBACK_LOCALE}-${slug}`],
     {
       tags: [`event-detail:${slug}`],
+      revalidate: 86400, // 24 hours
     },
   )
 
@@ -54,4 +55,5 @@ export const getPerformersByEventCached = ({
 }) =>
   unstable_cache(async () => fetchPerformers({ locale }), [locale || DEFAULT_FALLBACK_LOCALE], {
     tags: [`event-performers`],
+    revalidate: 86400, // 24 hours
   })
