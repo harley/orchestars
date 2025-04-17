@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
                 { seat: { equals: ticketCode } },
                 { event: { equals: eventId } },
                 { eventScheduleId: { equals: eventScheduleId } },
+                { status: { equals: 'booked' } },
               ],
             }
           : {
@@ -54,12 +55,12 @@ export async function POST(req: NextRequest) {
                 { ticketCode: { equals: ticketCode } },
                 { event: { equals: eventId } },
                 { eventScheduleId: { equals: eventScheduleId } },
+                { status: { equals: 'booked' } },
               ],
             }),
       },
       sort: ['-createdAt'],
     });
-
 
     // Get the first matching ticket
     const ticketDoc = ticketResult.docs[0]
