@@ -31,11 +31,13 @@ export const SeatHoldings: CollectionConfig = {
       type: 'relationship',
       relationTo: 'events',
       required: true,
+      index: true,
     },
     {
       name: 'eventScheduleId',
       type: 'text',
       required: false,
+      index: true,
     },
     {
       name: 'code',

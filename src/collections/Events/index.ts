@@ -25,6 +25,7 @@ export const Events: CollectionConfig = {
     {
       name: 'slug',
       type: 'text',
+      index: true,
     },
     {
       name: 'description',
@@ -255,6 +256,7 @@ export const Events: CollectionConfig = {
       type: 'select',
       required: false,
       options: EVENT_STATUSES,
+      index: true,
     },
   ],
   hooks: {

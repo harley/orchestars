@@ -13,16 +13,19 @@ export const Payments: CollectionConfig = {
       type: 'relationship',
       relationTo: 'users',
       required: true,
+      index: true,
     },
     {
       name: 'order',
       type: 'relationship',
       relationTo: 'orders',
       required: true,
+      index: true,
     },
     {
       name: 'paymentMethod',
       type: 'text',
+      index: true,
     },
     {
       name: 'currency',
@@ -37,6 +40,7 @@ export const Payments: CollectionConfig = {
     {
       name: 'promotionCode',
       type: 'text',
+      index: true,
       required: false,
     },
     {
@@ -100,6 +104,7 @@ export const Payments: CollectionConfig = {
       name: 'status',
       type: 'select',
       required: true,
+      index: true,
       options: PAYMENT_STATUSES,
       hooks: {
         afterChange: [afterChangeStatus],
