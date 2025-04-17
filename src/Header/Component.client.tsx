@@ -5,7 +5,8 @@ import React from 'react'
 
 import type { Header } from '@/payload-types'
 
-import { HeaderNav } from './Nav'
+// import { HeaderNav } from './Nav'
+import Navbar from './Nav/Navbar'
 
 interface HeaderClientProps {
   data: Header
@@ -27,5 +28,5 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [headerTheme])
 
-  return <HeaderNav data={data} />
+  return <Navbar data={data} />
 }
