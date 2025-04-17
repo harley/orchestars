@@ -22,6 +22,7 @@ export const Tickets: CollectionConfig = {
       name: 'user',
       type: 'relationship',
       relationTo: 'users',
+      index: true,
     },
     {
       name: 'userEmail',
@@ -52,10 +53,12 @@ export const Tickets: CollectionConfig = {
     {
       name: 'ticketCode',
       type: 'text',
+      index: true,
     },
     {
       name: 'seat',
       type: 'text',
+      index: true,
       hooks: {
         afterChange: [afterChangeSeat],
       },
@@ -63,6 +66,7 @@ export const Tickets: CollectionConfig = {
     {
       name: 'ticketPriceName',
       type: 'text',
+      index: true,
     },
     {
       name: 'ticketPriceInfo',
@@ -72,11 +76,13 @@ export const Tickets: CollectionConfig = {
       name: 'event',
       type: 'relationship',
       relationTo: 'events',
+      index: true,
     },
     {
       name: 'eventScheduleId',
       type: 'text',
       required: false,
+      index: true,
     },
     {
       name: 'eventDate',
@@ -121,6 +127,7 @@ export const Tickets: CollectionConfig = {
       relationTo: 'orders',
       maxDepth: 1,
       hasMany: false,
+      index: true,
     },
     {
       name: 'orderCode',

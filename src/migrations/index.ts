@@ -34,6 +34,7 @@ import * as migration_20250409_081019_add_localization_event_collection from './
 import * as migration_20250410_162213_updateLocalization from './20250410_162213_updateLocalization';
 import * as migration_20250411_061402_update_checkin_records_table from './20250411_061402_update_checkin_records_table';
 import * as migration_20250414_155659_create_email_collection from './20250414_155659_create_email_collection';
+import * as migration_20250417_035104_adding_column_indexes_collections from './20250417_035104_adding_column_indexes_collections';
 
 export const migrations = [
   {
@@ -214,6 +215,11 @@ export const migrations = [
   {
     up: migration_20250414_155659_create_email_collection.up,
     down: migration_20250414_155659_create_email_collection.down,
-    name: '20250414_155659_create_email_collection'
+    name: '20250414_155659_create_email_collection',
+  },
+  {
+    up: migration_20250417_035104_adding_column_indexes_collections.up,
+    down: migration_20250417_035104_adding_column_indexes_collections.down,
+    name: '20250417_035104_adding_column_indexes_collections'
   },
 ];

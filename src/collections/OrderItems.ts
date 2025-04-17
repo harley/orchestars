@@ -8,22 +8,26 @@ export const OrderItems: CollectionConfig = {
       type: 'relationship',
       relationTo: 'orders',
       required: true,
+      index: true,
     },
     {
       name: 'event',
       type: 'relationship',
       relationTo: 'events',
       required: true,
+      index: true,
     },
     {
       name: 'ticketPriceId',
       type: 'text',
       required: true,
+      index: true,
     },
     {
       name: 'ticketPriceName',
       type: 'text',
       required: false,
+      index: true,
     },
     {
       name: 'seat',
