@@ -11,17 +11,20 @@ export const Orders: CollectionConfig = {
     {
       name: 'orderCode',
       type: 'text',
+      index: true,
     },
     {
       name: 'user',
       type: 'relationship',
       relationTo: 'users',
+      index: true,
     },
     {
       name: 'status',
       type: 'select',
       defaultValue: 'processing',
       options: ORDER_STATUSES,
+      index: true,
       hooks: {
         afterChange: [afterChangeStatus],
       },
@@ -35,11 +38,13 @@ export const Orders: CollectionConfig = {
       type: 'relationship',
       relationTo: 'promotions',
       required: false,
+      index: true,
     },
     {
       name: 'promotionCode',
       type: 'text',
       required: false,
+      index: true,
     },
     {
       name: 'totalBeforeDiscount',
