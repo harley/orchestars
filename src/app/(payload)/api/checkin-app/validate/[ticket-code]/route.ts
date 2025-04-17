@@ -18,6 +18,11 @@ export async function POST(req: NextRequest) {
     const headers = await getHeaders()
     const { user } = await payload.auth({ headers })
 
+    //Get params event-id and event-scheduler-id by url
+    const body = await req.json();
+    const eventId = body.eventId;
+    const eventScheduleId = body.eventScheduleId;
+    
     if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized - Invalid admin user' },
@@ -33,59 +38,35 @@ export async function POST(req: NextRequest) {
     // Determine search type (seat label or ticket code)
     const isSearchBySeat = ticketCode.length <= 4
 
-    // Find ticket with event and schedule info using SQL
-    const ticketResult = await payload.db.pool.query<{
-      id: string
-      event_id: number
-      event_schedule_id: string
-      attendee_name: string
-      ticket_code: string
-      seat: string | null
-      status: string
-      event_title: string
-      event_schedules: string
-      event_location: string
-      schedule_date: string | null
-    }>(`
-      WITH schedule_info AS (
-        SELECT 
-          e.id as event_id,
-          el.title as event_title,
-          el.event_location as event_location,
-          json_agg(es.*) as event_schedules
-        FROM events e
-        LEFT JOIN events_locales el ON el._parent_id = e.id AND el._locale = $2
-        LEFT JOIN events_schedules es ON es._parent_id = e.id
-        GROUP BY e.id, el.title, el.event_location
-      )
-      SELECT 
-        t.id,
-        t.event_id,
-        t.event_schedule_id,
-        t.attendee_name,
-        t.ticket_code,
-        t.seat,
-        t.status,
-        s.event_title,
-        s.event_schedules,
-        s.event_location,
-        es.date::text AS schedule_date
-      FROM tickets t
-      JOIN schedule_info s ON s.event_id = t.event_id
-      LEFT JOIN events_schedules es ON es.id = t.event_schedule_id
-      WHERE ${isSearchBySeat ? 't.seat = $1' : 't.ticket_code = $1'}
-    `, [ticketCode, "vi"])    
-    // Return 404 if no tickets found
-    if (!ticketResult.rows.length || !ticketResult.rows[0]) {
-      return NextResponse.json({ error: 'Ticket not found' }, { status: 404 })
-    }
+    const ticketResult = await payload.find({
+      collection: 'tickets',
+      where: {
+        ...(isSearchBySeat
+          ? {
+              and: [
+                { seat: { equals: ticketCode } },
+                { event: { equals: eventId } },
+                { eventScheduleId: { equals: eventScheduleId } },
+              ],
+            }
+          : {
+              and: [
+                { ticketCode: { equals: ticketCode } },
+                { event: { equals: eventId } },
+                { eventScheduleId: { equals: eventScheduleId } },
+              ],
+            }),
+      },
+      sort: ['-createdAt'],
+    });
+
 
     // Get the first matching ticket
-    const ticketDoc = ticketResult.rows[0]
+    const ticketDoc = ticketResult.docs[0]
     // If searching by seat label and found multiple tickets
-    if (isSearchBySeat && ticketResult.rows.length > 1) {
+    if (isSearchBySeat && ticketResult.docs.length > 1) {
       // Get check-in records for all found tickets
-      const ticketCodes = ticketResult.rows.map(t => t.ticket_code)
+      const ticketCodes = ticketResult.docs.map(t => t.ticketCode)
       const checkinRecordsResult = await payload.find({
         collection: 'checkinRecords',
         where: {
@@ -100,17 +81,14 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(
           {
-            tickets: ticketResult.rows.map(ticketDoc => ({
+            tickets: ticketResult.docs.map(ticketDoc => ({
               id: ticketDoc.id,
-              attendeeName: ticketDoc.attendee_name,
-              ticketCode: ticketDoc.ticket_code,
+              attendeeName: ticketDoc.attendeeName,
+              ticketCode: ticketDoc.ticketCode,
               seat: ticketDoc.seat,
               status: ticketDoc.status,
-              eventTitle: ticketDoc.event_title,
-              eventLocation: ticketDoc.event_location,
-              scheduleDate: ticketDoc.schedule_date,
-              isCheckedIn: checkedInTicketIds.has(ticketDoc.ticket_code),
-              checkinRecord: checkinRecordsResult.docs.find(r => r.ticketCode === ticketDoc.ticket_code)
+              isCheckedIn: checkedInTicketIds.has(ticketDoc.ticketCode!),
+              checkinRecord: checkinRecordsResult.docs.find(r => r.ticketCode === ticketDoc.ticketCode)
             })),
           },
           { status: 300 }
@@ -122,7 +100,7 @@ export async function POST(req: NextRequest) {
       collection: 'checkinRecords',
       where: {
         ticketCode: {
-          equals: ticketDoc?.ticket_code
+          equals: ticketDoc?.ticketCode
         }
       }
     })
@@ -133,13 +111,11 @@ export async function POST(req: NextRequest) {
         {
           ticket: {
             id: ticketDoc.id,
-            attendeeName: ticketDoc.attendee_name,
-            ticketCode: ticketDoc.ticket_code,
+            attendeeName: ticketDoc.attendeeName,
+            ticketCode: ticketDoc.ticketCode,
             seat: ticketDoc.seat,
             status: ticketDoc.status,
-            eventTitle: ticketDoc.event_title,
-            eventLocation: ticketDoc.event_location,
-            scheduleDate: ticketDoc.schedule_date
+            
           },
           error: 'Ticket has already been checked in',
         },
@@ -150,14 +126,11 @@ export async function POST(req: NextRequest) {
     // Return 200 if ticket valid and not checked in
     return NextResponse.json({
       ticket: {
-        id: ticketDoc.id,
-        attendeeName: ticketDoc.attendee_name,
-        ticketCode: ticketDoc.ticket_code,
-        seat: ticketDoc.seat,
-        status: ticketDoc.status,
-        eventTitle: ticketDoc.event_title,
-        eventLocation: ticketDoc.event_location,
-        scheduleDate: ticketDoc.schedule_date
+        id: ticketDoc?.id,
+        attendeeName: ticketDoc?.attendeeName,
+        ticketCode: ticketDoc?.ticketCode,
+        seat: ticketDoc?.seat,
+        status: ticketDoc?.status,
       },
     }, { status: 200 })
   } catch (error) {

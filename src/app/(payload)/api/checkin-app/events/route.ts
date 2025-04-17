@@ -31,12 +31,12 @@ export async function GET() {
                 equals: 'published_open_sales',
             },  
     }})
-    console.log(events)
+
     if (!events.docs?.length) {
         return NextResponse.json({ error: 'No event is found' }, { status: 404 })
     }
    
-    console.log(events.docs)
+
     return NextResponse.json({
           events
         }, { status: 200 })
