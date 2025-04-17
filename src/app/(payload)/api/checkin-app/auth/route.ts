@@ -33,7 +33,9 @@ function decrypt(encryptedBase64: string): string {
       throw new Error('Empty input')
     }
 
+   
     const normalBase64 = base64UrlToBase64(encryptedBase64)
+    console.log('Normal Base64:', normalBase64)
     // Validate base64
     if (!isBase64(normalBase64)) {
       console.error('Decrypt error: Invalid base64 input:', normalBase64)
@@ -45,11 +47,14 @@ function decrypt(encryptedBase64: string): string {
 
     // Extract IV from the beginning of the encrypted data
     const iv = encryptedBuffer.subarray(0, IV_LENGTH)
+
     const encryptedContent = encryptedBuffer.subarray(IV_LENGTH)
 
     // Create decipher
     const keyBuffer = Buffer.from(KEY).slice(0, 16)
 
+    console.log('IV:', iv.toString('hex'))
+    console.log('Key:', keyBuffer.toString('hex'))
     const decipher = crypto.createDecipheriv(ALGORITHM, keyBuffer, iv)
 
     // Decrypt
@@ -62,38 +67,46 @@ function decrypt(encryptedBase64: string): string {
     throw new Error(`Failed to decrypt data: ${error.message}`)
   }
 }
-
 export async function POST(req: NextRequest) {
   try {
     const payload = await getPayload({ config })
-    // Parse request body
     const body = await req.json()
-    const { email: encryptedEmail, password: encryptedPassword } = body
+    const { email: maybeEncryptedEmail, password: maybeEncryptedPassword } = body
 
-    if (!encryptedEmail || !encryptedPassword) {
+    if (!maybeEncryptedEmail || !maybeEncryptedPassword) {
       return NextResponse.json(
-        { error: 'Encrypted email and password are required' },
+        { error: 'Email and password are required' },
         { status: 400 },
       )
     }
 
-    // Decrypt the credentials
-    let email, password
-    try {
-      email = decrypt(encryptedEmail)
-      password = decrypt(encryptedPassword)
-    } catch (err) {
-      const error = err as Error
-      return NextResponse.json(
-        {
-          error: 'Failed to decrypt credentials',
-          details: error.message,
-        },
-        { status: 400 },
-      )
+    // Determine if the request is same-origin
+    const origin = req.headers.get('origin') || ''
+    const referer = req.headers.get('referer') || ''
+    const isSameOrigin =
+      origin.includes(process.env.NEXT_PUBLIC_SERVER_URL || '') ||
+      referer.includes(process.env.NEXT_PUBLIC_SERVER_URL || '')
+
+    let email = maybeEncryptedEmail
+    let password = maybeEncryptedPassword
+
+    if (!isSameOrigin) {
+      try {
+        email = decrypt(maybeEncryptedEmail)
+        password = decrypt(maybeEncryptedPassword)
+        console.log('Decrypted email:', email)
+      } catch (err) {
+        const error = err as Error
+        return NextResponse.json(
+          {
+            error: 'Failed to decrypt credentials',
+            details: error.message,
+          },
+          { status: 400 },
+        )
+      }
     }
 
-    // Attempt to login with Payload CMS
     const result = await payload.login({
       collection: 'admins',
       data: {
@@ -106,22 +119,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
 
-    // Check if user is an event admin
     if (!isAdminOrSuperAdminOrEventAdmin({ req: { user: result.user } })) {
       return NextResponse.json(
-        { error: 'Unauthorized access. Only event admins can access the checkin app.' },
+        { error: 'Unauthorized access. Only event admins can access the check-in app.' },
         { status: 403 },
       )
     }
 
-    // Return user data and token
     return NextResponse.json({
       token: result.token,
       user: result.user,
     })
   } catch (err) {
     const error = err as Error
-
     return NextResponse.json(
       {
         error: 'Authentication failed',
