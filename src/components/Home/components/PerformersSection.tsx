@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useRef, useEffect } from 'react'
+import React from 'react'
 import { Music, Users } from 'lucide-react'
 import { Performer } from '@/types/Performer'
 import { cn } from '@/utilities/ui'
 import { useTranslate } from '@/providers/I18n/client'
-
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 const PerformerCard: React.FC<{ performer: Performer; index: number }> = ({ performer, index }) => {
   return (
     <div
@@ -45,63 +45,17 @@ const PerformerCard: React.FC<{ performer: Performer; index: number }> = ({ perf
   )
 }
 
-const PerformersSection = ({ performers }: { performers: Performer[] }) => {
+const PerformersSection = ({
+  performers,
+  className,
+}: {
+  performers: Performer[]
+  className?: string
+}) => {
   const { t } = useTranslate()
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    // Auto scroll animation
-    const container = scrollContainerRef.current
-    if (!container) return
-    // Make the performers visible initially
-    const cards = container.querySelectorAll('.animate-on-scroll')
-    cards.forEach((card) => {
-      card.classList.add('visible')
-    })
-    // Set up auto-scrolling
-    let animationId: number
-    let isPaused = false
-    const scroll = () => {
-      if (container && !isPaused) {
-        // If we've scrolled to the end (with a buffer), jump back to start
-        if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 200) {
-          container.scrollTo({ left: 0, behavior: 'auto' })
-        } else {
-          // Otherwise, scroll a bit to the right
-          container.scrollBy({ left: 1, behavior: 'auto' })
-        }
-      }
-      animationId = requestAnimationFrame(scroll)
-    }
-    // Start auto-scrolling
-    animationId = requestAnimationFrame(scroll)
-    // Pause scrolling when user interacts with the container
-    const pauseScrolling = () => {
-      isPaused = true
-    }
-    const resumeScrolling = () => {
-      // Add a short delay before resuming
-      setTimeout(() => (isPaused = false), 2000)
-    }
-    container.addEventListener('mouseenter', pauseScrolling)
-    container.addEventListener('mouseleave', resumeScrolling)
-    container.addEventListener('touchstart', pauseScrolling)
-    container.addEventListener('touchend', resumeScrolling)
-    // Manual scrolling should also pause auto-scroll
-    container.addEventListener('wheel', pauseScrolling)
-    // Clean up
-    return () => {
-      cancelAnimationFrame(animationId)
-      container.removeEventListener('mouseenter', pauseScrolling)
-      container.removeEventListener('mouseleave', resumeScrolling)
-      container.removeEventListener('touchstart', pauseScrolling)
-      container.removeEventListener('touchend', resumeScrolling)
-      container.removeEventListener('wheel', pauseScrolling)
-    }
-  }, [])
 
   return (
-    <section className="py-24 relative overflow-hidden bg-gray-100">
+    <section className={`py-20 relative overflow-hidden ${className || ''}`}>
       <div
         className="absolute -z-10"
         style={
@@ -111,37 +65,28 @@ const PerformersSection = ({ performers }: { performers: Performer[] }) => {
         }
       />
 
-      <div className="container mx-auto px-6 md:px-10">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
-            {t('home.outstandingPerformers')}
-          </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
-        </div>
-
-        <p className="text-muted-foreground text-center mb-16 max-w-2xl mx-auto text-lg">
-          {t('home.outstandingPerformersDescription')}
-        </p>
-
-        <div className="relative">
-          {/* Scroll shadow indicators */}
-          {/* <div className="absolute left-0 top-0 bottom-0 w-24 z-10"></div>
-          <div className="absolute right-0 top-0 bottom-0 w-24 z-10"></div> */}
-
-          <div
-            // ref={scrollContainerRef}
-            className="flex overflow-x-auto pb-8 gap-8 hide-scrollbar scroll-smooth justify-center"
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              WebkitOverflowScrolling: 'touch',
-            }}
-          >
-            {(performers || []).map((performer, index) => (
-              <PerformerCard key={performer.id} performer={performer} index={index} />
-            ))}
+      <div className="container mx-auto px-4">
+        <div className="mb-12">
+          <div className="text-center mb-4">
+            <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
+              {t('home.outstandingPerformers')}
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
           </div>
+          <p className="mt-5 md:mt-0 text-muted-foreground text-center mb-8 max-w-2xl mx-auto text-lg">
+            {t('home.outstandingPerformersDescription')}
+          </p>
         </div>
+
+        <Carousel className="w-full relative">
+          <CarouselContent className="">
+            {(performers || []).map((performer, index) => (
+              <CarouselItem key={performer.id} className="basis-1/1 lg:basis-1/3">
+                <PerformerCard key={performer.id} performer={performer} index={index} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
       </div>
     </section>
   )
