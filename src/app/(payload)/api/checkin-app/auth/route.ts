@@ -7,7 +7,7 @@ import crypto from 'crypto'
 // AES encryption configuration
 const ALGORITHM = 'aes-128-ctr'
 const IV_LENGTH = 16 // 16 bytes for AES
-const KEY = process.env.ENCRYPTION_KEY || 'YOUR_SECRET_HERE' // Make sure this matches your encryption key
+const KEY = process.env.PAYLOAD_SECRET || 'YOUR_SECRET_HERE' // Make sure this matches your encryption key
 
 function isBase64(str: string) {
   try {
@@ -68,7 +68,6 @@ export async function POST(req: NextRequest) {
     const payload = await getPayload({ config })
     // Parse request body
     const body = await req.json()
-
     const { email: encryptedEmail, password: encryptedPassword } = body
 
     if (!encryptedEmail || !encryptedPassword) {
