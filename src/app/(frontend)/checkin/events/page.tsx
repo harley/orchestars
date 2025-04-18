@@ -74,7 +74,7 @@ export default function ChooseEventPage() {
     `${formatDate(start)} - ${formatDate(end)}`;
 
   return (
-    <div className="min-h-screen p-6 bg-gray-100">
+    <div className="min-h-screen py-12 p-6 bg-gray-100">
       <div className="space-y-6">
         {events.map((event) => (
           <div key={event.id} className="bg-white rounded-lg shadow p-4">
