@@ -52,7 +52,7 @@ const ConfirmOrderModal = ({
   const { t } = useTranslate()
   const { toast } = useToast()
   const searchParams = useSearchParams()
-  const eventScheduleId = searchParams.get('eventScheduleId')
+  const eventScheduleId = searchParams?.get('eventScheduleId')
 
   const ticketSelected = useMemo(() => {
     return selectedSeats.reduce(

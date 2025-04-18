@@ -64,8 +64,9 @@ const AdminEventClient: React.FC<Props> = ({ event }) => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(
-    searchParams.get('scheduleId'),
-  )
+    searchParams?.get('scheduleId') ?? null
+  );
+
   const [selectedTicketPrice, setSelectedTicketPrice] = useState<string | null>(null)
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(false)

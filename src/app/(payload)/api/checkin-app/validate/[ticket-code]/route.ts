@@ -64,6 +64,13 @@ export async function POST(req: NextRequest) {
 
     // Get the first matching ticket
     const ticketDoc = ticketResult.docs[0]
+
+    // Return 404 if ticket not found 
+    if (!ticketDoc) {
+      return NextResponse.json({ error: 'Ticket not found' }, { status: 404 })
+    }
+
+
     // If searching by seat label and found multiple tickets
     if (isSearchBySeat && ticketResult.docs.length > 1) {
       // Get check-in records for all found tickets
