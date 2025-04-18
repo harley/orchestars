@@ -7,6 +7,17 @@ import { Event, User } from '@/payload-types'
 export async function POST(request: Request) {
   try {
     const { email, ticketCode } = await request.json()
+
+    // Validate inputs
+    if (!email || !ticketCode) {
+      return NextResponse.json(
+        {
+          message: 'Email and ticket code are required',
+        },
+        { status: 400 },
+      )
+    }
+
     const payload = await getPayload({ config })
 
     // Find ticket by code
