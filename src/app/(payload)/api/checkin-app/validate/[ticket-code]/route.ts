@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
 
     // Get the first matching ticket
     const ticketDoc = ticketResult.docs[0]
+    console.log('ticketDoc', ticketDoc)
 
     // Return 404 if ticket not found 
     if (!ticketDoc) {
@@ -92,10 +93,17 @@ export async function POST(req: NextRequest) {
             tickets: ticketResult.docs.map(ticketDoc => ({
               id: ticketDoc.id,
               attendeeName: ticketDoc.attendeeName,
+              email: typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+              ? ticketDoc.user.email
+              : null,
+              phoneNumber:  typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+              ? ticketDoc.user.phoneNumber
+              : null,
               ticketCode: ticketDoc.ticketCode,
               seat: ticketDoc.seat,
               status: ticketDoc.status,
               isCheckedIn: checkedInTicketIds.has(ticketDoc.ticketCode!),
+              ticketPriceInfo: ticketDoc.ticketPriceInfo,
               checkinRecord: checkinRecordsResult.docs.find(r => r.ticketCode === ticketDoc.ticketCode)
             })),
           },
@@ -120,10 +128,18 @@ export async function POST(req: NextRequest) {
           ticket: {
             id: ticketDoc.id,
             attendeeName: ticketDoc.attendeeName,
+            email: typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+            ? ticketDoc.user.email
+            : null,
+            phoneNumber:  typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+            ? ticketDoc.user.phoneNumber
+            : null,
             ticketCode: ticketDoc.ticketCode,
             seat: ticketDoc.seat,
             status: ticketDoc.status,
-            
+            ticketPriceInfo: ticketDoc.ticketPriceInfo,
+            isCheckedIn: true,
+            checkinRecord: checkinRecordResult.docs[0]
           },
           error: 'Ticket has already been checked in',
         },
@@ -136,9 +152,18 @@ export async function POST(req: NextRequest) {
       ticket: {
         id: ticketDoc?.id,
         attendeeName: ticketDoc?.attendeeName,
+        email: typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+        ? ticketDoc.user.email
+        : null,
+        phoneNumber:  typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+        ? ticketDoc.user.phoneNumber
+        : null,
         ticketCode: ticketDoc?.ticketCode,
         seat: ticketDoc?.seat,
         status: ticketDoc?.status,
+        ticketPriceInfo: ticketDoc.ticketPriceInfo,
+        isCheckedIn: false,
+        checkinRecord: null,
       },
     }, { status: 200 })
   } catch (error) {

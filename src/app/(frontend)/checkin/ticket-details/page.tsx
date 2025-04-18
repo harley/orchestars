@@ -19,7 +19,7 @@ export default function TicketDetailsPage() {
   const checkinData = checkinRecord ? JSON.parse(decodeURIComponent(checkinRecord)) : null;
   const alreadyCheckedIn = !!checkinData;
 
-  const handleCheckIn = async () => {    
+  const handleCheckIn = async () => {
     if (!ticketData?.code) return;
     setIsCheckingIn(true);
     try {
@@ -50,9 +50,17 @@ export default function TicketDetailsPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <div className={`max-w-xl mx-auto rounded-xl p-6 text-white text-center ${
-        alreadyCheckedIn ? 'bg-red-500' : 'bg-green-500'
-      }`}>
+
+      <button
+        type="button"
+        onClick={() => router.replace('/checkin/validates')}
+        className="mb-4 px-4 py-3 rounded-full border-2 border-orange-500 text-orange-500 rounded hover:bg-orange-50 transition"
+      >
+        Back
+      </button>
+
+      <div className={`max-w-xl mx-auto rounded-xl p-6 text-white text-center ${alreadyCheckedIn ? 'bg-red-500' : 'bg-green-500'
+        }`}>
         {alreadyCheckedIn ? <XCircle size={60} className="mx-auto mb-2" /> : <CheckCircle size={60} className="mx-auto mb-2" />}
         <h1 className="text-2xl font-bold mb-1">
           {alreadyCheckedIn ? 'TICKET USED' : 'VALID TICKET'}
@@ -71,15 +79,17 @@ export default function TicketDetailsPage() {
           <p><strong>Name:</strong> {ticketData.attendeeName}</p>
           <p><strong>Event:</strong> {ticketData.eventName}</p>
           <p><strong>Date:</strong> {ticketData.eventTime}</p>
+          <p><strong>Email:</strong> {ticketData.email}</p>
+          <p><strong>Phone Number:</strong> {ticketData.phoneNumber}</p>
+          <p><strong>Ticket Type:</strong> {ticketData.ticketPriceInfo.name}</p>
           <p><strong>Seat:</strong> {ticketData.seat || 'N/A'}</p>
         </div>
 
         <button
           onClick={handleCheckIn}
           disabled={alreadyCheckedIn || isCheckingIn}
-          className={`w-full py-3 rounded-full font-bold transition ${
-            alreadyCheckedIn ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-white text-green-600 hover:bg-gray-100'
-          }`}
+          className={`w-full py-2 rounded-lg font-bold transition ${alreadyCheckedIn ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-white text-green-600 hover:bg-gray-100'
+            }`}
         >
           {alreadyCheckedIn ? 'ALREADY CHECKED IN' : isCheckingIn ? 'CHECKING IN...' : 'CHECK IN NOW'}
         </button>
