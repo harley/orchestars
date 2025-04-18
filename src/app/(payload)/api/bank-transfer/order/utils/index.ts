@@ -606,7 +606,9 @@ export const createOrderAndTicketsWithTicketClassType = async ({
           collection: 'tickets',
           data: {
             ticketCode: generateCode('TK'),
-            attendeeName: `${customerData.firstName} ${customerData.lastName}`,
+            attendeeName: customerData?.firstName
+              ? `${customerData.firstName || ''} ${customerData.lastName || ''}`
+              : `${customerInput?.firstName || ''} ${customerInput?.lastName || ''}`,
             status: 'pending_payment',
             ticketPriceInfo: {
               ...(ticketPriceInfo || {}),

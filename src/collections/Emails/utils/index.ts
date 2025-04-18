@@ -1,3 +1,4 @@
+import { NODE_ENV } from '@/config/app'
 import { Email } from '@/payload-types'
 import { BasePayload } from 'payload'
 
@@ -38,6 +39,9 @@ const sendMail = async ({
   mailData: { to?: string; cc?: string; subject?: string; html: string }
 }) => {
   try {
+    if (!NODE_ENV || ['development', 'local'].includes(NODE_ENV)) {
+      return { id: `mock-id-${Math.random()}` }
+    }
     return await payload.sendEmail(mailData)
   } catch (error) {
     console.error('Error while sending mail: ', error)
