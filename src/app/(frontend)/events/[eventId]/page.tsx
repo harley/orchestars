@@ -70,7 +70,7 @@ const EventDetailPage = async (props: {
     <div className="">
       <PageClient />
       <div className="min-h-screen flex flex-col">
-        <main className="flex-grow">
+        <main className="flex-grow pt-6">
           <EventBanner event={eventDetail} />
           {isUpcoming && <UpcomingSaleBanner />}
 

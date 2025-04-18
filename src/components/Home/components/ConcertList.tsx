@@ -8,9 +8,10 @@ import Link from 'next/link'
 import { useTranslate } from '@/providers/I18n/client'
 interface ConcertListProps {
   onGoingPaginatedDocs: PaginatedDocs
+  className?: string
 }
 
-const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs }) => {
+const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, className }) => {
   const elementsRef = useRef<(HTMLDivElement | null)[]>([])
 
   const { t } = useTranslate()
@@ -39,8 +40,8 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs }) => {
   }, [])
 
   return (
-    <section className="py-20 ">
-      <div className="container mx-auto px-6 md:px-10">
+    <section className={`py-20 ${className || ''}`}>
+      <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
             {t('home.onGoingEvent')}
