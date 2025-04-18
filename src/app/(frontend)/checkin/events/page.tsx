@@ -28,7 +28,7 @@ export default function ChooseEventPage() {
   const fetchEvents = async () => {
     if (!token) {
       alert('Please login first');
-      router.push('/');
+      router.push('/checkin');
       return;
     }
     setLoading(true);

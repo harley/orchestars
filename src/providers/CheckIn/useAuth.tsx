@@ -27,7 +27,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const setToken = (token: string) => {
-    Cookies.set('token', token);
+    Cookies.set('token', token, {
+      expires: 1, 
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: 'Strict',
+    });
     setTokenState(token);
   };
 

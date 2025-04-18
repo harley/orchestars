@@ -35,7 +35,7 @@ function decrypt(encryptedBase64: string): string {
 
    
     const normalBase64 = base64UrlToBase64(encryptedBase64)
-    console.log('Normal Base64:', normalBase64)
+
     // Validate base64
     if (!isBase64(normalBase64)) {
       console.error('Decrypt error: Invalid base64 input:', normalBase64)
@@ -53,8 +53,6 @@ function decrypt(encryptedBase64: string): string {
     // Create decipher
     const keyBuffer = Buffer.from(KEY).slice(0, 16)
 
-    console.log('IV:', iv.toString('hex'))
-    console.log('Key:', keyBuffer.toString('hex'))
     const decipher = crypto.createDecipheriv(ALGORITHM, keyBuffer, iv)
 
     // Decrypt
