@@ -34,6 +34,9 @@ export async function POST(req: NextRequest) {
     if (!ticketCode) {
       return NextResponse.json({ error: 'Ticket code is required' }, { status: 400 })
     }
+    if (!eventId && !eventScheduleId) {
+      return NextResponse.json({ error: 'Please choose event, it is required' }, { status: 400 })
+    }
 
     // Determine search type (seat label or ticket code)
     const isSearchBySeat = ticketCode.length <= 4
@@ -81,7 +84,8 @@ export async function POST(req: NextRequest) {
         where: {
           ticketCode: {
             in: ticketCodes
-          }
+          },
+          deletedAt: { equals: null },
         }
       })
 
@@ -117,7 +121,8 @@ export async function POST(req: NextRequest) {
       where: {
         ticketCode: {
           equals: ticketDoc?.ticketCode
-        }
+        },
+         deletedAt: { equals: null },
       }
     })
 
