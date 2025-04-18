@@ -14,6 +14,8 @@ type CheckInResponse = {
     email: string
     ticketCode: string
     checkedInAt?: string
+    attendeeName?: string
+    eventName?: string
   }
 }
 
@@ -115,8 +117,16 @@ export default function CustomerCheckInPage() {
                 <span>{checkedInData.ticketCode}</span>
               </div>
               <div className="flex items-center justify-between p-2 rounded bg-gray-50">
+                <span className="font-medium">Event Name:</span>
+                <span>{checkedInData.eventName}</span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-gray-50">
                 <span className="font-medium">Email:</span>
                 <span>{checkedInData.email}</span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-gray-50">
+                <span className="font-medium">Attendee Name:</span>
+                <span>{checkedInData.attendeeName}</span>
               </div>
               {checkedInData.checkedInAt && (
                 <div className="flex items-center justify-between p-2 rounded">
