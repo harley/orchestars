@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; 
 import Head from 'next/head';
 import { useAuth } from '@/providers/CheckIn/useAuth';
@@ -9,8 +9,15 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { setToken } = useAuth();
+  const { isHydrated, token, setToken } = useAuth();
   
+  useEffect(() => {
+    if (!isHydrated) return; 
+    if (token) {
+      router.replace('/checkin/events');
+    }
+  }, [isHydrated, token]);
+
   const handleLogin = async () => {
     if (!email || !password) {
       alert('Please enter both email and password');
@@ -43,6 +50,7 @@ export default function Login() {
       setIsLoading(false);
     }
   };
+
 
   return (
     <>
