@@ -27,18 +27,22 @@ export async function POST(request: Request) {
 
     // Validate ticket exists
     if (!ticket) {
-      return NextResponse.json({
-        success: false,
-        message: 'Invalid ticket code',
-      })
+      return NextResponse.json(
+        {
+          message: 'Invalid ticket code',
+        },
+        { status: 400 },
+      )
     }
 
     // Validate email matches
     if (ticket.userEmail !== email) {
-      return NextResponse.json({
-        success: false,
-        message: 'Email does not match ticket records',
-      })
+      return NextResponse.json(
+        {
+          message: 'Email does not match ticket records',
+        },
+        { status: 400 },
+      )
     }
 
     // Check if ticket is already checked in by looking up check-in records
@@ -54,13 +58,12 @@ export async function POST(request: Request) {
       .then((res) => res.docs[0])
 
     if (existingCheckIn) {
-      return NextResponse.json({
-        success: false,
-        message: 'This ticket has already been checked in',
-        data: {
-          checkedInAt: existingCheckIn.checkInTime,
+      return NextResponse.json(
+        {
+          message: 'This ticket has already been checked in',
         },
-      })
+        { status: 400 },
+      )
     }
     const eventRecord = ticket.event as Event
     const eventId = eventRecord?.id as number
@@ -91,7 +94,6 @@ export async function POST(request: Request) {
     }
     // Return success response
     return NextResponse.json({
-      success: true,
       message: 'Check-in successful',
       data: {
         zoneId,
@@ -107,10 +109,9 @@ export async function POST(request: Request) {
     console.error('Check-in error:', error)
     return NextResponse.json(
       {
-        success: false,
         message: 'An error occurred while processing your request',
       },
-      { status: 500 },
+      { status: 400 },
     )
   }
 }

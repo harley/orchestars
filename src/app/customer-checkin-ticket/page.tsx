@@ -37,27 +37,31 @@ export default function CustomerCheckInPage() {
         body: JSON.stringify({ email, ticketCode }),
       })
 
-      const data: CheckInResponse = await response.json()
+      if (response.ok) {
+        const data: CheckInResponse = await response.json()
 
-      if (!data.success) {
+        setCheckedInData(data.data)
         toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: data.message || 'Something went wrong',
+          title: 'Success',
+          description: 'Ticket checked in successfully',
         })
+
         return
       }
 
-      setCheckedInData(data.data)
-      toast({
-        title: 'Success',
-        description: 'Ticket checked in successfully',
-      })
-    } catch (_error: any) {
+      const errorData: CheckInResponse = await response.json()
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Failed to check in. Please try again.',
+        description: errorData?.message || 'Failed to check in. Please try again.',
+      })
+    } catch (error: any) {
+      console.log('error', error)
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description:
+          error instanceof Error ? error.message : 'Failed to check in. Please try again.',
       })
     } finally {
       setIsLoading(false)
