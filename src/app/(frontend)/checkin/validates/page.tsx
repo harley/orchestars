@@ -80,7 +80,6 @@ export default function ValidatePage() {
       }
       if (response.status === 409 && data.ticket && data.checkinRecord) {
         const encodedTK = encodedTicket(data.ticket);
-
         const encodedCheckinRecord = encodeURIComponent(JSON.stringify(data.checkinRecord));
         router.push(`/checkin/ticket-details?ticket=${encodedTK}&checkinRecord=${encodedCheckinRecord}`);
         return;
@@ -91,6 +90,7 @@ export default function ValidatePage() {
       }
 
       const encodedTK = encodedTicket(data.ticket);
+
       router.push(`/checkin/ticket-details?ticket=${encodedTK}`);
     } catch (error: any) {
       alert(error.message || 'Failed to check in');
@@ -139,7 +139,7 @@ export default function ValidatePage() {
 
         <div className="flex justify-end mt-4">
           <button
-            onClick={() => router.push('/history')}
+            onClick={() => router.push('/checkin/history')}
             className="flex items-center gap-1 text-orange-600 hover:underline"
           >
             <Clock3 size={16} /> View History

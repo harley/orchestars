@@ -53,7 +53,7 @@ export default function TicketDetailsPage() {
 
       <button
         type="button"
-        onClick={() => router.replace('/checkin/validates')}
+        onClick={() => router.replace(`/checkin/validates/?eventId=${ticketData.eventId}&eventScheduleId=${ticketData.eventScheduleId}`)}
         className="mb-4 px-4 py-3 rounded-full border-2 border-orange-500 text-orange-500 rounded hover:bg-orange-50 transition"
       >
         Back

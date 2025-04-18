@@ -20,10 +20,11 @@ export async function GET() {
     const result = await payload.find({
       collection: 'checkinRecords',
       where: {
-        checkedInBy: {
-          equals: user.id,
-        },
+        createdAt: {
+          greater_than: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(),
       },
+        deletedAt: { equals: null },
+    },
       sort: '-createdAt',
     })
 
