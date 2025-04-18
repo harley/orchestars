@@ -1,56 +1,55 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; 
-import Head from 'next/head';
-import { useAuth } from '@/providers/CheckIn/useAuth';
+'use client'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Head from 'next/head'
+import { useAuth } from '@/providers/CheckIn/useAuth'
 
 export default function Login() {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { isHydrated, token, setToken } = useAuth();
-  
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const { isHydrated, token, setToken } = useAuth()
+
   useEffect(() => {
-    if (!isHydrated) return; 
+    if (!isHydrated) return
     if (token) {
-      router.replace('/checkin/events');
+      router.replace('/checkin/events')
     }
-  }, [isHydrated, token]);
+  }, [isHydrated, token, router])
 
   const handleLogin = async () => {
     if (!email || !password) {
-      alert('Please enter both email and password');
-      return;
+      alert('Please enter both email and password')
+      return
     }
 
     try {
-      setIsLoading(true);
+      setIsLoading(true)
 
       const res = await fetch('/api/checkin-app/auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-            email,
-            password,
-         }),
-      });
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      })
 
       if (res?.ok) {
-        const token = await res.json(); // or decode from cookie if SSR-only
-        setToken(token.token); // optional since cookie already stores it
-        router.replace('/checkin/events');
+        const token = await res.json() // or decode from cookie if SSR-only
+        setToken(token.token) // optional since cookie already stores it
+        router.replace('/checkin/events')
       }
     } catch (error) {
-      console.error('Login error:', error);
-      alert('An error occurred during login');
+      console.error('Login error:', error)
+      alert('An error occurred during login')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
-
+  }
 
   return (
     <>
@@ -100,5 +99,5 @@ export default function Login() {
         </div>
       </div>
     </>
-  );
+  )
 }
