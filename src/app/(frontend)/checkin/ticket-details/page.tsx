@@ -5,6 +5,7 @@ import { useAuth } from '@/providers/CheckIn/useAuth';
 
 import { CheckCircle, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { categories } from '@/components/EventDetail/data/seat-maps/categories'
 
 export default function TicketDetailsPage() {
 
@@ -65,14 +66,16 @@ export default function TicketDetailsPage() {
 
       <button
         type="button"
-        onClick={() => router.replace(`/checkin/validates/?eventId=${ticketData.eventId}&eventScheduleId=${ticketData.eventScheduleId}`)}
-        className="mb-4 px-4 py-3 rounded-full border-2 border-orange-500 text-orange-500 rounded hover:bg-orange-50 transition"
+        onClick={() => router.back()}
+        className="mb-4 px-4 py-3 rounded-xl border-2 border-orange-500 text-orange-500 rounded hover:bg-orange-50 transition"
       >
         Back
       </button>
 
-      <div className={`max-w-xl mx-auto rounded-xl p-6 text-white text-center ${alreadyCheckedIn ? 'bg-red-500' : 'bg-green-500'
-        }`}>
+      <div className={`max-w-xl mx-auto rounded-xl p-6 text-white text-center ${alreadyCheckedIn && 'bg-red-500'}
+        }`} style={{
+          backgroundColor: categories.find((c) => c.id === ticketData.ticketPriceInfo.key)?.color,
+        }}>
         {alreadyCheckedIn ? <XCircle size={60} className="mx-auto mb-2" /> : <CheckCircle size={60} className="mx-auto mb-2" />}
         <h1 className="text-2xl font-bold mb-1">
           {alreadyCheckedIn ? 'TICKET USED' : 'VALID TICKET'}

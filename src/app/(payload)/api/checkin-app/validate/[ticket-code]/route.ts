@@ -67,7 +67,6 @@ export async function POST(req: NextRequest) {
 
     // Get the first matching ticket
     const ticketDoc = ticketResult.docs[0]
-    console.log('ticketDoc', ticketDoc)
 
     // Return 404 if ticket not found 
     if (!ticketDoc) {
