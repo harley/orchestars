@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const cookieToken = Cookies.get('token');
-    console.log('Cookie token:', cookieToken);
+
     if (cookieToken) {
       setTokenState(cookieToken);
     }

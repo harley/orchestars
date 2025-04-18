@@ -4,12 +4,15 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/CheckIn/useAuth';
 
 import { CheckCircle, XCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function TicketDetailsPage() {
+
+  
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { token } = useAuth();
+  const { isHydrated, token } = useAuth();
+
   const [isCheckingIn, setIsCheckingIn] = useState(false);
 
   const ticket = searchParams?.get('ticket');
@@ -18,7 +21,16 @@ export default function TicketDetailsPage() {
   const ticketData = ticket ? JSON.parse(decodeURIComponent(ticket)) : null;
   const checkinData = checkinRecord ? JSON.parse(decodeURIComponent(checkinRecord)) : null;
   const alreadyCheckedIn = !!checkinData;
+  
+  useEffect(() => {
+    if (!isHydrated) return; 
+    if (!token) {
+      router.replace('/checkin');
+      return;
+    }
 
+  }, [isHydrated, token]);
+  
   const handleCheckIn = async () => {
     if (!ticketData?.code) return;
     setIsCheckingIn(true);

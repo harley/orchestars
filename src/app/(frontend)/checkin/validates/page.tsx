@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/CheckIn/useAuth';
 
@@ -26,7 +26,7 @@ export default function ValidatePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [multipleTickets, setMultipleTickets] = useState<any[]>([]);
   const router = useRouter();
-  const { token } = useAuth();
+  const { isHydrated, token } = useAuth();
   const searchParams = useSearchParams();
 
   const eventId = searchParams?.get('eventId');
@@ -34,8 +34,16 @@ export default function ValidatePage() {
   const eventLocation = searchParams?.get('eventLocation');
   const eventTitle = searchParams?.get('eventTitle');
   const scheduleDate = (searchParams?.get('eventScheduleDate') || '').split('T')[0];
+  
+  useEffect(() => {
+    if (!isHydrated) return; 
+    if (!token) {
+      router.replace('/checkin');
+      return;
+    }
 
-
+  }, [isHydrated, token]);
+  
   const encodedTicket = (ticket: Ticket) => {
     return encodeURIComponent(JSON.stringify({
       code: ticket.ticketCode,
