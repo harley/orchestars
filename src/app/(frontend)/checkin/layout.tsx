@@ -1,4 +1,4 @@
-import { AuthProvider } from '@//providers/CheckIn/useAuth'
+import { AuthProvider } from '@/providers/CheckIn/useAuth'
 import { ReactNode } from 'react'
 
 export default function RootLayout({ children }: { children: ReactNode }) {
