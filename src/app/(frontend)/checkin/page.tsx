@@ -35,8 +35,6 @@ export default function Login() {
         const token = await res.json(); // or decode from cookie if SSR-only
         setToken(token.token); // optional since cookie already stores it
         router.replace('/checkin/events');
-      } else {
-        alert(res?.error || 'Login failed');
       }
     } catch (error) {
       console.error('Login error:', error);
