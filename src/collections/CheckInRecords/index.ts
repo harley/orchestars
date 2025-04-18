@@ -60,5 +60,15 @@ export const CheckInRecords: CollectionConfig = {
       relationTo: 'admins',
       required: false,
     },
+    { name:'deletedAt',
+      type: 'date',
+      required: false,
+      admin: {
+        date: {
+          pickerAppearance: 'dayAndTime',
+          timeFormat: 'HH:mm a',
+        },
+      },
+    },
   ],
 }

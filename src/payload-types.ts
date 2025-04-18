@@ -777,6 +777,7 @@ export interface CheckinRecord {
   eventScheduleId?: string | null;
   checkInTime?: string | null;
   checkedInBy?: (number | null) | Admin;
+  deletedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1820,6 +1821,7 @@ export interface CheckinRecordsSelect<T extends boolean = true> {
   eventScheduleId?: T;
   checkInTime?: T;
   checkedInBy?: T;
+  deletedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
