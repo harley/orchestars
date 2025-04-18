@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { headers as getHeaders } from 'next/headers'
-// import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
+import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 // import { getClientSideURL } from '@/utilities/getURL'
 
 export async function POST(req: NextRequest) {
@@ -20,7 +20,8 @@ export async function POST(req: NextRequest) {
     const headers = await getHeaders()
     const { user } = await payload.auth({ headers })
 
-    if (!user) {
+    if (!user || !isAdminOrSuperAdminOrEventAdmin({
+      req: { user }})) {
       return NextResponse.json(
         { error: 'Unauthorized - Invalid admin user' },
         { status: 401 },
@@ -56,8 +57,8 @@ export async function POST(req: NextRequest) {
     const existingCheckIn = await payload.find({
       collection: 'checkinRecords',
       where: {
-        ticket: {
-          equals: ticketDoc.id,
+        ticketCode: {
+          equals: ticketDoc.ticketCode,
         },
       },
     })
@@ -82,6 +83,11 @@ export async function POST(req: NextRequest) {
         checkedInBy: user.id, // Use the admin's ID who performed check-in
       },
     })
+
+    // return error if check-in record is not created
+    if (!checkinRecord) {
+      return NextResponse.json({ error: 'Failed to create check-in record' }, { status: 500 })
+    }
 
     return NextResponse.json({ checkinRecord }, { status: 200 })
   } catch (error) {
