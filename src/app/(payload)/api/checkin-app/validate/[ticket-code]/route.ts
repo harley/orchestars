@@ -93,8 +93,12 @@ export async function POST(req: NextRequest) {
             tickets: ticketResult.docs.map(ticketDoc => ({
               id: ticketDoc.id,
               attendeeName: ticketDoc.attendeeName,
-              email: ticketDoc.user.email,
-              phoneNumber: ticketDoc.user.phoneNumber,
+              email: typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+              ? ticketDoc.user.email
+              : null,
+              phoneNumber:  typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+              ? ticketDoc.user.phoneNumber
+              : null,
               ticketCode: ticketDoc.ticketCode,
               seat: ticketDoc.seat,
               status: ticketDoc.status,
@@ -124,8 +128,12 @@ export async function POST(req: NextRequest) {
           ticket: {
             id: ticketDoc.id,
             attendeeName: ticketDoc.attendeeName,
-            email: ticketDoc.user.email,
-            phoneNumber: ticketDoc.user.phoneNumber,
+            email: typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+            ? ticketDoc.user.email
+            : null,
+            phoneNumber:  typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+            ? ticketDoc.user.phoneNumber
+            : null,
             ticketCode: ticketDoc.ticketCode,
             seat: ticketDoc.seat,
             status: ticketDoc.status,
@@ -144,8 +152,12 @@ export async function POST(req: NextRequest) {
       ticket: {
         id: ticketDoc?.id,
         attendeeName: ticketDoc?.attendeeName,
-        email: ticketDoc.user.email,
-        phoneNumber: ticketDoc.user.phoneNumber,
+        email: typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+        ? ticketDoc.user.email
+        : null,
+        phoneNumber:  typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+        ? ticketDoc.user.phoneNumber
+        : null,
         ticketCode: ticketDoc?.ticketCode,
         seat: ticketDoc?.seat,
         status: ticketDoc?.status,
