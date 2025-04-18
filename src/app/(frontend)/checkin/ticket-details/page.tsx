@@ -19,9 +19,7 @@ export default function TicketDetailsPage() {
   const checkinData = checkinRecord ? JSON.parse(decodeURIComponent(checkinRecord)) : null;
   const alreadyCheckedIn = !!checkinData;
 
-  const handleCheckIn = async () => {
-    console.log(ticketData)
-    
+  const handleCheckIn = async () => {    
     if (!ticketData?.code) return;
     setIsCheckingIn(true);
     try {

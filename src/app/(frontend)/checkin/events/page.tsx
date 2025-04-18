@@ -41,7 +41,7 @@ export default function ChooseEventPage() {
         },
       });
       const json = await response.json();
-      setEvents(json.events.docs);
+      setEvents(json.events?.docs);
     } catch (error: any) {
       alert(error.message || 'Failed to load events');
     } finally {

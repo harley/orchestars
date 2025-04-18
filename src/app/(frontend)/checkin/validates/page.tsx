@@ -41,8 +41,6 @@ export default function ValidatePage() {
         body: JSON.stringify({ eventId, eventScheduleId: scheduleId }),
       });
       const data = await response.json();
-      console.log(data.ticket);
-        
       if (response.status === 300 && data.tickets) {
         setMultipleTickets(data.tickets);
         return;
@@ -55,6 +53,7 @@ export default function ValidatePage() {
           eventTime: scheduleDate,
           seat: data.ticket.seat,
         }));
+
         const encodedCheckinRecord = encodeURIComponent(JSON.stringify(data.checkinRecord));
         router.push(`/checkin/ticket-details?ticket=${encodedTicket}&checkinRecord=${encodedCheckinRecord}`);
         return;
@@ -71,6 +70,7 @@ export default function ValidatePage() {
         eventTime: scheduleDate,
         seat: data.ticket.seat,
       }));
+
       router.push(`/checkin/ticket-details?ticket=${encodedTicket}`);
     } catch (error: any) {
       alert(error.message || 'Failed to check in');
@@ -88,6 +88,7 @@ export default function ValidatePage() {
       eventTime: scheduleDate,
       seat: ticket.seat,
     }));
+
     const params: any = { ticket: encodedTicket };
     if (ticket.isCheckedIn && ticket.checkinRecord) {
       params.checkinRecord = encodeURIComponent(JSON.stringify(ticket.checkinRecord));
