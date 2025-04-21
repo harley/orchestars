@@ -63,7 +63,7 @@ export default function TicketDetailsPage() {
       <button
         type="button"
         onClick={() => router.back()}
-        className="mb-4 px-4 py-3 rounded-xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 transition"
+        className="mb-4 px-4 py-3 rounded-xl border-2 border-gray-900 text-gray-900 hover:bg-gray-100 transition"
       >
         Back
       </button>
@@ -88,7 +88,7 @@ export default function TicketDetailsPage() {
         {alreadyCheckedIn && (
           <div className="bg-white text-gray-800 rounded-md p-4 mb-4 text-left">
             <p>
-              <strong>Checked in at:</strong> {new Date(checkinData.checkedInAt).toLocaleString()}
+              <strong>Checked in at:</strong> {checkinData.checkInTime}
             </p>
             <p>
               <strong>By:</strong> {checkinData.checkedInBy?.email || 'N/A'}

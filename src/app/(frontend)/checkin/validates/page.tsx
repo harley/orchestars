@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
 
-import { Clock3, CheckCircle, XCircle } from 'lucide-react'
+import { Clock3, CheckCircle, XCircle, Key } from 'lucide-react'
+import { format } from 'date-fns'
 
 interface Ticket {
   ticketCode: string
   attendeeName: string
   seat: string
-  ticketPriceInfo: string
+  ticketPriceInfo: string | object
   email: string
   phoneNumber: string
   isCheckedIn: boolean
@@ -32,6 +33,8 @@ export default function ValidatePage() {
   const eventLocation = searchParams?.get('eventLocation')
   const eventTitle = searchParams?.get('eventTitle')
   const scheduleDate = (searchParams?.get('eventScheduleDate') || '').split('T')[0]
+
+  const formatDate = (iso: string) => format(new Date(iso), 'PPpp')
 
   useEffect(() => {
     if (!isHydrated) return
@@ -84,13 +87,37 @@ export default function ValidatePage() {
         setMultipleTickets(data.tickets || [])
         return
       }
-      if (response.status === 409 && data.ticket && data.checkinRecord) {
-        const encodedTK = encodedTicket(data.ticket)
-        const encodedCheckinRecord = encodeURIComponent(JSON.stringify(data.checkinRecord))
-        router.push(
-          `/checkin/ticket-details?ticket=${encodedTK}&checkinRecord=${encodedCheckinRecord}`,
+      if (response.status === 409) {
+        alert('This ticket has already been checked in')
+        const minimalTicket = {
+          ticketCode: data.ticket.ticketCode,
+          attendeeName: data.ticket.attendeeName,
+          phoneNumber: data.ticket.phoneNumber,
+          seat: data.ticket.seat,
+          ticketPriceInfo:
+          {
+            key: data.ticket.ticketPriceInfo.key,
+            name: data.ticket.ticketPriceInfo.name,
+          },
+          email: data.ticket.email,
+          isCheckedIn: true,
+        }
+        
+        const encodedTK = encodedTicket(minimalTicket)
+        
+        const encodedCheckinRecord = encodeURIComponent(
+          JSON.stringify({
+            checkInTime: formatDate(data.ticket.checkinRecord.checkInTime),
+            checkedInBy: {
+              email: data.ticket.checkinRecord.checkedInBy?.email,
+            },
+          })
         )
-        return
+        
+        router.push(
+          `/checkin/ticket-details?ticket=${encodedTK}&checkinRecord=${encodedCheckinRecord}`
+        )
+        return        
       }
       if (response.status === 404) {
         alert(data.error || 'Ticket not found')
@@ -123,7 +150,7 @@ export default function ValidatePage() {
         <button
           type="button"
           onClick={() => router.replace('/checkin/events')}
-          className="mb-4 px-4 py-2 rounded-lg border-2 border-orange-500 text-orange-500 hover:bg-orange-50 transition"
+          className="mb-4 px-4 py-2 rounded-lg border-2 border-gray-900 text-gray-900 hover:bg-orange-50 transition"
         >
           Back
         </button>
@@ -131,7 +158,7 @@ export default function ValidatePage() {
         <input
           type="text"
           className="w-full border border-gray-300 rounded-lg p-3 mb-4"
-          placeholder="Enter ticket code"
+          placeholder="Enter ticket code/Seat"
           value={ticketCode}
           onChange={(e) => setTicketCode(e.target.value)}
         />
@@ -140,7 +167,7 @@ export default function ValidatePage() {
           onClick={handleCheckIn}
           disabled={isLoading}
           className={`w-full py-3 rounded-lg text-white font-semibold ${
-            isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-600'
+            isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-black'
           }`}
         >
           {isLoading ? 'Validating...' : 'Validate Ticket'}

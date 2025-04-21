@@ -56,7 +56,7 @@ export default function Login() {
       <Head>
         <title>Login</title>
       </Head>
-      <div className="min-h-screen flex items-center justify-center bg-orange-400 px-4">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">Welcome Back</h1>
           <p className="text-sm text-gray-600 mb-6 text-center">Sign in to continue</p>
@@ -66,7 +66,7 @@ export default function Login() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
               <input
                 type="email"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-700"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
@@ -78,7 +78,7 @@ export default function Login() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <input
                 type="password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-700"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
@@ -90,7 +90,7 @@ export default function Login() {
               onClick={handleLogin}
               disabled={isLoading}
               className={`w-full py-3 text-white rounded-lg font-semibold transition ${
-                isLoading ? 'bg-orange-300 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-600'
+                isLoading ? 'bg-gray-700 cursor-not-allowed' : 'bg-gray-900 hover:bg-black'
               }`}
             >
               {isLoading ? 'Signing in...' : 'Sign In'}
