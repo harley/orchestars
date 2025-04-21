@@ -1083,7 +1083,7 @@ export interface Partner {
  */
 export interface Performer {
   id: number;
-  name: string;
+  name?: string | null;
   displayOrder?: number | null;
   avatar?: (number | null) | Media;
   genre?: string | null;
