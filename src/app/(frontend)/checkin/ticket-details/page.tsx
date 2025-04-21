@@ -88,7 +88,7 @@ export default function TicketDetailsPage() {
         {alreadyCheckedIn && (
           <div className="bg-white text-gray-800 rounded-md p-4 mb-4 text-left">
             <p>
-              <strong>Checked in at:</strong> {new Date(checkinData.checkedInAt).toLocaleString()}
+              <strong>Checked in at:</strong> {checkinData.checkInTime}
             </p>
             <p>
               <strong>By:</strong> {checkinData.checkedInBy?.email || 'N/A'}

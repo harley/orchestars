@@ -12,7 +12,7 @@ export default function ChooseEventPage() {
   const [selectedEvent, setSelectedEvent] = useState<any>(null)
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null)
   const router = useRouter()
-  const { isHydrated, token } = useAuth()
+  const { isHydrated, token, setToken } = useAuth()
 
   const fetchEvents = useCallback(async () => {
     if (!token) {
@@ -29,6 +29,10 @@ export default function ChooseEventPage() {
           Authorization: `JWT ${token}`,
         },
       })
+      if (response.status === 401) {
+        setToken('')
+      }
+      
       const json = await response.json()
       setEvents(json.events?.docs || [])
     } catch (error: any) {
