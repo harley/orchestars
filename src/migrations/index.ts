@@ -36,6 +36,7 @@ import * as migration_20250411_061402_update_checkin_records_table from './20250
 import * as migration_20250414_155659_create_email_collection from './20250414_155659_create_email_collection';
 import * as migration_20250417_035104_adding_column_indexes_collections from './20250417_035104_adding_column_indexes_collections';
 import * as migration_20250418_075402_add_deleteAt_to_checkin_record from './20250418_075402_add_deleteAt_to_checkin_record';
+import * as migration_20250421_075432_add_localization_performer_name from './20250421_075432_add_localization_performer_name';
 
 export const migrations = [
   {
@@ -226,6 +227,11 @@ export const migrations = [
   {
     up: migration_20250418_075402_add_deleteAt_to_checkin_record.up,
     down: migration_20250418_075402_add_deleteAt_to_checkin_record.down,
-    name: '20250418_075402_add_deleteAt_to_checkin_record'
+    name: '20250418_075402_add_deleteAt_to_checkin_record',
+  },
+  {
+    up: migration_20250421_075432_add_localization_performer_name.up,
+    down: migration_20250421_075432_add_localization_performer_name.down,
+    name: '20250421_075432_add_localization_performer_name'
   },
 ];
