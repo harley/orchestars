@@ -13,7 +13,7 @@ export const Performers: CollectionConfig = {
     {
       name: 'name',
       type: 'text',
-      required: true,
+      required: false,
       localized: true,
     },
     {

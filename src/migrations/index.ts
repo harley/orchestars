@@ -37,6 +37,7 @@ import * as migration_20250414_155659_create_email_collection from './20250414_1
 import * as migration_20250417_035104_adding_column_indexes_collections from './20250417_035104_adding_column_indexes_collections';
 import * as migration_20250418_075402_add_deleteAt_to_checkin_record from './20250418_075402_add_deleteAt_to_checkin_record';
 import * as migration_20250421_075432_add_localization_performer_name from './20250421_075432_add_localization_performer_name';
+import * as migration_20250421_080746_drop_not_null_performer_name from './20250421_080746_drop_not_null_performer_name';
 
 export const migrations = [
   {
@@ -232,6 +233,11 @@ export const migrations = [
   {
     up: migration_20250421_075432_add_localization_performer_name.up,
     down: migration_20250421_075432_add_localization_performer_name.down,
-    name: '20250421_075432_add_localization_performer_name'
+    name: '20250421_075432_add_localization_performer_name',
+  },
+  {
+    up: migration_20250421_080746_drop_not_null_performer_name.up,
+    down: migration_20250421_080746_drop_not_null_performer_name.down,
+    name: '20250421_080746_drop_not_null_performer_name'
   },
 ];
