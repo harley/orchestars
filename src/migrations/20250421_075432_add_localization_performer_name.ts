@@ -2,7 +2,7 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
-   ALTER TABLE "performers_locales" ADD COLUMN "name" varchar NOT NULL;
+   ALTER TABLE "performers_locales" ADD COLUMN "name" varchar;
   ALTER TABLE "performers" DROP COLUMN IF EXISTS "name";`)
 }
 
