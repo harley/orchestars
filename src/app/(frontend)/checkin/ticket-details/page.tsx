@@ -63,7 +63,7 @@ export default function TicketDetailsPage() {
       <button
         type="button"
         onClick={() => router.back()}
-        className="mb-4 px-4 py-3 rounded-xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 transition"
+        className="mb-4 px-4 py-3 rounded-xl border-2 border-gray-900 text-gray-900 hover:bg-gray-100 transition"
       >
         Back
       </button>

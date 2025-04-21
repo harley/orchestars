@@ -85,7 +85,7 @@ export default function ChooseEventPage() {
             <button
               onClick={() => handleSelectEvent(event)}
               className={`w-full py-2 px-4 text-white rounded ${
-                selectedEvent?.id === event.id ? 'bg-gray-400' : 'bg-orange-500 hover:bg-orange-600'
+                selectedEvent?.id === event.id ? 'bg-gray-400' : 'bg-gray-900 hover:bg-black'
               }`}
             >
               {selectedEvent?.id === event.id ? 'Selected' : 'Select Event'}
@@ -101,7 +101,7 @@ export default function ChooseEventPage() {
                       className={`px-3 py-2 rounded text-white text-sm ${
                         selectedSchedule?.id === schedule.id
                           ? 'bg-green-600'
-                          : 'bg-orange-500 hover:bg-orange-600'
+                          : 'bg-gray-900 hover:bg-black'
                       }`}
                     >
                       {formatDate(schedule.date)}
@@ -119,7 +119,7 @@ export default function ChooseEventPage() {
       {selectedSchedule && (
         <button
           onClick={handleConfirm}
-          className="mt-6 w-full py-3 bg-orange-500 hover:bg-orange-600 text-white text-lg font-semibold rounded"
+          className="mt-6 w-full py-3 bg-gray-900 hover:bg-black text-white text-lg font-semibold rounded"
         >
           Confirm
         </button>

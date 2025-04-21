@@ -123,7 +123,7 @@ export default function ValidatePage() {
         <button
           type="button"
           onClick={() => router.replace('/checkin/events')}
-          className="mb-4 px-4 py-2 rounded-lg border-2 border-orange-500 text-orange-500 hover:bg-orange-50 transition"
+          className="mb-4 px-4 py-2 rounded-lg border-2 border-gray-900 text-gray-900 hover:bg-gray-100 transition"
         >
           Back
         </button>
@@ -140,7 +140,7 @@ export default function ValidatePage() {
           onClick={handleCheckIn}
           disabled={isLoading}
           className={`w-full py-3 rounded-lg text-white font-semibold ${
-            isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-600'
+            isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-black'
           }`}
         >
           {isLoading ? 'Validating...' : 'Validate Ticket'}
@@ -149,7 +149,7 @@ export default function ValidatePage() {
         <div className="flex justify-end mt-4">
           <button
             onClick={() => router.push('/checkin/history')}
-            className="flex items-center gap-1 text-orange-600 hover:underline"
+            className="flex items-center gap-1 text-black hover:underline"
           >
             <Clock3 size={16} /> View History
           </button>
