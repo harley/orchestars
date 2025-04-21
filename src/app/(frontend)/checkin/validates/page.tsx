@@ -88,7 +88,7 @@ export default function ValidatePage() {
         return
       }
       if (response.status === 409) {
-        alert('Ticket already checked in')
+        alert('This ticket has already been checked in')
         const minimalTicket = {
           ticketCode: data.ticket.ticketCode,
           attendeeName: data.ticket.attendeeName,
