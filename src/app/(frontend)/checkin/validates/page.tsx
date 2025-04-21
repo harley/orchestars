@@ -131,7 +131,7 @@ export default function ValidatePage() {
         <input
           type="text"
           className="w-full border border-gray-300 rounded-lg p-3 mb-4"
-          placeholder="Enter ticket code"
+          placeholder="Enter ticket code/Seat"
           value={ticketCode}
           onChange={(e) => setTicketCode(e.target.value)}
         />

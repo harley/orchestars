@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
         ...(isSearchBySeat
           ? {
               and: [
-                { seat: { equals: ticketCode } },
+                { seat: { equals: ticketCode.toUpperCase() } },
                 { event: { equals: eventId } },
                 { eventScheduleId: { equals: eventScheduleId } },
                 { status: { equals: 'booked' } },
