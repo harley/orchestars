@@ -80,12 +80,17 @@ export async function POST(request: Request) {
     const eventId = eventRecord?.id as number
     const userId = (ticket.user as User)?.id as number
 
+    const eventDate = eventRecord?.schedules?.find(
+      (schedule) => schedule.id === ticket.eventScheduleId,
+    )?.date
+
     // Create check-in record
     const checkInRecord = await payload.create({
       collection: 'checkinRecords',
       data: {
         event: eventId,
         seat: ticket.seat!,
+        eventDate: eventDate || null,
         user: userId,
         ticket: ticket.id,
         ticketCode: ticket.ticketCode as string,
