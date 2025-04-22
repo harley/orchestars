@@ -62,7 +62,7 @@ export const afterChangeStatus = async ({ value, originalDoc, req }: FieldHookAr
       }
     }
 
-    handler()
+    await handler()
   }
   return value
 }
