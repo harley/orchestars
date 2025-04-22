@@ -9,7 +9,8 @@
     "upcomingEvents": "Sắp Diễn Ra",
     "sponsorsAndPartners": "Nhà Tài Trợ Và Đối Tác",
     "shows": "Các Sự Kiện",
-    "contact": "Liên Hệ"
+    "contact": "Liên Hệ",
+    "noShows": "Không Có Chương Trình Sắp Diễn Ra"
   },
   "common": {
     "loading": "Đang tải...",
