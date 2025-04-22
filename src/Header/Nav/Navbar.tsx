@@ -5,8 +5,9 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import type { Header as HeaderType, Media } from '@/payload-types'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import { useTranslate } from '@/providers/I18n/client'
+import { Event } from '@/types/Event'
 
-const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any>[] }) => {
+const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
   const navItems = data?.navItems || []
   const logo = data.logo as Media
 
