@@ -53,6 +53,7 @@ export default function HistoryPage() {
 
         if (response.status === 401) {
           setToken('')
+          return
         }
 
         const data = await response.json()
