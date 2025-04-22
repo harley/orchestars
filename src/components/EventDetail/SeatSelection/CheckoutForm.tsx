@@ -222,10 +222,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   const calculatedTotal = calculateTotalOrder(promotionInfo, ticketSelected, event)
 
   return (
-    <div className="flex flex-col md:flex-row bg-black text-white">
+    <div className="flex flex-col container px-10 mx-auto gap-4 md:flex-row text-black">
       {/* Form section */}
-      <div className="p-6 flex-1">
-        <h3 className="text-2xl font-bold mb-6">{t('event.recipientInfo')}</h3>
+      <div className="p-6 flex-1 bg-white rounded-lg border-r border-gray-200">
+        <h3 className="text-xl font-bold mb-6">{t('checkout.personalInfo')}</h3>
 
         <form onSubmit={handleSubmit(handleConfirm)}>
           <div className="space-y-4 max-w-xl mb-8">
@@ -235,7 +235,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
               </Label>
               <Input
                 id="lastName"
-                className="w-full bg-transparent border border-white/30 rounded-md text-white"
+                className="w-full border border-gray-300 rounded-md"
                 placeholder={t('event.enterLastName')}
                 {...register('lastName', { required: t('event.lastNameRequired') })}
               />
@@ -250,7 +250,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
               </Label>
               <Input
                 id="firstName"
-                className="w-full bg-transparent border border-white/30 rounded-md text-white"
+                className="w-full border border-gray-300 rounded-md"
                 placeholder={t('event.enterFirstName')}
                 {...register('firstName', { required: t('event.firstNameRequired') })}
               />
@@ -265,7 +265,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
               </Label>
               <Input
                 id="phoneNumber"
-                className="w-full bg-transparent border border-white/30 rounded-md text-white"
+                className="w-full border border-gray-300 rounded-md"
                 placeholder={t('event.enterPhoneNumber')}
                 {...register('phoneNumber', { required: t('event.phoneNumberRequired') })}
               />
@@ -281,7 +281,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
               <Input
                 id="email"
                 type="email"
-                className="w-full bg-transparent border border-white/30 rounded-md text-white"
+                className="w-full border border-gray-300 rounded-md"
                 placeholder={t('event.enterEmail')}
                 {...register('email', {
                   required: t('event.emailRequired'),
@@ -297,7 +297,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
             </div>
 
             <div className="mt-6">
-              <Label className="block mb-3 font-medium">{t('event.selectPaymentMethod')}</Label>
+              <Label className="block mb-3 font-medium">{t('checkout.paymentMethod')}</Label>
               <RadioGroup value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
                 <div className="space-y-2">
                   {paymentMethods.map((method) => (
@@ -305,8 +305,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                       key={method.id}
                       className={`flex items-center space-x-2 p-3 border rounded-md cursor-pointer transition-colors ${
                         selectedPaymentMethod === method.id
-                          ? 'border-primary bg-white/10'
-                          : 'border-white/30 hover:bg-white/5'
+                          ? 'border-black bg-gray-50'
+                          : 'border-gray-300 hover:bg-gray-50'
                       }`}
                     >
                       <RadioGroupItem value={method.id} id={method.id} />
@@ -327,12 +327,12 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
       </div>
 
       {/* Order summary */}
-      <div className="md:w-96 bg-gray-900 p-6">
-        <h3 className="text-2xl font-bold mb-4">{t('event.orderSummary')}</h3>
+      <div className="md:w-[40%] flex-1 bg-white rounded-lg p-6">
+        <h3 className="text-xl font-bold mb-4">{t('checkout.orderSummary')}</h3>
 
         <div className="mb-6">
-          <h4 className="font-medium mb-2">{t('event.ticketInfo')}</h4>
-          <div className="divider h-[1px] bg-white/20 my-4"></div>
+          <h4 className="font-medium mb-2">{t('checkout.ticketInfo')}</h4>
+          <div className="divider h-[1px] bg-gray-200 my-4"></div>
           <h4 className="font-medium mb-2">{t('event.selectedSeats')}:</h4>
           <div className="space-y-2 max-h-40 overflow-y-auto mb-4">
             {selectedSeats.map((seat) => (
@@ -358,23 +358,25 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
         {/* Coupon code */}
         <div className="mb-6">
-          <Label htmlFor="promoCode">{t('event.enterPromoCode')}</Label>
+          <Label htmlFor="promoCode" className="block mb-2">
+            {t('checkout.enterPromoCode')}
+          </Label>
           <div className="grid grid-cols-[1fr,auto] gap-2">
             <Input
               value={promotionCode}
               onChange={(e) => setPromotionCode(e.target.value)}
-              placeholder={t('event.enterPromoCode')}
-              className="flex-1 bg-transparent border border-white/30 rounded-md text-white"
+              placeholder={t('checkout.enterPromoCode')}
+              className="flex-1 border border-gray-300 rounded-md"
             />
             <Button
               onClick={checkPromotionCode}
               disabled={isSubmitting || isSubmittingPromotionForm}
-              className="bg-gray-800 text-white hover:bg-gray-700 whitespace-nowrap"
+              className="bg-black text-white hover:bg-gray-800 whitespace-nowrap"
             >
               {isSubmittingPromotionForm ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                t('event.applyCode')
+                t('checkout.apply')
               )}
             </Button>
           </div>
@@ -396,22 +398,24 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         {promotionInfo && promotionInfo.code === promotionCode && (
           <div
             className={`p-4 border rounded-md mb-4 ${
-              calculatedTotal.canApplyPromoCode ? 'bg-green-500/20' : 'bg-red-500/20'
+              calculatedTotal.canApplyPromoCode
+                ? 'bg-green-100 border-green-400'
+                : 'bg-red-100 border-red-400'
             }`}
           >
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 {calculatedTotal.canApplyPromoCode ? (
-                  <Check className="h-5 w-5 text-green-400" />
+                  <Check className="h-5 w-5 text-green-600" />
                 ) : (
-                  <X className="h-5 w-5 text-red-400" />
+                  <X className="h-5 w-5 text-red-600" />
                 )}
                 <span className="font-medium">
-                  {t('event.promoCode')}: {promotionCode}
+                  {t('checkout.promoCode')}: {promotionCode}
                 </span>
               </div>
               {calculatedTotal.canApplyPromoCode && (
-                <span className="text-green-400 font-medium">
+                <span className="text-green-600 font-medium">
                   {promotionInfo.discountType === 'percentage'
                     ? `${promotionInfo.discountValue}%`
                     : formatMoney(promotionInfo.discountValue)}
@@ -419,31 +423,31 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
               )}
             </div>
             {!calculatedTotal.canApplyPromoCode && (
-              <p className="text-sm text-red-400 mt-1">{t('event.promotionNotMeetConditions')}</p>
+              <p className="text-sm text-red-600 mt-1">{t('event.promotionNotMeetConditions')}</p>
             )}
           </div>
         )}
 
-        <div className="divider h-[1px] bg-white/20 my-4"></div>
+        <div className="divider h-[1px] bg-gray-200 my-4"></div>
 
         {/* Price summary */}
         <div className="space-y-2 mb-6">
           <div className="flex justify-between">
-            <span>{t('event.totalBeforeDiscount')}</span>
+            <span>{t('checkout.subtotal')}</span>
             <span>{formatMoney(calculatedTotal.amountBeforeDiscount)}</span>
           </div>
 
           {calculatedTotal.amountBeforeDiscount !== calculatedTotal.amount && (
-            <div className="flex justify-between text-green-400">
-              <span>{t('event.discount')}</span>
+            <div className="flex justify-between text-green-600">
+              <span>{t('checkout.discount')}</span>
               <span>
                 -{formatMoney(calculatedTotal.amountBeforeDiscount - calculatedTotal.amount)}
               </span>
             </div>
           )}
 
-          <div className="flex justify-between font-bold text-xl pt-2 border-t border-white/20">
-            <span>{t('event.totalAfterDiscount')}</span>
+          <div className="flex justify-between font-bold text-xl pt-2 border-t border-gray-200">
+            <span>{t('checkout.total')}</span>
             <span>{formatMoney(calculatedTotal.amount)}</span>
           </div>
         </div>
@@ -453,21 +457,21 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
           <Button
             onClick={handleSubmit(handleConfirm)}
             disabled={isSubmitting || isSubmittingPromotionForm}
-            className="w-full bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+            className="w-full bg-black text-white hover:bg-gray-800 disabled:opacity-50"
           >
             {isSubmitting ? (
               <Loader2 className="h-4 w-4 animate-spin mr-2" />
             ) : (
               <Check className="h-4 w-4 mr-2" />
             )}
-            {t('event.confirmAndPay')}
+            {t('checkout.confirmAndPay')}
           </Button>
 
           <Button
             onClick={onCancel}
             variant="outline"
             disabled={isSubmitting}
-            className="w-full border-white/30 text-white hover:bg-gray-800"
+            className="w-full border-gray-300 text-black hover:bg-gray-100"
           >
             <X className="h-4 w-4 mr-2" />
             {t('event.close')}
@@ -475,9 +479,9 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         </div>
 
         {/* Disclaimer */}
-        <div className="mt-6 text-xs text-white/70 flex items-start gap-2">
+        <div className="mt-6 text-xs text-gray-500 flex items-start gap-2">
           <Info size={16} className="min-w-4 mt-0.5" />
-          <p>{t('event.paymentTerms')}</p>
+          <p>{t('checkout.disclaimer')}</p>
         </div>
       </div>
     </div>
