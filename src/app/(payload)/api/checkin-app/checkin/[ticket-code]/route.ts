@@ -46,9 +46,9 @@ export async function POST(req: NextRequest) {
     }
 
     const ticketDoc = ticket.docs[0]
-    if (!ticketDoc || !ticketDoc.event || !ticketDoc.user || !ticketDoc.ticketCode) {
+    if (!ticketDoc || !ticketDoc.event || !ticketDoc.user || !ticketDoc.ticketCode || !ticketDoc.seat) {
       return NextResponse.json(
-        { error: 'Invalid ticket data - Missing required fields' },
+        { error: 'Invalid ticket data - Missing required fields or Seat is not assigned to Ticket' },
         { status: 400 },
       )
     }
@@ -75,7 +75,8 @@ export async function POST(req: NextRequest) {
       collection: 'checkinRecords',
       data: {
         event: ticketDoc.event,
-        user: ticketDoc.user, // Keep the original ticket user
+        user: ticketDoc.user,
+        seat: ticketDoc.seat,
         ticket: ticketDoc,
         ticketCode: ticketDoc.ticketCode,
         eventScheduleId: ticketDoc.eventScheduleId || null,
