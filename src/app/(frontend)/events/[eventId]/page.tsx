@@ -22,6 +22,7 @@ import { format as dateFnsFormat } from 'date-fns'
 import { RichText as RichTextConverter } from '@payloadcms/richtext-lexical/react'
 import { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 import TicketSelection from '@/components/EventDetail/TicketSelection/Component.client'
+import SeatSelection from '@/components/EventDetail/SeatSelection'
 import TermsConditions from '@/components/EventDetail/TermsConditions/Component.client'
 
 // export const dynamic = 'force-dynamic'

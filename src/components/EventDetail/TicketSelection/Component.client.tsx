@@ -5,7 +5,7 @@ import { Event } from '@/payload-types'
 import { useTranslate } from '@/providers/I18n/client'
 import { format as dateFnsFormat } from 'date-fns'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import SeatSelection from '../SeatSelection/Component.client'
+import SeatSelection from '../SeatSelection'
 import { isSameDay } from 'date-fns'
 
 interface TicketSelectionProps {
@@ -51,10 +51,19 @@ const TicketSelection: React.FC<TicketSelectionProps> = ({ event, unavailableSea
     }
   }
 
-  // Handle ticket selection
-  const handleSelectTicket = () => {
-    // Handled by the SeatSelection component
-  }
+  useEffect(() => {
+    const defaultDate = eventDates[0]
+
+    if (!eventScheduleId && defaultDate) {
+      const schedule = event.schedules?.find(
+        (schedule) => schedule.date && isSameDay(new Date(schedule.date), defaultDate),
+      )
+
+      const newUrl = `${pathname}?eventScheduleId=${schedule?.id}`
+      router.replace(newUrl, { scroll: false })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <section className="py-12">

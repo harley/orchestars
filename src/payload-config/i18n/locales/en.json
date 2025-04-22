@@ -12,7 +12,9 @@
   "common": {
     "loading": "Loading...",
     "tryAgain": "Try Again",
-    "goHome": "Go Home"
+    "goHome": "Go Home",
+    "back": "Back",
+    "cancel": "Cancel"
   },
   "event": {
     "chooseAttendingDate": "Choose Your Attending Date",
@@ -106,7 +108,13 @@
     "promotionNotMeetConditions": "Minimum conditions not met to apply promo code",
     "dateTime": "Date & time",
     "event": "Event",
-    "selectTicket": "Select Ticket"
+    "selectTicket": "Select Ticket",
+    "checkout": "Checkout",
+    "notAvailable": "Not Available",
+    "selected": "Selected",
+    "stage": "Stage",
+    "balcony": "Balcony",
+    "ticketPrices": "Ticket Prices"
   },
   "seatSelection": {
     "booking": "Booking",
@@ -119,7 +127,8 @@
     "holdAndPay": "Hold Seat & Pay",
     "cannotSelectSeat": "Cannot select seat",
     "noEmptySeats": "Please do not leave empty seats",
-    "close": "Close"
+    "close": "Close",
+    "proceedToPayment": "Proceed to Payment"
   },
   "message": {
     "errorHoldingSeatAndPayment": "An error occurred while holding the seat and processing the payment",
@@ -185,5 +194,24 @@
     "tryingAgainDescription": "Attempting to recover from the error",
     "goingHome": "Going home",
     "goingHomeDescription": "Navigating to the home page"
+  },
+  "checkout": {
+    "personalInfo": "Personal Information",
+    "lastName": "Last Name",
+    "firstName": "First Name",
+    "phone": "Phone Number",
+    "email": "Email",
+    "paymentMethod": "Payment Method",
+    "orderSummary": "Order Summary",
+    "ticketInfo": "Ticket Information",
+    "promoCode": "Promo Code",
+    "enterPromoCode": "Enter promo code",
+    "apply": "Apply",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "total": "Total",
+    "termsAgreement": "I agree to the Terms and Conditions and Privacy Policy. I understand that my ticket will be sent to my email after payment is confirmed.",
+    "confirmAndPay": "Confirm and Pay",
+    "disclaimer": "Your tickets will be sent to your email after successful payment. Please check your email inbox (and spam folder) for your ticket confirmation."
   }
 }
