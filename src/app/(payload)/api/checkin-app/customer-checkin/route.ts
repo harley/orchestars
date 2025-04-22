@@ -85,6 +85,7 @@ export async function POST(request: Request) {
       collection: 'checkinRecords',
       data: {
         event: eventId,
+        seat: ticket.seat!,
         user: userId,
         ticket: ticket.id,
         ticketCode: ticket.ticketCode as string,
