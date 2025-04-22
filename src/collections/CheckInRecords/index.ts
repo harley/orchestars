@@ -11,7 +11,7 @@ export const CheckInRecords: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'ticketCode',
-    defaultColumns: ['ticketCode', 'event', 'checkInTime'],
+    defaultColumns: ['ticketCode', 'event', 'checkInTime', 'seat', 'eventDate'],
   },
   fields: [
     {
@@ -34,12 +34,22 @@ export const CheckInRecords: CollectionConfig = {
       unique: true,
     },
     {
+      name: 'seat',
+      type: 'text',
+      required: true,
+    },
+    {
       name: 'ticketCode',
       type: 'text',
       required: true,
     },
     {
       name: 'eventScheduleId',
+      type: 'text',
+      required: false,
+    },
+    {
+      name: 'eventDate',
       type: 'text',
       required: false,
     },
