@@ -75,7 +75,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
                       <Calendar size={16} className="mr-2" />
                       <span>
                         {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}&nbsp;-&nbsp;
-                        {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}
+                        {dateFnsFormat(new Date(evt.endDatetime), 'dd.MM.yyyy')}
                       </span>
                     </div>
                   )}
