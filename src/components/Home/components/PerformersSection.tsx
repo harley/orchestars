@@ -55,7 +55,7 @@ const PerformersSection = ({
   const { t } = useTranslate()
 
   return (
-    <section className={`py-20 relative overflow-hidden ${className || ''}`}>
+    <section className={`py-10 md:py-20 relative overflow-hidden ${className || ''}`}>
       <div
         className="absolute -z-10"
         style={
@@ -67,9 +67,11 @@ const PerformersSection = ({
 
       <div className="container mx-auto px-4">
         <div className="mb-4 w-fit">
-          <h2 className="text-4xl font-bold uppercase">{t('home.outstandingPerformers')}</h2>
+          <h2 className="text-2xl md:text-4xl font-bold uppercase">
+            {t('home.outstandingPerformers')}
+          </h2>
         </div>
-        <p className="mt-5 md:mt-0 text-muted-foreground max-w-2xl text-lg">
+        <p className="mt-5 md:mt-0 text-muted-foreground text-lg">
           {t('home.outstandingPerformersDescription')}
         </p>
 

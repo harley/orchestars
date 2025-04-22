@@ -59,7 +59,7 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any
               src={logo?.url as string}
               alt={logo?.alt || data?.title || ''}
               className={`transition-all duration-300 ease-in-out ${
-                scrolled ? 'h-10' : 'h-16'
+                scrolled ? 'h-6 md:h-10' : 'h-12 md:h-16'
               } w-auto`}
             />
           </Link>
@@ -103,7 +103,7 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any
                         </Link>
                       ))
                     ) : (
-                      <div className="block px-4 py-2 text-sm text-white/90">No upcoming shows</div>
+                      <div className="block px-4 py-2 text-sm text-black/90">No upcoming shows</div>
                     )}
                   </div>
                 )}
@@ -145,13 +145,13 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any
                               key={event.id}
                               href={`/events/${event.slug}`}
                               onClick={() => setIsOpen(false)}
-                              className="block text-sm text-white/90 hover:text-white"
+                              className="block text-sm text-black hover:underline"
                             >
                               {event.title}
                             </Link>
                           ))
                         ) : (
-                          <div className="text-sm text-white/90">No upcoming shows</div>
+                          <div className="text-sm text-black/90">No upcoming shows</div>
                         )}
                       </div>
                     </div>
