@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
 
     // Get ticket code from URL parameter
     const ticketCode = req.nextUrl.pathname.split('/').pop()
+    const {eventDate} = await req.json()
 
     // Find ticket by code
     const ticket = await payload.find({
@@ -80,6 +81,7 @@ export async function POST(req: NextRequest) {
         ticket: ticketDoc,
         ticketCode: ticketDoc.ticketCode,
         eventScheduleId: ticketDoc.eventScheduleId || null,
+        eventDate: eventDate || null,
         checkInTime: new Date().toISOString(),
         checkedInBy: user.id, // Use the admin's ID who performed check-in
       },
