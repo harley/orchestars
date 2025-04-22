@@ -4,9 +4,10 @@ import { format as dateFnsFormat } from 'date-fns'
 import Link from 'next/link'
 import { useTranslate } from '@/providers/I18n/client'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
+import { Event } from '@/types/Event'
 
 interface EventBannerProps {
-  events: Record<string, any>[]
+  events: Event[]
 }
 
 const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
@@ -38,6 +39,8 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
 
   if (!events || events.length === 0) return null
 
+  console.log('event', events)
+
   return (
     <div
       className="relative w-full h-[200px] sm:h-[200px] md:h-[300px] lg:h-[400px] xl:h-[500px] 2xl:h-[700px] overflow-hidden"
@@ -57,7 +60,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
           >
             {/* Hover overlay with animation */}
             <div
-              className={`absolute inset-0 bg-black/80 flex flex-col items-start justify-end text-white transition-opacity duration-300 ${
+              className={`absolute inset-0 bg-black/90 flex flex-col items-start justify-end text-white transition-opacity duration-300 ${
                 isHovering ? 'opacity-100' : 'opacity-0'
               }`}
             >
@@ -65,22 +68,24 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
                 <h3 className="text-sm md:text-3xl lg:text-xl font-bold md:mb-4">
                   {t('home.upcomingEvents')}
                 </h3>
-                <h2 className="line-clamp-2 text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 md:mb-4">
-                  {evt.title}
-                </h2>
+                {evt.configuration?.showBannerTitle && (
+                  <h2 className="line-clamp-2 text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 md:mb-4">
+                    {evt.title}
+                  </h2>
+                )}
 
                 <div className="hidden lg:flex flex-col gap-2 font-medium mb-4 md:mb-6 text-sm md:text-base">
-                  {evt.startDatetime && (
+                  {evt.configuration?.showBannerTime && evt.startDatetime && (
                     <div className="flex items-center">
                       <Calendar size={16} className="mr-2" />
                       <span>
                         {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}&nbsp;-&nbsp;
-                        {dateFnsFormat(new Date(evt.endDatetime), 'dd.MM.yyyy')}
+                        {dateFnsFormat(new Date(evt.endDatetime as string), 'dd.MM.yyyy')}
                       </span>
                     </div>
                   )}
 
-                  {evt.eventLocation && (
+                  {evt.configuration?.showBannerLocation && evt.eventLocation && (
                     <div className="flex items-center">
                       <MapPin size={16} className="mr-2" />
                       <span className="">
@@ -92,9 +97,11 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
                   )}
                 </div>
 
-                <span className="hidden md:block max-w-[600px] font-medium text-lg mb-4 md:mb-6">
-                  {evt.description}
-                </span>
+                {evt.configuration?.showBannerDescription && (
+                  <span className="hidden md:block max-w-[600px] font-medium text-lg mb-4 md:mb-6">
+                    {evt.description}
+                  </span>
+                )}
 
                 <Link
                   href={`/events/${evt.slug}`}
