@@ -57,12 +57,12 @@ const ActivitiesSection = ({ activity, className }: { activity: Activity; classN
   }, [])
 
   return (
-    <section className={`py-20 ${className || ''}`}>
+    <section className={`py-10 md:py-20 ${className || ''}`}>
       <div className="container mx-auto px-4 w-full">
         {/* Header Section */}
         <div className="mb-12">
           <div className="mb-4">
-            <h2 className="text-4xl font-extrabold uppercase">{activity?.mainTitle}</h2>
+            <h2 className="text-2xl md:text-4xl font-extrabold uppercase">{activity?.mainTitle}</h2>
           </div>
 
           <p className="mt-5 md:mt-0">{activity?.description}</p>

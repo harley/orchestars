@@ -4,9 +4,14 @@ import { useState, useEffect } from 'react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import type { Header as HeaderType, Media } from '@/payload-types'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
+import { useTranslate } from '@/providers/I18n/client'
+import { Event } from '@/types/Event'
 
-const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any>[] }) => {
+const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
+  const navItems = data?.navItems || []
   const logo = data.logo as Media
+
+  const { t } = useTranslate()
 
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -41,8 +46,8 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any
   // Fixed navigation items based on requirements
   const navigationItems = [
     { link: { label: 'Orchestars', url: '/' } },
-    { link: { label: 'Show', url: '#', isDropdown: true } },
-    { link: { label: 'Contact', url: '#contact', onClick: scrollToFooter } },
+    { link: { label: t('home.shows'), url: '#', isDropdown: true } },
+    { link: { label: t('home.contact'), url: '#contact', onClick: scrollToFooter } },
   ]
 
   return (
@@ -109,6 +114,15 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any
                 )}
               </div>
             ))}
+            {navItems.map(({ link }, i) => (
+              <Link
+                key={i}
+                href={link.url || ''}
+                className="nav-link font-medium text-white/90 hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
         </div>
 
@@ -166,6 +180,16 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any
                     </Link>
                   ),
                 )}
+                {navItems.map(({ link }, i) => (
+                  <Link
+                    key={i}
+                    href={link.url || ''}
+                    onClick={() => setIsOpen(false)}
+                    className="nav-link font-medium text-white/90 hover:text-white"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
               </div>
             </SheetContent>
           </Sheet>

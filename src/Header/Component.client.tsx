@@ -7,10 +7,11 @@ import type { Header } from '@/payload-types'
 
 // import { HeaderNav } from './Nav'
 import Navbar from './Nav/Navbar'
+import { Event } from '@/types/Event'
 
 interface HeaderClientProps {
   data: Header
-  events: Record<string, any>[]
+  events: Event[]
 }
 
 export const HeaderClient: React.FC<HeaderClientProps> = ({ data, events }) => {

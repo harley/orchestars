@@ -71,8 +71,7 @@ const EventDetailPage = async (props: {
     <div className="bg-white">
       <PageClient />
       <div className="min-h-screen flex flex-col">
-        <main className="flex-grow">
-          {/* Hero Banner Section */}
+        <main className="flex-grow pt-2 md:pt-6">
           <EventBanner event={eventDetail} />
 
           {/* About Section */}

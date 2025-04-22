@@ -53,4 +53,11 @@ export type Event = {
     [k: string]: any
   }
   ticketQuantityLimitation?: 'perTicketType' | 'perEvent'
+  configuration: {
+    showBannerTitle: boolean
+    showBannerDescription: boolean
+    showBannerTime: boolean
+    showBannerLocation: boolean
+  }
+  status: string
 }
