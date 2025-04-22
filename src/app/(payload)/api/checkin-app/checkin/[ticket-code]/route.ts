@@ -75,7 +75,8 @@ export async function POST(req: NextRequest) {
       collection: 'checkinRecords',
       data: {
         event: ticketDoc.event,
-        user: ticketDoc.user, // Keep the original ticket user
+        user: ticketDoc.user,
+        seat: ticketDoc.seat!,
         ticket: ticketDoc,
         ticketCode: ticketDoc.ticketCode,
         eventScheduleId: ticketDoc.eventScheduleId || null,
