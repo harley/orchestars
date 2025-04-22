@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Calendar, MapPin } from 'lucide-react'
 import { format as dateFnsFormat } from 'date-fns'
 import Link from 'next/link'
 import { useTranslate } from '@/providers/I18n/client'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
 import { Event } from '@/types/Event'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 interface EventBannerProps {
   events: Event[]
@@ -14,6 +15,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
   const { t } = useTranslate()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isHovering, setIsHovering] = useState(false)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -37,84 +39,105 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % events.length)
   }
 
-  if (!events || events.length === 0) return null
-
-  console.log('event', events)
-
-  return (
-    <div
-      className="relative w-full h-[200px] sm:h-[200px] md:h-[300px] lg:h-[400px] xl:h-[500px] 2xl:h-[700px] overflow-hidden"
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
-    >
-      {events?.map((evt, index) => (
+  const renderBanners = useCallback(
+    (evt: Event, index: number) => {
+      const banners = (
         <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${evt?.eventBanner?.url})` }}
+        >
+          {/* Hover overlay with animation */}
+          <div
+            className={`absolute inset-0 bg-black/90 flex flex-col items-start justify-end text-white transition-opacity duration-300 ${
+              isHovering ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <div className="container mx-auto px-16 lg:px-6 pb-10 lg:pb-20 flex flex-col">
+              <h3 className="text-sm md:text-3xl lg:text-xl font-bold md:mb-4">
+                {t('home.upcomingEvents')}
+              </h3>
+              {evt.configuration?.showBannerTitle && (
+                <h2 className="line-clamp-2 text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 md:mb-4">
+                  {evt.title}
+                </h2>
+              )}
+
+              <div className="hidden lg:flex flex-col gap-2 font-medium mb-4 md:mb-6 text-sm md:text-base">
+                {evt.configuration?.showBannerTime && evt.startDatetime && (
+                  <div className="flex items-center">
+                    <Calendar size={16} className="mr-2" />
+                    <span>
+                      {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}&nbsp;-&nbsp;
+                      {dateFnsFormat(new Date(evt.endDatetime as string), 'dd.MM.yyyy')}
+                    </span>
+                  </div>
+                )}
+
+                {evt.configuration?.showBannerLocation && evt.eventLocation && (
+                  <div className="flex items-center">
+                    <MapPin size={16} className="mr-2" />
+                    <span className="">
+                      {typeof evt.eventLocation === 'string' ? evt.eventLocation : 'Event location'}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {evt.configuration?.showBannerDescription && (
+                <span className="hidden md:block max-w-[600px] font-medium text-lg mb-4 md:mb-6">
+                  {evt.description}
+                </span>
+              )}
+
+              <Link
+                href={`/events/${evt.slug}`}
+                className="inline-block w-fit py-2 px-4 md:px-6 md:py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                {evt.status === EVENT_STATUS.published_open_sales.value && t('home.bookTicket')}
+                {evt.status === EVENT_STATUS.published_upcoming.value && t('home.upcomingEvents')}
+              </Link>
+            </div>
+          </div>
+        </div>
+      )
+
+      if (!isMobile) {
+        return (
+          <div
+            key={evt.id}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+          >
+            {banners}
+          </div>
+        )
+      }
+
+      return (
+        <Link
           key={evt.id}
+          href={`/events/${evt.slug}`}
           className={`absolute inset-0 transition-opacity duration-1000 ${
             index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}
         >
-          <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${evt?.eventBanner?.url})` }}
-          >
-            {/* Hover overlay with animation */}
-            <div
-              className={`absolute inset-0 bg-black/90 flex flex-col items-start justify-end text-white transition-opacity duration-300 ${
-                isHovering ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <div className="container mx-auto px-16 lg:px-6 pb-10 lg:pb-20 flex flex-col">
-                <h3 className="text-sm md:text-3xl lg:text-xl font-bold md:mb-4">
-                  {t('home.upcomingEvents')}
-                </h3>
-                {evt.configuration?.showBannerTitle && (
-                  <h2 className="line-clamp-2 text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 md:mb-4">
-                    {evt.title}
-                  </h2>
-                )}
+          {banners}
+        </Link>
+      )
+    },
+    [currentIndex, isHovering, isMobile, t],
+  )
 
-                <div className="hidden lg:flex flex-col gap-2 font-medium mb-4 md:mb-6 text-sm md:text-base">
-                  {evt.configuration?.showBannerTime && evt.startDatetime && (
-                    <div className="flex items-center">
-                      <Calendar size={16} className="mr-2" />
-                      <span>
-                        {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}&nbsp;-&nbsp;
-                        {dateFnsFormat(new Date(evt.endDatetime as string), 'dd.MM.yyyy')}
-                      </span>
-                    </div>
-                  )}
+  if (!events || events.length === 0) return null
 
-                  {evt.configuration?.showBannerLocation && evt.eventLocation && (
-                    <div className="flex items-center">
-                      <MapPin size={16} className="mr-2" />
-                      <span className="">
-                        {typeof evt.eventLocation === 'string'
-                          ? evt.eventLocation
-                          : 'Event location'}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {evt.configuration?.showBannerDescription && (
-                  <span className="hidden md:block max-w-[600px] font-medium text-lg mb-4 md:mb-6">
-                    {evt.description}
-                  </span>
-                )}
-
-                <Link
-                  href={`/events/${evt.slug}`}
-                  className="inline-block w-fit py-2 px-4 md:px-6 md:py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  {evt.status === EVENT_STATUS.published_open_sales.value && t('home.bookTicket')}
-                  {evt.status === EVENT_STATUS.published_upcoming.value && t('home.upcomingEvents')}
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
+  return (
+    <div
+      className="relative w-full h-[200px] sm:h-[200px] md:h-[300px] lg:h-[400px] xl:h-[500px] 2xl:h-[700px] overflow-hidden"
+      onMouseEnter={() => !isMobile && setIsHovering(true)}
+      onMouseLeave={() => !isMobile && setIsHovering(false)}
+    >
+      {events?.map(renderBanners)}
       {events?.length > 1 && (
         <>
           <button

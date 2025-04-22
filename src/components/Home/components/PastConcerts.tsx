@@ -42,11 +42,12 @@ const PastConcerts: React.FC<PastConcertsProps> = ({ events, className }) => {
                       alt={evt.eventThumbnail?.alt || evt.eventBanner?.alt || evt.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                    {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {/* Hover overlay to show event information on desktop view*/}
+                    <div className="hidden absolute inset-0 bg-black/50 md:flex flex-col items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <h3 className="text-white text-xl md:text-3xl line-clamp-3 font-bold mb-3 text-center">
                         {evt.title}
                       </h3>
+
                       <div className="flex flex-col text-white space-y-2">
                         <div className="flex items-center justify-center">
                           <Calendar className="h-4 w-4 mr-2 text-white/80" />
@@ -69,6 +70,32 @@ const PastConcerts: React.FC<PastConcertsProps> = ({ events, className }) => {
                         )}
                       </div>
                     </div>
+                  </div>
+                </div>
+
+                {/* event information on mobile view */}
+                <div className="bg-black/50 flex flex-col items-start justify-center transition-opacity duration-300 md:hidden">
+                  <h3 className="text-white text-xl md:text-3xl line-clamp-3 font-bold text-center">
+                    {evt.title}
+                  </h3>
+
+                  <div className="flex flex-col items-start text-white space-y-2">
+                    <div className="flex items-center justify-center">
+                      <Calendar className="h-4 w-4 mr-2 text-white/80" />
+                      <span className="text-sm">
+                        {evt.startDatetime &&
+                          dateFnsFormat(new Date(evt.startDatetime), 'dd/MM/yyyy')}{' '}
+                        -{' '}
+                        {evt.endDatetime && dateFnsFormat(new Date(evt.endDatetime), 'dd/MM/yyyy')}
+                      </span>
+                    </div>
+
+                    {evt.eventLocation && (
+                      <div className="flex items-start justify-center">
+                        <MapPin size={16} className="mr-2 text-white/80" />
+                        <span className="text-sm text-wrap">{evt.eventLocation}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CarouselItem>
