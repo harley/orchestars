@@ -46,7 +46,7 @@ export default function TicketDetailsPage() {
         return
       }
       alert('Ticket checked in successfully')
-      router.replace('/checkin/validates')
+      router.back()
     } catch (err: any) {
       alert(err.message || 'Failed to check in')
     } finally {
