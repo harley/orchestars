@@ -39,6 +39,7 @@ export default function TicketDetailsPage() {
           'Content-Type': 'application/json',
           Authorization: `JWT ${token}`,
         },
+        body: JSON.stringify({ eventDate: ticketData.eventTime }),
       })
       if (!res.ok) {
         const err = await res.json()

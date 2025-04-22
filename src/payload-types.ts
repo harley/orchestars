@@ -773,8 +773,10 @@ export interface CheckinRecord {
   event: number | Event;
   user: number | User;
   ticket: number | Ticket;
+  seat: string;
   ticketCode: string;
   eventScheduleId?: string | null;
+  eventDate?: string | null;
   checkInTime?: string | null;
   checkedInBy?: (number | null) | Admin;
   deletedAt?: string | null;
@@ -1817,8 +1819,10 @@ export interface CheckinRecordsSelect<T extends boolean = true> {
   event?: T;
   user?: T;
   ticket?: T;
+  seat?: T;
   ticketCode?: T;
   eventScheduleId?: T;
+  eventDate?: T;
   checkInTime?: T;
   checkedInBy?: T;
   deletedAt?: T;
