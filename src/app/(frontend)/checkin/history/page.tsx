@@ -140,9 +140,9 @@ export default function HistoryPage() {
                 <p className="text-sm text-gray-600">{item.eventTitle}</p>
                 <p className="text-sm text-gray-600">Seat: {item.ticket?.seat || 'N/A'}</p>
                 <p className="text-sm text-gray-600">
-                  Checked in: {item.checkInTime.split('T')[0]}
+                  Checked in: {item.checkInTime?.split('T')[0]}
                 </p>
-                <p className="text-sm text-gray-600">Checked in by: {item.checkedInBy.email}</p>
+                <p className="text-sm text-gray-600">Checked in by: {item.checkedInBy?.email}</p>
                 <button
                   className="mt-2 text-sm text-red-500 hover:underline outline-red-500"
                   onClick={() => handleDelete(item.ticketCode)}
