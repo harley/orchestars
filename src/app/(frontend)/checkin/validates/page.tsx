@@ -25,7 +25,7 @@ export default function ValidatePage() {
   const [isLoading, setIsLoading] = useState(false)
   const [multipleTickets, setMultipleTickets] = useState<any[]>([])
   const router = useRouter()
-  const { isHydrated, token } = useAuth()
+  const { isHydrated, token, setToken } = useAuth()
   const searchParams = useSearchParams()
 
   const eventId = searchParams?.get('eventId')
@@ -83,6 +83,10 @@ export default function ValidatePage() {
         body: JSON.stringify({ eventId, eventScheduleId: scheduleId }),
       })
       const data = await response.json()
+      if (response.status === 401) {
+        setToken('')
+        return
+      }
       if (response.status === 300 && data.tickets) {
         setMultipleTickets(data.tickets || [])
         return
