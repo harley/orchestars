@@ -118,7 +118,7 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
               <Link
                 key={`${i}-${link.url}`}
                 href={link.url || ''}
-                className="nav-link font-medium text-white/90 hover:text-white"
+                className="nav-link font-medium text-black/90 hover:text-black"
               >
                 {link.label}
               </Link>
@@ -174,7 +174,7 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
                       key={i}
                       href={link.url || '#'}
                       onClick={() => setIsOpen(false)}
-                      className="nav-link font-medium text-black/90 hover:text-white"
+                      className="nav-link font-medium text-black/90 hover:text-black"
                     >
                       {link.label}
                     </Link>
@@ -185,7 +185,7 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
                     key={`${i}-${link.url}`}
                     href={link.url || ''}
                     onClick={() => setIsOpen(false)}
-                    className="nav-link font-medium text-white/90 hover:text-white"
+                    className="nav-link font-medium text-black/90 hover:text-black"
                   >
                     {link.label}
                   </Link>

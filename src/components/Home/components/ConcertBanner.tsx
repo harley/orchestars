@@ -107,6 +107,9 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
                 >
                   {evt.status === EVENT_STATUS.published_open_sales.value && t('home.bookTicket')}
                   {evt.status === EVENT_STATUS.published_upcoming.value && t('home.upcomingEvents')}
+                  {evt.status !== EVENT_STATUS.published_open_sales.value &&
+                    evt.status !== EVENT_STATUS.published_upcoming.value &&
+                    t('home.viewDetail')}
                 </Link>
               </div>
             </div>
