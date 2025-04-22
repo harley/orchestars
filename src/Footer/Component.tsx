@@ -11,7 +11,7 @@ export async function Footer() {
   const locale = await getLocale()
   const footerData: FooterType = await getCachedGlobal('footer', 1, locale)()
   return (
-    <footer className="pt-8 mt-auto">
+    <footer className="pt-8 border-t border-black mt-auto">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           <div

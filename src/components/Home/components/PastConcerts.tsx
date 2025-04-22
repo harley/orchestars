@@ -44,7 +44,7 @@ const PastConcerts: React.FC<PastConcertsProps> = ({ events, className }) => {
                     />
                     {/* Hover overlay */}
                     <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <h3 className="text-white text-xl md:text-3xl line-clamp-2 font-bold mb-3 text-center">
+                      <h3 className="text-white text-xl md:text-3xl line-clamp-3 font-bold mb-3 text-center">
                         {evt.title}
                       </h3>
                       <div className="flex flex-col text-white space-y-2">
