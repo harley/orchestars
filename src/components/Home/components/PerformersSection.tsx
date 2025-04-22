@@ -67,7 +67,7 @@ const PerformersSection = ({
 
       <div className="container mx-auto px-4">
         <div className="mb-4 w-fit">
-          <h2 className="text-4xl font-extrabold uppercase">{t('home.outstandingPerformers')}</h2>
+          <h2 className="text-4xl font-bold uppercase">{t('home.outstandingPerformers')}</h2>
         </div>
         <p className="mt-5 md:mt-0 text-muted-foreground max-w-2xl text-lg">
           {t('home.outstandingPerformersDescription')}
