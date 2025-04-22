@@ -91,13 +91,13 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any
 
                 {/* Dropdown for Show menu */}
                 {link.isDropdown && (
-                  <div className="absolute left-0 mt-2 w-48 bg-black/95 border border-gray-800 rounded-md shadow-lg py-1 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
+                  <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-800 overflow-hidden rounded-md shadow-lg opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
                     {events && events.length > 0 ? (
                       events.map((event) => (
                         <Link
                           key={event.id}
                           href={`/events/${event.slug}`}
-                          className="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-gray-800"
+                          className="block px-4 py-2 text-sm hover:text-white hover:bg-black"
                         >
                           {event.title}
                         </Link>
@@ -119,11 +119,11 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any
           {/* Mobile menu button */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <button className="md:hidden text-white">
+              <button className="md:hidden">
                 <Menu size={24} />
               </button>
             </SheetTrigger>
-            <SheetContent side="right" className="bg-black/95 text-white border-gray-800">
+            <SheetContent side="right" className="bg-white border-gray-800">
               <div className="flex flex-col mt-10 space-y-6">
                 {navigationItems.map(({ link }, i) =>
                   link.onClick ? (
@@ -131,13 +131,13 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any
                       key={i}
                       href={link.url}
                       onClick={link.onClick}
-                      className="nav-link font-medium text-white/90 hover:text-white"
+                      className="nav-link font-medium text-black/90 hover:text-white"
                     >
                       {link.label}
                     </a>
                   ) : link.isDropdown ? (
                     <div key={i} className="space-y-2">
-                      <div className="nav-link font-medium text-white/90">{link.label}</div>
+                      <div className="nav-link font-medium text-black/90">{link.label}</div>
                       <div className="pl-4 space-y-3">
                         {events && events.length > 0 ? (
                           events.map((event) => (
@@ -160,7 +160,7 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any
                       key={i}
                       href={link.url || '#'}
                       onClick={() => setIsOpen(false)}
-                      className="nav-link font-medium text-white/90 hover:text-white"
+                      className="nav-link font-medium text-black/90 hover:text-white"
                     >
                       {link.label}
                     </Link>

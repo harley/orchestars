@@ -57,46 +57,53 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
           >
             {/* Hover overlay with animation */}
             <div
-              className={`absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white text-center transition-opacity duration-300 ${
+              className={`absolute inset-0 bg-black/80 flex flex-col items-start justify-end text-white transition-opacity duration-300 ${
                 isHovering ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 md:mb-4 px-4">
-                {evt.title}
-              </h2>
+              <div className="container mx-auto px-16 lg:px-6 pb-5 lg:pb-20 flex flex-col">
+                <h3 className="text-sm md:text-3xl lg:text-xl font-bold mb-2 md:mb-4">
+                  {t('home.upcomingEvents')}
+                </h3>
+                <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 md:mb-4">
+                  {evt.title}
+                </h2>
 
-              <div className="hidden md:flex flex-col items-center gap-2 mb-4 md:mb-6 text-sm md:text-base">
-                {evt.startDatetime && (
-                  <div className="flex items-center">
-                    <Calendar size={16} className="mr-2" />
-                    <span>
-                      {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}&nbsp;-&nbsp;
-                      {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}
-                    </span>
-                  </div>
-                )}
+                <div className="hidden lg:flex flex-col gap-2 font-medium mb-4 md:mb-6 text-sm md:text-base">
+                  {evt.startDatetime && (
+                    <div className="flex items-center">
+                      <Calendar size={16} className="mr-2" />
+                      <span>
+                        {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}&nbsp;-&nbsp;
+                        {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}
+                      </span>
+                    </div>
+                  )}
 
-                {evt.eventLocation && (
-                  <div className="flex items-center">
-                    <MapPin size={16} className="mr-2" />
-                    <span className="">
-                      {typeof evt.eventLocation === 'string' ? evt.eventLocation : 'Event location'}
-                    </span>
-                  </div>
-                )}
+                  {evt.eventLocation && (
+                    <div className="flex items-center">
+                      <MapPin size={16} className="mr-2" />
+                      <span className="">
+                        {typeof evt.eventLocation === 'string'
+                          ? evt.eventLocation
+                          : 'Event location'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <span className="hidden md:block max-w-[600px] font-medium text-lg mb-4 md:mb-6">
+                  {evt.description}
+                </span>
+
+                <Link
+                  href={`/events/${evt.slug}`}
+                  className="inline-block w-fit px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  {evt.status === EVENT_STATUS.published_open_sales.value && t('home.bookTicket')}
+                  {evt.status === EVENT_STATUS.published_upcoming.value && t('home.upcomingEvents')}
+                </Link>
               </div>
-
-              <span className="hidden md:block max-w-[600px] font-medium text-lg mb-4 md:mb-6">
-                {evt.description}
-              </span>
-
-              <Link
-                href={`/events/${evt.slug}`}
-                className="inline-block px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                {evt.status === EVENT_STATUS.published_open_sales.value && t('home.bookTicket')}
-                {evt.status === EVENT_STATUS.published_upcoming.value && t('home.upcomingEvents')}
-              </Link>
             </div>
           </div>
         </div>

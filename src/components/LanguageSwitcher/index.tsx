@@ -43,7 +43,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
     <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(
-          'flex items-center gap-1 text-white/90 hover:text-white transition-colors outline-none',
+          'flex items-center gap-1 text-black hover:underline transition-colors outline-none',
           className,
         )}
       >
@@ -52,7 +52,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="bg-[#1A1F2C]/95 backdrop-blur-md border-white/10 text-white"
+        className="bg-white backdrop-blur-md border-white/10 text-black hover:underlin"
       >
         {languages.map((language) => (
           <DropdownMenuItem
