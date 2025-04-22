@@ -19,7 +19,7 @@ export default function HistoryPage() {
   const [checkins, setCheckins] = useState<CheckinRecord[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
-  const { token } = useAuth()
+  const { isHydrated, token, setToken } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
 
   const handleDelete = async (id: string) => {
@@ -51,6 +51,10 @@ export default function HistoryPage() {
           },
         })
 
+        if (response.status === 401) {
+          setToken('')
+        }
+
         const data = await response.json()
         setCheckins(data.records || [])
       } catch (err) {
@@ -71,6 +75,15 @@ export default function HistoryPage() {
     return matchesSearch
   })
 
+
+  useEffect(() => {
+    if (!isHydrated) return
+    if (!token) {
+      router.replace('/checkin')
+      return
+    }
+
+  }, [isHydrated, token, router])
   return (
     <div className="min-h-screen bg-white pt-16 px-6">
       {/* Header */}
