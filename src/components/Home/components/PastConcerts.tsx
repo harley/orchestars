@@ -21,12 +21,12 @@ const PastConcerts: React.FC<PastConcertsProps> = ({ events, className }) => {
   const { t } = useTranslate()
 
   return (
-    <section className={`py-20 ${className || ''}`}>
+    <section className={`py-10 md:py-20 ${className || ''}`}>
       <div className="container mx-auto px-4 w-full">
         <Carousel className="w-full relative">
-          <div className="flex flex-col md:flex-row md:items-center gap-2 justify-between mb-4">
-            <h2 className="text-4xl font-bold uppercase">{t('home.pastEvents')}</h2>
-            <div className="hidden md:flex space-x-4">
+          <div className="flex md:items-center gap-2 justify-between mb-4">
+            <h2 className="text-2xl md:text-4xl font-bold uppercase">{t('home.pastEvents')}</h2>
+            <div className="flex space-x-4">
               <CarouselPrevious className="relative inset-0 translate-y-0 bg-transparent hover:bg-black/10 text-white border border-white rounded-full h-10 w-10" />
               <CarouselNext className="relative inset-0 translate-y-0 bg-transparent hover:bg-black/10 text-white border border-white rounded-full h-10 w-10" />
             </div>
@@ -44,7 +44,7 @@ const PastConcerts: React.FC<PastConcertsProps> = ({ events, className }) => {
                     />
                     {/* Hover overlay */}
                     <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <h3 className="text-white text-xl md:text-2xl font-bold mb-3 text-center">
+                      <h3 className="text-white text-xl md:text-3xl line-clamp-2 font-bold mb-3 text-center">
                         {evt.title}
                       </h3>
                       <div className="flex flex-col text-white space-y-2">
@@ -74,10 +74,6 @@ const PastConcerts: React.FC<PastConcertsProps> = ({ events, className }) => {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <div className="flex md:hidden justify-center space-x-4">
-            <CarouselPrevious className="relative inset-0 translate-y-0 bg-transparent hover:bg-black/10 text-white border border-white rounded-full h-10 w-10" />
-            <CarouselNext className="relative inset-0 translate-y-0 bg-transparent hover:bg-black/10 text-white border border-white rounded-full h-10 w-10" />
-          </div>
         </Carousel>
       </div>
     </section>

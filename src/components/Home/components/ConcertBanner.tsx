@@ -61,11 +61,11 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
                 isHovering ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              <div className="container mx-auto px-16 lg:px-6 pb-5 lg:pb-20 flex flex-col">
-                <h3 className="text-sm md:text-3xl lg:text-xl font-bold mb-2 md:mb-4">
+              <div className="container mx-auto px-16 lg:px-6 pb-10 lg:pb-20 flex flex-col">
+                <h3 className="text-sm md:text-3xl lg:text-xl font-bold md:mb-4">
                   {t('home.upcomingEvents')}
                 </h3>
-                <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 md:mb-4">
+                <h2 className="line-clamp-2 text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 md:mb-4">
                   {evt.title}
                 </h2>
 
@@ -75,7 +75,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
                       <Calendar size={16} className="mr-2" />
                       <span>
                         {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}&nbsp;-&nbsp;
-                        {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}
+                        {dateFnsFormat(new Date(evt.endDatetime), 'dd.MM.yyyy')}
                       </span>
                     </div>
                   )}
@@ -98,7 +98,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
 
                 <Link
                   href={`/events/${evt.slug}`}
-                  className="inline-block w-fit px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                  className="inline-block w-fit py-2 px-4 md:px-6 md:py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   {evt.status === EVENT_STATUS.published_open_sales.value && t('home.bookTicket')}
                   {evt.status === EVENT_STATUS.published_upcoming.value && t('home.upcomingEvents')}
@@ -148,12 +148,12 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
           </button>
         </>
       )}
-      <div className="absolute bottom-8 left-0 right-0 z-30 flex justify-center gap-2">
+      <div className="absolute bottom-4 md:bottom-8 left-0 right-0 z-30 flex justify-center gap-2">
         {events?.map((_, index) => (
           <button
             key={index}
             onClick={() => handleDotClick(index)}
-            className={`h-2 rounded-full transition-all ${
+            className={`h-2 rounded-full transition-all border border-white ${
               index === currentIndex ? 'w-8 bg-black/50' : 'w-2 bg-black/50 hover:bg-black/80'
             }`}
             aria-label={`Go to slide ${index + 1}`}
