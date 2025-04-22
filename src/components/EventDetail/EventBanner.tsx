@@ -5,7 +5,7 @@ import { format as dateFnsFormat } from 'date-fns'
 
 const EventBanner = ({ event }: { event: Event }) => {
   return (
-    <section className="bg-gray-50 py-20">
+    <section className="bg-gray-100 py-20">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row gap-8 md:gap-12">
           {/* Left Content - Event Title */}
