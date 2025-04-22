@@ -7,6 +7,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher'
 import { useTranslate } from '@/providers/I18n/client'
 
 const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any>[] }) => {
+  const navItems = data?.navItems || []
   const logo = data.logo as Media
 
   const { t } = useTranslate()
@@ -112,6 +113,15 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any
                 )}
               </div>
             ))}
+            {navItems.map(({ link }, i) => (
+              <Link
+                key={i}
+                href={link.url || ''}
+                className="nav-link font-medium text-white/90 hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
         </div>
 
@@ -169,6 +179,16 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Record<string, any
                     </Link>
                   ),
                 )}
+                {navItems.map(({ link }, i) => (
+                  <Link
+                    key={i}
+                    href={link.url || ''}
+                    onClick={() => setIsOpen(false)}
+                    className="nav-link font-medium text-white/90 hover:text-white"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
               </div>
             </SheetContent>
           </Sheet>
