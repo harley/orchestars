@@ -103,7 +103,10 @@
     "currencySymbol": "₫",
     "requiresMinimumTickets": "Requires a minimum of {{count}} tickets",
     "noPromotionsAvailable": "No promotions available",
-    "promotionNotMeetConditions": "Minimum conditions not met to apply promo code"
+    "promotionNotMeetConditions": "Minimum conditions not met to apply promo code",
+    "dateTime": "Date & time",
+    "event": "Event",
+    "selectTicket": "Select Ticket"
   },
   "seatSelection": {
     "booking": "Booking",

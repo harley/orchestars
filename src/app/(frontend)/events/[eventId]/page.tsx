@@ -9,7 +9,6 @@ import TermCondition from '@/components/EventDetail/TermCondition'
 import SeatReservationClient from '@/components/EventDetail/SeatReservation/Component.client'
 import FeaturedPerformers from '@/components/EventDetail/FeaturedPerformers/Component'
 import FAQ from '@/components/EventDetail/FAQ/Component'
-import DetailDescriptionClient from '@/components/EventDetail/DetailDescription/Component.client'
 import { getEventCached } from './actions'
 import UpcomingSaleBanner from '@/components/EventDetail/UpcomingSale'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
@@ -17,6 +16,13 @@ import { checkBookedOrPendingPaymentSeats } from '@/app/(payload)/api/bank-trans
 import { getSeatHoldings } from '@/app/(payload)/api/seat-holding/seat/utils'
 import { cookies } from 'next/headers'
 import { getLocale } from '@/providers/I18n/server'
+import { Media } from '@/payload-types'
+import { Calendar, MapPin } from 'lucide-react'
+import { format as dateFnsFormat } from 'date-fns'
+import { RichText as RichTextConverter } from '@payloadcms/richtext-lexical/react'
+import { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
+import TicketSelection from '@/components/EventDetail/TicketSelection/Component.client'
+import TermsConditions from '@/components/EventDetail/TermsConditions/Component.client'
 
 // export const dynamic = 'force-dynamic'
 export const revalidate = 86400 // 24 hours
@@ -67,20 +73,33 @@ const EventDetailPage = async (props: {
   }
 
   return (
-    <div className="">
+    <div className="bg-white">
       <PageClient />
       <div className="min-h-screen flex flex-col">
-        <main className="flex-grow pt-6">
+        <main className="flex-grow">
+          {/* Hero Banner Section */}
           <EventBanner event={eventDetail} />
+
+          {/* About Section */}
+          <section className="py-12">
+            <div className="container mx-auto px-4">
+              <h2 className="text-4xl font-bold mb-8 uppercase">About</h2>
+
+              <RichTextConverter data={eventDetail.detailDescription as SerializedEditorState} />
+            </div>
+          </section>
+
+          {/* Ticket Section */}
           {isUpcoming && <UpcomingSaleBanner />}
 
           {isOpenForSales && (
-            <SeatReservationClient
+            <TicketSelection
               event={eventDetail}
-              unavailableSeats={unavailableSeats as string[]}
+              // onSelectDate={(date) => console.log('Selected date:', date)}
+              // onSelectTicket={() => console.log('Select ticket clicked')}
             />
           )}
-          <DetailDescriptionClient event={eventDetail} />
+
           <FeaturedPerformers eventSlug={eventSlug} />
           {!isUpcoming && (
             <>
