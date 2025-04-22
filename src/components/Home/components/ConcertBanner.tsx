@@ -59,7 +59,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
                 )}
 
                 {evt.title && evt.configuration?.showBannerTitle && (
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 animate-fade-in">
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 animate-fade-in">
                     {evt.title}
                   </h1>
                 )}

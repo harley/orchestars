@@ -47,10 +47,11 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ['Montserrat', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Gilroy', 'Montserrat', 'Inter', 'system-ui', 'sans-serif'],
         display: ['EB Garamond', 'SF Pro Display', 'Inter', 'system-ui', 'sans-serif'],
         garamond: ['EB Garamond', 'serif'],
         montserrat: ['Montserrat', 'sans-serif'],
+        gilroy: ['Gilroy', 'sans-serif'],
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',

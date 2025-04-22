@@ -65,7 +65,7 @@ export async function Footer() {
                 </span>
               </div>
             </Link>
-            <pre className="text-muted-foreground max-w-sm text-[13px] mx-auto text-left whitespace-pre-wrap font-montserrat">
+            <pre className="text-muted-foreground max-w-sm text-[13px] mx-auto text-left whitespace-pre-wrap font-gilroy">
               {footerData?.description}
             </pre>
           </div>

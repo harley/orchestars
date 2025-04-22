@@ -20,7 +20,7 @@ const EventBanner = ({ event }: { event: Event }) => {
         <div className="container mx-auto px-6 md:px-10 pb-16 md:pb-20 w-full">
           <div className="max-w-3xl">
             {event.title && event.configuration?.showBannerTitle && (
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 animate-fade-in">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 animate-fade-in">
                 {event.title}
               </h1>
             )}
