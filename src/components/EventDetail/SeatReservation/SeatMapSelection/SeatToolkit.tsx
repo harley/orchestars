@@ -25,6 +25,8 @@ type SeatItem = {
   status: 'Available' | 'Unavailable' | string
   category: string
 }
+const BASE_WIDTH = 1386;
+
 
 const SeatMapToolkit = ({
   onSelectSeat,
@@ -38,6 +40,35 @@ const SeatMapToolkit = ({
   const [seats, setSeats] = useState<SeatItem[]>([])
   const [showModal, setShowModal] = useState(false)
 
+  const [workspace, setWorkspace] = useState({
+    initialViewBoxScale: 0.6,
+    initialViewBoxScaleForWidth: 2000,
+    visibilityOffset: 0,
+  });
+
+  useEffect(() => {
+    const screenWidth = window.innerWidth;
+  if (screenWidth <= 320) {
+      setWorkspace({
+        initialViewBoxScale: 0.27,
+        initialViewBoxScaleForWidth: 150,
+        visibilityOffset: 0,
+      });
+    } else if (screenWidth <= 768) {
+      setWorkspace({
+        initialViewBoxScale: 0.5,
+        initialViewBoxScaleForWidth: 1000,
+        visibilityOffset: 0,
+      });
+    } else {
+      setWorkspace({
+        initialViewBoxScale: 0.8,
+        initialViewBoxScaleForWidth: 2000,
+        visibilityOffset: 0,
+      });
+    }
+  }, []);
+  
   useEffect(() => {
     if (unavailableSeats?.length) {
       const seatSet = new Set(unavailableSeats)
@@ -166,11 +197,7 @@ const SeatMapToolkit = ({
           ],
           polylines: [],
           images: [],
-          workspace: {
-            initialViewBoxScale: 0.605909115101895,
-            initialViewBoxScaleForWidth: 1386,
-            visibilityOffset: 0,
-          },
+          workspace: workspace
         }}
         options={{
           shapes: {

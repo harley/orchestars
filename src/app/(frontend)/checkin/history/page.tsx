@@ -78,9 +78,9 @@ export default function HistoryPage() {
         <h1 className="text-2xl font-bold text-gray-900">Check-In History</h1>
         <button
           onClick={() => router.back()}
-          className="w-9 h-9 rounded-full border border-orange-500 flex items-center justify-center"
+          className="w-9 h-9 rounded-full border border-gray-900 flex items-center justify-center"
         >
-          <X className="text-orange-500 w-5 h-5" />
+          <X className="text-gray-900 w-5 h-5" />
         </button>
       </div>
 
@@ -96,7 +96,7 @@ export default function HistoryPage() {
       <button
         type="button"
         onClick={() => router.back()}
-        className="mb-4 px-4 py-3 rounded-xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 transition"
+        className="mb-4 px-4 py-3 rounded-xl border-2 border-gray-900 text-gray-900 hover:bg-gray-100 transition"
       >
         Back
       </button>
@@ -104,7 +104,7 @@ export default function HistoryPage() {
       {/* History List */}
       <div className="space-y-4">
         {isLoading ? (
-          <div className="text-center mt-20 text-orange-500">
+          <div className="text-center mt-20 text-gray-900">
             <Clock3 className="mx-auto mb-3 animate-spin" size={32} />
             <p>Loading check-in history...</p>
           </div>
@@ -114,10 +114,10 @@ export default function HistoryPage() {
           filteredCheckins?.map((item) => (
             <div
               key={item.id}
-              className="flex p-4 rounded-lg bg-gray-100 border-l-4 border-orange-500 shadow-sm"
+              className="flex p-4 rounded-lg bg-gray-100 border-l-4 border-gray-900 shadow-sm"
             >
               <div className="flex-shrink-0 mt-1">
-                <Clock3 className="text-orange-500" size={24} />
+                <Clock3 className="text-gray-900" size={24} />
               </div>
               <div className="ml-4 py-2">
                 <h3 className="text-sm font-semibold text-gray-800">
