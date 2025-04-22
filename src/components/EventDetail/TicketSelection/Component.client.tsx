@@ -1,23 +1,24 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Event } from '@/payload-types'
 import { useTranslate } from '@/providers/I18n/client'
 import { format as dateFnsFormat } from 'date-fns'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import SeatSelection from '../SeatSelection/Component.client'
+import { isSameDay } from 'date-fns'
 
 interface TicketSelectionProps {
   event: Event
-  onSelectDate?: (date: string) => void
-  onSelectTicket?: () => void
+  unavailableSeats?: string[]
 }
 
-const TicketSelection: React.FC<TicketSelectionProps> = ({
-  event,
-  onSelectDate,
-  onSelectTicket,
-}) => {
+const TicketSelection: React.FC<TicketSelectionProps> = ({ event, unavailableSeats = [] }) => {
   const { t } = useTranslate()
-  const [selectedDate, setSelectedDate] = useState<string>('')
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const eventScheduleId = searchParams?.get('eventScheduleId')
 
   // Get available dates from event schedules or use start/end dates
   const getEventDates = () => {
@@ -33,14 +34,26 @@ const TicketSelection: React.FC<TicketSelectionProps> = ({
 
   const eventDates = getEventDates()
 
+  // Find selected schedule based on eventScheduleId
+  const selectedSchedule = event.schedules?.find((schedule) => schedule.id === eventScheduleId)
+
+  // Handle date selection (update URL with eventScheduleId)
   const handleDateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const date = e.target.value
-    setSelectedDate(date)
-    onSelectDate?.(date)
+    const selectedDate = new Date(e.target.value)
+
+    const schedule = event.schedules?.find(
+      (schedule) => schedule.date && isSameDay(new Date(schedule.date), selectedDate),
+    )
+
+    if (schedule) {
+      const newUrl = `${pathname}?eventScheduleId=${schedule.id}`
+      router.push(newUrl, { scroll: false })
+    }
   }
 
+  // Handle ticket selection
   const handleSelectTicket = () => {
-    onSelectTicket?.()
+    // Handled by the SeatSelection component
   }
 
   return (
@@ -65,7 +78,7 @@ const TicketSelection: React.FC<TicketSelectionProps> = ({
                   <select
                     className="appearance-none w-full border border-gray-300 rounded-md py-2 pl-4 pr-10 bg-white focus:outline-none focus:ring-2 focus:ring-black"
                     onChange={handleDateChange}
-                    value={selectedDate || eventDates[0]}
+                    value={selectedSchedule?.date || eventDates[0]}
                   >
                     {eventDates.map((date, index) => (
                       <option key={index} value={date}>
@@ -91,13 +104,8 @@ const TicketSelection: React.FC<TicketSelectionProps> = ({
               <div className="font-bold">{event.title}</div>
             </div>
             <div className="p-4 flex items-center justify-center">
-              <button
-                className="bg-black text-white rounded-md py-2 px-6 hover:bg-gray-800 transition-colors"
-                onClick={handleSelectTicket}
-                disabled={!selectedDate && eventDates.length > 0}
-              >
-                {t('event.selectTicket')}
-              </button>
+              {/* Use SeatSelection component */}
+              <SeatSelection event={event} unavailableSeats={unavailableSeats} />
             </div>
           </div>
         </div>

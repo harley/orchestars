@@ -93,11 +93,7 @@ const EventDetailPage = async (props: {
           {isUpcoming && <UpcomingSaleBanner />}
 
           {isOpenForSales && (
-            <TicketSelection
-              event={eventDetail}
-              // onSelectDate={(date) => console.log('Selected date:', date)}
-              // onSelectTicket={() => console.log('Select ticket clicked')}
-            />
+            <TicketSelection event={eventDetail} unavailableSeats={unavailableSeats} />
           )}
 
           <FeaturedPerformers eventSlug={eventSlug} />
