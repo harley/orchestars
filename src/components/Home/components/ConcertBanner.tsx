@@ -41,64 +41,11 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
 
   const renderBanners = useCallback(
     (evt: Event, index: number) => {
-      const banners = (
+      const Banner = (
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${evt?.eventBanner?.url})` }}
-        >
-          {/* Hover overlay with animation */}
-          <div
-            className={`absolute inset-0 bg-black/90 flex flex-col items-start justify-end text-white transition-opacity duration-300 ${
-              isHovering ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            <div className="container mx-auto px-16 lg:px-6 pb-10 lg:pb-20 flex flex-col">
-              <h3 className="text-sm md:text-3xl lg:text-xl font-bold md:mb-4">
-                {t('home.upcomingEvents')}
-              </h3>
-              {evt.configuration?.showBannerTitle && (
-                <h2 className="line-clamp-2 text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 md:mb-4">
-                  {evt.title}
-                </h2>
-              )}
-
-              <div className="hidden lg:flex flex-col gap-2 font-medium mb-4 md:mb-6 text-sm md:text-base">
-                {evt.configuration?.showBannerTime && evt.startDatetime && (
-                  <div className="flex items-center">
-                    <Calendar size={16} className="mr-2" />
-                    <span>
-                      {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}&nbsp;-&nbsp;
-                      {dateFnsFormat(new Date(evt.endDatetime as string), 'dd.MM.yyyy')}
-                    </span>
-                  </div>
-                )}
-
-                {evt.configuration?.showBannerLocation && evt.eventLocation && (
-                  <div className="flex items-center">
-                    <MapPin size={16} className="mr-2" />
-                    <span className="">
-                      {typeof evt.eventLocation === 'string' ? evt.eventLocation : 'Event location'}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {evt.configuration?.showBannerDescription && (
-                <span className="hidden md:block max-w-[600px] font-medium text-lg mb-4 md:mb-6">
-                  {evt.description}
-                </span>
-              )}
-
-              <Link
-                href={`/events/${evt.slug}`}
-                className="inline-block w-fit py-2 px-4 md:px-6 md:py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                {evt.status === EVENT_STATUS.published_open_sales.value && t('home.bookTicket')}
-                {evt.status === EVENT_STATUS.published_upcoming.value && t('home.upcomingEvents')}
-              </Link>
-            </div>
-          </div>
-        </div>
+        />
       )
 
       if (!isMobile) {
@@ -109,7 +56,55 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
               index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
           >
-            {banners}
+            {Banner}
+            {/* Hover overlay with animation */}
+            <div
+              className={`absolute inset-0 bg-black/85 flex flex-col items-start justify-end text-white transition-opacity duration-300 ${
+                isHovering ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              <div className="container mx-auto px-6 pb-20 flex flex-col">
+                <h3 className="text-xl font-bold mb-4">{t('home.upcomingEvents')}</h3>
+                {evt.configuration?.showBannerTitle && (
+                  <h2 className="line-clamp-2 text-4xl xl:text-5xl font-bold mb-4">{evt.title}</h2>
+                )}
+
+                <div className="flex flex-col gap-2 font-medium mb-6">
+                  {evt.configuration?.showBannerTime && evt.startDatetime && (
+                    <div className="flex items-center">
+                      <Calendar size={16} className="mr-2" />
+                      <span>
+                        {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}&nbsp;-&nbsp;
+                        {dateFnsFormat(new Date(evt.endDatetime as string), 'dd.MM.yyyy')}
+                      </span>
+                    </div>
+                  )}
+
+                  {evt.configuration?.showBannerLocation && evt.eventLocation && (
+                    <div className="flex items-center">
+                      <MapPin size={16} className="mr-2" />
+                      <span className="">
+                        {typeof evt.eventLocation === 'string'
+                          ? evt.eventLocation
+                          : 'Event location'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {evt.configuration?.showBannerDescription && (
+                  <span className="max-w-[600px] font-medium text-lg mb-6">{evt.description}</span>
+                )}
+
+                <Link
+                  href={`/events/${evt.slug}`}
+                  className="inline-block w-fit px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  {evt.status === EVENT_STATUS.published_open_sales.value && t('home.bookTicket')}
+                  {evt.status === EVENT_STATUS.published_upcoming.value && t('home.upcomingEvents')}
+                </Link>
+              </div>
+            </div>
           </div>
         )
       }
@@ -122,7 +117,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
             index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}
         >
-          {banners}
+          {Banner}
         </Link>
       )
     },
@@ -137,7 +132,10 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
       onMouseEnter={() => !isMobile && setIsHovering(true)}
       onMouseLeave={() => !isMobile && setIsHovering(false)}
     >
+      {/* Render banners for each event with transitions and navigation controls */}
       {events?.map(renderBanners)}
+
+      {/* Navigation buttons and dots for banner carousel */}
       {events?.length > 1 && (
         <>
           <button
@@ -178,6 +176,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
           </button>
         </>
       )}
+
       <div className="absolute bottom-4 md:bottom-8 left-0 right-0 z-30 flex justify-center gap-2">
         {events?.map((_, index) => (
           <button
