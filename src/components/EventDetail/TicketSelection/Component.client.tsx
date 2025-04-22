@@ -68,7 +68,7 @@ const TicketSelection: React.FC<TicketSelectionProps> = ({ event, unavailableSea
   return (
     <section className="py-12">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold mb-4 uppercase">{t('event.ticket')}</h2>
+        <h2 className="text-2xl md:text-4xl font-bold mb-4 uppercase">{t('event.ticket')}</h2>
         <p className="text-lg mb-8">{t('event.selectDateToAttend')}</p>
 
         <div className="border rounded-lg overflow-hidden">

@@ -4,9 +4,8 @@ import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 import PageClient from './page.client'
 import EventBanner from '@/components/EventDetail/EventBanner'
-// import Schedule from '@/components/EventDetail/Schedule'
+import Schedule from '@/components/EventDetail/Schedule'
 import TermCondition from '@/components/EventDetail/TermCondition'
-import SeatReservationClient from '@/components/EventDetail/SeatReservation/Component.client'
 import FeaturedPerformers from '@/components/EventDetail/FeaturedPerformers/Component'
 import FAQ from '@/components/EventDetail/FAQ/Component'
 import { getEventCached } from './actions'
@@ -16,14 +15,9 @@ import { checkBookedOrPendingPaymentSeats } from '@/app/(payload)/api/bank-trans
 import { getSeatHoldings } from '@/app/(payload)/api/seat-holding/seat/utils'
 import { cookies } from 'next/headers'
 import { getLocale } from '@/providers/I18n/server'
-import { Media } from '@/payload-types'
-import { Calendar, MapPin } from 'lucide-react'
-import { format as dateFnsFormat } from 'date-fns'
 import { RichText as RichTextConverter } from '@payloadcms/richtext-lexical/react'
 import { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 import TicketSelection from '@/components/EventDetail/TicketSelection/Component.client'
-import SeatSelection from '@/components/EventDetail/SeatSelection'
-import TermsConditions from '@/components/EventDetail/TermsConditions/Component.client'
 
 // export const dynamic = 'force-dynamic'
 export const revalidate = 86400 // 24 hours
@@ -84,7 +78,7 @@ const EventDetailPage = async (props: {
           {/* About Section */}
           <section className="py-12">
             <div className="container mx-auto px-4">
-              <h2 className="text-4xl font-bold mb-8 uppercase">About</h2>
+              <h2 className="text-2xl md:text-4xl font-bold mb-8 uppercase">About</h2>
 
               <RichTextConverter data={eventDetail.detailDescription as SerializedEditorState} />
             </div>
@@ -100,7 +94,7 @@ const EventDetailPage = async (props: {
           <FeaturedPerformers eventSlug={eventSlug} />
           {!isUpcoming && (
             <>
-              {/* {!!esventDetail.schedules?.length && <Schedule schedules={eventDetail.schedules} />} */}
+              {!!eventDetail.schedules?.length && <Schedule schedules={eventDetail.schedules} />}
               {eventDetail.eventTermsAndConditions && (
                 <TermCondition termCondition={eventDetail.eventTermsAndConditions} />
               )}
