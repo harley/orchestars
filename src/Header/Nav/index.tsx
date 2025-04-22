@@ -63,7 +63,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
       <div className="container mx-auto px-6 md:px-10 flex items-center justify-between">
         <Link
           href="/"
-          className="text-2xl font-display font-semibold tracking-tight flex items-center gap-2 text-white transition-all duration-300"
+          className="text-2xl font-semibold tracking-tight flex items-center gap-2 text-white transition-all duration-300"
           style={{ transform: scrolled ? 'scale(0.95)' : 'scale(1)' }}
         >
           {logo?.url && (
