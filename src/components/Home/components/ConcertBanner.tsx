@@ -3,6 +3,7 @@ import { Calendar, MapPin } from 'lucide-react'
 import { format as dateFnsFormat } from 'date-fns'
 import Link from 'next/link'
 import { useTranslate } from '@/providers/I18n/client'
+import { EVENT_STATUS } from '@/collections/Events/constants/status'
 
 interface EventBannerProps {
   events: Record<string, any>[]
@@ -11,14 +12,17 @@ interface EventBannerProps {
 const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
   const { t } = useTranslate()
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [isHovering, setIsHovering] = useState(false)
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % events?.length || 0)
+      if (!isHovering) {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % events?.length || 0)
+      }
     }, 6000)
 
     return () => clearInterval(interval)
-  }, [events?.length])
+  }, [events?.length, isHovering])
 
   const handleDotClick = (index: number) => {
     setCurrentIndex(index)
@@ -32,8 +36,14 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % events.length)
   }
 
+  if (!events || events.length === 0) return null
+
   return (
-    <div className="relative w-full h-[170px] sm:h-[200px] md:h-[300px] lg:h-[400px] xl:h-[500px] 2xl:h-[700px] overflow-hidden">
+    <div
+      className="relative w-full h-[200px] sm:h-[200px] md:h-[300px] lg:h-[400px] xl:h-[500px] 2xl:h-[700px] overflow-hidden"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
       {events?.map((evt, index) => (
         <div
           key={evt.id}
@@ -41,69 +51,61 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
             index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}
         >
-          <div className="absolute inset-0  z-10" />
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: `url(${evt?.eventBanner?.url})` }}
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/95 to-transparent" />
-          </div>
+            {/* Hover overlay with animation */}
+            <div
+              className={`absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white text-center transition-opacity duration-300 ${
+                isHovering ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 md:mb-4 px-4">
+                {evt.title}
+              </h2>
 
-          <div className="relative z-20 h-full flex items-end">
-            <div className="container mx-auto px-6 md:px-10 pb-2 md:pb-24">
-              <div className="max-w-3xl">
-                {evt.sponsor && (
-                  <div className="inline-block px-3 py-1 mb-3 border border-white/30 rounded-full backdrop-blur text-xs text-white/90">
-                    Powered by <span className="font-semibold">{evt.sponsor}</span>
+              <div className="hidden md:flex flex-col items-center gap-2 mb-4 md:mb-6 text-sm md:text-base">
+                {evt.startDatetime && (
+                  <div className="flex items-center">
+                    <Calendar size={16} className="mr-2" />
+                    <span>
+                      {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}&nbsp;-&nbsp;
+                      {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}
+                    </span>
                   </div>
                 )}
 
-                {evt.title && evt.configuration?.showBannerTitle && (
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 animate-fade-in">
-                    {evt.title}
-                  </h1>
+                {evt.eventLocation && (
+                  <div className="flex items-center">
+                    <MapPin size={16} className="mr-2" />
+                    <span className="">
+                      {typeof evt.eventLocation === 'string' ? evt.eventLocation : 'Event location'}
+                    </span>
+                  </div>
                 )}
-
-                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 text-white/90 mb-8">
-                  {evt.configuration?.showBannerTime && (
-                    <div className="flex items-center">
-                      <Calendar className="h-5 w-5 mr-2" />
-                      <span>
-                        {evt.startDatetime &&
-                          dateFnsFormat(new Date(evt.startDatetime), 'dd/MM/yyyy HH:mm a')}{' '}
-                        -{' '}
-                        {evt.endDatetime &&
-                          dateFnsFormat(new Date(evt.endDatetime), 'dd/MM/yyyy HH:mm a')}
-                      </span>
-                    </div>
-                  )}
-
-                  {evt.eventLocation && evt.configuration?.showBannerLocation && (
-                    <div className="flex items-center">
-                      <MapPin className="h-5 w-5 mr-2" />
-                      <span>{evt.eventLocation}</span>
-                    </div>
-                  )}
-                </div>
-
-                <Link
-                  href={`/events/${evt.slug}`}
-                  className=" lg:py-3 lg:px-6 py-1 px-3 shadow-lg bg-slate-100/80 text-black lg:text-base text-[13px] hover:bg-slate-100/100 relative cursor-pointer rounded-lg font-medium inline-flex items-center justify-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/20"
-                >
-                  {t('home.viewDetail')}
-                </Link>
               </div>
+
+              <span className="hidden md:block max-w-[600px] font-medium text-lg mb-4 md:mb-6">
+                {evt.description}
+              </span>
+
+              <Link
+                href={`/events/${evt.slug}`}
+                className="inline-block px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                {evt.status === EVENT_STATUS.published_open_sales.value && t('home.bookTicket')}
+                {evt.status === EVENT_STATUS.published_upcoming.value && t('home.upcomingEvents')}
+              </Link>
             </div>
           </div>
         </div>
       ))}
-
       {events?.length > 1 && (
         <>
-          {' '}
           <button
             onClick={handlePrev}
-            className="absolute top-1/2 left-4 z-30 -translate-y-1/2 p-2 rounded-full bg-white/20 backdrop-blur text-white hover:bg-white/30 transition-all"
+            className="absolute top-1/2 left-4 z-30 -translate-y-1/2 p-2 rounded-full border border-white/80 bg-black/20 backdrop-blur text-white hover:bg-black/30 transition-all"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -121,7 +123,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
           </button>
           <button
             onClick={handleNext}
-            className="absolute top-1/2 right-4 z-30 -translate-y-1/2 p-2 rounded-full bg-white/20 backdrop-blur text-white hover:bg-white/30 transition-all"
+            className="absolute top-1/2 right-4 z-30 -translate-y-1/2 p-2 rounded-full border border-white/80 bg-black/20 backdrop-blur text-white hover:bg-black/30 transition-all"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -139,14 +141,13 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
           </button>
         </>
       )}
-
-      <div className="absolute bottom-2 md:bottom-8 left-0 right-0 z-30 flex justify-center gap-2">
+      <div className="absolute bottom-8 left-0 right-0 z-30 flex justify-center gap-2">
         {events?.map((_, index) => (
           <button
             key={index}
             onClick={() => handleDotClick(index)}
-            className={`md:h-2 h-1 rounded-full transition-all ${
-              index === currentIndex ? 'md:w-8 w-4 bg-white' : 'w-2 bg-white/50 hover:bg-white/80'
+            className={`h-2 rounded-full transition-all ${
+              index === currentIndex ? 'w-8 bg-black/50' : 'w-2 bg-black/50 hover:bg-black/80'
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />

@@ -3,7 +3,6 @@
 
 import React, { useEffect, useMemo } from 'react'
 import ConcertBanner from './components/ConcertBanner'
-import ConcertList from './components/ConcertList'
 import PastConcerts from './components/PastConcerts'
 import PerformersSection from './components/PerformersSection'
 import { initScrollAnimation } from '@/utilities/scrollAnimation'
@@ -17,7 +16,6 @@ import Partners from './components/Partners'
 
 const HomeClient = ({
   bannerDocs,
-  onGoingPaginatedDocs,
   partners,
   performers,
   pastEvents,
@@ -37,14 +35,11 @@ const HomeClient = ({
 
   const visibleSections = useMemo(() => {
     const array = []
-    if (onGoingPaginatedDocs?.docs?.length) {
-      array.push({ Component: ConcertList, props: { onGoingPaginatedDocs } })
+    if (pastEvents?.length > 0) {
+      array.push({ Component: PastConcerts, props: { events: pastEvents } })
     }
     if (performers?.length > 0) {
       array.push({ Component: PerformersSection, props: { performers } })
-    }
-    if (pastEvents?.length > 0) {
-      array.push({ Component: PastConcerts, props: { events: pastEvents } })
     }
     if (partners?.length > 0) {
       array.push({ Component: Partners, props: { partners } })
@@ -56,15 +51,11 @@ const HomeClient = ({
   }, [])
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-black">
       <main className="flex-grow pt-6">
         <ConcertBanner events={bannerDocs} />
         {visibleSections.map((section, index) => (
-          <section.Component
-            key={index}
-            {...section.props}
-            className={index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}
-          />
+          <section.Component key={index} {...section.props} className="bg-black !text-white" />
         ))}
       </main>
     </div>

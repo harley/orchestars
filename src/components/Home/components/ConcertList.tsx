@@ -68,8 +68,8 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, classNa
                 )}
               >
                 <img
-                  src={evt.eventThumbnail?.url || evt.eventBanner?.url}
-                  alt={evt.eventThumbnail?.alt || evt.eventBanner?.alt || evt.title}
+                  src={evt.eventBanner?.url || evt.eventThumbnail?.url}
+                  alt={evt.eventBanner?.alt || evt.eventThumbnail?.alt || evt.title}
                   className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                 />
               </div>
@@ -87,7 +87,7 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, classNa
                 >
                   {evt.title}
                 </Link>
-                <div className="flex flex-col sm:flex-row gap-4 text-muted-foreground mb-4">
+                <div className="flex flex-col font-medium gap-1 text-muted-foreground mb-4">
                   <div className="flex items-center">
                     <Calendar className="h-4 w-4 mr-2" />
                     <span className="text-sm">

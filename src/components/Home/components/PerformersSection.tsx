@@ -25,7 +25,7 @@ const PerformerCard: React.FC<{ performer: Performer; index: number }> = ({ perf
         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500" />
       </div>
 
-      <h3 className="text-2xl font-bold mb-3 text-black">{performer.name}</h3>
+      <h3 className="text-2xl font-bold mb-3 text-white">{performer.name}</h3>
 
       {performer.genre && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground/80 mb-2">
@@ -66,22 +66,20 @@ const PerformersSection = ({
       />
 
       <div className="container mx-auto px-4">
-        <div className="mb-12">
-          <div className="text-center mb-4">
-            <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
-              {t('home.outstandingPerformers')}
-            </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
-          </div>
-          <p className="mt-5 md:mt-0 text-muted-foreground text-center mb-8 max-w-2xl mx-auto text-lg">
-            {t('home.outstandingPerformersDescription')}
-          </p>
+        <div className="mb-4 w-fit">
+          <h2 className="text-4xl font-extrabold uppercase">{t('home.outstandingPerformers')}</h2>
         </div>
+        <p className="mt-5 md:mt-0 text-muted-foreground max-w-2xl text-lg">
+          {t('home.outstandingPerformersDescription')}
+        </p>
 
         <Carousel className="w-full relative">
           <CarouselContent className="">
             {(performers || []).map((performer, index) => (
-              <CarouselItem key={performer.id} className="basis-1/1 lg:basis-1/3">
+              <CarouselItem
+                key={performer.id}
+                className="basis-1/1 flex justify-center lg:basis-1/3"
+              >
                 <PerformerCard key={performer.id} performer={performer} index={index} />
               </CarouselItem>
             ))}

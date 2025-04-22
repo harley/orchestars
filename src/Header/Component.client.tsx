@@ -10,9 +10,10 @@ import Navbar from './Nav/Navbar'
 
 interface HeaderClientProps {
   data: Header
+  events: Record<string, any>[]
 }
 
-export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
+export const HeaderClient: React.FC<HeaderClientProps> = ({ data, events }) => {
   /* Storing the value in a useState to avoid hydration errors */
   // const [theme, setTheme] = useState<string | null>(null)
   // const { headerTheme, setHeaderTheme } = useHeaderTheme()
@@ -28,5 +29,5 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [headerTheme])
 
-  return <Navbar data={data} />
+  return <Navbar data={data} events={events} />
 }

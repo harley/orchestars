@@ -8,11 +8,8 @@ const Partners = ({ partners = [], className }: { partners: Partner[]; className
   return (
     <section className={`py-20 ${className || ''}`}>
       <div className="container mx-auto px-4 w-full">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
-            {t('home.sponsorsAndPartners')}
-          </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
+        <div className="mb-8">
+          <h2 className="text-4xl font-bold uppercase">{t('home.sponsorsAndPartners')}</h2>
         </div>
 
         <div className="flex flex-wrap justify-center gap-8">
