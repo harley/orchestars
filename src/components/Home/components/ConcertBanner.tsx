@@ -18,14 +18,14 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
   const isMobile = useIsMobile()
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    if (events.length <= 1) return
+    const id = setInterval(() => {
       if (!isHovering) {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % events?.length || 0)
+        setCurrentIndex((p) => (p + 1) % events.length)
       }
     }, 6000)
-
-    return () => clearInterval(interval)
-  }, [events?.length, isHovering])
+    return () => clearInterval(id)
+  }, [events.length, isHovering])
 
   const handleDotClick = (index: number) => {
     setCurrentIndex(index)
@@ -74,8 +74,13 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
                     <div className="flex items-center">
                       <Calendar size={16} className="mr-2" />
                       <span>
-                        {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}&nbsp;-&nbsp;
-                        {dateFnsFormat(new Date(evt.endDatetime as string), 'dd.MM.yyyy')}
+                        {dateFnsFormat(new Date(evt.startDatetime), 'dd.MM.yyyy')}
+                        {evt.endDatetime && (
+                          <>
+                            &nbsp;-&nbsp;
+                            {dateFnsFormat(new Date(evt.endDatetime), 'dd.MM.yyyy')}
+                          </>
+                        )}
                       </span>
                     </div>
                   )}

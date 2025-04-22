@@ -74,7 +74,7 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
         <div className="hidden md:flex items-center justify-start flex-1">
           <div className="flex items-center space-x-8">
             {navigationItems.map(({ link }, i) => (
-              <div key={i} className="relative group">
+              <div key={`${i}-${link.url}`} className="relative group">
                 {link.onClick ? (
                   <a
                     href={link.url}
@@ -116,7 +116,7 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
             ))}
             {navItems.map(({ link }, i) => (
               <Link
-                key={i}
+                key={`${i}-${link.url}`}
                 href={link.url || ''}
                 className="nav-link font-medium text-white/90 hover:text-white"
               >
@@ -142,7 +142,7 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
                 {navigationItems.map(({ link }, i) =>
                   link.onClick ? (
                     <a
-                      key={i}
+                      key={`${i}-${link.url}`}
                       href={link.url}
                       onClick={link.onClick}
                       className="nav-link font-medium text-black/90 hover:text-white"
@@ -182,7 +182,7 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
                 )}
                 {navItems.map(({ link }, i) => (
                   <Link
-                    key={i}
+                    key={`${i}-${link.url}`}
                     href={link.url || ''}
                     onClick={() => setIsOpen(false)}
                     className="nav-link font-medium text-white/90 hover:text-white"

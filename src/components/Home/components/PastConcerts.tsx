@@ -1,8 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Calendar, MapPin } from 'lucide-react'
 import { Event } from '@/types/Event'
 import { format as dateFnsFormat } from 'date-fns'
-import Link from 'next/link'
 import { useTranslate } from '@/providers/I18n/client'
 import {
   Carousel,
