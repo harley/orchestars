@@ -207,6 +207,11 @@ export const Events: CollectionConfig = {
       relationTo: 'media',
     },
     {
+      name: 'mobileEventBanner',
+      type: 'upload',
+      relationTo: 'media',
+    },
+    {
       name: 'eventThumbnail',
       type: 'upload',
       relationTo: 'media',
