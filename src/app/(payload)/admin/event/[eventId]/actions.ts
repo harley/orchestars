@@ -3,6 +3,8 @@
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { sql } from '@payloadcms/db-postgres/drizzle'
+import { Ticket } from './types'
+import { Event, OrderItem } from '@/payload-types'
 
 interface TicketCounts {
   [ticketPriceName: string]: {
@@ -151,5 +153,123 @@ export const getSeatHoldings = async (eventId: string, scheduleId: string) => {
   } catch (error) {
     console.error('Error fetching seat holdings:', error)
     return []
+  }
+}
+
+export const getBookedSeatsByEventScheduleId = async (eventId: number, eventScheduleId: string) => {
+  try {
+    const payload = await getPayload({
+      config,
+    })
+
+    const result = await payload.db.drizzle.execute(sql`
+      SELECT 
+      ticket.id,
+      ticket.ticket_code as "ticketCode",
+      ticket.attendee_name as "attendeeName",
+      ticket.ticket_price_info as "ticketPriceInfo",
+      ticket.ticket_price_name AS "ticketPriceName",
+      ticket.event_schedule_id AS "eventScheduleId",
+      ticket.seat
+      FROM tickets ticket
+      WHERE 
+        ticket.event_id = ${Number(eventId)}
+        AND ticket.event_schedule_id = ${eventScheduleId}
+        AND ticket.status = 'booked'
+    `)
+
+    return result?.rows || []
+  } catch (error) {
+    console.log('error', error)
+
+    return []
+  }
+}
+
+export const swapSeats = async (
+  originalTicket: Ticket,
+  changedData: { seat: string; eventId: number; eventScheduleId: string; ticketPriceId: string },
+) => {
+  const payload = await getPayload({
+    config,
+  })
+  const existOriginalTicket = await payload.findByID({
+    collection: 'tickets',
+    id: originalTicket.id,
+  })
+
+  if (!existOriginalTicket) {
+    throw new Error('Original ticket not found')
+  }
+
+  const checkExistChangedSeat = await payload
+    .find({
+      collection: 'tickets',
+      limit: 1,
+      where: {
+        seat: {
+          equals: changedData.seat,
+        },
+        eventScheduleId: {
+          equals: changedData.eventScheduleId,
+        },
+        event: {
+          equals: changedData.eventId,
+        },
+      },
+    })
+    .then((res) => res.docs?.[0])
+
+  if (checkExistChangedSeat) {
+    throw new Error('Seat is already booked')
+  }
+
+  const updatedData: Record<string, any> = {
+    seat: changedData.seat.toUpperCase(),
+    eventScheduleId: changedData.eventScheduleId,
+  }
+  if (
+    (existOriginalTicket.ticketPriceInfo as Record<string, any>)?.id !== changedData.ticketPriceId
+  ) {
+    const newTicketPriceInfo = (existOriginalTicket.event as Event).ticketPrices?.find(
+      (tPrice) => tPrice.id === changedData.ticketPriceId,
+    )
+    if (newTicketPriceInfo) {
+      updatedData.ticketPriceInfo = { ...newTicketPriceInfo, ticketPriceId: newTicketPriceInfo.id }
+      updatedData.ticketPriceName = newTicketPriceInfo?.name
+    }
+  }
+
+  const transactionID = await payload.db.beginTransaction()
+  if (!transactionID) {
+    throw new Error('Opps! Something went wrong!')
+  }
+
+  try {
+    const updatedTicket = await payload.update({
+      collection: 'tickets',
+      id: originalTicket.id,
+      data: updatedData,
+      req: { transactionID },
+    })
+    if ((updatedTicket.orderItem as OrderItem)?.id) {
+      const updateOrderItemData = {
+        seat: changedData.seat.toUpperCase(),
+        ticketPriceName: updatedTicket.ticketPriceName,
+        ticketPriceId: updatedData.ticketPriceInfo?.id,
+      }
+
+      await payload.update({
+        collection: 'orderItems',
+        id: (updatedTicket.orderItem as OrderItem).id,
+        data: updateOrderItemData,
+        req: { transactionID },
+      })
+    }
+    await payload.db.commitTransaction(transactionID)
+  } catch (error: any) {
+    await payload.db.rollbackTransaction(transactionID)
+
+    throw new Error(error?.message)
   }
 }

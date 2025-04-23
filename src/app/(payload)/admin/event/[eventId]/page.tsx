@@ -94,6 +94,7 @@ const AdminEventPage = async ({ params }: Props) => {
           typeof ticket.quantity === 'number',
       )
       .map((ticket) => ({
+        id: ticket.id!,
         name: ticket.name!,
         key: ticket.key!,
         price: ticket.price!,
