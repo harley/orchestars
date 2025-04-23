@@ -24,7 +24,9 @@ export default function CustomerCheckInPage() {
   const [ticketCode, setTicketCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [checkedInData, setCheckedInData] = useState<CheckInResponse['data']>()
-  const [adminId, setAdminId] = useState('')
+
+  const [ticketGivenConfirmed, setTicketGivenConfirmed] = useState(false)
+
   const { toast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,7 +72,6 @@ export default function CustomerCheckInPage() {
     setCheckedInData(undefined)
     setEmail('')
     setTicketCode('')
-    setAdminId('')
   }
   const handleTicketGiven = async () => {
     const adminInput = window.prompt('Enter your admin ID:')
@@ -94,6 +95,7 @@ export default function CustomerCheckInPage() {
   
       if (response.ok) {
         const result = await response.json()
+        setTicketGivenConfirmed(true) 
         toast({
           title: 'Confirmed',
           description: result.message || 'Ticket marked as given.',
@@ -124,8 +126,9 @@ export default function CustomerCheckInPage() {
           className="w-full max-w-md p-6 space-y-6 rounded-lg shadow-lg"
           style={{
             backgroundColor: zoneCategory?.color,
-            background: `linear-gradient(to bottom, ${zoneCategory?.color}80 0%, ${zoneCategory?.color}30 100%)`,
+            background: ticketGivenConfirmed ? zoneCategory?.color : `linear-gradient(to bottom, ${zoneCategory?.color}80 0%, ${zoneCategory?.color}30 100%)`,
           }}
+          
         >
           <div className="text-center space-y-4 bg-white p-6 rounded-lg">
             <div
