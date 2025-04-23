@@ -40,6 +40,12 @@ export type Event = {
     url: string
     [k: string]: any
   }
+  mobileEventBanner?: {
+    id: number
+    alt: string
+    url: string
+    [k: string]: any
+  }
   eventThumbnail?: {
     id: number
     alt: string

@@ -3,11 +3,16 @@ import CryptoJS from 'crypto-js'
 import { ZALO_PAYMENT } from '@/config/payment'
 import payload from 'payload'
 import config from '@/payload.config'
+import { logError } from '@/collections/Logs/utils'
+import { Order, Payment } from '@/payload-types'
 // import { Event } from '@/payload-types'
 
 export async function POST(request: NextRequest) {
+  let body: any = null
+  let callbackData: any = null
+  let payment: Payment | null = null
   try {
-    const body = await request.json()
+    body = await request.json()
     console.log('Received body:', body)
 
     const { data: dataStr, mac: reqMac } = body
@@ -18,20 +23,20 @@ export async function POST(request: NextRequest) {
       return jsonResponse(-1, 'Mac verification failed')
     }
 
-    const dataJson = JSON.parse(dataStr)
+    callbackData = JSON.parse(dataStr)
 
-    console.log('dataJson', dataJson)
-    const appTransId = dataJson.app_trans_id
+    console.log('callbackData', callbackData)
+    const appTransId = callbackData?.app_trans_id
 
-    await payload.init({ config })
+    await initPayload()
 
-    const payment = await findPayment(appTransId)
+    payment = await findPayment(appTransId)
     if (!payment) {
-      return jsonResponse(-1, 'Payment record not found')
+      throw new Error('Payment record not found')
     }
 
     if (payment.status !== 'processing') {
-      return jsonResponse(0, 'Payment is not in processing status')
+      throw new Error('Payment is not in processing status')
     }
 
     const transactionID = await payload.db.beginTransaction()
@@ -41,7 +46,7 @@ export async function POST(request: NextRequest) {
     try {
       const paymentData = {
         ...(payment.paymentData as Record<string, any>),
-        callbackData: dataJson,
+        callbackData,
       }
       await updatePaymentStatus(payment.id, transactionID, paymentData)
 
@@ -52,14 +57,49 @@ export async function POST(request: NextRequest) {
       console.log(`Order status updated successfully for app_trans_id = ${appTransId}`)
       await payload.db.commitTransaction(transactionID)
       return jsonResponse(1, 'Success')
-    } catch (error) {
+    } catch (error: any) {
       await payload.db.rollbackTransaction(transactionID)
+
+      logError({
+        payload,
+        action: 'PAYMENT_CALLBACK_ERROR',
+        description: `Error processing payment callback: ${error instanceof Error ? error.message : 'An unknown error occurred'}`,
+        data: {
+          error: {
+            error,
+            stack: error?.stack,
+            errorMessage:
+              error instanceof Error ? error.message : error || 'An unknown error occurred',
+          },
+          data: { requestBody: body, callbackData },
+        },
+        req: request,
+        payment: payment?.id || null,
+        order: (payment?.order as Order)?.id || null,
+      })
       return jsonResponse(0, error instanceof Error ? error.message : 'An unknown error occurred')
     }
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error('Error processing payment:', error)
+    logError({
+      payload,
+      action: 'PAYMENT_CALLBACK_ERROR',
+      description: `Error processing payment callback: ${error instanceof Error ? error.message : 'An unknown error occurred'}`,
+      data: {
+        error: {
+          error,
+          stack: error?.stack,
+          errorMessage:
+            error instanceof Error ? error.message : error || 'An unknown error occurred',
+        },
+        data: { requestBody: body, callbackData },
+      },
+      req: request,
+      payment: payment?.id || null,
+      order: (payment?.order as Order)?.id || null,
+    })
 
-    return jsonResponse(0, error instanceof Error ? error.message : 'An unknown error occurred')
+    return jsonResponse(0, 'An unknown error occurred')
   }
 }
 
@@ -136,4 +176,25 @@ async function updatePaymentStatus(
 
 function jsonResponse(code: number, message: string) {
   return NextResponse.json({ return_code: code, message })
+}
+
+const initPayload = async () => {
+  const maxRetries = 3
+  let retries = 0
+  while (retries < maxRetries) {
+    try {
+      await payload.init({ config })
+
+      break
+    } catch (error: any) {
+      console.error(`Failed to initialize payload. Retry ${retries + 1}/${maxRetries}`)
+      retries++
+      if (retries === maxRetries) {
+        throw new Error(
+          `Failed to initialize payload after multiple attempts: ${error?.message || ''}`,
+        )
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1000)) // Wait for 1 second before retrying
+    }
+  }
 }

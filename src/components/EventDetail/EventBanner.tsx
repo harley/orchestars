@@ -44,7 +44,11 @@ const EventBanner = ({ event }: { event: Event }) => {
           <div className="md:w-7/12">
             <div className="relative rounded-lg overflow-hidden">
               <img
-                src={(event.eventBanner as Media)?.url || '/images/logos/logo-black-adjacent.png'}
+                src={
+                  (event?.mobileEventBanner as Media)?.url ||
+                  (event.eventBanner as Media)?.url ||
+                  '/images/logos/logo-black-adjacent.png'
+                }
                 alt={event.title || 'Event'}
                 className="w-full h-auto object-cover rounded-lg shadow-md"
               />

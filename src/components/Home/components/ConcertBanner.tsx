@@ -42,12 +42,22 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
   const renderBanners = useCallback(
     (evt: Event, index: number) => {
       const Banner = (
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${evt?.eventBanner?.url})` }}
-        />
+        <>
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden lg:block"
+            style={{ backgroundImage: `url(${evt?.eventBanner?.url})` }}
+          />
+
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat md:hidden"
+            style={{
+              backgroundImage: `url(${evt?.mobileEventBanner?.url || evt?.eventBanner?.url})`,
+            }}
+          />
+        </>
       )
 
+      // show on desktop
       if (!isMobile) {
         return (
           <div
@@ -117,6 +127,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
         )
       }
 
+      // show on mobile
       return (
         <Link
           key={evt.id}

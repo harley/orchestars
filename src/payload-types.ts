@@ -87,6 +87,7 @@ export interface Config {
     faqs: Faq;
     admins: Admin;
     emails: Email;
+    logs: Log;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -119,6 +120,7 @@ export interface Config {
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     admins: AdminsSelect<false> | AdminsSelect<true>;
     emails: EmailsSelect<false> | EmailsSelect<true>;
+    logs: LogsSelect<false> | LogsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -779,6 +781,8 @@ export interface CheckinRecord {
   eventDate?: string | null;
   checkInTime?: string | null;
   checkedInBy?: (number | null) | Admin;
+  ticketGivenTime?: string | null;
+  ticketGivenBy?: (number | null) | Admin;
   deletedAt?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -844,6 +848,7 @@ export interface Event {
     | null;
   eventLogo?: (number | null) | Media;
   eventBanner?: (number | null) | Media;
+  mobileEventBanner?: (number | null) | Media;
   eventThumbnail?: (number | null) | Media;
   sponsorLogo?: (number | null) | Media;
   ticketQuantityLimitation?: ('perTicketType' | 'perEvent') | null;
@@ -1159,6 +1164,44 @@ export interface Email {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "logs".
+ */
+export interface Log {
+  id: number;
+  action: string;
+  description?: string | null;
+  timestamp: string;
+  status?: ('success' | 'error' | 'warning' | 'info') | null;
+  /**
+   * Additional data related to this log entry
+   */
+  data?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Related order (if applicable)
+   */
+  order?: (number | null) | Order;
+  /**
+   * Related payment (if applicable)
+   */
+  payment?: (number | null) | Payment;
+  /**
+   * IP address where the action originated
+   */
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1444,6 +1487,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'emails';
         value: number | Email;
+      } | null)
+    | ({
+        relationTo: 'logs';
+        value: number | Log;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1826,6 +1873,8 @@ export interface CheckinRecordsSelect<T extends boolean = true> {
   eventDate?: T;
   checkInTime?: T;
   checkedInBy?: T;
+  ticketGivenTime?: T;
+  ticketGivenBy?: T;
   deletedAt?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1873,6 +1922,7 @@ export interface EventsSelect<T extends boolean = true> {
       };
   eventLogo?: T;
   eventBanner?: T;
+  mobileEventBanner?: T;
   eventThumbnail?: T;
   sponsorLogo?: T;
   ticketQuantityLimitation?: T;
@@ -2135,6 +2185,23 @@ export interface EmailsSelect<T extends boolean = true> {
   provider?: T;
   extraData?: T;
   sentAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "logs_select".
+ */
+export interface LogsSelect<T extends boolean = true> {
+  action?: T;
+  description?: T;
+  timestamp?: T;
+  status?: T;
+  data?: T;
+  order?: T;
+  payment?: T;
+  ipAddress?: T;
+  userAgent?: T;
   updatedAt?: T;
   createdAt?: T;
 }

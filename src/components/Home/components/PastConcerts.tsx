@@ -26,8 +26,8 @@ const PastConcerts: React.FC<PastConcertsProps> = ({ events, className }) => {
           <div className="flex md:items-center gap-2 justify-between mb-4">
             <h2 className="text-2xl md:text-4xl font-bold uppercase">{t('home.pastEvents')}</h2>
             <div className="flex space-x-4">
-              <CarouselPrevious className="relative inset-0 translate-y-0 bg-transparent hover:bg-black/10 text-white border border-white rounded-full h-10 w-10" />
-              <CarouselNext className="relative inset-0 translate-y-0 bg-transparent hover:bg-black/10 text-white border border-white rounded-full h-10 w-10" />
+              <CarouselPrevious className="relative inset-0 translate-y-0 bg-black/30 hover:bg-black/80 hover:text-white text-white rounded-full h-10 w-10" />
+              <CarouselNext className="relative inset-0 translate-y-0 bg-black/30 hover:bg-black/80 hover:text-white text-white rounded-full h-10 w-10" />
             </div>
           </div>
 
@@ -35,7 +35,7 @@ const PastConcerts: React.FC<PastConcertsProps> = ({ events, className }) => {
             {events.map((evt) => (
               <CarouselItem key={evt.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
                 <div key={evt.id} className="flex flex-col">
-                  <div className="md:aspect-[3/4] aspect-square overflow-hidden mb-4 rounded-md relative group">
+                  <div className="md:aspect-[3/4] aspect-square overflow-hidden mb-4 rounded-md relative group border border-black/10 ">
                     <img
                       src={evt.eventThumbnail?.url || evt.eventBanner?.url}
                       alt={evt.eventThumbnail?.alt || evt.eventBanner?.alt || evt.title}
