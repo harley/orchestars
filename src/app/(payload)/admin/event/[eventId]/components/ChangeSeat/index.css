@@ -1,0 +1,242 @@
+* Pure CSS for SeatSwapScheduler component  */
+
+.scheduler-root {
+  max-width: 850px;
+  margin: 48px auto 0 auto;
+  padding: 32px;
+  background: #fff;
+  border-radius: 32px;
+  box-shadow: 0 4px 32px 0 rgba(120, 106, 185, 0.10);
+  border: 1px solid #eee;
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.scheduler-title {
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: #7c49e0;
+  text-align: center;
+  letter-spacing: -1px;
+  margin-bottom: 30px;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+.scheduler-main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .scheduler-main {
+    flex-direction: row;
+    justify-content: center;
+    gap: 36px;
+  }
+}
+
+.seat-panel {
+  flex: 1 1 0;
+  background: #f1f0fb;
+  border-radius: 18px;
+  padding: 22px 20px;
+  min-width: 240px;
+  box-shadow: 0 2px 12px 0 rgba(124, 73, 224, 0.03);
+  border: 1px solid #ece5fa;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.seat-panel-title {
+  font-weight: 600;
+  font-size: 1.18rem;
+  color: #672ecb;
+  margin-bottom: 7px;
+  letter-spacing: 0.1rem;
+}
+
+.seat-panel-section {
+  margin-bottom: 0.7rem;
+  max-height: 400px;
+  overflow: auto;
+}
+
+.seat-label {
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: #777;
+  margin-bottom: 5px;
+  display: block;
+}
+.seat-select {
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid #ded1f3;
+  background: #ffffff;
+  font-size: 1rem;
+  font-family: inherit;
+  margin-top: 3px;
+  outline: none;
+  transition: border 0.2s;
+  color: #000;
+}
+.seat-select:focus {
+  border-color: #b095ef;
+  color: #000;
+}
+
+.seats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.seat-btn {
+  border-radius: 7px;
+  padding: 10px 0;
+  width: 100%;
+  font-family: 'Fira Mono', 'Consolas', monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: 2px solid #e2defb;
+  cursor: pointer;
+  transition: background 0.15s, border 0.15s, color 0.15s;
+  background: #f6f2ff;
+  color: #652edb;
+}
+.seat-btn-booked {
+  background: #e9e3ff;
+  border: 2px solid #cdbcff;
+  color: #6e29a7;
+}
+.seat-btn-free {
+  background: #e9fff3;
+  border: 2px solid #c3f9df;
+  color: #137f42;
+}
+.seat-btn:hover,
+.seat-btn:focus {
+  background: #f3e9ff;
+  border: 2.5px solid #ad9eff;
+}
+.seat-btn-selected {
+  border: 3.5px solid #6c23ca;
+  box-shadow: 0 0 0 3px #e3d2f7;
+  background: #ece3fb;
+  color: #473185;
+}
+
+.seats-empty {
+  color: #bbb;
+  font-size: 0.94rem;
+  grid-column: 1 / -1;
+  text-align: center;
+  font-style: italic;
+  padding: 12px 0;
+}
+
+.seat-info {
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-top: 13px;
+  border: 1px solid #f1e9fa;
+  box-shadow: 0 1px 6px 0 rgba(206, 195, 239, 0.10);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 120px;
+}
+.seat-info-label {
+  font-size: 0.94rem;
+  color: #9675cd;
+  margin-right: 5px;
+  font-weight: 500;
+}
+.seat-info-value {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #4a146b;
+}
+
+.scheduler-divider {
+  height: 1.5px;
+  width: 100%;
+  background: linear-gradient(to right, #ede2f7, #c9fbcb);
+  margin: 22px 0;
+  border-radius: 1px;
+}
+@media (min-width: 768px) {
+  .scheduler-divider {
+    width: 1.5px;
+    height: auto;
+    min-height: 220px;
+    margin: 0 18px;
+    background: linear-gradient(to bottom, #ede2f7, #c9fbcb);
+  }
+}
+
+.scheduler-actions {
+  margin-top: 32px;
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  align-items: center;
+}
+.scheduler-btn {
+  font-size: 1.13rem;
+  padding: 13px 46px;
+  border-radius: 13px;
+  font-weight: bold;
+  border: none;
+  box-shadow: 0 2px 8px 0 rgba(160, 123, 245, 0.07);
+  cursor: pointer;
+  outline: none;
+  transition: background 0.2s, color 0.2s, box-shadow 0.15s, opacity 0.15s;
+}
+.scheduler-btn-confirm {
+  background: linear-gradient(90deg,#b095ef 0,#9657c1 100%);
+  color: #fff;
+  box-shadow: 0 2px 12px 0 rgba(124, 73, 224, 0.07);
+}
+.scheduler-btn-confirm:hover:enabled {
+  background: linear-gradient(90deg,#a385e8 0,#8b3eb2 100%);
+}
+.scheduler-btn:disabled,
+.scheduler-btn[disabled] {
+  opacity: 0.6;
+  pointer-events: none;
+}
+.scheduler-btn-cancel {
+  background: #f4f2fa;
+  color: #7048b7;
+  border: 1.2px solid #d2c2ec;
+}
+.scheduler-btn-cancel:hover:enabled {
+  background: #ebe5f6;
+}
+
+@media (max-width: 500px) {
+  .scheduler-root {
+    padding: 9vw 2vw;
+    min-width: 0;
+  }
+  .seat-panel {
+    min-width: 0;
+    padding: 11px 3vw;
+  }
+  .scheduler-title {
+    font-size: 1.2rem;
+  }
+  .scheduler-btn {
+    padding: 8px 10vw;
+    font-size: 1rem;
+  }
+}
