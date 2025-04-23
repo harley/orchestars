@@ -225,7 +225,7 @@ export const swapSeats = async (
   }
 
   const updatedData: Record<string, any> = {
-    seat: changedData.seat,
+    seat: changedData.seat.toUpperCase(),
     eventScheduleId: changedData.eventScheduleId,
   }
   if (
@@ -246,22 +246,22 @@ export const swapSeats = async (
   }
 
   try {
-    const update = await payload.update({
+    const updatedTicket = await payload.update({
       collection: 'tickets',
       id: originalTicket.id,
       data: updatedData,
       req: { transactionID },
     })
-    if ((update.orderItem as OrderItem)?.id) {
+    if ((updatedTicket.orderItem as OrderItem)?.id) {
       const updateOrderItemData = {
-        seat: changedData.seat,
-        ticketPriceName: update.ticketPriceName,
+        seat: changedData.seat.toUpperCase(),
+        ticketPriceName: updatedTicket.ticketPriceName,
         ticketPriceId: updatedData.ticketPriceInfo?.id,
       }
 
       await payload.update({
         collection: 'orderItems',
-        id: (update.orderItem as OrderItem).id,
+        id: (updatedTicket.orderItem as OrderItem).id,
         data: updateOrderItemData,
         req: { transactionID },
       })

@@ -147,7 +147,6 @@ const SeatSwapScheduler = ({ event }: { event: Event }) => {
           freeSeats.push({
             id: s.label,
             ticketPriceName: ticketPriceInfo?.name || '',
-            status: 'booked',
             seat: s.label,
             eventScheduleId: rightEventScheduleId,
             ticketPriceInfo,
