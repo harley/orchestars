@@ -43,24 +43,21 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
     <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(
-          'flex items-center gap-1 text-black hover:underline transition-colors outline-none',
+          'flex items-center gap-1 text-black/90 hover:text-black transition-colors outline-none',
           className,
         )}
       >
         <Globe size={16} className="mr-1" />
         <span className="text-sm hidden sm:inline">{currentLanguage.code.toUpperCase()}</span>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        className="bg-white backdrop-blur-md border-white/10 text-black hover:underline"
-      >
+      <DropdownMenuContent align="end" className="bg-white backdrop-blur-md border-white/10">
         {languages.map((language) => (
           <DropdownMenuItem
             key={language.code}
             onClick={() => handleLanguageChange(language)}
             className={cn(
               'flex items-center gap-2 text-sm cursor-pointer hover:bg-white/10',
-              currentLanguage.code === language.code ? 'bg-white/20' : '',
+              currentLanguage.code === language.code ? 'bg-black/20' : '',
             )}
           >
             <span className="mr-1">{language.flag}</span>
