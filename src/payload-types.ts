@@ -856,6 +856,7 @@ export interface Event {
     showBannerTitle?: boolean | null;
     showBannerTime?: boolean | null;
     showBannerLocation?: boolean | null;
+    showBannerDescription?: boolean | null;
   };
   status?: ('draft' | 'published_upcoming' | 'published_open_sales' | 'completed' | 'cancelled') | null;
   updatedAt: string;
@@ -1931,6 +1932,7 @@ export interface EventsSelect<T extends boolean = true> {
         showBannerTitle?: T;
         showBannerTime?: T;
         showBannerLocation?: T;
+        showBannerDescription?: T;
       };
   status?: T;
   updatedAt?: T;
