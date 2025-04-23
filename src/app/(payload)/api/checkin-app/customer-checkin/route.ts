@@ -36,6 +36,7 @@ export async function POST(request: Request) {
       })
       .then((res) => res.docs?.[0])
 
+
     // Validate ticket exists
     if (!ticket) {
       return NextResponse.json(
@@ -56,6 +57,16 @@ export async function POST(request: Request) {
       )
     }
 
+    const sisterTickets = await payload.find({
+      collection: 'tickets',
+      where: {
+        ticketCode: { not_equals: ticketCode },
+        status: { equals: TICKET_STATUS.booked.value },
+        user: { equals: (ticket.user as User)?.id }, // ensure this is ID, not object
+        eventScheduleId: { equals: ticket.eventScheduleId },
+      },
+    }).then((res) => res.docs)
+    
     // Check if ticket is already checked in by looking up check-in records
     const existingCheckIn = await payload
       .find({
@@ -69,6 +80,7 @@ export async function POST(request: Request) {
         },
       })
       .then((res) => res.docs[0])
+
 
     if (existingCheckIn) {
       return NextResponse.json(
@@ -118,6 +130,11 @@ export async function POST(request: Request) {
         zoneId,
         email: ticket.userEmail,
         ticketCode: ticket.ticketCode,
+        sisterTickets: sisterTickets.map((t) => ({
+          ticketCode: t.ticketCode,
+          attendeeName: t.attendeeName,
+          seat: t.seat,
+        })),
         attendeeName: ticket.attendeeName,
         eventName: eventRecord?.title,
         checkedInAt: checkInRecord.checkInTime,
