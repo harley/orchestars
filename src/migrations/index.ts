@@ -39,6 +39,7 @@ import * as migration_20250418_075402_add_deleteAt_to_checkin_record from './202
 import * as migration_20250421_075432_add_localization_performer_name from './20250421_075432_add_localization_performer_name';
 import * as migration_20250422_051335_add_seat_and_event_date_to_checkin_record from './20250422_051335_add_seat_and_event_date_to_checkin_record';
 import * as migration_20250422_152826_add_mobile_event_banner_column from './20250422_152826_add_mobile_event_banner_column';
+import * as migration_20250423_023720_add_ticket_given_time_and_ticket_given_by_to_checkin_record from './20250423_023720_add_ticket_given_time_and_ticket_given_by_to_checkin_record';
 
 export const migrations = [
   {
@@ -244,6 +245,11 @@ export const migrations = [
   {
     up: migration_20250422_152826_add_mobile_event_banner_column.up,
     down: migration_20250422_152826_add_mobile_event_banner_column.down,
-    name: '20250422_152826_add_mobile_event_banner_column'
+    name: '20250422_152826_add_mobile_event_banner_column',
+  },
+  {
+    up: migration_20250423_023720_add_ticket_given_time_and_ticket_given_by_to_checkin_record.up,
+    down: migration_20250423_023720_add_ticket_given_time_and_ticket_given_by_to_checkin_record.down,
+    name: '20250423_023720_add_ticket_given_time_and_ticket_given_by_to_checkin_record'
   },
 ];
