@@ -87,7 +87,7 @@ function SeatPanel({
                     seatType === 'booked' ? 'seat-btn-booked' : 'seat-btn-free',
                     selectedSeat?.seat === seat?.seat ? 'seat-btn-selected' : '',
                   ].join(' ')}
-                  aria-pressed={selectedSeat === seat}
+                  aria-pressed={selectedSeat?.seat === seat?.seat}
                 >
                   {seat.seat}
                 </button>
