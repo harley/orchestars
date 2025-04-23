@@ -2,12 +2,9 @@ import type { CollectionConfig } from 'payload'
 
 export const Logs: CollectionConfig = {
   slug: 'logs',
-  access: {
-    // read: () => true,
-  },
   admin: {
     useAsTitle: 'action',
-    defaultColumns: ['action', 'description', 'timestamp', 'status', 'user', 'order', 'payment'],
+    defaultColumns: ['action', 'description', 'timestamp', 'status', 'order', 'payment'],
   },
   fields: [
     {
