@@ -63,7 +63,9 @@ export async function POST(request: Request) {
         where: {
           ticketCode: {
             equals: ticketCode,
+
           },
+          deletedAt: { equals: null },
         },
       })
       .then((res) => res.docs[0])

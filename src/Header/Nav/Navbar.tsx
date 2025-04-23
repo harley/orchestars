@@ -74,7 +74,7 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
         <div className="hidden md:flex items-center justify-start flex-1">
           <div className="flex items-center space-x-8">
             {navigationItems.map(({ link }, i) => (
-              <div key={i} className="relative group">
+              <div key={link.url ?? link.label} className="relative group">
                 {link.onClick ? (
                   <a
                     href={link.url}
@@ -108,7 +108,9 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
                         </Link>
                       ))
                     ) : (
-                      <div className="block px-4 py-2 text-sm text-black/90">No upcoming shows</div>
+                      <div className="block px-4 py-2 text-sm text-black/90">
+                        {t('home.noShows')}
+                      </div>
                     )}
                   </div>
                 )}
@@ -116,9 +118,9 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
             ))}
             {navItems.map(({ link }, i) => (
               <Link
-                key={i}
+                key={link.url ?? link.label}
                 href={link.url || ''}
-                className="nav-link font-medium text-white/90 hover:text-white"
+                className="nav-link font-medium text-black/90 hover:text-black"
               >
                 {link.label}
               </Link>
@@ -142,7 +144,7 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
                 {navigationItems.map(({ link }, i) =>
                   link.onClick ? (
                     <a
-                      key={i}
+                      key={link.url ?? link.label}
                       href={link.url}
                       onClick={link.onClick}
                       className="nav-link font-medium text-black/90 hover:text-white"
@@ -165,16 +167,16 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
                             </Link>
                           ))
                         ) : (
-                          <div className="text-sm text-black/90">No upcoming shows</div>
+                          <div className="text-sm text-black/90"> {t('home.noShows')}</div>
                         )}
                       </div>
                     </div>
                   ) : (
                     <Link
-                      key={i}
+                      key={link.url ?? link.label}
                       href={link.url || '#'}
                       onClick={() => setIsOpen(false)}
-                      className="nav-link font-medium text-black/90 hover:text-white"
+                      className="nav-link font-medium text-black/90 hover:text-black"
                     >
                       {link.label}
                     </Link>
@@ -182,10 +184,10 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
                 )}
                 {navItems.map(({ link }, i) => (
                   <Link
-                    key={i}
+                    key={link.url ?? link.label}
                     href={link.url || ''}
                     onClick={() => setIsOpen(false)}
-                    className="nav-link font-medium text-white/90 hover:text-white"
+                    className="nav-link font-medium text-black/90 hover:text-black"
                   >
                     {link.label}
                   </Link>

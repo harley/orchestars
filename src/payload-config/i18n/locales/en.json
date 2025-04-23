@@ -9,7 +9,8 @@
     "upcomingEvents": "Upcoming",
     "sponsorsAndPartners": "Sponsors & Partners",
     "shows": "Shows",
-    "contact": "Contact"
+    "contact": "Contact",
+    "noShows": "No Upcoming Shows"
   },
   "common": {
     "loading": "Loading...",
