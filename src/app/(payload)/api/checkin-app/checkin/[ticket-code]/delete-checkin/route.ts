@@ -46,9 +46,7 @@ export async function POST(req: NextRequest) {
       });
       
       const updatedRecord = result.docs?.[0];
-      console.log('updatedRecord', updatedRecord)
-      console.log('result', result)
-      
+
       if (!updatedRecord) {
         return NextResponse.json({ error: 'Check-in record not found' }, { status: 404 });
       }
