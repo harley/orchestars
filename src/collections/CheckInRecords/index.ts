@@ -70,6 +70,17 @@ export const CheckInRecords: CollectionConfig = {
       relationTo: 'admins',
       required: false,
     },
+    {
+      name: 'ticketGivenTime',
+      type: 'text',
+      required: false,
+    },
+    {
+      name: 'ticketGivenBy',
+      type: 'relationship',
+      relationTo: 'admins',
+      required: false,
+    },
     { name:'deletedAt',
       type: 'date',
       required: false,
