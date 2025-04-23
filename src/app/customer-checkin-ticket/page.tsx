@@ -192,7 +192,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
       {/* Sister Tickets Panel */}
       <div className="w-full max-w-md bg-white p-4 rounded-lg shadow-sm">
         <h3 className="text-lg font-semibold mb-2">{t('customerCheckinTicket.sisterTickets')}</h3>
-        {data?.sisterTickets && data.sisterTickets.length > 0 && (
+        {data?.sisterTickets && data?.sisterTickets.length > 0 && (
           <div className="w-full max-w-md flex gap-2 p-2 m-2">
             <Button
               variant="outline"
