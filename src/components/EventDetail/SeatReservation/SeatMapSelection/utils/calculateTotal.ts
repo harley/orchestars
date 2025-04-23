@@ -137,7 +137,7 @@ export function calculateDiscountedAmountsPerOrderItem(
 
       totalAmountThatAppliedDiscount += totalValueOrderItem
     } else {
-      totalAmountNotThatAppliedDiscount += amountBeforeDiscount
+      totalAmountNotThatAppliedDiscount += totalValueOrderItem
     }
   }
 
