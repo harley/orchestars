@@ -57,6 +57,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
         </>
       )
 
+      // show on desktop
       if (!isMobile) {
         return (
           <div
@@ -126,6 +127,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
         )
       }
 
+      // show on mobile
       return (
         <Link
           key={evt.id}
