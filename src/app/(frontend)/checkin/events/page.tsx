@@ -1,9 +1,8 @@
 'use client'
-
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
-
+import { useTranslate } from '@/providers/I18n/client'
 import { format } from 'date-fns'
 
 export default function ChooseEventPage() {
@@ -13,10 +12,11 @@ export default function ChooseEventPage() {
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null)
   const router = useRouter()
   const { isHydrated, token, setToken } = useAuth()
+  const { t } = useTranslate()
 
   const fetchEvents = useCallback(async () => {
     if (!token) {
-      alert('Please login first')
+      alert(t('error.pleaseLoginFirst'))
       router.push('/checkin')
       return
     }
@@ -32,15 +32,15 @@ export default function ChooseEventPage() {
       if (response.status === 401) {
         setToken('')
       }
-      
+
       const json = await response.json()
       setEvents(json.events?.docs || [])
     } catch (error: any) {
-      alert(error.message || 'Failed to load events')
+      alert(error.message || t('error.failedToLoadEvents'))
     } finally {
       setLoading(false)
     }
-  }, [token, router])
+  }, [token, router, t])
 
   useEffect(() => {
     if (!isHydrated) return
@@ -63,12 +63,12 @@ export default function ChooseEventPage() {
 
   const handleConfirm = () => {
     if (!selectedEvent || !selectedSchedule) {
-      alert('Please select an event and schedule')
+      alert(t('checkin.pleaseSelectEventAndSchedule'))
       return
     }
 
     router.push(
-      `/checkin/validates?eventId=${selectedEvent.id}&scheduleId=${selectedSchedule.id}&eventLocation=${selectedEvent.eventLocation}&eventTitle=${selectedEvent.title}&eventScheduleDate=${selectedSchedule.date}`,
+      `/checkin/validates?eventId=${ॱselectedEvent.id}&scheduleId=${selectedSchedule.id}&eventLocation=${selectedEvent.eventLocation}&eventTitle=${selectedEvent.title}&eventScheduleDate=${selectedSchedule.date}`,
     )
   }
 
@@ -79,7 +79,9 @@ export default function ChooseEventPage() {
   return (
     <div className="min-h-screen py-12 p-6 bg-gray-100">
       <div className="space-y-6">
-        {loading && <p className="text-center text-gray-500">Loading events...</p>}
+        {loading && (
+          <p className="text-center text-gray-500">{t('checkin.loadingEvents')}</p>
+        )}
         {events?.map((event) => (
           <div key={event.id} className="bg-white rounded-lg shadow p-4">
             <h2 className="text-xl font-bold text-gray-900">{event.title}</h2>
@@ -92,7 +94,9 @@ export default function ChooseEventPage() {
                 selectedEvent?.id === event.id ? 'bg-gray-400' : 'bg-gray-900 hover:bg-black'
               }`}
             >
-              {selectedEvent?.id === event.id ? 'Selected' : 'Select Event'}
+              {selectedEvent?.id === event.id
+                ? t('checkin.selected')
+                : t('checkin.selectEvent')}
             </button>
 
             {selectedEvent?.id === event.id && (
@@ -112,7 +116,9 @@ export default function ChooseEventPage() {
                     </button>
                   ))
                 ) : (
-                  <p className="text-sm text-gray-600">No schedules available for this event</p>
+                  <p className="text-sm text-gray-600">
+                    {t('checkin.noSchedulesAvailable')}
+                  </p>
                 )}
               </div>
             )}
@@ -125,7 +131,7 @@ export default function ChooseEventPage() {
           onClick={handleConfirm}
           className="mt-6 w-full py-3 bg-gray-900 hover:bg-black text-white text-lg font-semibold rounded"
         >
-          Confirm
+          {t('checkin.confirm')}
         </button>
       )}
     </div>
