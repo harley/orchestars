@@ -45,7 +45,6 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
 
   // Fixed navigation items based on requirements
   const navigationItems = [
-    { link: { label: 'Orchestars', url: '/' } },
     { link: { label: t('home.shows'), url: '#', isDropdown: true } },
     { link: { label: t('home.contact'), url: '#contact', onClick: scrollToFooter } },
   ]
@@ -73,6 +72,15 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center justify-start flex-1">
           <div className="flex items-center space-x-8">
+            {navItems.map(({ link }, i) => (
+              <Link
+                key={link.url ?? link.label}
+                href={link.url || ''}
+                className="nav-link font-medium text-black/90 hover:text-black"
+              >
+                {link.label}
+              </Link>
+            ))}
             {navigationItems.map(({ link }, i) => (
               <div key={link.url ?? link.label} className="relative group">
                 {link.onClick ? (
@@ -116,15 +124,6 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
                 )}
               </div>
             ))}
-            {navItems.map(({ link }, i) => (
-              <Link
-                key={link.url ?? link.label}
-                href={link.url || ''}
-                className="nav-link font-medium text-black/90 hover:text-black"
-              >
-                {link.label}
-              </Link>
-            ))}
           </div>
         </div>
 
@@ -141,6 +140,16 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
             </SheetTrigger>
             <SheetContent side="right" className="bg-white border-gray-800">
               <div className="flex flex-col mt-10 space-y-6">
+                {navItems.map(({ link }, i) => (
+                  <Link
+                    key={link.url ?? link.label}
+                    href={link.url || ''}
+                    onClick={() => setIsOpen(false)}
+                    className="nav-link font-medium text-black/90 hover:text-black"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
                 {navigationItems.map(({ link }, i) =>
                   link.onClick ? (
                     <a
@@ -182,16 +191,6 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
                     </Link>
                   ),
                 )}
-                {navItems.map(({ link }, i) => (
-                  <Link
-                    key={link.url ?? link.label}
-                    href={link.url || ''}
-                    onClick={() => setIsOpen(false)}
-                    className="nav-link font-medium text-black/90 hover:text-black"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
               </div>
             </SheetContent>
           </Sheet>
