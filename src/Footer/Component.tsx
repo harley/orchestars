@@ -11,8 +11,8 @@ export async function Footer() {
   const locale = await getLocale()
   const footerData: FooterType = await getCachedGlobal('footer', 1, locale)()
   return (
-    <footer className="bg-[#1a1f2c] pt-8 mt-auto">
-      <div className="container mx-auto px-6 text-white">
+    <footer className="pt-8 border-t border-black mt-auto">
+      <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           <div
             className="text-center space-y-4 animate-on-scroll md:hidden block"
@@ -20,7 +20,7 @@ export async function Footer() {
           >
             <Link href="/" className="inline-block mb-4">
               <div className="text-2xl font-semibold tracking-tight">
-                <span className="bg-clip-text text-white bg-gradient-to-r from-primary to-primary/80">
+                <span className="bg-clip-text bg-gradient-to-r from-primary to-primary/80">
                   {footerData?.title || 'Imagine Philharmonic Orchestra'}
                 </span>
               </div>
@@ -60,7 +60,7 @@ export async function Footer() {
           >
             <Link href="/" className="inline-block mb-2">
               <div className="text-2xl font-semibold tracking-tight">
-                <span className="bg-clip-text text-white bg-gradient-to-r from-primary to-primary/80">
+                <span className="bg-clip-text bg-gradient-to-r from-primary to-primary/80">
                   {footerData?.title || 'Imagine Philharmonic Orchestra'}
                 </span>
               </div>
@@ -95,7 +95,7 @@ export async function Footer() {
           </div>
         </div>
       </div>
-      <div className=" mt-12 pt-4 text-center text-sm text-muted-foreground bg-gray-950 gap-2 text-slate-100 pb-3 ">
+      <div className=" mt-12 pt-4 text-center text-sm text-muted-foreground gap-2 pb-3 ">
         <div className="container mx-auto flex md:flex-row flex-col  gap-4 justify-between items-center text-xs">
           <p>
             © {2025} {footerData?.title}. All rights reserved.
@@ -107,22 +107,22 @@ export async function Footer() {
                 href={link.link || ''}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="h-10 w-10 rounded-full bg-white/80 flex items-center justify-center shadow-subtle hover:bg-white hover:shadow-md transition-all"
+                className="h-10 w-10 rounded-full bg-black flex items-center justify-center shadow-subtle hover:bg-black/80 hover:shadow-md transition-all"
               >
                 {String(link.name).toLowerCase() === 'facebook' && (
-                  <Facebook className="h-4 w-4  text-black" />
+                  <Facebook className="h-4 w-4  text-white" />
                 )}
                 {String(link.name).toLowerCase() === 'twitter' && (
-                  <Twitter className="h-4 w-4 text-black" />
+                  <Twitter className="h-4 w-4 text-white" />
                 )}
                 {String(link.name).toLowerCase() === 'instagram' && (
-                  <Instagram className="h-4 w-4 text-black" />
+                  <Instagram className="h-4 w-4 text-white" />
                 )}
                 {String(link.name).toLowerCase() === 'youtube' && (
-                  <Youtube className="h-4 w-4 text-black" />
+                  <Youtube className="h-4 w-4 text-white" />
                 )}
                 {String(link.name).toLowerCase() === 'tiktok' && (
-                  <TikTok className="h-4 w-4 text-black" />
+                  <TikTok className="h-4 w-4 text-white" />
                 )}
               </a>
             ))}

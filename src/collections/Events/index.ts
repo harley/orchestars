@@ -254,6 +254,11 @@ export const Events: CollectionConfig = {
           type: 'checkbox',
           defaultValue: true,
         },
+        {
+          name: 'showBannerDescription',
+          type: 'checkbox',
+          defaultValue: true,
+        },
       ],
     },
     {
