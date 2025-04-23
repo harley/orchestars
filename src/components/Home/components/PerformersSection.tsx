@@ -25,7 +25,7 @@ const PerformerCard: React.FC<{ performer: Performer; index: number }> = ({ perf
         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500" />
       </div>
 
-      <h3 className="text-2xl font-bold mb-3 text-white">{performer.name}</h3>
+      <h3 className="text-2xl font-bold mb-3">{performer.name}</h3>
 
       {performer.genre && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground/80 mb-2">

@@ -51,11 +51,11 @@ const HomeClient = ({
   }, [])
 
   return (
-    <div className="min-h-screen flex flex-col bg-black">
+    <div className="min-h-screen flex flex-col">
       <main className="flex-grow pt-2 md:pt-6">
         <ConcertBanner events={bannerDocs} />
         {visibleSections.map((section, index) => (
-          <section.Component key={index} {...section.props} className="bg-black !text-white" />
+          <section.Component key={index} {...section.props} />
         ))}
       </main>
     </div>
