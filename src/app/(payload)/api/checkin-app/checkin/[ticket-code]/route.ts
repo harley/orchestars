@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
         ticketCode: {
           equals: ticketDoc.ticketCode,
         },
+        deletedAt: { equals: null },
       },
     })
 
