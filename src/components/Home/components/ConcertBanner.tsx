@@ -63,7 +63,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
                 isHovering ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              <div className="container mx-auto px-6 pb-20 flex flex-col">
+              <div className="container mx-auto px-6 pb-12 flex flex-col">
                 <h3 className="text-xl font-bold mb-4">{t('home.upcomingEvents')}</h3>
                 {evt.configuration?.showBannerTitle && (
                   <h2 className="line-clamp-2 text-4xl xl:text-5xl font-bold mb-4">{evt.title}</h2>
