@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     }).then(res => res.docs)
 
     const alreadyCheckedInCodes = new Set(existingCheckIns.map(r => r.ticketCode))
-    const ticketsToCheckIn = tickets.filter(t => !alreadyCheckedInCodes.has(t?.ticketCode!))
+    const ticketsToCheckIn = tickets.filter(t => !alreadyCheckedInCodes.has(t?.ticketCode || ""))
 
     const checkInRecords = []
 

@@ -181,8 +181,8 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
                 <div className="text-center space-y-4 bg-white p-6 rounded-lg">
                   <input
                     type="checkbox"
-                    checked={selectedCodes.includes(data?.ticketCode!)}
-                    onChange={() => toggleSelection(data?.ticketCode!)}
+                    checked={selectedCodes.includes(data?.ticketCode || "")}
+                    onChange={() => toggleSelection(data?.ticketCode || "")}
                     className="w-4 h-4"
                   />
 
