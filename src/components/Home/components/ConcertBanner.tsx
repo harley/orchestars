@@ -44,8 +44,10 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
       const Banner = (
         <>
           <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden lg:block"
-            style={{ backgroundImage: `url(${evt?.eventBanner?.url})` }}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden md:block"
+            style={{
+              backgroundImage: `url(${evt?.eventBanner?.url})`,
+            }}
           />
 
           <div
