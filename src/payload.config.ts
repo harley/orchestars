@@ -35,6 +35,7 @@ import { updatePaymentStatus } from './collections/Payments/jobs/updatePaymentSt
 import { i18n } from './payload-config/i18n'
 import { localization } from './payload-config/localization'
 import { Emails } from './collections/Emails'
+import { Logs } from './collections/Logs'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -117,6 +118,7 @@ export default buildConfig({
     FAQs,
     Admins,
     Emails,
+    Logs,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
