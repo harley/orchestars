@@ -152,7 +152,7 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
                       {link.label}
                     </a>
                   ) : link.isDropdown ? (
-                    <div key={i} className="space-y-2">
+                    <div key={link.url ?? link.label} className="space-y-2">
                       <div className="nav-link font-medium text-black/90">{link.label}</div>
                       <div className="pl-4 space-y-3">
                         {events && events.length > 0 ? (
