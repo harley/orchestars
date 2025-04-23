@@ -93,7 +93,7 @@ const EventDetailPage = async (props: {
           <FeaturedPerformers eventSlug={eventSlug} />
           {!isUpcoming && (
             <>
-              {!!eventDetail.schedules?.length && <Schedule schedules={eventDetail.schedules} />}
+              {/* {!!eventDetail.schedules?.length && <Schedule schedules={eventDetail.schedules} />} */}
               {eventDetail.eventTermsAndConditions && (
                 <TermCondition termCondition={eventDetail.eventTermsAndConditions} />
               )}
