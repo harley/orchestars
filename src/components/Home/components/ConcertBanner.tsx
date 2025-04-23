@@ -33,7 +33,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
   }
 
   return (
-    <div className="relative w-full h-[170px] sm:h-[200px] md:h-[300px] lg:h-[400px] xl:h-[500px] 2xl:h-[700px] overflow-hidden">
+    <div className="relative w-full h-[300px] lg:h-[400px] xl:h-[500px] 2xl:h-[700px] overflow-hidden">
       {events?.map((evt, index) => (
         <div
           key={evt.id}
@@ -42,9 +42,20 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
           }`}
         >
           <div className="absolute inset-0  z-10" />
+          {/* Desktop Banner */}
           <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden md:block"
             style={{ backgroundImage: `url(${evt?.eventBanner?.url})` }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-t from-black/95 to-transparent" />
+          </div>
+
+          {/* Mobile Banner */}
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat md:hidden"
+            style={{
+              backgroundImage: `url(${evt?.mobileEventBanner?.url || evt?.eventBanner?.url})`,
+            }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-black/95 to-transparent" />
           </div>
