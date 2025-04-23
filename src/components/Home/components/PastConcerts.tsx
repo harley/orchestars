@@ -42,7 +42,7 @@ const PastConcerts: React.FC<PastConcertsProps> = ({ events, className }) => {
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     {/* Hover overlay to show event information on desktop view*/}
-                    <div className="hidden absolute inset-0 bg-black/50 md:flex flex-col items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="hidden absolute inset-0 bg-black/70 md:flex flex-col items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <h3 className="text-white text-xl md:text-3xl line-clamp-3 font-bold mb-3 text-center">
                         {evt.title}
                       </h3>
