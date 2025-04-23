@@ -4,7 +4,6 @@ import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 import PageClient from './page.client'
 import EventBanner from '@/components/EventDetail/EventBanner'
-import Schedule from '@/components/EventDetail/Schedule'
 import TermCondition from '@/components/EventDetail/TermCondition'
 import FeaturedPerformers from '@/components/EventDetail/FeaturedPerformers/Component'
 import FAQ from '@/components/EventDetail/FAQ/Component'
@@ -18,6 +17,9 @@ import { getLocale } from '@/providers/I18n/server'
 import { RichText as RichTextConverter } from '@payloadcms/richtext-lexical/react'
 import { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 import TicketSelection from '@/components/EventDetail/TicketSelection/Component.client'
+import Partners from '@/components/Home/components/Partners'
+import { getPartnersCached } from '@/components/Home/actions'
+import { Partner } from '@/types/Partner'
 
 // export const dynamic = 'force-dynamic'
 export const revalidate = 86400 // 24 hours
@@ -34,7 +36,10 @@ const EventDetailPage = async (props: {
 
   const locale = await getLocale()
 
-  const eventDetail = await getEventCached({ slug: eventSlug, locale })()
+  const [eventDetail, partnerData] = await Promise.all([
+    getEventCached({ slug: eventSlug, locale })(),
+    getPartnersCached({ locale })(),
+  ])
 
   if (!eventDetail) {
     return notFound()
@@ -100,6 +105,8 @@ const EventDetailPage = async (props: {
               <FAQ />
             </>
           )}
+
+          <Partners partners={partnerData as Partner[]} />
         </main>
       </div>
     </div>
