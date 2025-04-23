@@ -31,8 +31,24 @@ export const calculateTotalOrder = (
     appliedTicketClasses,
   )
   const canApplyPromoCode = canApplyPromotion(promotionInfo, totalQuantityAppliedTicketClasses)
-
   if (canApplyPromoCode) {
+    if (promotionInfo.discountApplyScope === 'per_order_item') {
+      const {
+        amountBeforeDiscount,
+        totalAmountNotThatAppliedDiscount,
+        totalAmountThatAppliedDiscount,
+      } = calculateDiscountedAmountsPerOrderItem(
+        ticketSelected,
+        appliedTicketClasses,
+        promotionInfo,
+      )
+
+      return {
+        amountBeforeDiscount,
+        amount: totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount,
+        canApplyPromoCode: true,
+      }
+    }
     ;({ totalAmountThatAppliedDiscount, totalAmountNotThatAppliedDiscount } =
       calculateDiscountedAmounts(ticketSelected, appliedTicketClasses))
     const amountBeforeDiscount = totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount
@@ -96,6 +112,36 @@ export function calculateDiscountedAmounts(
   }
 
   return { totalAmountThatAppliedDiscount, totalAmountNotThatAppliedDiscount }
+}
+
+export function calculateDiscountedAmountsPerOrderItem(
+  ticketSelected: TicketSelected,
+  appliedTicketClasses: NonNullable<Promotion['appliedTicketClasses']>,
+  promotionInfo: Promotion,
+) {
+  let totalAmountThatAppliedDiscount = 0
+  let totalAmountNotThatAppliedDiscount = 0
+  let amountBeforeDiscount = 0
+
+  for (const tk of Object.values(ticketSelected)) {
+    const appliedForTicket = isTicketApplied(appliedTicketClasses, tk?.ticketName)
+    let totalValueOrderItem = tk.total
+    amountBeforeDiscount += totalValueOrderItem
+    if (appliedForTicket) {
+      if (promotionInfo.discountType === 'percentage') {
+        totalValueOrderItem -= (totalValueOrderItem * promotionInfo.discountValue) / 100
+      } else if (promotionInfo.discountType === 'fixed_amount') {
+        const discount = (tk.seats.length || 1) * promotionInfo.discountValue
+        totalValueOrderItem = totalValueOrderItem - discount
+      }
+
+      totalAmountThatAppliedDiscount += totalValueOrderItem
+    } else {
+      totalAmountNotThatAppliedDiscount += amountBeforeDiscount
+    }
+  }
+
+  return { amountBeforeDiscount, totalAmountThatAppliedDiscount, totalAmountNotThatAppliedDiscount }
 }
 
 export function applyDiscount(promotionInfo: Promotion, totalAmountThatAppliedDiscount: number) {

@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { DISCOUNT_APPLY_SCOPE, DISCOUNT_APPLY_SCOPES } from './constants'
 // import { afterChangeStatus } from './hooks/afterChangeStatus'
 
 export const Promotions: CollectionConfig = {
@@ -69,6 +70,14 @@ export const Promotions: CollectionConfig = {
           },
         },
       ],
+    },
+    {
+      name: 'discountApplyScope',
+      type: 'select',
+      label: 'Apply Discount On',
+      defaultValue: DISCOUNT_APPLY_SCOPE.totalOrderValue.value,
+      required: false,
+      options: DISCOUNT_APPLY_SCOPES,
     },
     {
       name: 'discountType',
