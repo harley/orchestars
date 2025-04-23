@@ -228,7 +228,11 @@ const SeatSelection: React.FC<SeatSelectionProps> = ({
                                             : '#CCCCCC',
                               }}
                             ></div>
-                            <span>{formatMoney(price.price || 0, price.currency || 'VND')}</span>
+                            <span className="flex-1 max-w-[100px]">{price.name}</span>
+                            &nbsp;-&nbsp;
+                            <span className="flex-1 ">
+                              {formatMoney(price.price || 0, price.currency || 'VND')}
+                            </span>
                           </div>
                         ))}
                       </div>
