@@ -213,36 +213,6 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
           }
         </div>
         <ul className="space-y-2">
-          {/* Original ticket always listed, checkbox only in 'given' */}
-          <li className="flex items-center rounded">
-            {bulkMode === 'given' && data?.ticketCode && !markGivenResult.includes(data?.ticketCode) && (
-              <button
-                className="w-full max-w-md p-6 rounded-lg shadow-lg"
-                style={{
-                  backgroundColor: zoneCategory(data.zoneId)?.color,
-                  background: markGivenResult.includes(data?.ticketCode || '')
-                    ? zoneCategory(data.zoneId)?.color
-                    : `linear-gradient(to bottom, ${zoneCategory(data.zoneId)?.color}80 0%, ${zoneCategory(data.zoneId)?.color}30 100%)`,
-                }}
-                onClick={() => toggleSelection(data?.ticketCode || '')}
-                disabled={markGivenResult.includes(data?.ticketCode || '')}
-              >
-                <div className="text-left space-y-4 bg-white p-6 rounded-lg">
-                  <span className=" inline-flex">
-                    <input
-                      type="checkbox"
-                      checked={selectedCodes.includes(data?.ticketCode || '')}
-                      onChange={() => toggleSelection(data?.ticketCode || '')}
-                      className="w-4 h-4 inline-flex"
-                    />
-                    <span className="pl-2">
-                      <strong>{data?.attendeeName || 'Unnamed'}</strong> – {data?.ticketCode}
-                    </span>
-                  </span>
-                </div>
-              </button>
-            )}
-          </li>
           {/* List all sibling tickets, checkbox only in bulkMode */}
           {data?.sisterTickets &&
             data.sisterTickets.map(sister => (
