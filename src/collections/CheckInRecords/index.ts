@@ -77,8 +77,7 @@ export const CheckInRecords: CollectionConfig = {
     },
     {
       name: 'ticketGivenBy',
-      type: 'relationship',
-      relationTo: 'admins',
+      type: "text",
       required: false,
     },
     { name:'deletedAt',
