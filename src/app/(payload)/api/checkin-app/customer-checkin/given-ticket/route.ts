@@ -23,28 +23,27 @@ export async function POST(request: Request) {
     }
 
     const payload = await getPayload({ config })
-
-    const isValidUsherId = (usherId: any) => typeof usherId=== 'number' && usherId >= 0 && usherId <= 10;
-    if (!adminId || isValidUsherId(adminId)) {
-      return NextResponse.json(
-        { message: 'Admin not found' },
-        { status: 404 },
-      )
+    const isValidUsherId = (usherId: any) =>
+      !isNaN(Number(usherId)) && Number(usherId) >= 0 && Number(usherId) <= 10
+    if (!isValidUsherId(adminId)) {
+      return NextResponse.json({ message: 'Admin not found' }, { status: 404 })
     }
 
     const results: Array<{ ticketCode: string; status: 'updated' | 'not_found' | 'created' }> = []
 
     // Get tickets for all provided codes with related event data
-    const tickets = await payload.find({
-      collection: 'tickets',
-      where: {
-        ticketCode: { in: ticketCodes },
-      },
-      depth: 2, // Ensure we get related event and user data
-    }).then(res => res.docs)
+    const tickets = await payload
+      .find({
+        collection: 'tickets',
+        where: {
+          ticketCode: { in: ticketCodes },
+        },
+        depth: 2, // Ensure we get related event and user data
+      })
+      .then((res) => res.docs)
 
     // Verify all tickets belong to the same user
-    const userIds = new Set(tickets.map(ticket => getRelationshipId(ticket.user)).filter(Boolean))
+    const userIds = new Set(tickets.map((ticket) => getRelationshipId(ticket.user)).filter(Boolean))
     if (userIds.size > 1) {
       return NextResponse.json(
         { message: 'All ticket codes must belong to the same user' },
@@ -55,7 +54,7 @@ export async function POST(request: Request) {
     const userId = userIds.values().next().value
 
     // Create map of ticket codes to ticket objects
-    const ticketMap = new Map(tickets.map(ticket => [ticket.ticketCode, ticket]))
+    const ticketMap = new Map(tickets.map((ticket) => [ticket.ticketCode, ticket]))
 
     // Process each ticket code
     for (const code of ticketCodes) {
@@ -67,7 +66,7 @@ export async function POST(request: Request) {
             deletedAt: { equals: null },
           },
         })
-        .then(res => res.docs[0])
+        .then((res) => res.docs[0])
 
       if (existingCheckin) {
         // Update existing check-in record

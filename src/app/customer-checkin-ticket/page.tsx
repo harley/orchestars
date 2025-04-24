@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
@@ -8,6 +8,7 @@ import { categories } from '@/components/EventDetail/data/seat-maps/categories'
 import { useTranslate } from '@/providers/I18n/client'
 import { Separator } from '@/components/ui/separator'
 import { Loader2 } from 'lucide-react'
+import { CheckinRecord } from '@/payload-types'
 
 type SisterTicket = {
   ticketCode: string
@@ -15,6 +16,7 @@ type SisterTicket = {
   seat?: string
   zoneId: string
   zoneName: string
+  checkinRecord?: CheckinRecord
 }
 
 // Response type from backend
@@ -119,10 +121,38 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
   const shouldShowCheckbox = (sisterTicketCode: string) =>
     bulkMode === 'given' && !markGivenResult.includes(sisterTicketCode)
 
+  const [loadingSisterTickets, setLoadingSisterTickets] = useState(true)
+  const [sisterTicketsData, setSisterTicketsData] = useState<SisterTicket[]>([])
+  const loadSisterTickets = useCallback(async () => {
+    try {
+      setLoadingSisterTickets(true)
+      const qsStr = new URLSearchParams({
+        ticketCode: data?.ticketCode || '',
+      }).toString()
+
+      const res = await fetch(`/api/checkin-app/customer-checkin/sister-checkin?${qsStr}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (res.ok) {
+        const json = await res.json()
+        setSisterTicketsData(json.data.sisterTickets)
+      }
+    } catch (error) {
+      console.error('Error loading sister tickets:', error)
+    } finally {
+      setLoadingSisterTickets(false)
+    }
+  }, [data?.ticketCode])
+
+  useEffect(() => {
+    loadSisterTickets()
+  }, [loadSisterTickets])
+
   const sisterTickets = useMemo(() => {
     const groupByZone = categories.reduce(
       (obj, cate) => {
-        const seatsByZone = data?.sisterTickets?.filter((sister) => sister.zoneId === cate.id) || []
+        const seatsByZone = sisterTicketsData?.filter((sister) => sister.zoneId === cate.id) || []
         if (seatsByZone.length) {
           obj[cate.id] = {
             zoneName: seatsByZone[0]?.zoneName || '',
@@ -136,9 +166,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
     )
 
     return groupByZone
-  }, [data?.sisterTickets])
-
-  console.log('sisterTickets', sisterTickets)
+  }, [sisterTicketsData])
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center space-y-6 mb-6">
@@ -241,7 +269,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
       {/* Sister Tickets Panel */}
       <div className="w-full max-w-md md:max-w-6xl bg-white p-4 rounded-lg shadow-sm">
         <h3 className="text-lg font-semibold mb-2">{t('customerCheckinTicket.sisterTickets')}</h3>
-        {data?.sisterTickets && data?.sisterTickets.length > 0 && bulkMode !== 'given' && (
+        {sisterTicketsData.length > 0 && bulkMode !== 'given' && (
           <div className="w-full flex mb-4">
             <Button variant="outline" onClick={() => setBulkMode('given')} className="flex-1">
               {t('customerCheckinTicket.bulkMarkGiven')}
@@ -263,66 +291,79 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
             </Button>
           )}
         </div>
-        {Object.entries(sisterTickets).map(([zoneId, zone]) => {
-          return (
-            <React.Fragment key={zoneId}>
-              <div className="">
-                <h3 className="text-lg font-semibold mb-2">{zone.zoneName}</h3>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
-                  {zone.seats.map((sister) => {
-                    return (
-                      <button
-                        key={sister.ticketCode}
-                        className="w-full max-w-md p-4 rounded-lg shadow-lg"
-                        style={{
-                          backgroundColor: zoneCategory(sister.zoneId)?.color,
-                          background: markGivenResult.includes(sister.ticketCode || '')
-                            ? zoneCategory(sister.zoneId)?.color
-                            : `linear-gradient(to bottom, ${zoneCategory(sister.zoneId)?.color}80 0%, ${zoneCategory(sister.zoneId)?.color}30 100%)`,
-                        }}
-                        disabled={markGivenResult.includes(sister.ticketCode || '')}
-                        onClick={() => toggleSelection(sister.ticketCode)}
-                      >
-                        <div className="text-left bg-white p-2 rounded-lg">
-                          <span className="inline-flex">
-                            {sister.ticketCode && shouldShowCheckbox(sister.ticketCode) && (
-                              <input
-                                type="checkbox"
-                                checked={selectedCodes.includes(sister.ticketCode)}
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  toggleSelection(sister.ticketCode)
-                                }}
-                                className="w-4 h-4 inline-flex cursor-pointer"
-                              />
-                            )}
-                            <span className="pl-2">
-                              <span>{sister.attendeeName || 'Unnamed'}</span>
-                              <br />
-                              <b>{sister.ticketCode}</b>
-                              <br />
-                              {sister.seat && (
-                                <span className="text-sm">
-                                  {' '}
-                                  (Seat: <b>{sister.seat}</b>)
+        {loadingSisterTickets ? (
+          <div>Loading...</div>
+        ) : (
+          <>
+            {Object.entries(sisterTickets).map(([zoneId, zone]) => {
+              return (
+                <React.Fragment key={zoneId}>
+                  <div className="">
+                    <h3 className="text-lg font-semibold mb-2">{zone.zoneName}</h3>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
+                      {zone.seats.map((sister) => {
+                        return (
+                          <button
+                            key={sister.ticketCode}
+                            className="w-full max-w-md p-4 rounded-lg shadow-lg"
+                            style={{
+                              backgroundColor: zoneCategory(sister.zoneId)?.color,
+                              background:
+                                !!sister.checkinRecord ||
+                                markGivenResult.includes(sister.ticketCode || '')
+                                  ? zoneCategory(sister.zoneId)?.color
+                                  : `linear-gradient(to bottom, ${zoneCategory(sister.zoneId)?.color}80 0%, ${zoneCategory(sister.zoneId)?.color}30 100%)`,
+                            }}
+                            disabled={
+                              !!sister.checkinRecord ||
+                              markGivenResult.includes(sister.ticketCode || '')
+                            }
+                            onClick={() => toggleSelection(sister.ticketCode)}
+                          >
+                            <div className="text-left bg-white p-2 rounded-lg">
+                              <span className="inline-flex">
+                                {sister.ticketCode &&
+                                  !sister.checkinRecord &&
+                                  shouldShowCheckbox(sister.ticketCode) && (
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedCodes.includes(sister.ticketCode)}
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        toggleSelection(sister.ticketCode)
+                                      }}
+                                      className="w-4 h-4 inline-flex cursor-pointer"
+                                    />
+                                  )}
+                                <span className="pl-2">
+                                  <span>{sister.attendeeName || 'Unnamed'}</span>
+                                  <br />
+                                  <b>{sister.ticketCode}</b>
+                                  <br />
+                                  {sister.seat && (
+                                    <span className="text-sm">
+                                      {' '}
+                                      (Seat: <b>{sister.seat}</b>)
+                                    </span>
+                                  )}
                                 </span>
-                              )}
-                            </span>
-                          </span>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
+                              </span>
+                            </div>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                  <Separator className="my-6" />
+                </React.Fragment>
+              )
+            })}
+            {!sisterTicketsData?.length && (
+              <div className="p-2 text-sm text-gray-500">
+                {t('customerCheckinTicket.noSisterTickets')}
               </div>
-              <Separator className="my-6" />
-            </React.Fragment>
-          )
-        })}
-        {!data?.sisterTickets?.length && (
-          <div className="p-2 text-sm text-gray-500">
-            {t('customerCheckinTicket.noSisterTickets')}
-          </div>
+            )}
+          </>
         )}
       </div>
       {/* Bulk action toggles & buttons */}
