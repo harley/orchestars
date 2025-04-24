@@ -54,6 +54,8 @@ const NowShowingList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, clas
     }
   }, [])
 
+  if (nowShowingEvents.length === 0) return null
+
   return (
     <section className={`py-10 md:py-20 ${className || ''}`}>
       <Carousel className="w-full relative">
