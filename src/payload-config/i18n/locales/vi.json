@@ -283,6 +283,7 @@
     "bulkMarkGivenSuccess": "Đánh dấu hàng loạt đã giao vé thành công",
     "markedSelectedTicketsAsGiven": "Đã đánh dấu các vé được chọn là đã giao",
     "confirmTicketGiven": "Xác nhận vé này đã được giao bởi admin \"{{adminId}}\"?",
-    "confirmed": "Đã xác nhận"
+    "confirmed": "Đã xác nhận",
+          "alreadyCheckedIn": "Customer has already checked in but might not given ticket yet"
   }
 }

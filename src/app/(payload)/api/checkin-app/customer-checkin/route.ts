@@ -104,16 +104,6 @@ export async function POST(request: Request) {
         },
       })
       .then((res) => res.docs[0])
-
-    if (existingCheckIn) {
-      return NextResponse.json(
-        {
-          message: 'This ticket has already been checked in',
-        },
-        { status: 400 },
-      )
-    }
-
     const eventRecord = ticket.event as Event
     const eventId = eventRecord?.id as number
     const userId = (ticket.user as User)?.id as number
@@ -121,6 +111,37 @@ export async function POST(request: Request) {
     const eventDate = eventRecord?.schedules?.find(
       (schedule) => schedule.id === ticket.eventScheduleId,
     )?.date
+    
+    const { zoneId, zoneName } = getZoneInfo(ticket, eventRecord)
+    if (existingCheckIn) {
+      return NextResponse.json(
+        {
+          message: 'Ticket already checked in',
+          data: {
+            zoneId,
+            zoneName,
+            email: ticket.userEmail,
+            ticketCode: ticket.ticketCode,
+            sisterTickets: sisterTickets.map((t) => {
+              const { zoneId: sisterZoneId, zoneName: sisterZoneName } = getZoneInfo(t, eventRecord)
+              return {
+                ticketCode: t.ticketCode,
+                attendeeName: t.attendeeName,
+                seat: t.seat,
+                zoneId: sisterZoneId,
+                zoneName: sisterZoneName,
+              }
+            }),
+            attendeeName: ticket.attendeeName,
+            eventName: eventRecord?.title,
+            checkedInAt: existingCheckIn.checkInTime,
+            ticketPriceInfo: ticket.ticketPriceInfo,
+          },
+        },
+        { status: 409 },
+      )
+    }
+
 
     // Create check-in record
     const checkInRecord = await payload.create({
@@ -138,7 +159,7 @@ export async function POST(request: Request) {
     })
 
     // Get zone information using the helper function
-    const { zoneId, zoneName } = getZoneInfo(ticket, eventRecord)
+
 
     // Return success response
     return NextResponse.json({

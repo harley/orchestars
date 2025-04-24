@@ -284,7 +284,16 @@ export default function CustomerCheckInPage() {
           title: t('customerCheckinTicket.checkInSuccessful'),
           description: t('customerCheckinTicket.checkInSuccessful'),
         })
-      } else {
+      } else if (response.status === 409) {
+        const res: CheckInResponse = await response.json()
+        setCheckedInData(res.data)
+        toast({
+          title: t('customerCheckinTicket.alreadyCheckedIn'),
+          description: t('customerCheckinTicket.checkInSuccessful'),
+        })
+      }
+
+       else {
         const err: CheckInResponse = await response.json()
         toast({
           variant: 'destructive',
