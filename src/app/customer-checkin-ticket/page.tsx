@@ -38,53 +38,17 @@ interface CheckInResultProps {
 
 const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset, onConfirm }) => {
   const [selectedCodes, setSelectedCodes] = useState<string[]>([])
-  const [bulkMode, setBulkMode] = useState<'none' | 'checkin' | 'given'>('none')
+  const [bulkMode, setBulkMode] = useState<'none' | 'given'>('none')
   const { toast } = useToast()
   const { t } = useTranslate()
   const zoneCategory = (zoneId: string | undefined) => { return categories.find(cat => cat.id === zoneId) }
-  const [sisterCheckInResult, setSisterCheckInResult] = useState<string[]>([])
+
   const [markGivenResult, setMarkGivenResult] = useState<string[]>([])
 
   const toggleSelection = (code: string) => {
     setSelectedCodes(prev => (prev.includes(code) ? prev.filter(c => c !== code) : [...prev, code]))
   }
 
-  const bulkCheckIn = async () => {
-    if (!selectedCodes.length) {
-      toast({
-        variant: 'destructive',
-        title: t('customerCheckinTicket.noSelection'),
-        description: t('customerCheckinTicket.selectAtLeastOneSisterTicket'),
-      })
-      return
-    }
-    try {
-      const res = await fetch('/api/checkin-app/customer-checkin/sister-checkin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ticketCodeList: selectedCodes, email: data?.email }),
-      })
-      const json = await res.json()
-
-      setSisterCheckInResult((prev) => [
-        ...prev,
-        ...json.data.checkIns.map((item: { seat: string, ticketCode: string }) => item.ticketCode)
-      ])
-
-      toast({
-        title: t('customerCheckinTicket.bulkCheckInSuccess'),
-        description: json.message || t('customerCheckinTicket.checkedInSelectedTickets'),
-      })
-      setSelectedCodes([])
-      setBulkMode('none')
-    } catch {
-      toast({
-        variant: 'destructive',
-        title: t('error.bulkCheckInFailed'),
-        description: t('error.bulkCheckInFailed'),
-      })
-    }
-  }
 
   const bulkMarkGiven = async () => {
     if (!selectedCodes.length) {
@@ -122,10 +86,6 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
         ...json.data.updatedGivenTicketCode.filter((item: { status: string, ticketCode: string }) => item.status === 'updated').map((item: { status: string, ticketCode: string }) => item.ticketCode)
       ])
 
-      setSisterCheckInResult((prev) => [
-        ...prev,
-        ...json.data.updatedGivenTicketCode.filter((item: { status: string, ticketCode: string }) => item.status === 'updated').map((item: { status: string, ticketCode: string }) => item.ticketCode)
-      ])
       setSelectedCodes([])
       setBulkMode('none')
     } catch {
@@ -137,7 +97,6 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
     }
   }
   const shouldShowCheckbox = (sisterTicketCode: string) => (
-    (bulkMode === 'checkin' && !sisterCheckInResult.includes(sisterTicketCode)) ||
     (bulkMode === 'given' && !markGivenResult.includes(sisterTicketCode))
   );
 
@@ -149,7 +108,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
           className="w-full max-w-md p-6 rounded-lg shadow-lg"
           style={{
             backgroundColor: zoneCategory(data.zoneId)?.color,
-            background: confirmed
+            background: markGivenResult.includes(data?.ticketCode || '')
               ? zoneCategory(data.zoneId)?.color
               : `linear-gradient(to bottom, ${zoneCategory(data.zoneId)?.color}80 0%, ${zoneCategory(data.zoneId)?.color}30 100%)`,
           }}
@@ -208,6 +167,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
               <Button
                 onClick={onConfirm}
                 className="w-full text-white"
+                disabled={markGivenResult.includes(data?.ticketCode || '')}
                 style={{ backgroundColor: zoneCategory(data.zoneId)?.color }}
               >
                 {t('customerCheckinTicket.ticketGiven')}
@@ -228,14 +188,8 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
       <div className="w-full max-w-md bg-white p-4 rounded-lg shadow-sm">
         <h3 className="text-lg font-semibold mb-2">{t('customerCheckinTicket.sisterTickets')}</h3>
         {data?.sisterTickets && data?.sisterTickets.length > 0 && (
-          <div className="w-full max-w-md flex gap-2 p-2 m-2">
-            <Button
-              variant="outline"
-              onClick={() => setBulkMode('checkin')}
-              className="flex-1"
-            >
-              {t('customerCheckinTicket.bulkCheckIn')}
-            </Button>
+          <div className="w-full max-w-md flex mb-4">
+
             <Button
               variant="outline"
               onClick={() => setBulkMode('given')}
@@ -245,11 +199,24 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
             </Button>
           </div>
         )}
+        <div className="flex flex-row space-x-2">
+          {
+            bulkMode === 'given' && (
+              <Button
+                variant="secondary"
+                onClick={bulkMarkGiven}
+                className="ml-auto w-full mb-4"
+              >
+                {t('customerCheckinTicket.markSelectedAsGiven')}
+              </Button>
+            )
+          }
+        </div>
         <ul className="space-y-2">
           {/* Original ticket always listed, checkbox only in 'given' */}
           <li className="flex items-center rounded">
             {bulkMode === 'given' && data?.ticketCode && !markGivenResult.includes(data?.ticketCode) && (
-              <div
+              <button
                 className="w-full max-w-md p-6 rounded-lg shadow-lg"
                 style={{
                   backgroundColor: zoneCategory(data.zoneId)?.color,
@@ -257,8 +224,10 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
                     ? zoneCategory(data.zoneId)?.color
                     : `linear-gradient(to bottom, ${zoneCategory(data.zoneId)?.color}80 0%, ${zoneCategory(data.zoneId)?.color}30 100%)`,
                 }}
+                onClick={() => toggleSelection(data?.ticketCode || '')}
+                disabled={markGivenResult.includes(data?.ticketCode || '')}
               >
-                <div className=" space-y-4 bg-white p-6 rounded-lg">
+                <div className="text-left space-y-4 bg-white p-6 rounded-lg">
                   <span className=" inline-flex">
                     <input
                       type="checkbox"
@@ -271,14 +240,14 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
                     </span>
                   </span>
                 </div>
-              </div>
+              </button>
             )}
           </li>
           {/* List all sibling tickets, checkbox only in bulkMode */}
           {data?.sisterTickets &&
             data.sisterTickets.map(sister => (
               <li key={sister.ticketCode} className="flex items-center rounded">
-                <div
+                <button
                   className="w-full max-w-md p-6 rounded-lg shadow-lg"
                   style={{
                     backgroundColor: zoneCategory(sister.zoneId)?.color,
@@ -286,8 +255,10 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
                       ? zoneCategory(sister.zoneId)?.color
                       : `linear-gradient(to bottom, ${zoneCategory(sister.zoneId)?.color}80 0%, ${zoneCategory(sister.zoneId)?.color}30 100%)`,
                   }}
+                  disabled={markGivenResult.includes(sister.ticketCode || '')}
+                  onClick={() => toggleSelection(sister.ticketCode)}
                 >
-                  <div className=" space-y-4 bg-white p-6 rounded-lg">
+                  <div className="text-left space-y-4 bg-white p-6 rounded-lg">
                     <span className="inline-flex">
                       {sister.ticketCode && shouldShowCheckbox(sister.ticketCode) && (
                         <input
@@ -303,7 +274,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
                       </span>
                     </span>
                   </div>
-                </div>
+                </button>
               </li>
             ))}
           {!data?.sisterTickets?.length && (
@@ -312,31 +283,8 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
         </ul>
       </div>
       {/* Bulk action toggles & buttons */}
-      {
-        bulkMode === 'checkin' && (
-          <Button variant="secondary" onClick={bulkCheckIn} className="w-full max-w-md">
-            {t('customerCheckinTicket.checkInSelected')}
-          </Button>
-        )
-      }
-      {
-        bulkMode === 'given' && (
-          <Button variant="secondary" onClick={bulkMarkGiven} className="w-full max-w-md">
-            {t('customerCheckinTicket.markSelectedAsGiven')}
-          </Button>
-        )
-      }
-      {
-        bulkMode !== 'none' && (
-          <Button
-            variant="outline"
-            onClick={() => setBulkMode('none')}
-            className="w-full max-w-md"
-          >
-            {t('customerCheckinTicket.cancelBulk')}
-          </Button>
-        )
-      }
+
+
     </div >
   )
 }
