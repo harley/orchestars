@@ -282,6 +282,7 @@
       "bulkMarkGivenSuccess": "Bulk Mark Given",
       "markedSelectedTicketsAsGiven": "Marked selected tickets as given",
       "confirmTicketGiven": "Confirm this ticket has been given by admin \"{{adminId}}\"?",
-      "confirmed": "Confirmed"
+      "confirmed": "Confirmed",
+      "alreadyCheckedIn": "Customer has already checked in but might not given ticket yet"
   }
 }
