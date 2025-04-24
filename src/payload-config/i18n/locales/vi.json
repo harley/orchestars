@@ -260,6 +260,7 @@
     "checkIn": "Check-in",
     "checkingIn": "Đang check-in...",
     "checkInSuccessful": "Check-in Thành công!",
+    "confirmedSuccessfully": "Đã xác nhận thành công!",
     "zone": "Khu vực:",
     "ticketCode": "Mã vé:",
     "eventName": "Tên sự kiện:",
@@ -267,13 +268,14 @@
     "attendeeName": "Tên người tham dự:",
     "checkedInAt": "Check-in lúc:",
     "ticketGiven": "Vé đã được giao",
+    "confirmValidTicket": "Xác nhận vé hợp lệ và giao vé",
     "checkInAnotherTicket": "Check-in vé khác",
     "sisterTickets": "Vé liên quan",
     "noSisterTickets": "Không có vé liên quan nào",
     "bulkCheckIn": "Check-in hàng loạt",
-    "bulkMarkGiven": "Mở đánh dấu giao vé",
+    "bulkMarkGiven": "Cho phép checkin đồng thời nhiều vé",
     "checkInSelected": "Check-in Vé đã chọn",
-    "markSelectedAsGiven": "Đánh dấu vé đã chọn là đã giao",
+    "markSelectedAsGiven": "Xác nhận vé liên quan hợp lệ và giao vé",
     "cancelBulk": "Hủy Hành động hàng loạt",
     "noSelection": "Không có lựa chọn",
     "selectAtLeastOneSisterTicket": "Chọn ít nhất một vé liên quan",
@@ -281,9 +283,9 @@
     "bulkCheckInSuccess": "Check-in hàng loạt",
     "checkedInSelectedTickets": "Đã check-in các vé được chọn",
     "bulkMarkGivenSuccess": "Đánh dấu hàng loạt đã giao vé thành công",
-    "markedSelectedTicketsAsGiven": "Đã đánh dấu các vé được chọn là đã giao",
+    "markedSelectedTicketsAsGiven": "Các vé liên quan đã chọn được checkin thành công",
     "confirmTicketGiven": "Xác nhận vé này đã được giao bởi admin \"{{adminId}}\"?",
-    "confirmed": "Đã xác nhận",
-          "alreadyCheckedIn": "Customer has already checked in but might not given ticket yet"
+    "confirmed": "Đã xác nhận thành công",
+    "success": "Thành công"
   }
 }
