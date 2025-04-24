@@ -351,7 +351,7 @@ export default function CustomerCheckInPage() {
       const response = await fetch('/api/checkin-app/customer-checkin/given-ticket', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ticketCode: checkedInData?.ticketCode, adminId }),
+        body: JSON.stringify({ ticketCodes: [checkedInData?.ticketCode], adminId }),
       })
       if (response.ok) {
         setTicketGivenConfirmed(true)
