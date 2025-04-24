@@ -73,7 +73,7 @@ export async function POST(request: Request) {
       existingCheckins.docs.map((checkin) => [checkin.ticketCode, checkin]),
     )
 
-    const operations = []
+    const operations: Promise<any>[] = []
     const results: Array<{ ticketCode: string; status: 'updated' | 'not_found' | 'created' }> = []
 
     // Process each ticket code
