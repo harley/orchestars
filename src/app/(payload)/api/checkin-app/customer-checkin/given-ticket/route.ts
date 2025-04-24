@@ -45,7 +45,6 @@ export async function POST(request: Request) {
             ticketCode: true,
             user: true,
           },
-          // depth: 2, // Ensure we get related event and user data
         })
         .then((res) => res.docs),
       payload.find({
