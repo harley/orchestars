@@ -197,13 +197,13 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
           <div className="mt-4 text-center space-y-2 rounded-lg">
             <div className=" flex flex-col space-y-2">
 
-                <Button
-                  onClick={onConfirm}
-                  className="w-full text-white"
-                  style={{ backgroundColor: zoneCategory(data.zoneId)?.color }}
-                >
-                  {t('customerCheckinTicket.ticketGiven')}
-                </Button>
+              <Button
+                onClick={onConfirm}
+                className="w-full text-white"
+                style={{ backgroundColor: zoneCategory(data.zoneId)?.color }}
+              >
+                {t('customerCheckinTicket.ticketGiven')}
+              </Button>
 
               <Button
                 onClick={onReset}
