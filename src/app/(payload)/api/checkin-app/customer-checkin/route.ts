@@ -5,7 +5,7 @@ import { TICKET_STATUS } from '@/collections/Tickets/constants'
 import { Event, User } from '@/payload-types'
 
 // Helper function to extract zoneId and zoneName
-function getZoneInfo(ticket: any, eventRecord: Event): { zoneId: string; zoneName: string } {
+export function getZoneInfo(ticket: any, eventRecord: Event): { zoneId: string; zoneName: string } {
   const ticketPriceInfo = ticket.ticketPriceInfo as Record<string, any>
 
   let zoneId = ticketPriceInfo?.key || 'unknown'
@@ -82,16 +82,6 @@ export async function POST(request: Request) {
       )
     }
 
-    const sisterTickets = await payload.find({
-      collection: 'tickets',
-      where: {
-        ticketCode: { not_equals: ticketCode },
-        status: { equals: TICKET_STATUS.booked.value },
-        user: { equals: (ticket.user as User)?.id }, // ensure this is ID, not object
-        eventScheduleId: { equals: ticket.eventScheduleId },
-      },
-    }).then((res) => res.docs)
-
     // Check if ticket is already checked in by looking up check-in records
     const existingCheckIn = await payload
       .find({
@@ -111,7 +101,7 @@ export async function POST(request: Request) {
     const eventDate = eventRecord?.schedules?.find(
       (schedule) => schedule.id === ticket.eventScheduleId,
     )?.date
-    
+
     const { zoneId, zoneName } = getZoneInfo(ticket, eventRecord)
     if (existingCheckIn) {
       return NextResponse.json(
@@ -122,16 +112,6 @@ export async function POST(request: Request) {
             zoneName,
             email: ticket.userEmail,
             ticketCode: ticket.ticketCode,
-            sisterTickets: sisterTickets.map((t) => {
-              const { zoneId: sisterZoneId, zoneName: sisterZoneName } = getZoneInfo(t, eventRecord)
-              return {
-                ticketCode: t.ticketCode,
-                attendeeName: t.attendeeName,
-                seat: t.seat,
-                zoneId: sisterZoneId,
-                zoneName: sisterZoneName,
-              }
-            }),
             attendeeName: ticket.attendeeName,
             eventName: eventRecord?.title,
             checkedInAt: existingCheckIn.checkInTime,
@@ -141,7 +121,6 @@ export async function POST(request: Request) {
         { status: 409 },
       )
     }
-
 
     // Create check-in record
     const checkInRecord = await payload.create({
@@ -160,7 +139,6 @@ export async function POST(request: Request) {
 
     // Get zone information using the helper function
 
-
     // Return success response
     return NextResponse.json({
       message: 'Check-in successful',
@@ -169,16 +147,6 @@ export async function POST(request: Request) {
         zoneName,
         email: ticket.userEmail,
         ticketCode: ticket.ticketCode,
-        sisterTickets: sisterTickets.map((t) => {
-          const { zoneId: sisterZoneId, zoneName: sisterZoneName } = getZoneInfo(t, eventRecord)
-          return {
-            ticketCode: t.ticketCode,
-            attendeeName: t.attendeeName,
-            seat: t.seat,
-            zoneId: sisterZoneId,
-            zoneName: sisterZoneName,
-          }
-        }),
         attendeeName: ticket.attendeeName,
         eventName: eventRecord?.title,
         checkedInAt: checkInRecord.checkInTime,
