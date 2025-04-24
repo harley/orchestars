@@ -10,7 +10,7 @@ import { Partner } from '@/types/Partner'
 import { Performer } from '@/types/Performer'
 import { Event } from '@/types/Event'
 import { Activity } from '@/payload-types'
-import ConcertList from './components/ConcertList'
+import NowShowingList from './components/NowShowingList'
 
 const PastConcerts = dynamic(() => import('./components/PastConcerts'))
 const PerformersSection = dynamic(() => import('./components/PerformersSection'))
@@ -41,7 +41,7 @@ const HomeClient = ({
     const array = []
     if (onGoingPaginatedDocs?.docs?.length > 0) {
       array.push({
-        Component: ConcertList,
+        Component: NowShowingList,
         props: { onGoingPaginatedDocs },
       })
     }

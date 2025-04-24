@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 
 import Image from 'next/image'
 import { PaginatedDocs } from 'payload'
@@ -18,13 +18,17 @@ interface ConcertListProps {
   className?: string
 }
 
-const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, className }) => {
+const NowShowingList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, className }) => {
   const elementsRef = useRef<(HTMLDivElement | null)[]>([])
 
   const { t } = useTranslate()
 
-  const nowShowingEvents = onGoingPaginatedDocs?.docs.filter(
-    (evt) => evt.status === EVENT_STATUS.published_open_sales.value,
+  const nowShowingEvents = useMemo(
+    () =>
+      onGoingPaginatedDocs?.docs.filter(
+        (evt) => evt.status === EVENT_STATUS.published_open_sales.value,
+      ),
+    [onGoingPaginatedDocs?.docs],
   )
 
   useEffect(() => {
@@ -121,4 +125,4 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, classNa
   )
 }
 
-export default ConcertList
+export default NowShowingList
