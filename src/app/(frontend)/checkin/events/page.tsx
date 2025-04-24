@@ -72,16 +72,64 @@ export default function ChooseEventPage() {
     )
   }
 
-  const formatDate = (iso: string) => format(new Date(iso), 'PPpp')
+  const formatDate = (iso: string) => format(new Date(iso), 'MMMM d, yyyy, h:mm a')
   const formatDateRange = (start: string, end: string) =>
     `${formatDate(start)} - ${formatDate(end)}`
+
+  // format date and time
+  const formatDateAndTime = (isoDate: string, timeHHmm: string): string => {
+    try {
+      // Parse the ISO date
+      const date = new Date(isoDate)
+      const trimmedTimeHHmm = timeHHmm.trim()
+
+      // Validate the date
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date format')
+      }
+
+      // Validate and parse time string
+      if (!trimmedTimeHHmm || !/^\d{1,2}:\d{2}$/.test(trimmedTimeHHmm)) {
+        throw new Error('Time must be in format HH:MM')
+      }
+
+      // Parse time components safely
+      const parts = trimmedTimeHHmm.split(':')
+      const hours = Number(parts[0])
+      const minutes = Number(parts[1])
+
+      if (isNaN(hours) || hours < 0 || hours > 23) {
+        throw new Error('Hours must be between 0-23')
+      }
+
+      if (isNaN(minutes) || minutes < 0 || minutes > 59) {
+        throw new Error('Minutes must be between 0-59')
+      }
+
+      // Set the time components
+      date.setHours(hours, minutes, 0, 0)
+
+      // Format as "May 20, 2023, 7:30 PM"
+      const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+      }
+
+      return new Intl.DateTimeFormat('en-US', options).format(date)
+    } catch (error) {
+      console.error('Error formatting date and time:', error)
+      return 'Invalid date or time'
+    }
+  }
 
   return (
     <div className="min-h-screen py-12 p-6 bg-gray-100">
       <div className="space-y-6">
-        {loading && (
-          <p className="text-center text-gray-500">{t('checkin.loadingEvents')}</p>
-        )}
+        {loading && <p className="text-center text-gray-500">{t('checkin.loadingEvents')}</p>}
         {events?.map((event) => (
           <div key={event.id} className="bg-white rounded-lg shadow p-4">
             <h2 className="text-xl font-bold text-gray-900">{event.title}</h2>
@@ -94,9 +142,7 @@ export default function ChooseEventPage() {
                 selectedEvent?.id === event.id ? 'bg-gray-400' : 'bg-gray-900 hover:bg-black'
               }`}
             >
-              {selectedEvent?.id === event.id
-                ? t('checkin.selected')
-                : t('checkin.selectEvent')}
+              {selectedEvent?.id === event.id ? t('checkin.selected') : t('checkin.selectEvent')}
             </button>
 
             {selectedEvent?.id === event.id && (
@@ -112,13 +158,11 @@ export default function ChooseEventPage() {
                           : 'bg-gray-900 hover:bg-black'
                       }`}
                     >
-                      {formatDate(schedule.date)}
+                      {formatDateAndTime(schedule.date, schedule.details[0]?.time)}
                     </button>
                   ))
                 ) : (
-                  <p className="text-sm text-gray-600">
-                    {t('checkin.noSchedulesAvailable')}
-                  </p>
+                  <p className="text-sm text-gray-600">{t('checkin.noSchedulesAvailable')}</p>
                 )}
               </div>
             )}
