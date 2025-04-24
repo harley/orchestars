@@ -85,7 +85,7 @@ const NowShowingList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, clas
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* Image section */}
-                  <div className="relative rounded-lg overflow-hidden w-full h-[250px] sm:h-[600px] lg:h-[890px] shadow-md">
+                  <div className="relative rounded-lg overflow-hidden w-full h-[250px] md:h-[600px] lg:h-[700px] xl:h-[890px] shadow-md">
                     <Image
                       fill
                       sizes="(max-width:768px) 100vw, 50vw"
