@@ -124,7 +124,7 @@ export async function POST(request: Request) {
             },
           }),
         )
-        results.push({ ticketCode: code, status: 'created' })
+        results.push({ ticketCode: code, status: 'updated' })
       } else {
         results.push({ ticketCode: code, status: 'not_found' })
       }
