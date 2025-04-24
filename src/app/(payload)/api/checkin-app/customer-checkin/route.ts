@@ -91,6 +91,7 @@ export async function POST(request: Request) {
             eventName: eventRecord?.title,
             checkedInAt: existingCheckIn.checkInTime,
             ticketPriceInfo: ticket.ticketPriceInfo,
+            seat: ticket.seat,
           },
         },
         { status: 409 },
@@ -126,6 +127,7 @@ export async function POST(request: Request) {
         eventName: eventRecord?.title,
         checkedInAt: checkInRecord.checkInTime,
         ticketPriceInfo: ticket.ticketPriceInfo,
+        seat: ticket.seat,
       },
     })
   } catch (error) {
