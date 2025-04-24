@@ -78,6 +78,7 @@ const ConcertList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, classNa
                     <div className="relative rounded-lg overflow-hidden w-full h-[250px] sm:h-[600px] lg:h-[890px] shadow-md">
                       <Image
                         fill
+                        sizes="(max-width:768px) 100vw, 50vw"
                         src={evt.eventThumbnail?.url || evt.eventBanner?.url}
                         alt={evt.eventThumbnail?.alt || evt.eventBanner?.alt || evt.title}
                         className="object-cover object-center transition-transform duration-700 hover:scale-105"
