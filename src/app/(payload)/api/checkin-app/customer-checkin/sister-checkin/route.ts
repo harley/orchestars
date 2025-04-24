@@ -94,12 +94,7 @@ export async function POST(request: Request) {
       }
 
       checkInRecords.push({
-        ticketCode: ticket.ticketCode,
-        attendeeName: ticket.attendeeName,
-        seat: ticket.seat,
-        zoneId,
-        eventName: event.title,
-        checkedInAt: checkInRecord.checkInTime,
+        ticketCode: checkInRecord.ticketCode,
       })
     }
 

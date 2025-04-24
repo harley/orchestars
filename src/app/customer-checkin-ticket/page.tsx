@@ -13,6 +13,7 @@ export type CheckInResponse = {
   message: string
   data?: {
     zoneId: string
+    zoneName: string
     email: string
     ticketCode: string
     checkedInAt?: string
@@ -22,6 +23,8 @@ export type CheckInResponse = {
       ticketCode: string
       attendeeName?: string
       seat?: string
+      zoneId: string
+      zoneName: string
     }[]
   }
 }
@@ -38,7 +41,9 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
   const [bulkMode, setBulkMode] = useState<'none' | 'checkin' | 'given'>('none')
   const { toast } = useToast()
   const { t } = useTranslate()
-  const zoneCategory = categories.find(cat => cat.id === data?.zoneId)
+  const zoneCategory = (zoneId: string | undefined) => { return categories.find(cat => cat.id === zoneId) }
+  const [sisterCheckInResult, setSisterCheckInResult] = useState<string[]>([])
+  const [markGivenResult, setMarkGivenResult] = useState<string[]>([])
 
   const toggleSelection = (code: string) => {
     setSelectedCodes(prev => (prev.includes(code) ? prev.filter(c => c !== code) : [...prev, code]))
@@ -60,6 +65,12 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
         body: JSON.stringify({ ticketCodeList: selectedCodes, email: data?.email }),
       })
       const json = await res.json()
+
+      setSisterCheckInResult((prev) => [
+        ...prev,
+        ...json.data.checkIns.map((item: { seat: string, ticketCode: string }) => item.ticketCode)
+      ])
+
       toast({
         title: t('customerCheckinTicket.bulkCheckInSuccess'),
         description: json.message || t('customerCheckinTicket.checkedInSelectedTickets'),
@@ -97,6 +108,16 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
         title: t('customerCheckinTicket.bulkMarkGivenSuccess'),
         description: json.message || t('customerCheckinTicket.markedSelectedTicketsAsGiven'),
       })
+
+      setMarkGivenResult((prev) => [
+        ...prev,
+        ...json.data.updatedGivenTicketCode.filter((item: { status: string, ticketCode: string }) => item.status === 'updated').map((item: { status: string, ticketCode: string }) => item.ticketCode)
+      ])
+
+      setSisterCheckInResult((prev) => [
+        ...prev,
+        ...json.data.updatedGivenTicketCode.filter((item: { status: string, ticketCode: string }) => item.status === 'updated').map((item: { status: string, ticketCode: string }) => item.ticketCode)
+      ])
       setSelectedCodes([])
       setBulkMode('none')
     } catch {
@@ -107,88 +128,94 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
       })
     }
   }
+  const shouldShowCheckbox = (sisterTicketCode: string) => (
+    (bulkMode === 'checkin' && !sisterCheckInResult.includes(sisterTicketCode)) ||
+    (bulkMode === 'given' && !markGivenResult.includes(sisterTicketCode))
+  );
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center space-y-6 mb-6">
       {/* Colored info panel */}
-      <div
-        className="w-full max-w-md p-6 rounded-lg shadow-lg"
-        style={{
-          backgroundColor: zoneCategory?.color,
-          background: confirmed
-            ? zoneCategory?.color
-            : `linear-gradient(to bottom, ${zoneCategory?.color}80 0%, ${zoneCategory?.color}30 100%)`,
-        }}
-      >
-        <div className="text-center space-y-4 bg-white p-6 rounded-lg">
-          <div
-            className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
-            style={{ backgroundColor: zoneCategory?.color }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="white"
-              className="w-10 h-10"
+      {data && (
+        <div
+          className="w-full max-w-md p-6 rounded-lg shadow-lg"
+          style={{
+            backgroundColor: zoneCategory(data.zoneId)?.color,
+            background: confirmed
+              ? zoneCategory(data.zoneId)?.color
+              : `linear-gradient(to bottom, ${zoneCategory(data.zoneId)?.color}80 0%, ${zoneCategory(data.zoneId)?.color}30 100%)`,
+          }}
+        >
+          <div className="text-center space-y-4 bg-white p-6 rounded-lg">
+            <div
+              className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
+              style={{ backgroundColor: zoneCategory(data.zoneId)?.color }}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold">{t('customerCheckinTicket.checkInSuccessful')}</h2>
-          <div className="space-y-2 text-gray-600">
-            <div className="flex items-center justify-between p-2 rounded bg-gray-50">
-              <span className="font-medium">{t('customerCheckinTicket.zone')}</span>
-              <span className="font-bold" style={{ color: zoneCategory?.color }}>
-                {zoneCategory?.name}
-              </span>
-            </div>
-            <div className="flex items-center justify-between p-2 rounded">
-              <span className="font-medium">{t('customerCheckinTicket.ticketCode')}</span>
-              <span>{data?.ticketCode}</span>
-            </div>
-            <div className="flex items-center justify-between p-2 rounded bg-gray-50">
-              <span className="font-medium">{t('customerCheckinTicket.eventName')}</span>
-              <span>{data?.eventName}</span>
-            </div>
-            <div className="flex items-center justify-between p-2 rounded">
-              <span className="font-medium">{t('customerCheckinTicket.email')}</span>
-              <span>{data?.email}</span>
-            </div>
-            <div className="flex items-center justify-between p-2 rounded bg-gray-50">
-              <span className="font-medium">{t('customerCheckinTicket.attendeeName')}</span>
-              <span>{data?.attendeeName}</span>
-            </div>
-            {data?.checkedInAt && (
-              <div className="flex items-center justify-between p-2 rounded">
-                <span className="font-medium">{t('customerCheckinTicket.checkedInAt')}</span>
-                <span>{new Date(data?.checkedInAt).toLocaleString()}</span>
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="text-center space-y-4 bg-white p-6 rounded-lg">
-          <div className="mt-4 flex flex-col space-y-2">
-            {!data?.sisterTickets && (
-              <Button
-                onClick={onConfirm}
-                className="w-full text-white"
-                style={{ backgroundColor: zoneCategory?.color }}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="white"
+                className="w-10 h-10"
               >
-                {t('customerCheckinTicket.ticketGiven')}
-              </Button>
-            )}
-            <Button
-              onClick={onReset}
-              className="w-full bg-white text-black"
-              style={{ borderColor: zoneCategory?.color }}
-            >
-              {t('customerCheckinTicket.checkInAnotherTicket')}
-            </Button>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold">{t('customerCheckinTicket.checkInSuccessful')}</h2>
+            <div className="space-y-2 text-gray-600">
+              <div className="flex items-center justify-between p-2 rounded bg-gray-50">
+                <span className="font-medium">{t('customerCheckinTicket.zone')}</span>
+                <span className="font-bold" style={{ color: zoneCategory(data.zoneId)?.color }}>
+                  {data.zoneName}
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded">
+                <span className="font-medium">{t('customerCheckinTicket.ticketCode')}</span>
+                <span>{data?.ticketCode}</span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-gray-50">
+                <span className="font-medium">{t('customerCheckinTicket.eventName')}</span>
+                <span>{data?.eventName}</span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded">
+                <span className="font-medium">{t('customerCheckinTicket.email')}</span>
+                <span>{data?.email}</span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-gray-50">
+                <span className="font-medium">{t('customerCheckinTicket.attendeeName')}</span>
+                <span>{data?.attendeeName}</span>
+              </div>
+              {data?.checkedInAt && (
+                <div className="flex items-center justify-between p-2 rounded">
+                  <span className="font-medium">{t('customerCheckinTicket.checkedInAt')}</span>
+                  <span>{new Date(data?.checkedInAt).toLocaleString()}</span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </div>
+          <div className="mt-4 text-center space-y-2 rounded-lg">
+            <div className=" flex flex-col space-y-2">
+              {!data?.sisterTickets && (
+                <Button
+                  onClick={onConfirm}
+                  className="w-full text-white"
+                  style={{ backgroundColor: zoneCategory(data.zoneId)?.color }}
+                >
+                  {t('customerCheckinTicket.ticketGiven')}
+                </Button>
+              )}
+              <Button
+                onClick={onReset}
+                className="w-full bg-white text-black"
+                style={{ borderColor: zoneCategory(data.zoneId)?.color, borderWidth: 1 }}
+              >
+                {t('customerCheckinTicket.checkInAnotherTicket')}
+              </Button>
+            </div>
+          </div>
+        </div>)}
+
       {/* Sister Tickets Panel */}
       <div className="w-full max-w-md bg-white p-4 rounded-lg shadow-sm">
         <h3 className="text-lg font-semibold mb-2">{t('customerCheckinTicket.sisterTickets')}</h3>
@@ -213,24 +240,29 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
         <ul className="space-y-2">
           {/* Original ticket always listed, checkbox only in 'given' */}
           <li className="flex items-center rounded">
-            {bulkMode === 'given' && (
+            {bulkMode === 'given' && data?.ticketCode && !markGivenResult.includes(data?.ticketCode) && (
               <div
                 className="w-full max-w-md p-6 rounded-lg shadow-lg"
                 style={{
-                  backgroundColor: zoneCategory?.color,
-                  background: confirmed
-                    ? zoneCategory?.color
-                    : `linear-gradient(to bottom, ${zoneCategory?.color}80 0%, ${zoneCategory?.color}30 100%)`,
+                  backgroundColor: zoneCategory(data.zoneId)?.color,
+                  background: markGivenResult.includes(data?.ticketCode || '')
+                    ? zoneCategory(data.zoneId)?.color
+                    : `linear-gradient(to bottom, ${zoneCategory(data.zoneId)?.color}80 0%, ${zoneCategory(data.zoneId)?.color}30 100%)`,
                 }}
               >
-                <div className="text-center space-y-4 bg-white p-6 rounded-lg">
-                  <input
-                    type="checkbox"
-                    checked={selectedCodes.includes(data?.ticketCode || '')}
-                    onChange={() => toggleSelection(data?.ticketCode || '')}
-                    className="w-4 h-4"
-                  />
-                  <strong>{data?.attendeeName}</strong> – {data?.ticketCode}
+                <div className=" space-y-4 bg-white p-6 rounded-lg">
+                  <span className=" inline-flex">
+                    <input
+                      type="checkbox"
+                      checked={selectedCodes.includes(data?.ticketCode || '')}
+                      onChange={() => toggleSelection(data?.ticketCode || '')}
+                      className="w-4 h-4 inline-flex"
+                    />
+                    <span className="pl-2">
+                      <strong>{data?.attendeeName || 'Unnamed'}</strong> – {data?.ticketCode}
+
+                    </span>
+                  </span>
                 </div>
               </div>
             )}
@@ -242,15 +274,15 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
                 <div
                   className="w-full max-w-md p-6 rounded-lg shadow-lg"
                   style={{
-                    backgroundColor: zoneCategory?.color,
-                    background: confirmed
-                      ? zoneCategory?.color
-                      : `linear-gradient(to bottom, ${zoneCategory?.color}80 0%, ${zoneCategory?.color}30 100%)`,
+                    backgroundColor: zoneCategory(sister.zoneId)?.color,
+                    background: markGivenResult.includes(sister.ticketCode || '')
+                      ? zoneCategory(sister.zoneId)?.color
+                      : `linear-gradient(to bottom, ${zoneCategory(sister.zoneId)?.color}80 0%, ${zoneCategory(sister.zoneId)?.color}30 100%)`,
                   }}
                 >
-                  <div className="text-center space-y-4 bg-white p-6 rounded-lg">
-                    <div className="inline-flex">
-                      {bulkMode !== 'none' && (
+                  <div className=" space-y-4 bg-white p-6 rounded-lg">
+                    <span className="inline-flex">
+                      {sister.ticketCode && shouldShowCheckbox(sister.ticketCode) && (
                         <input
                           type="checkbox"
                           checked={selectedCodes.includes(sister.ticketCode)}
@@ -258,11 +290,11 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
                           className="w-4 h-4 inline-flex"
                         />
                       )}
-                      <div className="pl-2">
+                      <span className="pl-2">
                         <strong>{sister.attendeeName || 'Unnamed'}</strong> – {sister.ticketCode}
                         {sister.seat && <span className="text-xs"> (Seat: {sister.seat})</span>}
-                      </div>
-                    </div>
+                      </span>
+                    </span>
                   </div>
                 </div>
               </li>
@@ -273,26 +305,32 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
         </ul>
       </div>
       {/* Bulk action toggles & buttons */}
-      {bulkMode === 'checkin' && (
-        <Button variant="secondary" onClick={bulkCheckIn} className="w-full max-w-md">
-          {t('customerCheckinTicket.checkInSelected')}
-        </Button>
-      )}
-      {bulkMode === 'given' && (
-        <Button variant="secondary" onClick={bulkMarkGiven} className="w-full max-w-md">
-          {t('customerCheckinTicket.markSelectedAsGiven')}
-        </Button>
-      )}
-      {bulkMode !== 'none' && (
-        <Button
-          variant="outline"
-          onClick={() => setBulkMode('none')}
-          className="w-full max-w-md"
-        >
-          {t('customerCheckinTicket.cancelBulk')}
-        </Button>
-      )}
-    </div>
+      {
+        bulkMode === 'checkin' && (
+          <Button variant="secondary" onClick={bulkCheckIn} className="w-full max-w-md">
+            {t('customerCheckinTicket.checkInSelected')}
+          </Button>
+        )
+      }
+      {
+        bulkMode === 'given' && (
+          <Button variant="secondary" onClick={bulkMarkGiven} className="w-full max-w-md">
+            {t('customerCheckinTicket.markSelectedAsGiven')}
+          </Button>
+        )
+      }
+      {
+        bulkMode !== 'none' && (
+          <Button
+            variant="outline"
+            onClick={() => setBulkMode('none')}
+            className="w-full max-w-md"
+          >
+            {t('customerCheckinTicket.cancelBulk')}
+          </Button>
+        )
+      }
+    </div >
   )
 }
 
@@ -344,7 +382,7 @@ export default function CustomerCheckInPage() {
     setCheckedInData(undefined)
     setEmail('')
     setTicketCode('')
-    setTicketGivenConfirmed(false)
+
   }
 
   const handleTicketGiven = async () => {

@@ -4,6 +4,32 @@ import config from '@/payload.config'
 import { TICKET_STATUS } from '@/collections/Tickets/constants'
 import { Event, User } from '@/payload-types'
 
+// Helper function to extract zoneId and zoneName
+function getZoneInfo(ticket: any, eventRecord: Event): { zoneId: string; zoneName: string } {
+  const ticketPriceInfo = ticket.ticketPriceInfo as Record<string, any>
+
+  let zoneId = ticketPriceInfo?.key || 'unknown'
+  let zoneName = ticketPriceInfo?.name || 'unknown'
+
+  // If no zoneId from ticketPriceInfo, try to find it in eventRecord.ticketPrices
+  if (zoneId === 'unknown' && eventRecord?.ticketPrices) {
+    const ticketPrice = eventRecord.ticketPrices.find(
+      (price: any) => price.id === (ticketPriceInfo?.id || ticketPriceInfo?.ticketPriceId),
+    )
+    zoneId = ticketPrice?.key || 'unknown'
+  }
+
+  // If no zoneName from ticketPriceInfo, try to find it in eventRecord.ticketPrices
+  if (zoneName === 'unknown' && eventRecord?.ticketPrices) {
+    const ticketPrice = eventRecord.ticketPrices.find(
+      (price: any) => price.id === (ticketPriceInfo?.id || ticketPriceInfo?.ticketPriceId),
+    )
+    zoneName = ticketPrice?.name || 'unknown'
+  }
+
+  return { zoneId, zoneName }
+}
+
 export async function POST(request: Request) {
   try {
     const { email, ticketCode } = await request.json()
@@ -36,7 +62,6 @@ export async function POST(request: Request) {
       })
       .then((res) => res.docs?.[0])
 
-
     // Validate ticket exists
     if (!ticket) {
       return NextResponse.json(
@@ -66,7 +91,7 @@ export async function POST(request: Request) {
         eventScheduleId: { equals: ticket.eventScheduleId },
       },
     }).then((res) => res.docs)
-    
+
     // Check if ticket is already checked in by looking up check-in records
     const existingCheckIn = await payload
       .find({
@@ -74,13 +99,11 @@ export async function POST(request: Request) {
         where: {
           ticketCode: {
             equals: ticketCode,
-
           },
           deletedAt: { equals: null },
         },
       })
       .then((res) => res.docs[0])
-
 
     if (existingCheckIn) {
       return NextResponse.json(
@@ -90,6 +113,7 @@ export async function POST(request: Request) {
         { status: 400 },
       )
     }
+
     const eventRecord = ticket.event as Event
     const eventId = eventRecord?.id as number
     const userId = (ticket.user as User)?.id as number
@@ -113,32 +137,31 @@ export async function POST(request: Request) {
       },
     })
 
-    // Get zone information from ticket price info
-    const ticketPriceInfo = ticket.ticketPriceInfo as Record<string, any>
+    // Get zone information using the helper function
+    const { zoneId, zoneName } = getZoneInfo(ticket, eventRecord)
 
-    let zoneId = ticketPriceInfo?.key || 'unknown'
-    if (!zoneId && eventRecord?.ticketPrices) {
-      const ticketPrice = eventRecord.ticketPrices.find(
-        (price: any) => price.id === (ticketPriceInfo?.id || ticketPriceInfo?.ticketPriceId),
-      )
-      zoneId = ticketPrice?.key || 'unknown'
-    }
     // Return success response
     return NextResponse.json({
       message: 'Check-in successful',
       data: {
         zoneId,
+        zoneName,
         email: ticket.userEmail,
         ticketCode: ticket.ticketCode,
-        sisterTickets: sisterTickets.map((t) => ({
-          ticketCode: t.ticketCode,
-          attendeeName: t.attendeeName,
-          seat: t.seat,
-        })),
+        sisterTickets: sisterTickets.map((t) => {
+          const { zoneId: sisterZoneId, zoneName: sisterZoneName } = getZoneInfo(t, eventRecord)
+          return {
+            ticketCode: t.ticketCode,
+            attendeeName: t.attendeeName,
+            seat: t.seat,
+            zoneId: sisterZoneId,
+            zoneName: sisterZoneName,
+          }
+        }),
         attendeeName: ticket.attendeeName,
         eventName: eventRecord?.title,
         checkedInAt: checkInRecord.checkInTime,
-        ticketPriceInfo,
+        ticketPriceInfo: ticket.ticketPriceInfo,
       },
     })
   } catch (error) {
