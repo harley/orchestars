@@ -260,6 +260,7 @@
     "checkIn": "Check in",
     "checkingIn": "Checking in...",
     "checkInSuccessful": "Check-in Successful!",
+    "confirmedSuccessfully": "Confirmed successfully",
     "zone": "Zone:",
     "ticketCode": "Ticket Code:",
     "eventName": "Event Name:",
@@ -267,13 +268,14 @@
     "attendeeName": "Attendee Name:",
     "checkedInAt": "Checked in at:",
     "ticketGiven": "Ticket Given",
+    "confirmValidTicket": "Confirm valid ticket and give ticket",
     "checkInAnotherTicket": "Check in another ticket",
     "sisterTickets": "Other Tickets in This Order",
     "noSisterTickets": "No sister tickets available",
     "bulkCheckIn": "Bulk Check-In",
-    "bulkMarkGiven": "Mark Tickets as Given",
+    "bulkMarkGiven": "Allow checkin multiple tickets",
     "checkInSelected": "Check In Selected",
-    "markSelectedAsGiven": "Give Selected Tickets",
+    "markSelectedAsGiven": "Confirm sister tickets as valid and give ticket",
     "cancelBulk": "Cancel Bulk",
     "noSelection": "No selection",
     "selectAtLeastOneSisterTicket": "Select at least one sister ticket",
@@ -281,8 +283,9 @@
     "bulkCheckInSuccess": "Bulk Check-in",
     "checkedInSelectedTickets": "Checked in selected tickets",
     "bulkMarkGivenSuccess": "Give Selected Tickets",
-    "markedSelectedTicketsAsGiven": "Marked selected tickets as given",
+    "markedSelectedTicketsAsGiven": "Successful marked selected tickets as given",
     "confirmTicketGiven": "Confirm this ticket has been given by admin \"{{adminId}}\"?",
-    "confirmed": "Confirmed"
+    "confirmed": "Confirmed successfully",
+    "success": "Success"
   }
 }
