@@ -259,6 +259,7 @@
     "enterYourTicketCode": "Enter your ticket code",
     "checkIn": "Check in",
     "checkingIn": "Checking in...",
+    "alreadyCheckedIn": "Already checked in",
     "checkInSuccessful": "Check-in Successful!",
     "confirmedSuccessfully": "Confirmed successfully",
     "zone": "Zone:",
