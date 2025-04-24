@@ -64,7 +64,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       message: 'Bulk mark-given complete',
-      results,
+      data: {updatedGivenTicketCode: results}
     })
   } catch (error) {
     console.error('Bulk mark-given error:', error)

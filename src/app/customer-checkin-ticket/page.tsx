@@ -7,6 +7,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { categories } from '@/components/EventDetail/data/seat-maps/categories'
 import { useTranslate } from '@/providers/I18n/client'
 
+
 // Response type from backend
 export type CheckInResponse = {
   success: boolean
@@ -39,6 +40,8 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
   const { toast } = useToast()
   const { t } = useTranslate()
   const zoneCategory = categories.find(cat => cat.id === data?.zoneId)
+  const [ sisterCheckInResult, setSisterCheckInResult] = useState<string[]>([])
+  const [ markGivenResult, setMarkGivenResult] = useState<string[]>([])
 
   const toggleSelection = (code: string) => {
     setSelectedCodes(prev => (prev.includes(code) ? prev.filter(c => c !== code) : [...prev, code]))
@@ -60,6 +63,12 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
         body: JSON.stringify({ ticketCodeList: selectedCodes, email: data?.email }),
       })
       const json = await res.json()
+      console.log('json', json)
+      setSisterCheckInResult((prev) => [
+        ...prev, 
+        ...json.data.checkIns.map((item: {seat: string, ticketCode: string}) => item.ticketCode)
+      ] )
+      
       toast({
         title: t('customerCheckinTicket.bulkCheckInSuccess'),
         description: json.message || t('customerCheckinTicket.checkedInSelectedTickets'),
@@ -97,6 +106,12 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
         title: t('customerCheckinTicket.bulkMarkGivenSuccess'),
         description: json.message || t('customerCheckinTicket.markedSelectedTicketsAsGiven'),
       })
+
+      setMarkGivenResult((prev) => [
+        ...prev, 
+        ...json.data.updatedGivenTicketCode.map((item: {status: string, ticketCode: string}) => item.ticketCode)
+      ])
+
       setSelectedCodes([])
       setBulkMode('none')
     } catch {
@@ -107,6 +122,10 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
       })
     }
   }
+  const shouldShowCheckbox = (sisterTicketCode: string) => (
+    (bulkMode === 'checkin' && !sisterCheckInResult.includes(sisterTicketCode)) ||
+    (bulkMode === 'given' && !markGivenResult.includes(sisterTicketCode))
+  );
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center space-y-6 mb-6">
@@ -168,8 +187,8 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
             )}
           </div>
         </div>
-        <div className="text-center space-y-4 bg-white p-6 rounded-lg">
-          <div className="mt-4 flex flex-col space-y-2">
+        <div className="mt-4 text-center space-y-2 rounded-lg">
+          <div className=" flex flex-col space-y-2">
             {!data?.sisterTickets && (
               <Button
                 onClick={onConfirm}
@@ -182,7 +201,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
             <Button
               onClick={onReset}
               className="w-full bg-white text-black"
-              style={{ borderColor: zoneCategory?.color }}
+              style={{ borderColor: zoneCategory?.color, borderWidth: 1 }}
             >
               {t('customerCheckinTicket.checkInAnotherTicket')}
             </Button>
@@ -213,7 +232,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
         <ul className="space-y-2">
           {/* Original ticket always listed, checkbox only in 'given' */}
           <li className="flex items-center rounded">
-            {bulkMode === 'given' && (
+            {bulkMode === 'given' && data?.ticketCode && !markGivenResult.includes(data?.ticketCode) && (
               <div
                 className="w-full max-w-md p-6 rounded-lg shadow-lg"
                 style={{
@@ -223,76 +242,87 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
                     : `linear-gradient(to bottom, ${zoneCategory?.color}80 0%, ${zoneCategory?.color}30 100%)`,
                 }}
               >
-                <div className="text-center space-y-4 bg-white p-6 rounded-lg">
+                <div className=" space-y-4 bg-white p-6 rounded-lg">
+                <span className=" inline-flex">
                   <input
                     type="checkbox"
                     checked={selectedCodes.includes(data?.ticketCode || '')}
                     onChange={() => toggleSelection(data?.ticketCode || '')}
-                    className="w-4 h-4"
+                    className="w-4 h-4 inline-flex"
                   />
-                  <strong>{data?.attendeeName}</strong> – {data?.ticketCode}
-                </div>
+                  <span className="pl-2">
+                    <strong>{data?.attendeeName || 'Unnamed'}</strong> – {data?.ticketCode}
+
+                  </span>
+                </span>
+              </div>
               </div>
             )}
-          </li>
-          {/* List all sibling tickets, checkbox only in bulkMode */}
-          {data?.sisterTickets &&
-            data.sisterTickets.map(sister => (
-              <li key={sister.ticketCode} className="flex items-center rounded">
-                <div
-                  className="w-full max-w-md p-6 rounded-lg shadow-lg"
-                  style={{
-                    backgroundColor: zoneCategory?.color,
-                    background: confirmed
-                      ? zoneCategory?.color
-                      : `linear-gradient(to bottom, ${zoneCategory?.color}80 0%, ${zoneCategory?.color}30 100%)`,
-                  }}
-                >
-                  <div className="text-center space-y-4 bg-white p-6 rounded-lg">
-                    <div className="inline-flex">
-                      {bulkMode !== 'none' && (
-                        <input
-                          type="checkbox"
-                          checked={selectedCodes.includes(sister.ticketCode)}
-                          onChange={() => toggleSelection(sister.ticketCode)}
-                          className="w-4 h-4 inline-flex"
-                        />
-                      )}
-                      <div className="pl-2">
-                        <strong>{sister.attendeeName || 'Unnamed'}</strong> – {sister.ticketCode}
-                        {sister.seat && <span className="text-xs"> (Seat: {sister.seat})</span>}
-                      </div>
-                    </div>
-                  </div>
+        </li>
+        {/* List all sibling tickets, checkbox only in bulkMode */}
+        {data?.sisterTickets &&
+          data.sisterTickets.map(sister => (
+            <li key={sister.ticketCode} className="flex items-center rounded">
+              <div
+                className="w-full max-w-md p-6 rounded-lg shadow-lg"
+                style={{
+                  backgroundColor: zoneCategory?.color,
+                  background: confirmed
+                    ? zoneCategory?.color
+                    : `linear-gradient(to bottom, ${zoneCategory?.color}80 0%, ${zoneCategory?.color}30 100%)`,
+                }}
+              >
+                <div className=" space-y-4 bg-white p-6 rounded-lg">
+                  <span className="inline-flex">
+                    { sister.ticketCode && shouldShowCheckbox(sister.ticketCode) && (
+                      <input
+                        type="checkbox"
+                        checked={selectedCodes.includes(sister.ticketCode)}
+                        onChange={() => toggleSelection(sister.ticketCode)}
+                        className="w-4 h-4 inline-flex"
+                      />
+                    )}
+                    <span className="pl-2">
+                      <strong>{sister.attendeeName || 'Unnamed'}</strong> – {sister.ticketCode}
+                      {sister.seat && <span className="text-xs"> (Seat: {sister.seat})</span>}
+                    </span>
+                  </span>
                 </div>
-              </li>
-            ))}
-          {!data?.sisterTickets?.length && (
-            <li className="p-2 text-sm text-gray-500">{t('customerCheckinTicket.noSisterTickets')}</li>
-          )}
-        </ul>
-      </div>
-      {/* Bulk action toggles & buttons */}
-      {bulkMode === 'checkin' && (
-        <Button variant="secondary" onClick={bulkCheckIn} className="w-full max-w-md">
-          {t('customerCheckinTicket.checkInSelected')}
-        </Button>
-      )}
-      {bulkMode === 'given' && (
-        <Button variant="secondary" onClick={bulkMarkGiven} className="w-full max-w-md">
-          {t('customerCheckinTicket.markSelectedAsGiven')}
-        </Button>
-      )}
-      {bulkMode !== 'none' && (
-        <Button
-          variant="outline"
-          onClick={() => setBulkMode('none')}
-          className="w-full max-w-md"
-        >
-          {t('customerCheckinTicket.cancelBulk')}
-        </Button>
-      )}
+              </div>
+            </li>
+          ))}
+        {!data?.sisterTickets?.length && (
+          <li className="p-2 text-sm text-gray-500">{t('customerCheckinTicket.noSisterTickets')}</li>
+        )}
+      </ul>
     </div>
+      {/* Bulk action toggles & buttons */ }
+  {
+    bulkMode === 'checkin' && (
+      <Button variant="secondary" onClick={bulkCheckIn} className="w-full max-w-md">
+        {t('customerCheckinTicket.checkInSelected')}
+      </Button>
+    )
+  }
+  {
+    bulkMode === 'given' && (
+      <Button variant="secondary" onClick={bulkMarkGiven} className="w-full max-w-md">
+        {t('customerCheckinTicket.markSelectedAsGiven')}
+      </Button>
+    )
+  }
+  {
+    bulkMode !== 'none' && (
+      <Button
+        variant="outline"
+        onClick={() => setBulkMode('none')}
+        className="w-full max-w-md"
+      >
+        {t('customerCheckinTicket.cancelBulk')}
+      </Button>
+    )
+  }
+    </div >
   )
 }
 
