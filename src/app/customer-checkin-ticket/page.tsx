@@ -196,7 +196,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
           </div>
           <div className="mt-4 text-center space-y-2 rounded-lg">
             <div className=" flex flex-col space-y-2">
-              {!data?.sisterTickets && (
+
                 <Button
                   onClick={onConfirm}
                   className="w-full text-white"
@@ -204,7 +204,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
                 >
                   {t('customerCheckinTicket.ticketGiven')}
                 </Button>
-              )}
+
               <Button
                 onClick={onReset}
                 className="w-full bg-white text-black"
@@ -260,7 +260,6 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
                     />
                     <span className="pl-2">
                       <strong>{data?.attendeeName || 'Unnamed'}</strong> – {data?.ticketCode}
-
                     </span>
                   </span>
                 </div>
