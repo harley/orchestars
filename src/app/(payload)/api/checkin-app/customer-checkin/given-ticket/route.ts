@@ -24,15 +24,8 @@ export async function POST(request: Request) {
 
     const payload = await getPayload({ config })
 
-    // Verify admin exists
-    const admin = await payload
-      .find({
-        collection: 'admins',
-        where: { id: { equals: adminId } },
-      })
-      .then(res => res.docs[0])
-
-    if (!admin) {
+    const isValidUsherId = (usherId: any) => typeof usherId=== 'number' && usherId >= 0 && usherId <= 10;
+    if (!adminId || isValidUsherId(adminId)) {
       return NextResponse.json(
         { message: 'Admin not found' },
         { status: 404 },
@@ -83,7 +76,7 @@ export async function POST(request: Request) {
           id: existingCheckin.id,
           data: {
             ticketGivenTime: new Date().toISOString(),
-            ticketGivenBy: admin.id,
+            ticketGivenBy: adminId,
           },
         })
         results.push({ ticketCode: code, status: 'updated' })
@@ -115,7 +108,7 @@ export async function POST(request: Request) {
             eventScheduleId: ticket?.eventScheduleId,
             checkInTime: new Date().toISOString(),
             ticketGivenTime: new Date().toISOString(),
-            ticketGivenBy: admin.id,
+            ticketGivenBy: adminId,
           },
         })
         results.push({ ticketCode: code, status: 'updated' })
