@@ -10,6 +10,7 @@ import { Partner } from '@/types/Partner'
 import { Performer } from '@/types/Performer'
 import { Event } from '@/types/Event'
 import { Activity } from '@/payload-types'
+import ConcertList from './components/ConcertList'
 
 const PastConcerts = dynamic(() => import('./components/PastConcerts'))
 const PerformersSection = dynamic(() => import('./components/PerformersSection'))
@@ -18,6 +19,7 @@ const ActivitiesSection = dynamic(() => import('./components/Activities'))
 
 const HomeClient = ({
   bannerDocs,
+  onGoingPaginatedDocs,
   partners,
   performers,
   pastEvents,
@@ -37,6 +39,12 @@ const HomeClient = ({
 
   const visibleSections = useMemo(() => {
     const array = []
+    if (onGoingPaginatedDocs?.docs?.length > 0) {
+      array.push({
+        Component: ConcertList,
+        props: { onGoingPaginatedDocs },
+      })
+    }
     if (pastEvents?.length > 0) {
       array.push({ Component: PastConcerts, props: { events: pastEvents } })
     }
