@@ -130,7 +130,6 @@ export default function CustomerCheckInPage() {
       setLoadingTicketGiven(false)
     }
   }
-  console.log('ticketGivenConfirmed', ticketGivenConfirmed)
   if (checkedInData) {
     return (
       <CheckInResult
