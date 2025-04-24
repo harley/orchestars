@@ -347,18 +347,27 @@ const ConfirmOrderModal = ({
                   promotionInfo.code === promotionCode &&
                   (calculateTotal.canApplyPromoCode ? (
                     <div className="p-4 border rounded-md bg-green-50">
-                      <div className="flex justify-between items-center">
+                      <div className="flex md:flex-row flex-col justify-between items-center">
                         <div className="flex items-center gap-2">
                           <Check className="h-5 w-5 text-green-600" />
                           <span className="font-medium">
                             {t('event.promoCode')}: {promotionCode}
                           </span>
                         </div>
-                        <span className="text-green-600 font-medium">
-                          {promotionInfo.discountType === 'percentage'
-                            ? `${promotionInfo.discountValue}%`
-                            : `${t('event.currencySymbol')}${promotionInfo.discountValue}`}
-                        </span>
+                        <div className="text-green-600 font-medium">
+                          <span>
+                            {promotionInfo.discountType === 'percentage'
+                              ? `${promotionInfo.discountValue}%`
+                              : `${formatMoney(promotionInfo.discountValue, 'VND')}`}
+                          </span>
+
+                          <span className="text-sm">
+                            {promotionInfo.discountApplyScope === 'total_order_value' &&
+                              ` (${t('event.discountOnTotalOrderValue')})`}
+                            {promotionInfo.discountApplyScope === 'per_order_item' &&
+                              ` (${t('event.discountOnPerOrderItem')})`}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ) : (

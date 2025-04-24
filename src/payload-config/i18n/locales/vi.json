@@ -106,7 +106,9 @@
     "currencySymbol": "₫",
     "requiresMinimumTickets": "Yêu cầu tối thiểu {{count}} vé",
     "noPromotionsAvailable": "Hiện tại không có khuyến mãi nào",
-    "promotionNotMeetConditions": "Chưa thoả mãn điều kiện tối thiểu để áp dụng mã giảm giá"
+    "promotionNotMeetConditions": "Chưa thoả mãn điều kiện tối thiểu để áp dụng mã giảm giá",
+    "discountOnTotalOrderValue": "Áp dụng trên tổng giá trị đơn hàng",
+    "discountOnPerOrderItem": "Áp dụng trên từng vé"
   },
   "seatSelection": {
     "booking": "Đặt chỗ",
