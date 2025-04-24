@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Head from 'next/head'
 import { useAuth } from '@/providers/CheckIn/useAuth'
+import { useTranslate } from '@/providers/I18n/client'
 
 export default function Login() {
   const router = useRouter()
@@ -10,6 +11,7 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const { isHydrated, token, setToken } = useAuth()
+  const { t } = useTranslate()
 
   useEffect(() => {
     if (!isHydrated) return
@@ -20,7 +22,7 @@ export default function Login() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      alert('Please enter both email and password')
+      alert(t('checkin.pleaseEnterEmailAndPassword'))
       return
     }
 
@@ -45,7 +47,7 @@ export default function Login() {
       }
     } catch (error) {
       console.error('Login error:', error)
-      alert('An error occurred during login')
+      alert(t('error.loginFailed'))
     } finally {
       setIsLoading(false)
     }
@@ -54,34 +56,42 @@ export default function Login() {
   return (
     <>
       <Head>
-        <title>Login</title>
+        <title>{t('checkin.login')}</title>
       </Head>
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">Welcome Back</h1>
-          <p className="text-sm text-gray-600 mb-6 text-center">Sign in to continue</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">
+            {t('checkin.welcomeBack')}
+          </h1>
+          <p className="text-sm text-gray-600 mb-6 text-center">
+            {t('checkin.signInToContinue')}
+          </p>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('checkin.email')}
+              </label>
               <input
                 type="email"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-700"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder={t('checkin.enterYourEmail')}
                 disabled={isLoading}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('checkin.password')}
+              </label>
               <input
                 type="password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-700"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder={t('checkin.enterYourPassword')}
                 disabled={isLoading}
               />
             </div>
@@ -93,7 +103,7 @@ export default function Login() {
                 isLoading ? 'bg-gray-700 cursor-not-allowed' : 'bg-gray-900 hover:bg-black'
               }`}
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? t('checkin.signingIn') : t('checkin.signIn')}
             </button>
           </div>
         </div>

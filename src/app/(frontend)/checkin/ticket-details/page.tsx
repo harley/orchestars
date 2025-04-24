@@ -2,15 +2,16 @@
 
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
-
 import { CheckCircle, XCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { categories } from '@/components/EventDetail/data/seat-maps/categories'
+import { useTranslate } from '@/providers/I18n/client'
 
 export default function TicketDetailsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { isHydrated, token } = useAuth()
+  const { t } = useTranslate()
 
   const [isCheckingIn, setIsCheckingIn] = useState(false)
 
@@ -43,20 +44,24 @@ export default function TicketDetailsPage() {
       })
       if (!res.ok) {
         const err = await res.json()
-        alert(err.message || 'Failed to check in')
+        alert(err.message || t('error.failedToCheckIn'))
         return
       }
-      alert('Ticket checked in successfully')
+      alert(t('checkin.ticketCheckedInSuccessfully'))
       router.back()
     } catch (err: any) {
-      alert(err.message || 'Failed to check in')
+      alert(err.message || t('error.failedToCheckIn'))
     } finally {
       setIsCheckingIn(false)
     }
   }
 
   if (!ticketData) {
-    return <div className="p-6 text-center text-red-500 font-semibold">Invalid ticket data</div>
+    return (
+      <div className="p-6 text-center text-red-500 font-semibold">
+        {t('checkin.invalidTicketData')}
+      </div>
+    )
   }
 
   return (
@@ -66,11 +71,12 @@ export default function TicketDetailsPage() {
         onClick={() => router.back()}
         className="mb-4 px-4 py-3 rounded-xl border-2 border-gray-900 text-gray-900 hover:bg-gray-100 transition"
       >
-        Back
+        {t('checkin.back')}
       </button>
 
       <div
-        className={`max-w-xl mx-auto rounded-xl p-6 text-white text-center ${alreadyCheckedIn && 'bg-red-500'}
+        className={`max-w-xl mx-auto rounded-xl p-6 text-white text-center ${
+          alreadyCheckedIn && 'bg-red-500'
         }`}
         style={{
           backgroundColor: categories.find((c) => c.id === ticketData.ticketPriceInfo.key)?.color,
@@ -82,43 +88,43 @@ export default function TicketDetailsPage() {
           <CheckCircle size={60} className="mx-auto mb-2" />
         )}
         <h1 className="text-2xl font-bold mb-1">
-          {alreadyCheckedIn ? 'TICKET USED' : 'VALID TICKET'}
+          {alreadyCheckedIn ? t('checkin.ticketUsed') : t('checkin.validTicket')}
         </h1>
         <p className="text-lg font-semibold mb-4">#{ticketData.code}</p>
 
         {alreadyCheckedIn && (
           <div className="bg-white text-gray-800 rounded-md p-4 mb-4 text-left">
             <p>
-              <strong>Checked in at:</strong> {checkinData.checkInTime}
+              <strong>{t('checkin.checkedInAt')}</strong> {checkinData.checkInTime}
             </p>
             <p>
-              <strong>By:</strong> {checkinData.checkedInBy?.email || 'N/A'}
+              <strong>{t('checkin.by')}</strong> {checkinData.checkedInBy?.email || 'N/A'}
             </p>
           </div>
         )}
 
         <div className="bg-white text-gray-800 rounded-md p-4 text-left mb-4">
-          <h2 className="font-bold text-base mb-2">TICKET DETAILS</h2>
+          <h2 className="font-bold text-base mb-2">{t('checkin.ticketDetails')}</h2>
           <p>
-            <strong>Name:</strong> {ticketData.attendeeName}
+            <strong>{t('checkin.name')}</strong> {ticketData.attendeeName}
           </p>
           <p>
-            <strong>Event:</strong> {ticketData.eventName}
+            <strong>{t('checkin.event')}</strong> {ticketData.eventName}
           </p>
           <p>
-            <strong>Date:</strong> {ticketData.eventTime}
+            <strong>{t('checkin.date')}</strong> {ticketData.eventTime}
           </p>
           <p>
-            <strong>Email:</strong> {ticketData.email}
+            <strong>{t('checkin.emailLabel')}</strong> {ticketData.email}
           </p>
           <p>
-            <strong>Phone Number:</strong> {ticketData.phoneNumber}
+            <strong>{t('checkin.phoneNumber')}</strong> {ticketData.phoneNumber}
           </p>
           <p>
-            <strong>Ticket Type:</strong> {ticketData.ticketPriceInfo.name}
+            <strong>{t('checkin.ticketType')}</strong> {ticketData.ticketPriceInfo.name}
           </p>
           <p>
-            <strong>Seat:</strong> {ticketData.seat || 'N/A'}
+            <strong>{t('checkin.seat')}</strong> {ticketData.seat || 'N/A'}
           </p>
         </div>
 
@@ -132,10 +138,10 @@ export default function TicketDetailsPage() {
           }`}
         >
           {alreadyCheckedIn
-            ? 'ALREADY CHECKED IN'
+            ? t('checkin.alreadyCheckedIn')
             : isCheckingIn
-              ? 'CHECKING IN...'
-              : 'CHECK IN NOW'}
+              ? t('checkin.checkingIn')
+              : t('checkin.checkInNow')}
         </button>
       </div>
     </div>

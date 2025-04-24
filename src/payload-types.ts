@@ -958,6 +958,7 @@ export interface Promotion {
     isApplyCondition?: boolean | null;
     minTickets?: number | null;
   };
+  discountApplyScope?: ('total_order_value' | 'per_order_item') | null;
   discountType: 'percentage' | 'fixed_amount';
   discountValue: number;
   startDate: string;
@@ -1960,6 +1961,7 @@ export interface PromotionsSelect<T extends boolean = true> {
         isApplyCondition?: T;
         minTickets?: T;
       };
+  discountApplyScope?: T;
   discountType?: T;
   discountValue?: T;
   startDate?: T;
