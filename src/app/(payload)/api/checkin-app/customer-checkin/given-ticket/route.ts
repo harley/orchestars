@@ -29,18 +29,33 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Admin not found' }, { status: 404 })
     }
 
-    const results: Array<{ ticketCode: string; status: 'updated' | 'not_found' | 'created' }> = []
-
     // Get tickets for all provided codes with related event data
-    const tickets = await payload
-      .find({
-        collection: 'tickets',
+    const [tickets, existingCheckins] = await Promise.all([
+      payload
+        .find({
+          collection: 'tickets',
+          where: {
+            ticketCode: { in: ticketCodes },
+          },
+          select: {
+            event: true,
+            eventDate: true,
+            eventScheduleId: true,
+            seat: true,
+            ticketCode: true,
+            user: true,
+          },
+          // depth: 2, // Ensure we get related event and user data
+        })
+        .then((res) => res.docs),
+      payload.find({
+        collection: 'checkinRecords',
         where: {
           ticketCode: { in: ticketCodes },
+          deletedAt: { equals: null },
         },
-        depth: 2, // Ensure we get related event and user data
-      })
-      .then((res) => res.docs)
+      }),
+    ])
 
     // Verify all tickets belong to the same user
     const userIds = new Set(tickets.map((ticket) => getRelationshipId(ticket.user)).filter(Boolean))
@@ -51,70 +66,71 @@ export async function POST(request: Request) {
       )
     }
 
-    const userId = userIds.values().next().value
-
     // Create map of ticket codes to ticket objects
     const ticketMap = new Map(tickets.map((ticket) => [ticket.ticketCode, ticket]))
 
+    const existingCheckinsMap = new Map(
+      existingCheckins.docs.map((checkin) => [checkin.ticketCode, checkin]),
+    )
+
+    const operations = []
+    const results: Array<{ ticketCode: string; status: 'updated' | 'not_found' | 'created' }> = []
+
     // Process each ticket code
     for (const code of ticketCodes) {
-      const existingCheckin = await payload
-        .find({
-          collection: 'checkinRecords',
-          where: {
-            ticketCode: { equals: code },
-            deletedAt: { equals: null },
-          },
-        })
-        .then((res) => res.docs[0])
+      const existingCheckin = existingCheckinsMap.get(code)
+      const ticket = ticketMap.get(code)
 
       if (existingCheckin) {
         // Update existing check-in record
-        await payload.update({
-          collection: 'checkinRecords',
-          id: existingCheckin.id,
-          data: {
-            ticketGivenTime: new Date().toISOString(),
-            ticketGivenBy: adminId,
-          },
-        })
+        operations.push(
+          payload.update({
+            collection: 'checkinRecords',
+            id: existingCheckin.id,
+            data: {
+              ticketGivenTime: new Date().toISOString(),
+              ticketGivenBy: adminId,
+            },
+          }),
+        )
         results.push({ ticketCode: code, status: 'updated' })
-      } else if (ticketMap.has(code)) {
-        // Create new check-in record for valid ticket
-        const ticket = ticketMap.get(code)
-
+      } else if (ticket) {
         // Extract and validate required fields
-        const eventId = getRelationshipId(ticket?.event)
-        const ticketId = getRelationshipId(ticket) || ticket?.id
-        const userIdFromTicket = getRelationshipId(ticket?.user)
-        const ticketCode = ticket?.ticketCode
+        const eventId = getRelationshipId(ticket.event)
+        const ticketId = getRelationshipId(ticket) || ticket.id
+        const userIdFromTicket = getRelationshipId(ticket.user)
+        const ticketCode = ticket.ticketCode
 
         // Validate required fields
-        if (!eventId || !ticketId || !userIdFromTicket || !ticketCode || !ticket?.seat) {
+        if (!eventId || !ticketId || !userIdFromTicket || !ticketCode || !ticket.seat) {
           results.push({ ticketCode: code, status: 'not_found' })
           continue
         }
 
-        await payload.create({
-          collection: 'checkinRecords',
-          data: {
-            event: eventId,
-            seat: ticket?.seat,
-            eventDate: ticket.eventDate || null,
-            user: userIdFromTicket,
-            ticket: ticketId,
-            ticketCode: ticketCode,
-            eventScheduleId: ticket?.eventScheduleId,
-            checkInTime: new Date().toISOString(),
-            ticketGivenTime: new Date().toISOString(),
-            ticketGivenBy: adminId,
-          },
-        })
-        results.push({ ticketCode: code, status: 'updated' })
+        operations.push(
+          payload.create({
+            collection: 'checkinRecords',
+            data: {
+              event: eventId,
+              seat: ticket.seat,
+              eventDate: ticket.eventDate || null,
+              user: userIdFromTicket,
+              ticket: ticketId,
+              ticketCode: ticketCode,
+              eventScheduleId: ticket.eventScheduleId,
+              checkInTime: new Date().toISOString(),
+              ticketGivenTime: new Date().toISOString(),
+              ticketGivenBy: adminId,
+            },
+          }),
+        )
+        results.push({ ticketCode: code, status: 'created' })
       } else {
         results.push({ ticketCode: code, status: 'not_found' })
       }
     }
+
+    await Promise.all(operations)
 
     return NextResponse.json({
       message: 'Bulk mark-given complete',
