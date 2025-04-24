@@ -109,9 +109,13 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
 
       setMarkGivenResult((prev) => [
         ...prev, 
-        ...json.data.updatedGivenTicketCode.map((item: {status: string, ticketCode: string}) => item.ticketCode)
+        ...json.data.updatedGivenTicketCode.filter((item: {status: string, ticketCode: string}) => item.status === 'updated').map((item: {status: string, ticketCode: string}) => item.ticketCode)
       ])
 
+      setSisterCheckInResult((prev) => [
+        ...prev, 
+        ...json.data.updatedGivenTicketCode.filter((item: {status: string, ticketCode: string}) => item.status === 'updated').map((item: {status: string, ticketCode: string}) => item.ticketCode)
+      ])
       setSelectedCodes([])
       setBulkMode('none')
     } catch {
@@ -134,7 +138,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
         className="w-full max-w-md p-6 rounded-lg shadow-lg"
         style={{
           backgroundColor: zoneCategory?.color,
-          background: confirmed
+          background: markGivenResult.includes(data?.ticketCode || '')
             ? zoneCategory?.color
             : `linear-gradient(to bottom, ${zoneCategory?.color}80 0%, ${zoneCategory?.color}30 100%)`,
         }}
@@ -237,7 +241,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
                 className="w-full max-w-md p-6 rounded-lg shadow-lg"
                 style={{
                   backgroundColor: zoneCategory?.color,
-                  background: confirmed
+                  background: markGivenResult.includes(data?.ticketCode || '')
                     ? zoneCategory?.color
                     : `linear-gradient(to bottom, ${zoneCategory?.color}80 0%, ${zoneCategory?.color}30 100%)`,
                 }}
@@ -267,7 +271,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
                 className="w-full max-w-md p-6 rounded-lg shadow-lg"
                 style={{
                   backgroundColor: zoneCategory?.color,
-                  background: confirmed
+                  background: markGivenResult.includes(sister.ticketCode || '')
                     ? zoneCategory?.color
                     : `linear-gradient(to bottom, ${zoneCategory?.color}80 0%, ${zoneCategory?.color}30 100%)`,
                 }}
@@ -374,7 +378,7 @@ export default function CustomerCheckInPage() {
     setCheckedInData(undefined)
     setEmail('')
     setTicketCode('')
-    setTicketGivenConfirmed(false)
+
   }
 
   const handleTicketGiven = async () => {

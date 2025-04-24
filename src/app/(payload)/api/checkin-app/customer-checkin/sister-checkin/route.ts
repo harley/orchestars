@@ -94,8 +94,7 @@ export async function POST(request: Request) {
       }
 
       checkInRecords.push({
-        ticketCode: ticket.ticketCode,
-        seat: ticket.seat,
+        ticketCode: checkInRecord.ticketCode,
       })
     }
 
