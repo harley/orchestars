@@ -76,6 +76,7 @@ export default function ChooseEventPage() {
   const formatDateRange = (start: string, end: string) =>
     `${formatDate(start)} - ${formatDate(end)}`
 
+  // format date and time
   const formatDateAndTime = (isoDate: string, timeHHmm: string): string => {
     try {
       // Parse the ISO date
