@@ -41,6 +41,9 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
 
   const renderBanners = useCallback(
     (evt: Event, index: number) => {
+      const isUpcoming = evt.status === EVENT_STATUS.published_upcoming.value
+      const isNowShowing = evt.status === EVENT_STATUS.published_open_sales.value
+
       const Banner = (
         <>
           <div
@@ -76,7 +79,10 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
               }`}
             >
               <div className="container mx-auto px-6 pb-12 flex flex-col">
-                <h3 className="text-xl font-bold mb-4">{t('home.upcomingEvents')}</h3>
+                <h3 className="text-xl font-bold mb-4">
+                  {isUpcoming && t('home.upcomingEvents')}
+                  {isNowShowing && t('home.nowShowingEvents')}
+                </h3>
                 {evt.configuration?.showBannerTitle && (
                   <h2 className="line-clamp-2 text-4xl xl:text-5xl font-bold mb-4">{evt.title}</h2>
                 )}
