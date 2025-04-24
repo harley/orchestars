@@ -9,6 +9,7 @@ import { USER_PROMOTION_REDEMPTION_STATUS } from '@/collections/Promotion/consta
 import { ORDER_STATUS } from '@/collections/Orders/constants'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
 import { getExistingSeatHolding } from '@/app/(payload)/api/seat-holding/seat/utils'
+import { DISCOUNT_APPLY_SCOPE } from '@/collections/Promotion/constants'
 
 export const checkBookedOrPendingPaymentSeats = async ({
   eventId,
@@ -806,39 +807,83 @@ export const calculateTotalDiscountBookingTypeSeat = ({
       let totalAmountThatAppliedDiscount = 0
       let totalAmountNotThatAppliedDiscount = 0
 
-      for (const orderItem of orderItems) {
-        const ticketPriceInfo = event?.ticketPrices?.find(
-          (ticketPrice: any) => ticketPrice.id === orderItem.ticketPriceId,
-        )
+      const discountApplyScope =
+        promotion.discountApplyScope || DISCOUNT_APPLY_SCOPE.totalOrderValue.value
+      if (discountApplyScope === DISCOUNT_APPLY_SCOPE.perOrderItem.value) {
+        let amountBeforeDiscount = 0
+        for (const orderItem of orderItems) {
+          const ticketPriceInfo = event?.ticketPrices?.find(
+            (ticketPrice: any) => ticketPrice.id === orderItem.ticketPriceId,
+          )
 
-        // Apply to all tickets if appliedTicketClasses is empty
-        const appliedForTicket =
-          appliedTicketClasses.length === 0 ||
-          appliedTicketClasses.some((applied) => applied.ticketClass === ticketPriceInfo?.name)
-        const price = ticketPriceInfo?.price || 0
-        const quantity = 1 // for booking type seat, quantity always 1
-        if (appliedForTicket) {
-          totalAmountThatAppliedDiscount += price * quantity
-        } else {
-          totalAmountNotThatAppliedDiscount += price * quantity
+          // Apply to all tickets if appliedTicketClasses is empty
+          const appliedForTicket =
+            appliedTicketClasses.length === 0 ||
+            appliedTicketClasses.some((applied) => applied.ticketClass === ticketPriceInfo?.name)
+          const price = ticketPriceInfo?.price || 0
+          const quantity = 1 // for booking type seat, quantity always 1
+
+          let totalValueOrderItem = price * quantity
+
+          amountBeforeDiscount += totalValueOrderItem
+          if (appliedForTicket) {
+            if (promotion.discountType === 'percentage') {
+              totalValueOrderItem -= (totalValueOrderItem * promotion.discountValue) / 100
+            } else if (promotion.discountType === 'fixed_amount') {
+              totalValueOrderItem = totalValueOrderItem - promotion.discountValue
+            }
+
+            totalAmountThatAppliedDiscount += totalValueOrderItem
+          } else {
+            totalAmountNotThatAppliedDiscount += totalValueOrderItem
+          }
         }
-      }
 
-      const amountBeforeDiscount =
-        totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount
+        const amountAfterDiscount =
+          totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount
 
-      if (promotion.discountType === 'percentage') {
-        totalAmountThatAppliedDiscount -=
-          (totalAmountThatAppliedDiscount * promotion.discountValue) / 100
-      } else if (promotion.discountType === 'fixed_amount') {
-        totalAmountThatAppliedDiscount = totalAmountThatAppliedDiscount - promotion.discountValue
-      }
+        return {
+          amountBeforeDiscount,
+          amountAfterDiscount,
+        }
+      } else {
+        // default DISCOUNT_APPLY_SCOPE.totalOrderValue
+        for (const orderItem of orderItems) {
+          const ticketPriceInfo = event?.ticketPrices?.find(
+            (ticketPrice: any) => ticketPrice.id === orderItem.ticketPriceId,
+          )
 
-      const amountAfterDiscount = totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount
+          // Apply to all tickets if appliedTicketClasses is empty
+          const appliedForTicket =
+            appliedTicketClasses.length === 0 ||
+            appliedTicketClasses.some((applied) => applied.ticketClass === ticketPriceInfo?.name)
+          const price = ticketPriceInfo?.price || 0
+          const quantity = 1 // for booking type seat, quantity always 1
 
-      return {
-        amountBeforeDiscount,
-        amountAfterDiscount,
+          if (appliedForTicket) {
+            totalAmountThatAppliedDiscount += price * quantity
+          } else {
+            totalAmountNotThatAppliedDiscount += price * quantity
+          }
+        }
+
+        const amountBeforeDiscount =
+          totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount
+
+        if (promotion.discountType === 'percentage') {
+          totalAmountThatAppliedDiscount -=
+            (totalAmountThatAppliedDiscount * promotion.discountValue) / 100
+        } else if (promotion.discountType === 'fixed_amount') {
+          totalAmountThatAppliedDiscount = totalAmountThatAppliedDiscount - promotion.discountValue
+        }
+
+        const amountAfterDiscount =
+          totalAmountThatAppliedDiscount + totalAmountNotThatAppliedDiscount
+
+        return {
+          amountBeforeDiscount,
+          amountAfterDiscount,
+        }
       }
     } else {
       const amount = orderItems.reduce((total, item) => {

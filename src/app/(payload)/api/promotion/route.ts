@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
           startDate: true,
           endDate: true,
           conditions: true,
+          discountApplyScope: true,
         },
       })
       .then((res) => res.docs?.[0])
@@ -119,6 +120,7 @@ export async function GET(request: NextRequest, _context: any) {
           startDate: true,
           endDate: true,
           conditions: true,
+          discountApplyScope: true,
         },
       })
       .then((res) => res.docs)

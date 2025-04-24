@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label'
 import { Ticket } from 'lucide-react'
 import { Promotion } from '@/payload-types'
 import { useTranslate } from '@/providers/I18n/client'
+import { formatMoney } from '@/utilities/formatMoney'
 
 const PromotionList = ({
   promotions,
@@ -53,7 +54,11 @@ const PromotionList = ({
                   <p className="text-[12px] font-medium text-primary">
                     {promotion.discountType === 'percentage'
                       ? `${promotion.discountValue}% ${t('event.off')}`
-                      : `${t('event.currencySymbol')}${promotion.discountValue} ${t('event.off')}`}
+                      : `${formatMoney(promotion.discountValue, 'VND')} ${t('event.off')}`}
+                    {promotion.discountApplyScope === 'total_order_value' &&
+                      ` (${t('event.discountOnTotalOrderValue')})`}
+                    {promotion.discountApplyScope === 'per_order_item' &&
+                      ` (${t('event.discountOnPerOrderItem')})`}
                   </p>
                   {promotion.conditions?.minTickets && (
                     <p className="text-xs text-red-400">

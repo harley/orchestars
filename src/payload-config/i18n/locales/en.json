@@ -106,7 +106,9 @@
     "currencySymbol": "₫",
     "requiresMinimumTickets": "Requires a minimum of {{count}} tickets",
     "noPromotionsAvailable": "No promotions available",
-    "promotionNotMeetConditions": "Minimum conditions not met to apply promo code"
+    "promotionNotMeetConditions": "Minimum conditions not met to apply promo code",
+    "discountOnTotalOrderValue": "Apply on total order value",
+    "discountOnPerOrderItem": "Apply on each ticket in the order"
   },
   "seatSelection": {
     "booking": "Booking",
