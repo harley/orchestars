@@ -3,6 +3,7 @@ import { format as formatDate } from 'date-fns'
 import { categories } from '@/components/EventDetail/data/seat-maps/categories'
 import { formatMoney } from '@/utilities/formatMoney'
 import { Check } from 'lucide-react'
+import { useMemo, useState } from 'react'
 type SeatPanelProps = {
   loading?: boolean
   title: string
@@ -26,6 +27,15 @@ export const SeatPanel = ({
   seatType,
   event,
 }: SeatPanelProps) => {
+  const [searchSeat, setSearchSeat] = useState('')
+
+  const outputSeats = useMemo(() => {
+    if (!searchSeat) return seats
+    return seats.filter((seat) => {
+      const regex = new RegExp(searchSeat, 'i')
+      return regex.test(seat.seat || '')
+    })
+  }, [seats, searchSeat])
   return (
     <div className="seat-panel">
       <div className="seat-panel-title">{title}</div>
@@ -46,6 +56,18 @@ export const SeatPanel = ({
               </option>
             ))}
           </select>
+        </label>
+      </div>
+      <div className="seat-panel-section">
+        <label className="seat-label">
+          Search Seat
+          <input
+            type="text"
+            className="seat-select"
+            value={searchSeat}
+            onChange={(e) => setSearchSeat(e.target.value)}
+            placeholder="Enter seat ..."
+          />
         </label>
       </div>
       {selectedSeat && (
@@ -74,10 +96,10 @@ export const SeatPanel = ({
             {seatType === 'booked' ? 'Booked Seats' : 'Available Seats'}
           </label>
           <div className="seats-grid">
-            {seats.length === 0 ? (
+            {outputSeats.length === 0 ? (
               <div className="seats-empty">No seats</div>
             ) : (
-              seats.map((seat) => (
+              outputSeats.map((seat) => (
                 <button
                   type="button"
                   key={seat.id}
