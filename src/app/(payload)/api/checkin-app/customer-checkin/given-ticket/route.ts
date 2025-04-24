@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     const payload = await getPayload({ config })
     const isValidUsherId = (usherId: any) =>
       !isNaN(Number(usherId)) && Number(usherId) >= 0 && Number(usherId) <= 10
-    if (!adminId || !isValidUsherId(adminId)) {
+    if (!isValidUsherId(adminId)) {
       return NextResponse.json({ message: 'Admin not found' }, { status: 404 })
     }
 

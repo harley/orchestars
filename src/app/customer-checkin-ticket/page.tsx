@@ -127,7 +127,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
     try {
       setLoadingSisterTickets(true)
       const qsStr = new URLSearchParams({
-        ticketCode: encodeURIComponent(data?.ticketCode || ''),
+        ticketCode: data?.ticketCode || '',
       }).toString()
 
       const res = await fetch(`/api/checkin-app/customer-checkin/sister-checkin?${qsStr}`, {
