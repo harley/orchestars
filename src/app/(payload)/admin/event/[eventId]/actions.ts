@@ -4,9 +4,11 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { sql } from '@payloadcms/db-postgres/drizzle'
 import { Ticket } from './types'
-import { Event, OrderItem } from '@/payload-types'
+import { Event, OrderItem, User } from '@/payload-types'
 import { checkBookedOrPendingPaymentSeats } from '@/app/(payload)/api/bank-transfer/order/utils'
 import { getSeatHoldings as getCurrentSeatHoldings } from '@/app/(payload)/api/seat-holding/seat/utils'
+import { sendMailAndWriteLog } from '@/collections/Emails/utils'
+import { generateTicketBookEmailHtml } from '@/mail/templates/TicketBookedEmail'
 
 interface TicketCounts {
   [ticketPriceName: string]: {
@@ -284,6 +286,38 @@ export const swapSeats = async (
       })
     }
     await payload.db.commitTransaction(transactionID)
+
+    const sendUpdateMail = async () => {
+      if (updatedTicket.userEmail) {
+        const user = updatedTicket.user as User
+        const event = updatedTicket.event as Event
+        const html = await generateTicketBookEmailHtml({
+          ticketCode: updatedTicket.ticketCode || '',
+          eventName: event?.title || '',
+          eventDate: updatedTicket?.eventDate || '',
+          seat: updatedTicket.seat || '',
+        })
+
+        const resendMailData = {
+          to: updatedTicket.userEmail,
+          subject: `Update_${event?.title || ''}: Ticket Confirmation`,
+          cc: 'receipts@orchestars.vn',
+          html,
+        }
+
+        sendMailAndWriteLog({
+          payload: payload,
+          resendMailData,
+          emailData: {
+            user: user.id,
+            event: event?.id,
+            ticket: updatedTicket.id,
+          },
+        })
+      }
+    }
+
+    sendUpdateMail()
   } catch (error: any) {
     await payload.db.rollbackTransaction(transactionID)
 
