@@ -782,7 +782,7 @@ export interface CheckinRecord {
   checkInTime?: string | null;
   checkedInBy?: (number | null) | Admin;
   ticketGivenTime?: string | null;
-  ticketGivenBy?: (number | null) | Admin;
+  ticketGivenBy?: string | null;
   deletedAt?: string | null;
   updatedAt: string;
   createdAt: string;
