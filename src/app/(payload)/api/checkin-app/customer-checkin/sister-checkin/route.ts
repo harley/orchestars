@@ -3,7 +3,7 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { TICKET_STATUS } from '@/collections/Tickets/constants'
 import { Event, User } from '@/payload-types'
-import { getZoneInfo } from '../route'
+import { getZoneInfo } from '../utils'
 
 export async function POST(request: Request) {
   try {
