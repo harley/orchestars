@@ -10,8 +10,8 @@ import { Partner } from '@/types/Partner'
 import { Performer } from '@/types/Performer'
 import { Event } from '@/types/Event'
 import { Activity } from '@/payload-types'
-import NowShowingList from './components/NowShowingList'
 
+const NowShowingList = dynamic(() => import('./components/NowShowingList'))
 const PastConcerts = dynamic(() => import('./components/PastConcerts'))
 const PerformersSection = dynamic(() => import('./components/PerformersSection'))
 const Partners = dynamic(() => import('./components/Partners'))
