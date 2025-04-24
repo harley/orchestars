@@ -104,6 +104,14 @@ const CheckInResult: React.FC<CheckInResultProps> = ({ data, confirmed, onReset,
         body: JSON.stringify({ ticketCodes: selectedCodes, email: data?.email, adminId }),
       })
       const json = await res.json()
+      if (!res.ok) {
+        toast({
+          variant: 'destructive',
+          title: t('error.bulkMarkGivenFailed'),
+          description: json.message || t('error.bulkMarkGivenFailed'),
+        })
+        return
+      }
       toast({
         title: t('customerCheckinTicket.bulkMarkGivenSuccess'),
         description: json.message || t('customerCheckinTicket.markedSelectedTicketsAsGiven'),
