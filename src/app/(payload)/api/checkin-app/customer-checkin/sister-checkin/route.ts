@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getPayload } from 'payload'
-import config from '@/payload.config'
 import { TICKET_STATUS } from '@/collections/Tickets/constants'
 import { Event, User } from '@/payload-types'
 import { getZoneInfo } from '../utils'
+import { getPayload } from '@/payload-config/getPayloadConfig'
 
 export async function POST(request: Request) {
   try {
@@ -12,9 +11,7 @@ export async function POST(request: Request) {
     if (!email || !ticketCodeList || !Array.isArray(ticketCodeList)) {
       return NextResponse.json({ message: 'Email and ticket codes are required' }, { status: 400 })
     }
-
-    const payload = await getPayload({ config })
-
+    const payload = await getPayload()
     // Fetch tickets by code
     const tickets = await payload
       .find({
@@ -123,7 +120,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ data: { sisterTickets: [] } })
     }
 
-    const payload = await getPayload({ config })
+    const payload = await getPayload()
 
     const ticket = await payload
       .find({

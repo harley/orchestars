@@ -356,7 +356,10 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
                                       <input
                                         type="checkbox"
                                         checked={selectedCodes.includes(sister.ticketCode)}
-                                        onChange={(e) => toggleSelection(sister.ticketCode)}
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          toggleSelection(sister.ticketCode)
+                                        }}
                                         className="w-4 h-4 inline-flex cursor-pointer"
                                       />
                                     )}

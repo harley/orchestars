@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getPayload } from 'payload'
-import config from '@/payload.config'
+import { getPayload } from '@/payload-config/getPayloadConfig'
 import { TICKET_STATUS } from '@/collections/Tickets/constants'
 import { Event, User } from '@/payload-types'
 import { getZoneInfo } from './utils'
@@ -19,7 +18,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const payload = await getPayload({ config })
+    const payload = await getPayload()
 
     // Find ticket by code
     const ticket = await payload
@@ -33,7 +32,7 @@ export async function POST(request: Request) {
             equals: TICKET_STATUS.booked.value,
           },
         },
-        depth: 2,
+        depth: 1,
       })
       .then((res) => res.docs?.[0])
 
@@ -61,6 +60,7 @@ export async function POST(request: Request) {
     const existingCheckIn = await payload
       .find({
         collection: 'checkinRecords',
+        depth: 0,
         where: {
           ticketCode: {
             equals: ticketCode,
@@ -72,7 +72,6 @@ export async function POST(request: Request) {
     const eventRecord = ticket.event as Event
     const eventId = eventRecord?.id as number
     const userId = (ticket.user as User)?.id as number
-
     const eventDate = eventRecord?.schedules?.find(
       (schedule) => schedule.id === ticket.eventScheduleId,
     )?.date
@@ -101,6 +100,7 @@ export async function POST(request: Request) {
     // Create check-in record
     const checkInRecord = await payload.create({
       collection: 'checkinRecords',
+      depth: 0,
       data: {
         event: eventId,
         seat: ticket.seat!,

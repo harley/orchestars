@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getPayload } from 'payload'
-import config from '@/payload.config'
+import { getPayload } from '@/payload-config/getPayloadConfig'
 
 // Utility function to extract ID from relationship field
 const getRelationshipId = (field: any): number | null => {
@@ -22,7 +21,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const payload = await getPayload({ config })
+    const payload = await getPayload()
     const isValidUsherId = (usherId: any) =>
       !isNaN(Number(usherId)) && Number(usherId) >= 0 && Number(usherId) <= 10
     if (!isValidUsherId(adminId)) {
@@ -34,6 +33,8 @@ export async function POST(request: Request) {
       payload
         .find({
           collection: 'tickets',
+          depth: 0,
+          limit: ticketCodes.length,
           where: {
             ticketCode: { in: ticketCodes },
           },
@@ -50,6 +51,8 @@ export async function POST(request: Request) {
         .then((res) => res.docs),
       payload.find({
         collection: 'checkinRecords',
+        depth: 0,
+        limit: ticketCodes.length,
         where: {
           ticketCode: { in: ticketCodes },
           deletedAt: { equals: null },
@@ -87,6 +90,7 @@ export async function POST(request: Request) {
           payload.update({
             collection: 'checkinRecords',
             id: existingCheckin.id,
+            depth: 0,
             data: {
               ticketGivenTime: new Date().toISOString(),
               ticketGivenBy: adminId,
@@ -110,6 +114,7 @@ export async function POST(request: Request) {
         operations.push(
           payload.create({
             collection: 'checkinRecords',
+            depth: 0,
             data: {
               event: eventId,
               seat: ticket.seat,

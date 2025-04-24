@@ -1,20 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getPayload } from 'payload'
-import config from '@/payload.config'
 import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
-
+import { getPayload } from '@/payload-config/getPayloadConfig'
 
 export async function POST(req: NextRequest) {
   try {
-    const payload = await getPayload({ config })
+    const payload = await getPayload()
     const body = await req.json()
     const { email, password } = body
 
     if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 },
-      )
+      return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
     }
 
     const result = await payload.login({

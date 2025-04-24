@@ -89,6 +89,7 @@ export default function CustomerCheckInPage() {
     setCheckedInData(undefined)
     setEmail('')
     setTicketCode('')
+    setTicketGivenConfirmed(false)
   }
 
   const [loadingTicketGiven, setLoadingTicketGiven] = useState(false)
@@ -129,7 +130,6 @@ export default function CustomerCheckInPage() {
       setLoadingTicketGiven(false)
     }
   }
-
   if (checkedInData) {
     return (
       <CheckInResult
