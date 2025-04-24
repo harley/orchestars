@@ -2,7 +2,11 @@ import React, { useEffect, useState } from 'react'
 import './index.css'
 import { Event, Ticket } from '../../types'
 import { format as formatDate } from 'date-fns'
-import { getBookedSeatsByEventScheduleId, swapSeats } from '../../actions'
+import {
+  getBookedOrPendingPaymentOrHoldingSeats,
+  getBookedSeatsByEventScheduleId,
+  swapSeats,
+} from '../../actions'
 import DEFAULT_SEATS from '@/components/EventDetail/data/seat-maps/seats.json'
 
 type SeatPanelProps = {
@@ -130,13 +134,13 @@ const SeatSwapScheduler = ({ event }: { event: Event }) => {
     }
 
     const loadFreeSeats = async () => {
-      const bookedSeatsByRightEventSchId = await getBookedSeatsByEventScheduleId(
-        event.id as any,
-        rightEventScheduleId,
-      )
+      const bookedSeatsByRightEventSchId = await getBookedOrPendingPaymentOrHoldingSeats({
+        eventId: event.id as any,
+        eventScheduleId: rightEventScheduleId,
+      })
 
-      const arrStrBookedSeats = bookedSeatsByRightEventSchId.map((s) =>
-        String(s.seat).toUpperCase(),
+      const arrStrBookedSeats = bookedSeatsByRightEventSchId.map((seat) =>
+        String(seat).toUpperCase(),
       )
 
       const freeSeats: Partial<Ticket>[] = []
@@ -173,7 +177,12 @@ const SeatSwapScheduler = ({ event }: { event: Event }) => {
     setPending(true)
 
     try {
-      if (!leftSeatSelected || !rightSeatSelected) return
+      if (!leftSeatSelected) {
+        return alert('Please select a seat to swap from')
+      }
+      if (!rightSeatSelected) {
+        return alert('Please select a seat to swap to')
+      }
 
       await swapSeats(leftSeatSelected, {
         eventId: event.id as any,
