@@ -62,7 +62,7 @@ const NowShowingList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, clas
             <h2 className="text-2xl md:text-4xl font-bold uppercase">
               {t('home.nowShowingEvents')}
             </h2>
-            {nowShowingEvents.length && (
+            {nowShowingEvents.length > 1 && (
               <div className="flex space-x-4">
                 <CarouselPrevious className="relative inset-0 translate-y-0 bg-black/30 hover:bg-black/80 hover:text-white text-white rounded-full h-10 w-10" />
                 <CarouselNext className="relative inset-0 translate-y-0 bg-black/30 hover:bg-black/80 hover:text-white text-white rounded-full h-10 w-10" />
