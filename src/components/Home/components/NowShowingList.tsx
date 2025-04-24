@@ -54,6 +54,8 @@ const NowShowingList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, clas
     }
   }, [])
 
+  if (nowShowingEvents.length === 0) return null
+
   return (
     <section className={`py-10 md:py-20 ${className || ''}`}>
       <Carousel className="w-full relative">
@@ -62,7 +64,7 @@ const NowShowingList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, clas
             <h2 className="text-2xl md:text-4xl font-bold uppercase">
               {t('home.nowShowingEvents')}
             </h2>
-            {nowShowingEvents.length && (
+            {nowShowingEvents.length > 1 && (
               <div className="flex space-x-4">
                 <CarouselPrevious className="relative inset-0 translate-y-0 bg-black/30 hover:bg-black/80 hover:text-white text-white rounded-full h-10 w-10" />
                 <CarouselNext className="relative inset-0 translate-y-0 bg-black/30 hover:bg-black/80 hover:text-white text-white rounded-full h-10 w-10" />
@@ -83,7 +85,7 @@ const NowShowingList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, clas
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* Image section */}
-                  <div className="relative rounded-lg overflow-hidden w-full h-[250px] sm:h-[600px] lg:h-[890px] shadow-md">
+                  <div className="relative rounded-lg overflow-hidden w-full h-[250px] md:h-[600px] lg:h-[700px] xl:h-[890px] shadow-md">
                     <Image
                       fill
                       sizes="(max-width:768px) 100vw, 50vw"
