@@ -215,11 +215,13 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
               </svg>
             </div>
+
             <h2 className="text-2xl font-bold">
               {confirmed
                 ? t('customerCheckinTicket.confirmedSuccessfully')
                 : t('customerCheckinTicket.checkInSuccessful')}
             </h2>
+
             <div className="space-y-2 text-gray-600">
               <div className="flex items-center justify-between p-2 rounded bg-gray-50">
                 <span className="font-medium">{t('customerCheckinTicket.zone')}</span>
@@ -255,6 +257,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
               )}
             </div>
           </div>
+
           <div className="mt-4 text-center space-y-2 rounded-lg">
             <div className=" flex flex-col space-y-2">
               {!confirmed && (
@@ -298,6 +301,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
             </Button>
           </div>
         )}
+
         <div className="flex flex-row space-x-2">
           {bulkMode === 'given' && (
             <Button
@@ -313,6 +317,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
             </Button>
           )}
         </div>
+
         {loadingSisterTickets ? (
           <div>Loading...</div>
         ) : (
