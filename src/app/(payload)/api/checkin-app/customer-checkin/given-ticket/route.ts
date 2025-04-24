@@ -38,6 +38,7 @@ export async function POST(request: Request) {
             ticketCode: { in: ticketCodes },
           },
           select: {
+            id: true,
             event: true,
             eventDate: true,
             eventScheduleId: true,
