@@ -210,7 +210,7 @@ const SeatSwapScheduler = ({ event }: { event: Event }) => {
       <div className="scheduler-main">
         <SeatPanel
           loading={loadingLeftSeat}
-          title="From (Your Booked Seat)"
+          title={`From (Booked Seats: ${bookedSeats?.length || 0})`}
           eventScheduleId={leftEventScheduleId}
           selectedSeat={leftSeatSelected}
           seats={bookedSeats}
@@ -221,7 +221,7 @@ const SeatSwapScheduler = ({ event }: { event: Event }) => {
         />
         <div className="scheduler-divider" />
         <SeatPanel
-          title="To (Swap With Free Seat)"
+          title={`To (Swap With Free Seat: ${freeSeats?.length || 0})`}
           eventScheduleId={rightEventScheduleId}
           selectedSeat={rightSeatSelected}
           seats={freeSeats}
