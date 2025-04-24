@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
-
 import { Clock3, CheckCircle, XCircle, Key } from 'lucide-react'
 import { format } from 'date-fns'
+import { useTranslate } from '@/providers/I18n/client'
 
 interface Ticket {
   ticketCode: string
@@ -27,6 +27,7 @@ export default function ValidatePage() {
   const router = useRouter()
   const { isHydrated, token, setToken } = useAuth()
   const searchParams = useSearchParams()
+  const { t } = useTranslate()
 
   const eventId = searchParams?.get('eventId')
   const scheduleId = searchParams?.get('scheduleId')
@@ -64,11 +65,11 @@ export default function ValidatePage() {
 
   const handleCheckIn = async () => {
     if (!ticketCode.trim()) {
-      alert('Please enter a ticket code')
+      alert(t('checkin.pleaseEnterTicketCode'))
       return
     }
     if (!token) {
-      alert('Please login first')
+      alert(t('checkin.pleaseLoginFirst'))
       router.push('/checkin')
       return
     }
@@ -92,23 +93,22 @@ export default function ValidatePage() {
         return
       }
       if (response.status === 409) {
-        alert('This ticket has already been checked in')
+        alert(t('checkin.ticketAlreadyCheckedIn'))
         const minimalTicket = {
           ticketCode: data.ticket.ticketCode,
           attendeeName: data.ticket.attendeeName,
           phoneNumber: data.ticket.phoneNumber,
           seat: data.ticket.seat,
-          ticketPriceInfo:
-          {
+          ticketPriceInfo: {
             key: data.ticket.ticketPriceInfo.key,
             name: data.ticket.ticketPriceInfo.name,
           },
           email: data.ticket.email,
           isCheckedIn: true,
         }
-        
+
         const encodedTK = encodedTicket(minimalTicket)
-        
+
         const encodedCheckinRecord = encodeURIComponent(
           JSON.stringify({
             checkInTime: formatDate(data.ticket.checkinRecord.checkInTime),
@@ -117,14 +117,14 @@ export default function ValidatePage() {
             },
           })
         )
-        
+
         router.push(
           `/checkin/ticket-details?ticket=${encodedTK}&checkinRecord=${encodedCheckinRecord}`
         )
-        return        
+        return
       }
       if (response.status === 404) {
-        alert(data.error || 'Ticket not found')
+        alert(data.error || t('checkin.ticketNotFound'))
         return
       }
 
@@ -132,7 +132,7 @@ export default function ValidatePage() {
 
       router.push(`/checkin/ticket-details?ticket=${encodedTK}`)
     } catch (error: any) {
-      alert(error.message || 'Failed to check in')
+      alert(error.message || t('error.failedToCheckIn'))
     } finally {
       setIsLoading(false)
     }
@@ -156,13 +156,13 @@ export default function ValidatePage() {
           onClick={() => router.replace('/checkin/events')}
           className="mb-4 px-4 py-2 rounded-lg border-2 border-gray-900 text-gray-900 hover:bg-orange-50 transition"
         >
-          Back
+          {t('checkin.back')}
         </button>
 
         <input
           type="text"
           className="w-full border border-gray-300 rounded-lg p-3 mb-4"
-          placeholder="Enter ticket code/Seat"
+          placeholder={t('checkin.enterTicketCodeOrSeat')}
           value={ticketCode}
           onChange={(e) => setTicketCode(e.target.value)}
         />
@@ -174,7 +174,7 @@ export default function ValidatePage() {
             isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-black'
           }`}
         >
-          {isLoading ? 'Validating...' : 'Validate Ticket'}
+          {isLoading ? t('checkin.validating') : t('checkin.validateTicket')}
         </button>
 
         <div className="flex justify-end mt-4">
@@ -182,13 +182,13 @@ export default function ValidatePage() {
             onClick={() => router.push('/checkin/history')}
             className="flex items-center gap-1 text-orange-600 hover:underline"
           >
-            <Clock3 size={16} /> View History
+            <Clock3 size={16} /> {t('checkin.viewHistory')}
           </button>
         </div>
 
         {multipleTickets.length > 0 && (
           <div className="mt-6">
-            <h2 className="text-lg font-bold mb-3">Multiple Tickets Found</h2>
+            <h2 className="text-lg font-bold mb-3">{t('checkin.multipleTicketsFoundLabel')}</h2>
             <div className="space-y-4">
               {multipleTickets?.map((ticket, index) => (
                 <div
@@ -208,31 +208,34 @@ export default function ValidatePage() {
                       }`}
                     >
                       {ticket.isCheckedIn ? <XCircle size={16} /> : <CheckCircle size={16} />}
-                      {ticket.isCheckedIn ? 'Used' : 'Valid'}
+                      {ticket.isCheckedIn ? t('checkin.used') : t('checkin.valid')}
                     </span>
                   </div>
                   <div className="text-sm text-gray-700">
                     <p>
-                      <strong>Event:</strong> {eventTitle} — {eventLocation}
+                      <strong>{t('checkin.event')}</strong> {eventTitle} — {eventLocation}
                     </p>
                     <p>
-                      <strong>Schedule:</strong> {scheduleDate}
+                      <strong>{t('checkin.schedule')}</strong> {scheduleDate}
                     </p>
                     <p>
-                      <strong>Seat:</strong> {ticket.seat || 'N/A'}
+                      <strong>{t('checkin.seat')}</strong> {ticket.seat || 'N/A'}
                     </p>
                     <p>
-                      <strong>Email:</strong> {ticket.email}
+                      <strong>{t('checkin.emailLabel')}</strong> {ticket.email}
                     </p>
                     <p>
-                      <strong>Phone Number:</strong> {ticket.phoneNumber}
+                      <strong>{t('checkin.phoneNumber')}</strong> {ticket.phoneNumber}
                     </p>
                     <p>
-                      <strong>Ticket Price Info:</strong> {ticket.ticketPriceInfo}
+                      <strong>{t('checkin.ticketPriceInfoLabel')}</strong>{' '}
+                      {typeof ticket.ticketPriceInfo === 'string'
+                        ? ticket.ticketPriceInfo
+                        : ticket.ticketPriceInfo.name}
                     </p>
                     {ticket.isCheckedIn && ticket.checkinRecord && (
                       <p>
-                        <strong>Checked in:</strong>{' '}
+                        <strong>{t('checkin.checkedIn')}</strong>{' '}
                         {ticket.checkinRecord.checkInTime.split('T')[0]}
                       </p>
                     )}

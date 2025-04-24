@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
 import { Clock3, X } from 'lucide-react'
+import { useTranslate } from '@/providers/I18n/client'
 
 interface CheckinRecord {
   id: string
@@ -21,9 +22,10 @@ export default function HistoryPage() {
   const router = useRouter()
   const { isHydrated, token, setToken } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
+  const { t } = useTranslate()
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this record?')) return
+    if (!confirm(t('checkin.confirmDeleteRecord'))) return
     try {
       const response = await fetch(`/api/checkin-app/checkin/${id}/delete-checkin`, {
         method: 'POST',
@@ -33,15 +35,16 @@ export default function HistoryPage() {
       })
       if (!response.ok) {
         const error = await response.json()
-        alert(error.message || 'Failed to delete record')
+        alert(error.message || t('checkin.failedToDeleteRecord'))
         return
       }
       setCheckins((prev) => prev.filter((item) => item.id !== id))
-      alert('Record deleted successfully')
+      alert(t('checkin.recordDeletedSuccessfully'))
     } catch (_err) {
-      alert('Failed to delete record')
+      alert(t('checkin.failedToDeleteRecord'))
     }
   }
+
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -60,13 +63,14 @@ export default function HistoryPage() {
         setCheckins(data.records || [])
       } catch (err) {
         console.error('Failed to load history', err)
+        alert(t('error.failedToLoadHistory'))
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchHistory()
-  }, [token])
+  }, [token, t])
 
   const filteredCheckins = checkins.filter((item) => {
     const matchesSearch =
@@ -76,20 +80,19 @@ export default function HistoryPage() {
     return matchesSearch
   })
 
-
   useEffect(() => {
     if (!isHydrated) return
     if (!token) {
       router.replace('/checkin')
       return
     }
-
   }, [isHydrated, token, router])
+
   return (
     <div className="min-h-screen bg-white pt-16 px-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Check-In History</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('checkin.checkInHistory')}</h1>
         <button
           onClick={() => router.back()}
           className="w-9 h-9 rounded-full border border-gray-900 flex items-center justify-center"
@@ -101,7 +104,7 @@ export default function HistoryPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
         <input
           type="text"
-          placeholder="Search by ticket code or seat..."
+          placeholder={t('checkin.searchByTicketCodeOrSeat')}
           className="w-full md:w-1/2 border border-gray-300 rounded-full px-4 py-2 text-sm"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -112,7 +115,7 @@ export default function HistoryPage() {
         onClick={() => router.back()}
         className="mb-4 px-4 py-3 rounded-xl border-2 border-gray-900 text-gray-900 hover:bg-gray-100 transition"
       >
-        Back
+        {t('checkin.back')}
       </button>
 
       {/* History List */}
@@ -120,10 +123,10 @@ export default function HistoryPage() {
         {isLoading ? (
           <div className="text-center mt-20 text-gray-900">
             <Clock3 className="mx-auto mb-3 animate-spin" size={32} />
-            <p>Loading check-in history...</p>
+            <p>{t('checkin.loadingCheckInHistory')}</p>
           </div>
         ) : filteredCheckins?.length === 0 ? (
-          <p className="text-center text-gray-400 mt-16">No records found</p>
+          <p className="text-center text-gray-400 mt-16">{t('checkin.noRecordsFound')}</p>
         ) : (
           filteredCheckins?.map((item) => (
             <div
@@ -138,16 +141,20 @@ export default function HistoryPage() {
                   {item.ticketCode} — {item.attendeeName}
                 </h3>
                 <p className="text-sm text-gray-600">{item.eventTitle}</p>
-                <p className="text-sm text-gray-600">Seat: {item.ticket?.seat || 'N/A'}</p>
                 <p className="text-sm text-gray-600">
-                  Checked in: {item.checkInTime?.split('T')[0]}
+                  {t('checkin.seat')} {item.ticket?.seat || 'N/A'}
                 </p>
-                <p className="text-sm text-gray-600">Checked in by: {item.checkedInBy?.email}</p>
+                <p className="text-sm text-gray-600">
+                  {t('checkin.checkedIn')} {item.checkInTime?.split('T')[0]}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {t('checkin.by')} {item.checkedInBy?.email}
+                </p>
                 <button
                   className="mt-2 text-sm text-red-500 hover:underline outline-red-500"
                   onClick={() => handleDelete(item.ticketCode)}
                 >
-                  <X className="inline-block mr-1" size={16} /> Delete
+                  <X className="inline-block mr-1" size={16} /> {t('checkin.delete')}
                 </button>
               </div>
             </div>
