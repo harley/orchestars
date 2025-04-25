@@ -193,7 +193,7 @@
     "unexpectedError": "Lỗi không xác định"
   },
   "checkin": {
-    "welcomeBack": "Chào mừng trở lại",
+    "adminCheckIn": "Admin Soát Vé",
     "signInToContinue": "Đăng nhập để tiếp tục",
     "email": "Email",
     "enterYourEmail": "Nhập email của bạn",

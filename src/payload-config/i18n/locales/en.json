@@ -193,7 +193,7 @@
     "unexpectedError": "Unexpected error"
   },
   "checkin": {
-    "welcomeBack": "Welcome Back",
+    "adminCheckIn": "Admin Check-In",
     "signInToContinue": "Sign in to continue",
     "email": "Email",
     "enterYourEmail": "Enter your email",
