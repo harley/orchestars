@@ -288,6 +288,8 @@
     "markedSelectedTicketsAsGiven": "Successful marked selected tickets as given",
     "confirmTicketGiven": "Confirm this ticket has been given by admin \"{{adminId}}\"?",
     "confirmed": "Confirmed successfully",
-    "success": "Success"
+    "success": "Success",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All"
   }
 }
