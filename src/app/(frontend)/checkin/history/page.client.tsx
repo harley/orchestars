@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
 import { Clock3, X } from 'lucide-react'
 import { useTranslate } from '@/providers/I18n/client'
-import { getCheckinHistory } from '../actions'
+import { getCheckinHistory, getCheckinHistoryCached } from '../actions'
 
 interface CheckinRecord {
   id: string
@@ -19,7 +19,7 @@ interface CheckinRecord {
 
 export default function HistoryClientPage({ history = [] }: { history: CheckinRecord[] }) {
   const [checkins, setCheckins] = useState<CheckinRecord[]>(history)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { isHydrated, token, setToken } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
@@ -54,27 +54,27 @@ export default function HistoryClientPage({ history = [] }: { history: CheckinRe
     }
   }
 
-  useEffect(() => {
-    if (!token) return
+  // useEffect(() => {
+  //   if (!token) return
 
-    const fetchHistory = async () => {
-      try {
-        const response = await getCheckinHistory({ token })
+  //   const fetchHistory = async () => {
+  //     try {
+  //       const response = await getCheckinHistoryCached({ token })()
 
-        if (!response || response.status === 401) return
+  //       if (!response || response.status === 401) return
 
-        const data = await response.json()
-        setCheckins(data.records || [])
-      } catch (err) {
-        console.error('Failed to load history', err)
-        alert(t('error.failedToLoadHistory'))
-      } finally {
-        setIsLoading(false)
-      }
-    }
+  //       const data = await response.json()
+  //       setCheckins(data.records || [])
+  //     } catch (err) {
+  //       console.error('Failed to load history', err)
+  //       alert(t('error.failedToLoadHistory'))
+  //     } finally {
+  //       setIsLoading(false)
+  //     }
+  //   }
 
-    fetchHistory()
-  }, [token, t, setToken])
+  //   fetchHistory()
+  // }, [token, t, setToken])
 
   const filteredCheckins = checkins.filter((item) => {
     const matchesSearch =

@@ -1,20 +1,39 @@
+import { getPayload } from '@/payload-config/getPayloadConfig'
 import { unstable_cache } from 'next/cache'
+import type { CheckinRecord } from '@/payload-types'
 
-export async function getCheckinHistory({ token }: { token: string | null }) {
-  console.log(
-    `>>> Fetching checkin history for token: ${token ? token.substring(0, 10) + '...' : 'null'}`,
-  )
+export async function getCheckinHistory({
+  token,
+}: {
+  token: string | null
+}): Promise<CheckinRecord[] | null> {
+  if (!token) {
+    console.error('Error: No token provided for getCheckinHistory')
+    return null
+  }
+
   try {
-    const response = await fetch(`/api/checkin-app/history-checkin-record`, {
-      headers: {
-        Authorization: `JWT ${token}`,
+    const payload = await getPayload()
+
+    const oneDayAgo = new Date()
+    oneDayAgo.setDate(oneDayAgo.getDate() - 1)
+
+    const result = await payload.find({
+      collection: 'checkinRecords',
+      where: {
+        createdAt: {
+          greater_than: oneDayAgo.toISOString(),
+        },
+        deletedAt: { equals: null },
       },
+      sort: '-createdAt',
+      limit: 100,
+      depth: 1,
     })
 
-    return response
+    return result.docs as CheckinRecord[]
   } catch (error) {
-    console.error('Error while fetching event detail', error)
-
+    console.error('Error fetching check-in history directly:', error)
     return null
   }
 }
@@ -25,6 +44,6 @@ export const getCheckinHistoryCached = ({ token }: { token: string | null }) =>
     ['checkin-history', token ?? 'no-token'],
     {
       tags: [`checkin-history`],
-      revalidate: 86400, // 24 hours
+      revalidate: 86400,
     },
   )
