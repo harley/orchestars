@@ -331,9 +331,6 @@ const SeatAssignment: React.FC<Props> = ({ event }) => {
         }}
       >
         <div style={{ flex: 1 }}>
-          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-            {event.title}
-          </h1>
           <div className="space-y-4">
             <div>
               <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Dates</h2>

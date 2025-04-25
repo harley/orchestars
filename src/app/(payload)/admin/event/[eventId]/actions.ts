@@ -1,6 +1,6 @@
 'use server'
 
-import { getPayload } from 'payload'
+import { getPayload } from '@/payload-config/getPayloadConfig'
 import config from '@/payload.config'
 import { sql } from '@payloadcms/db-postgres/drizzle'
 import { Ticket } from './types'
@@ -18,9 +18,7 @@ interface TicketCounts {
 
 export async function getTicketsForSchedule(eventId: string, scheduleId: string) {
   try {
-    const payload = await getPayload({
-      config,
-    })
+    const payload = await getPayload()
 
     const result = await payload.db.drizzle.execute(sql`
       SELECT 
@@ -64,9 +62,7 @@ export async function getTicketsForSchedule(eventId: string, scheduleId: string)
 
 export async function assignSeatToTicket(ticketId: string, seat: string | null) {
   try {
-    const payload = await getPayload({
-      config,
-    })
+    const payload = await getPayload()
 
     await payload.update({
       collection: 'tickets',
@@ -84,9 +80,7 @@ export async function assignSeatToTicket(ticketId: string, seat: string | null) 
 }
 
 export async function getBookedTicketsCounts(eventId: string): Promise<TicketCounts> {
-  const payload = await getPayload({
-    config,
-  })
+  const payload = await getPayload()
 
   const result = await payload.db.drizzle.execute(sql`
     SELECT 
@@ -122,9 +116,7 @@ export const getSeatHoldings = async (eventId: string, scheduleId: string) => {
   'use server'
 
   try {
-    const payload = await getPayload({
-      config,
-    })
+    const payload = await getPayload()
 
     const now = new Date().toISOString()
     const res = await payload.find({
@@ -164,9 +156,7 @@ export const getSeatHoldings = async (eventId: string, scheduleId: string) => {
 
 export const getBookedSeatsByEventScheduleId = async (eventId: number, eventScheduleId: string) => {
   try {
-    const payload = await getPayload({
-      config,
-    })
+    const payload = await getPayload()
 
     const result = await payload.db.drizzle.execute(sql`
       SELECT 
@@ -199,9 +189,7 @@ export const getBookedOrPendingPaymentOrHoldingSeats = async ({
   eventId: number
   eventScheduleId: string
 }) => {
-  const payload = await getPayload({
-    config,
-  })
+  const payload = await getPayload()
 
   const unavailableSeats = await checkBookedOrPendingPaymentSeats({
     eventId: Number(eventId),
@@ -222,9 +210,7 @@ export const swapSeats = async (
   originalTicket: Ticket,
   changedData: { seat: string; eventId: number; eventScheduleId: string; ticketPriceId: string },
 ) => {
-  const payload = await getPayload({
-    config,
-  })
+  const payload = await getPayload()
   const existOriginalTicket = await payload.findByID({
     collection: 'tickets',
     id: originalTicket.id,
@@ -324,5 +310,170 @@ export const swapSeats = async (
     await payload.db.rollbackTransaction(transactionID)
 
     throw new Error(error?.message)
+  }
+}
+
+export async function getCheckinStats(eventId: string, selectedDate?: string) {
+  const payload = await getPayload()
+  const db = payload.db
+
+  const dateFilter = selectedDate ? sql`AND t.event_schedule_id = ${selectedDate}` : sql``
+
+  const basicStats = await db.drizzle.execute<{
+    total_booked: number
+    total_checkins: number
+    given_tickets: number
+    admin_checkins: number
+    self_checkins: number
+    self_checkins_without_tickets: number
+    self_checkins_with_tickets: number
+  }>(sql`
+    WITH ticket_stats AS (
+      SELECT COUNT(*) as total_booked
+      FROM tickets t
+      INNER JOIN orders ord ON ord.id = t.order_id
+      WHERE t.event_id = ${eventId}::int
+      AND t.status = 'booked'
+      ${dateFilter}
+    ),
+    checkin_stats AS (
+      SELECT 
+        COUNT(*) as total_checkins,
+        COUNT(CASE WHEN ticket_given_time IS NOT NULL THEN 1 END) as given_tickets,
+        COUNT(CASE WHEN checked_in_by_id IS NOT NULL THEN 1 END) as admin_checkins,
+        COUNT(CASE WHEN checked_in_by_id IS NULL THEN 1 END) as self_checkins
+      FROM checkin_records cr
+      INNER JOIN tickets t ON t.id = cr.ticket_id
+      WHERE cr.event_id = ${eventId}::int
+      AND cr.deleted_at IS NULL
+      AND t.status = 'booked'
+      ${dateFilter}
+    )
+    SELECT 
+      ts.total_booked,
+      cs.total_checkins,
+      cs.given_tickets,
+      cs.admin_checkins,
+      cs.self_checkins,
+      cs.self_checkins - cs.given_tickets as self_checkins_without_tickets,
+      cs.self_checkins - (cs.self_checkins - cs.given_tickets) as self_checkins_with_tickets
+    FROM ticket_stats ts
+    CROSS JOIN checkin_stats cs
+  `)
+
+  const zoneStats = await db.drizzle.execute<{ zone: string; checked_in: number }>(sql`
+    WITH zone_counts AS (
+      SELECT 
+        COALESCE(ticket_price_info->>'zone', 'Unknown') as zone,
+        COUNT(*) as total_in_zone,
+        COUNT(CASE WHEN cr.id IS NOT NULL AND cr.deleted_at IS NULL THEN 1 END) as checked_in
+      FROM tickets t
+      INNER JOIN orders ord ON ord.id = t.order_id
+      LEFT JOIN checkin_records cr ON t.id = cr.ticket_id
+      WHERE t.event_id = ${eventId}::int
+      AND t.status = 'booked'
+      ${dateFilter}
+      GROUP BY ticket_price_info->>'zone'
+    )
+    SELECT 
+      zone,
+      total_in_zone,
+      checked_in,
+      total_in_zone - checked_in as remaining
+    FROM zone_counts
+    ORDER BY zone
+  `)
+
+  const event = await db.drizzle.execute<{ title: string; date: string }>(sql`
+    SELECT el.title, e.start_datetime as date
+    FROM events e
+    LEFT JOIN events_locales el ON el._parent_id = e.id AND el._locale = 'vi'
+    WHERE e.id = ${eventId}::int
+  `)
+
+  // Transform zone stats into a Record<string, number> format
+  const checkinsByZone = zoneStats.rows.reduce(
+    (acc, zone) => {
+      acc[zone.zone] = zone.checked_in
+      return acc
+    },
+    {} as Record<string, number>,
+  )
+
+  const stats = {
+    totalTickets: Number(basicStats.rows[0]?.total_booked) || 0,
+    totalCheckins: Number(basicStats.rows[0]?.total_checkins) || 0,
+    checkinsLast30Min: 0, // TODO: Add this stat if needed
+    checkinsByZone,
+    selfCheckins: Number(basicStats.rows[0]?.self_checkins) || 0,
+    adminCheckins: Number(basicStats.rows[0]?.admin_checkins) || 0,
+    avgCheckinTime: null, // TODO: Add this stat if needed
+  }
+
+  return {
+    event: event.rows[0],
+    currentTime: new Date().toISOString(),
+    ...stats,
+  }
+}
+
+export async function getEvent(eventId: string): Promise<Event> {
+  const payload = await getPayload()
+
+  const payloadEvent = await payload
+    .find({
+      collection: 'events',
+      where: {
+        slug: {
+          equals: eventId,
+        },
+      },
+      depth: 2,
+      limit: 1,
+    })
+    .then((res) => res.docs[0])
+
+  if (!payloadEvent) {
+    throw new Error('Event not found')
+  }
+
+  // Convert PayloadEvent to Event
+  return {
+    id: String(payloadEvent.id),
+    slug: payloadEvent.slug || null,
+    title: payloadEvent.title || null,
+    description: payloadEvent.description || null,
+    startDatetime: payloadEvent.startDatetime || null,
+    endDatetime: payloadEvent.endDatetime || null,
+    eventLocation: payloadEvent.eventLocation || null,
+    schedules: payloadEvent.schedules
+      ?.filter((schedule) => schedule.date)
+      .map((schedule) => ({
+        id: String(schedule.id),
+        date: schedule.date!,
+        details: schedule.details
+          ?.filter((detail) => detail.time && detail.name && detail.description)
+          .map((detail) => ({
+            time: detail.time!,
+            name: detail.name!,
+            description: detail.description!,
+          })),
+      })),
+    ticketPrices: payloadEvent.ticketPrices
+      ?.filter(
+        (ticket) =>
+          ticket.name &&
+          ticket.key &&
+          typeof ticket.price === 'number' &&
+          ticket.currency &&
+          typeof ticket.quantity === 'number',
+      )
+      .map((ticket) => ({
+        name: ticket.name!,
+        key: ticket.key!,
+        price: ticket.price!,
+        currency: ticket.currency!,
+        quantity: ticket.quantity!,
+      })),
   }
 }

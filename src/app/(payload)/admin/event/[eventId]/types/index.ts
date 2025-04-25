@@ -1,10 +1,11 @@
 export interface Event {
   id: string
-  title: string
-  description: string
-  startDatetime: string
-  endDatetime: string
-  eventLocation: string
+  slug: string | null
+  title: string | null
+  description: string | null
+  startDatetime: string | null
+  endDatetime: string | null
+  eventLocation: string | null
   schedules?: Array<{
     id: string
     date: string
