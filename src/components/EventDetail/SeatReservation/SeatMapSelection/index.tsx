@@ -202,7 +202,7 @@ const SeatMapSelection = ({
       <section className="py-12 bg-gray-100">
         <div className="container mx-auto px-4">
           <div className="w-full">
-            <h2 className="text-2xl md:text-4xl mb-4 font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent uppercase">
+            <h2 className="text-2xl md:text-4xl mb-4 font-bold uppercase">
               {t('seatSelection.booking')}
             </h2>
 
@@ -222,7 +222,7 @@ const SeatMapSelection = ({
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="w-full">
-            <h2 className="text-2xl md:text-4xl mb-4 font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent uppercase">
+            <h2 className="text-2xl md:text-4xl mb-4 font-bold uppercase">
               {t('seatSelection.stageMap')}
             </h2>
 

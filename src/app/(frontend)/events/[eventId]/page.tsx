@@ -14,9 +14,7 @@ import { checkBookedOrPendingPaymentSeats } from '@/app/(payload)/api/bank-trans
 import { getSeatHoldings } from '@/app/(payload)/api/seat-holding/seat/utils'
 import { cookies } from 'next/headers'
 import { getLocale } from '@/providers/I18n/server'
-import { RichText as RichTextConverter } from '@payloadcms/richtext-lexical/react'
-import { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
-import TicketSelection from '@/components/EventDetail/TicketSelection/Component.client'
+import About from '@/components/EventDetail/About'
 import Partners from '@/components/Home/components/Partners'
 import { getPartnersCached } from '@/components/Home/actions'
 import { Partner } from '@/types/Partner'
@@ -81,21 +79,10 @@ const EventDetailPage = async (props: {
           <EventBanner event={eventDetail} />
 
           {/* About Section */}
-          <section className="py-12">
-            <div className="container mx-auto px-4">
-              <h2 className="text-2xl md:text-4xl font-bold mb-8 uppercase">About</h2>
-
-              <RichTextConverter data={eventDetail.detailDescription as SerializedEditorState} />
-            </div>
-          </section>
+          <About eventDetail={eventDetail} />
 
           {/* Ticket Section */}
           {isUpcoming && <UpcomingSaleBanner />}
-
-          {/* {isOpenForSales && (
-            <TicketSelection event={eventDetail} unavailableSeats={unavailableSeats} />
-          )} */}
-
           {isOpenForSales && (
             <SeatReservationClient
               event={eventDetail}

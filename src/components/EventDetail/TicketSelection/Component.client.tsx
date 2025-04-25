@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Event } from '@/payload-types'
 import { useTranslate } from '@/providers/I18n/client'
 import { format as dateFnsFormat } from 'date-fns'
