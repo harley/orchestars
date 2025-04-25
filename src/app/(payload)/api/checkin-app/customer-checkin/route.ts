@@ -17,13 +17,12 @@ export async function POST(request: Request) {
         { status: 400 },
       )
     }
-
     const payload = await getPayload()
-
     // Find ticket by code
     const ticket = await payload
       .find({
         collection: 'tickets',
+        limit: 1,
         where: {
           ticketCode: {
             equals: ticketCode,
@@ -35,7 +34,6 @@ export async function POST(request: Request) {
         depth: 1,
       })
       .then((res) => res.docs?.[0])
-
     // Validate ticket exists
     if (!ticket) {
       return NextResponse.json(
@@ -55,12 +53,12 @@ export async function POST(request: Request) {
         { status: 400 },
       )
     }
-
     // Check if ticket is already checked in by looking up check-in records
     const existingCheckIn = await payload
       .find({
         collection: 'checkinRecords',
         depth: 0,
+        limit: 1,
         where: {
           ticketCode: {
             equals: ticketCode,
@@ -112,7 +110,6 @@ export async function POST(request: Request) {
         checkInTime: new Date().toISOString(),
       },
     })
-
     // Get zone information using the helper function
 
     // Return success response

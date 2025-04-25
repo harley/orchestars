@@ -28,6 +28,23 @@ export async function GET() {
         equals: 'published_open_sales',
       },
     },
+    limit: 50, // Add pagination limit
+    select: {
+      id: true,
+      title: true,
+      eventLocation: true,
+      startDatetime: true,
+      endDatetime: true,
+      schedules: {
+        id: true,
+        date: true,
+        details: {
+          time: true,
+          name: true,
+          description: true,
+        },
+      },
+    },
   })
 
   if (!events.docs?.length) {

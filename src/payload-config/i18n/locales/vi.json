@@ -193,7 +193,7 @@
     "unexpectedError": "Lỗi không xác định"
   },
   "checkin": {
-    "welcomeBack": "Chào mừng trở lại",
+    "adminCheckIn": "Admin Soát Vé",
     "signInToContinue": "Đăng nhập để tiếp tục",
     "email": "Email",
     "enterYourEmail": "Nhập email của bạn",
@@ -254,7 +254,7 @@
     "valid": "Hợp lệ"
   },
   "customerCheckinTicket": {
-    "ticketCheckIn": "Check-in Vé",
+    "ticketCheckIn": "Tự Check In",
     "enterYourEmail": "Nhập email của bạn",
     "enterYourTicketCode": "Nhập mã vé của bạn",
     "checkIn": "Check-in",

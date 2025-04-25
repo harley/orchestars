@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
     const ticket = await payload.find({
       collection: 'tickets',
       depth: 0,
+      limit: 1,
       where: {
         ticketCode: {
           equals: ticketCode,
@@ -66,6 +67,7 @@ export async function POST(req: NextRequest) {
     const existingCheckIn = await payload.find({
       collection: 'checkinRecords',
       depth: 0,
+      limit: 1,
       where: {
         ticketCode: {
           equals: ticketDoc.ticketCode,

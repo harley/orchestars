@@ -61,11 +61,9 @@ export default function Login() {
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">
-            {t('checkin.welcomeBack')}
+            {t('checkin.adminCheckIn')}
           </h1>
-          <p className="text-sm text-gray-600 mb-6 text-center">
-            {t('checkin.signInToContinue')}
-          </p>
+          <p className="text-sm text-gray-600 mb-6 text-center">{t('checkin.signInToContinue')}</p>
 
           <div className="space-y-4">
             <div>

@@ -1,5 +1,3 @@
-// app/checkin/choose-event/page.tsx
-
 import ChooseEventClientPage from './page.client'
 import { getLocale } from '@/providers/I18n/server'
 import { unstable_cache } from 'next/cache'
