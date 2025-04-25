@@ -119,10 +119,6 @@ export default function ValidatePage() {
         body: JSON.stringify({ eventId, eventScheduleId: scheduleId }),
       })
       const data = await response.json()
-      if (response.status === 401) {
-        setToken('')
-        return
-      }
       if (response.status === 300 && data.tickets) {
         setMultipleTickets(data.tickets || [])
         return
