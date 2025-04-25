@@ -6,6 +6,7 @@ import { useAuth } from '@/providers/CheckIn/useAuth'
 import { Clock3, CheckCircle, XCircle, Key } from 'lucide-react'
 import { format } from 'date-fns'
 import { useTranslate } from '@/providers/I18n/client'
+import Link from 'next/link'
 
 interface Ticket {
   ticketCode: string
@@ -115,11 +116,11 @@ export default function ValidatePage() {
             checkedInBy: {
               email: data.ticket.checkinRecord.checkedInBy?.email,
             },
-          })
+          }),
         )
 
         router.push(
-          `/checkin/ticket-details?ticket=${encodedTK}&checkinRecord=${encodedCheckinRecord}`
+          `/checkin/ticket-details?ticket=${encodedTK}&checkinRecord=${encodedCheckinRecord}`,
         )
         return
       }
@@ -178,12 +179,13 @@ export default function ValidatePage() {
         </button>
 
         <div className="flex justify-end mt-4">
-          <button
-            onClick={() => router.push('/checkin/history')}
+          <Link
+            href="/checkin/history"
+            target="_blank"
             className="flex items-center gap-1 text-orange-600 hover:underline"
           >
             <Clock3 size={16} /> {t('checkin.viewHistory')}
-          </button>
+          </Link>
         </div>
 
         {multipleTickets.length > 0 && (
