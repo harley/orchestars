@@ -201,14 +201,12 @@ const SeatMapSelection = ({
 
       <section className="py-12 bg-gray-100">
         <div className="container mx-auto px-4">
-          <div className="w-full max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
-                {t('seatSelection.booking')}
-              </h2>
-              <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
-            </div>
+          <div className="w-full">
+            <h2 className="text-2xl md:text-4xl mb-4 font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent uppercase">
+              {t('seatSelection.booking')}
+            </h2>
 
+            {/* <div className="flex flex-col items-center justify-center"> */}
             <DateSelector
               schedules={event.schedules || []}
               selectedDate={selectedSchedule?.date ? new Date(selectedSchedule?.date) : undefined}
@@ -216,19 +214,18 @@ const SeatMapSelection = ({
             />
 
             <TicketPrices ticketPrices={event.ticketPrices} />
+            {/* </div> */}
           </div>
         </div>
       </section>
 
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="w-full max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent">
-                {t('seatSelection.stageMap')}
-              </h2>
-              <div className="w-24 h-1 bg-gradient-to-r from-gray-950 to-gray-700 mx-auto mt-4 rounded-full" />
-            </div>
+          <div className="w-full">
+            <h2 className="text-2xl md:text-4xl mb-4 font-extrabold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent uppercase">
+              {t('seatSelection.stageMap')}
+            </h2>
+
             <div className="relative">
               {loadingScheduleMap && (
                 <div className="absolute z-50 top-[30%] left-1/2 -translate-x-1/2 p-5 bg-gray-100/30 rounded-md flex flex-col items-center justify-center gap-2">
