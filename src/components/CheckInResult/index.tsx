@@ -224,7 +224,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
             <h2 className="text-2xl font-bold">
               {confirmed
                 ? t('customerCheckinTicket.confirmedSuccessfully')
-                : t('customerCheckinTicket.checkInSuccessful')}
+                : t('customerCheckinTicket.showTicket')}
             </h2>
 
             <div className="space-y-2 text-gray-600">

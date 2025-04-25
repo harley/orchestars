@@ -56,15 +56,15 @@ export default function CustomerCheckInPage() {
         const res: CheckInResponse = await response.json()
         setCheckedInData(res.data)
         toast({
-          title: t('customerCheckinTicket.checkInSuccessful'),
-          description: t('customerCheckinTicket.checkInSuccessful'),
+          title: t('customerCheckinTicket.showTicket'),
+          description: t('customerCheckinTicket.showTicket'),
         })
       } else if (response.status === 409) {
         const res: CheckInResponse = await response.json()
         setCheckedInData(res.data)
         toast({
           title: t('customerCheckinTicket.alreadyCheckedIn'),
-          description: t('customerCheckinTicket.checkInSuccessful'),
+          description: t('customerCheckinTicket.showTicket'),
         })
       } else {
         const err: CheckInResponse = await response.json()
@@ -96,8 +96,7 @@ export default function CustomerCheckInPage() {
   const handleTicketGiven = async () => {
     const adminId = window.prompt('Enter admin ID:')
     if (!adminId) return
-    const confirm = window.confirm(t('customerCheckinTicket.confirmTicketGiven', { adminId }))
-    if (!confirm) return
+
     try {
       setLoadingTicketGiven(true)
       const response = await fetch('/api/checkin-app/customer-checkin/given-ticket', {
