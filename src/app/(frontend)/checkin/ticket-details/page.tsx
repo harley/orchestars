@@ -6,13 +6,14 @@ import { CheckCircle, XCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { categories } from '@/components/EventDetail/data/seat-maps/categories'
 import { useTranslate } from '@/providers/I18n/client'
+import { useToast } from '@/hooks/use-toast'
 
 export default function TicketDetailsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { isHydrated, token } = useAuth()
   const { t } = useTranslate()
-
+  const { toast } = useToast()
   const [isCheckingIn, setIsCheckingIn] = useState(false)
 
   const ticket = searchParams?.get('ticket')
@@ -44,13 +45,28 @@ export default function TicketDetailsPage() {
       })
       if (!res.ok) {
         const err = await res.json()
-        alert(err.message || t('error.failedToCheckIn'))
+
+        toast({
+          title: 'Failed',
+          description: err.message || t('error.failedToCheckIn'),
+          variant: 'destructive',
+        })
+
         return
       }
-      alert(t('checkin.ticketCheckedInSuccessfully'))
-      router.back()
+      toast({
+        title: t('checkin.success'),
+        description: t('checkin.ticketCheckedInSuccessfully'),
+      })
+      setTimeout(() => {
+        router.back()
+      }, 1500)
     } catch (err: any) {
-      alert(err.message || t('error.failedToCheckIn'))
+      toast({
+        title: 'Failed',
+        description: err.message || t('error.failedToCheckIn'),
+        variant: 'destructive',
+      })
     } finally {
       setIsCheckingIn(false)
     }

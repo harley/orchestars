@@ -38,12 +38,9 @@ export async function getCheckinHistory({
   }
 }
 
+// todo set tag by locale
 export const getCheckinHistoryCached = ({ token }: { token: string | null }) =>
-  unstable_cache(
-    async () => getCheckinHistory({ token }),
-    ['checkin-history', token ?? 'no-token'],
-    {
-      tags: [`checkin-history`],
-      revalidate: 86400,
-    },
-  )
+  unstable_cache(async () => getCheckinHistory({ token }), ['checkin-history'], {
+    tags: [`checkin-history`],
+    revalidate: 86400,
+  })

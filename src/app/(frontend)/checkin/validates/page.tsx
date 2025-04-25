@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
-import { Clock3, CheckCircle, XCircle, Key } from 'lucide-react'
+import { Clock3, CheckCircle, XCircle } from 'lucide-react'
 import { format } from 'date-fns'
 import { useTranslate } from '@/providers/I18n/client'
 import Link from 'next/link'
+import { useToast } from '@/hooks/use-toast'
 
 interface Ticket {
   ticketCode: string
@@ -30,11 +31,36 @@ export default function ValidatePage() {
   const searchParams = useSearchParams()
   const { t } = useTranslate()
 
+  const { toast } = useToast()
+
   const eventId = searchParams?.get('eventId')
   const scheduleId = searchParams?.get('scheduleId')
   const eventLocation = searchParams?.get('eventLocation')
-  const eventTitle = searchParams?.get('eventTitle')
-  const scheduleDate = (searchParams?.get('eventScheduleDate') || '').split('T')[0]
+  const [eventTitle, setEventTitle] = useState('')
+  const [scheduleDate, setScheduleDate] = useState('')
+
+  useEffect(() => {
+    // Set initial values from searchParams
+    const titleFromParams = searchParams?.get('eventTitle') || ''
+    let dateFromParams = searchParams?.get('eventScheduleDate') || ''
+    dateFromParams = dateFromParams ? dateFromParams.split('T')?.[0] || '' : ''
+
+    setEventTitle(titleFromParams)
+    setScheduleDate(dateFromParams)
+
+    // If browser environment, check localStorage as fallback
+    if (typeof window !== 'undefined') {
+      if (!titleFromParams) {
+        const storedTitle = localStorage.getItem('eventTitle')
+        if (storedTitle) setEventTitle(storedTitle)
+      }
+
+      if (!dateFromParams) {
+        const storedDate = localStorage.getItem('eventScheduleDate')
+        if (storedDate) setScheduleDate(storedDate)
+      }
+    }
+  }, [searchParams])
 
   const formatDate = (iso: string) => format(new Date(iso), 'PPpp')
 
@@ -65,12 +91,20 @@ export default function ValidatePage() {
   }
 
   const handleCheckIn = async () => {
-    if (!ticketCode.trim()) {
-      alert(t('checkin.pleaseEnterTicketCode'))
+    if (!ticketCode?.trim()) {
+      toast({
+        title: 'Failed',
+        description: t('checkin.pleaseEnterTicketCode'),
+        variant: 'destructive',
+      })
       return
     }
     if (!token) {
-      alert(t('checkin.pleaseLoginFirst'))
+      toast({
+        title: 'Failed',
+        description: t('checkin.pleaseLoginFirst'),
+        variant: 'destructive',
+      })
       router.push('/checkin')
       return
     }
@@ -94,7 +128,7 @@ export default function ValidatePage() {
         return
       }
       if (response.status === 409) {
-        alert(t('checkin.ticketAlreadyCheckedIn'))
+        toast({ title: t('checkin.ticketAlreadyCheckedIn') })
         const minimalTicket = {
           ticketCode: data.ticket.ticketCode,
           attendeeName: data.ticket.attendeeName,
@@ -125,7 +159,11 @@ export default function ValidatePage() {
         return
       }
       if (response.status === 404) {
-        alert(data.error || t('checkin.ticketNotFound'))
+        toast({
+          title: 'Failed',
+          description: data.error || t('checkin.ticketNotFound'),
+          variant: 'destructive',
+        })
         return
       }
 
@@ -133,7 +171,11 @@ export default function ValidatePage() {
 
       router.push(`/checkin/ticket-details?ticket=${encodedTK}`)
     } catch (error: any) {
-      alert(error.message || t('error.failedToCheckIn'))
+      toast({
+        title: 'Failed',
+        description: error.message || t('error.failedToCheckIn'),
+        variant: 'destructive',
+      })
     } finally {
       setIsLoading(false)
     }
@@ -159,7 +201,14 @@ export default function ValidatePage() {
         >
           {t('checkin.back')}
         </button>
-
+        <div>
+          <h1 className="text-2xl font-bold mb-4">
+            {t('checkin.validateTicket')} {t('checkin.event')} {eventTitle}
+          </h1>
+          <div className="text-sm">
+            {t('checkin.date')} {scheduleDate}
+          </div>
+        </div>
         <input
           type="text"
           className="w-full border border-gray-300 rounded-lg p-3 mb-4"

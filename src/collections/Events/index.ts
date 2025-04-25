@@ -277,6 +277,7 @@ export const Events: CollectionConfig = {
           payload.logger.info(`Revalidating event`)
 
           revalidateTag('home-events')
+          revalidateTag('checkin-events-data')
           revalidateTag(`event-detail:${doc.slug}`)
         }
 

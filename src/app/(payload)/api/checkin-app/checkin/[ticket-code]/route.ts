@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { headers as getHeaders } from 'next/headers'
 import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 import { getPayload } from '@/payload-config/getPayloadConfig'
+import { revalidateTag } from 'next/cache'
 // import { getClientSideURL } from '@/utilities/getURL'
 
 export async function POST(req: NextRequest) {
@@ -96,8 +97,12 @@ export async function POST(req: NextRequest) {
         eventDate: eventDate || null,
         checkInTime: new Date().toISOString(),
         checkedInBy: user.id, // Use the admin's ID who performed check-in
+        ticketGivenTime: new Date().toISOString(),
+        ticketGivenBy: user.email,
       },
     })
+
+    revalidateTag('checkin-history')
 
     // return error if check-in record is not created
     if (!checkinRecord) {

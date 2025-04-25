@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
 import { Clock3, X } from 'lucide-react'
 import { useTranslate } from '@/providers/I18n/client'
-import { getCheckinHistory, getCheckinHistoryCached } from '../actions'
 
 interface CheckinRecord {
   id: string
@@ -19,9 +18,8 @@ interface CheckinRecord {
 
 export default function HistoryClientPage({ history = [] }: { history: CheckinRecord[] }) {
   const [checkins, setCheckins] = useState<CheckinRecord[]>(history)
-  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
-  const { isHydrated, token, setToken } = useAuth()
+  const { isHydrated, token } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const { t } = useTranslate()
 
@@ -54,28 +52,6 @@ export default function HistoryClientPage({ history = [] }: { history: CheckinRe
     }
   }
 
-  // useEffect(() => {
-  //   if (!token) return
-
-  //   const fetchHistory = async () => {
-  //     try {
-  //       const response = await getCheckinHistoryCached({ token })()
-
-  //       if (!response || response.status === 401) return
-
-  //       const data = await response.json()
-  //       setCheckins(data.records || [])
-  //     } catch (err) {
-  //       console.error('Failed to load history', err)
-  //       alert(t('error.failedToLoadHistory'))
-  //     } finally {
-  //       setIsLoading(false)
-  //     }
-  //   }
-
-  //   fetchHistory()
-  // }, [token, t, setToken])
-
   const filteredCheckins = checkins.filter((item) => {
     const matchesSearch =
       item.ticketCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -84,13 +60,20 @@ export default function HistoryClientPage({ history = [] }: { history: CheckinRe
     return matchesSearch
   })
 
+  const goBack = () => {
+    const eventId = localStorage.getItem('selectedEventId')
+    const eventScheduleId = localStorage.getItem('selectedScheduleId')
+
+    router.push(`/checkin/validates?eventId=${eventId}&scheduleId=${eventScheduleId}`)
+  }
+
   return (
     <div className="min-h-screen bg-white pt-16 px-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">{t('checkin.checkInHistory')}</h1>
         <button
-          onClick={() => router.back()}
+          onClick={goBack}
           className="w-9 h-9 rounded-full border border-gray-900 flex items-center justify-center"
         >
           <X className="text-gray-900 w-5 h-5" />
@@ -108,7 +91,7 @@ export default function HistoryClientPage({ history = [] }: { history: CheckinRe
       </div>
       <button
         type="button"
-        onClick={() => router.back()}
+        onClick={goBack}
         className="mb-4 px-4 py-3 rounded-xl border-2 border-gray-900 text-gray-900 hover:bg-gray-100 transition"
       >
         {t('checkin.back')}
@@ -116,12 +99,7 @@ export default function HistoryClientPage({ history = [] }: { history: CheckinRe
 
       {/* History List */}
       <div className="space-y-4">
-        {isLoading ? (
-          <div className="text-center mt-20 text-gray-900">
-            <Clock3 className="mx-auto mb-3 animate-spin" size={32} />
-            <p>{t('checkin.loadingCheckInHistory')}</p>
-          </div>
-        ) : filteredCheckins?.length === 0 ? (
+        {filteredCheckins?.length === 0 ? (
           <p className="text-center text-gray-400 mt-16">{t('checkin.noRecordsFound')}</p>
         ) : (
           filteredCheckins?.map((item) => (

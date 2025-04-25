@@ -1,4 +1,4 @@
-import { getCheckinHistory, getCheckinHistoryCached } from '../actions'
+import { getCheckinHistoryCached } from '../actions'
 import HistoryClientPage from './page.client'
 import { cookies } from 'next/headers'
 
@@ -23,8 +23,6 @@ const HistoryPage = async () => {
   } catch (error) {
     console.error('Error fetching initial check-in history:', error)
   }
-
-  console.log(`>>> Initial history: ${JSON.stringify(initialHistory)}`)
 
   return <HistoryClientPage history={initialHistory} />
 }
