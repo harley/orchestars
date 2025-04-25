@@ -37,6 +37,9 @@ export async function POST(req: NextRequest) {
     })
   } catch (err) {
     const error = err as Error
+
+    console.error('Error while logging in', error)
+
     return NextResponse.json(
       {
         error: 'Authentication failed',
