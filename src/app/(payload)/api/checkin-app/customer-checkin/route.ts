@@ -53,7 +53,6 @@ export async function POST(request: Request) {
         { status: 400 },
       )
     }
-    console.time('existingCheckIn')
     // Check if ticket is already checked in by looking up check-in records
     const existingCheckIn = await payload
       .find({
@@ -76,7 +75,6 @@ export async function POST(request: Request) {
     )?.date
 
     const { zoneId, zoneName } = getZoneInfo(ticket, eventRecord)
-    console.timeEnd('existingCheckIn')
     if (existingCheckIn) {
       return NextResponse.json(
         {
