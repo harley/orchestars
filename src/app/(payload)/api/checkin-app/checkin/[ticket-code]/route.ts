@@ -98,7 +98,6 @@ export async function POST(req: NextRequest) {
         checkInTime: new Date().toISOString(),
         checkedInBy: user.id, // Use the admin's ID who performed check-in
         ticketGivenTime: new Date().toISOString(),
-        ticketGivenBy: user.email,
       },
     })
 
