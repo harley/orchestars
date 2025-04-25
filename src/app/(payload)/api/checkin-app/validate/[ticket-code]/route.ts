@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
         ${
           isSearchBySeat
             ? `UPPER(t.seat) = '${ticketCode.toUpperCase()}'`
-            : `t.ticket_code = '${ticketCode}'`
+            : `t.ticket_code = '${ticketCode.toUpperCase()}'`
         }
         AND t.event_id = ${eventId}
         AND t.event_schedule_id = '${eventScheduleId}'
