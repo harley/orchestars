@@ -34,7 +34,7 @@
     "@payloadcms/plugin-nested-docs": "^3.30.0",
     "@payloadcms/plugin-redirects": "^3.30.0",
     "@payloadcms/plugin-search": "^3.30.0",
-    "@payloadcms/plugin-sentry": "^3.35.1",
+    "@payloadcms/plugin-sentry": "^3.30.0",
     "@payloadcms/plugin-seo": "^3.30.0",
     "@payloadcms/richtext-lexical": "^3.30.0",
     "@payloadcms/storage-vercel-blob": "^3.30.0",
