@@ -4,10 +4,10 @@ export const CheckInRecords: CollectionConfig = {
   slug: 'checkinRecords',
   timestamps: true,
   access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
+    // read: () => true,
+    // create: () => true,
+    // update: () => true,
+    // delete: () => true,
   },
   admin: {
     useAsTitle: 'ticketCode',
@@ -31,7 +31,6 @@ export const CheckInRecords: CollectionConfig = {
       type: 'relationship',
       relationTo: 'tickets',
       required: true,
-      unique: true,
     },
     {
       name: 'seat',

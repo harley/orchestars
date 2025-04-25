@@ -1,6 +1,8 @@
+import { redirect } from 'next/navigation'
 import { getCheckinHistoryCached } from '../actions'
 import HistoryClientPage from './page.client'
 import { cookies } from 'next/headers'
+import { checkAuthenticated } from '@/utilities/checkAuthenticated'
 
 interface CheckinRecord {
   id: string
@@ -14,6 +16,16 @@ interface CheckinRecord {
 
 const HistoryPage = async () => {
   const token = (await cookies()).get('token')?.value
+
+  if (!token) {
+    return redirect('/checkin')
+  }
+
+  const authData = await checkAuthenticated()
+
+  if (!authData?.user) {
+    return redirect('/checkin')
+  }
 
   let initialHistory: CheckinRecord[] = []
   try {

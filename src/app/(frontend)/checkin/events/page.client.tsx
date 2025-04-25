@@ -1,10 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/providers/CheckIn/useAuth'
 import { useTranslate } from '@/providers/I18n/client'
 import { format } from 'date-fns'
 import { Event } from '@/types/Event'
+import { useToast } from '@/hooks/use-toast'
 
 interface ChooseEventClientPageProps {
   publicEvents: Event[]
@@ -14,16 +14,10 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
   const [selectedEvent, setSelectedEvent] = useState<any>(null)
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null)
   const router = useRouter()
-  const { isHydrated, token } = useAuth()
   const { t } = useTranslate()
+  const { toast } = useToast()
 
   useEffect(() => {
-    if (!isHydrated) return
-    if (!token) {
-      router.replace('/checkin')
-      return
-    }
-
     const storedEventId = localStorage.getItem('selectedEventId')
     const storedScheduleId = localStorage.getItem('selectedScheduleId')
 
@@ -38,7 +32,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
         setSelectedSchedule(foundSchedule)
       }
     }
-  }, [isHydrated, token, router, publicEvents])
+  }, [router, publicEvents])
 
   const handleSelectEvent = (event: any) => {
     setSelectedEvent(event)
@@ -51,7 +45,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
 
   const handleConfirm = () => {
     if (!selectedEvent || !selectedSchedule) {
-      alert(t('checkin.pleaseSelectEventAndSchedule'))
+      toast({ title: t('checkin.pleaseSelectEventAndSchedule'), variant: 'destructive' })
       return
     }
     localStorage.setItem('selectedEventId', selectedEvent.id)

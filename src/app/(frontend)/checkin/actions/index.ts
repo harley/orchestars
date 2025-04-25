@@ -2,16 +2,11 @@ import { getPayload } from '@/payload-config/getPayloadConfig'
 import { unstable_cache } from 'next/cache'
 import type { CheckinRecord } from '@/payload-types'
 
-export async function getCheckinHistory({
-  token,
-}: {
-  token: string | null
-}): Promise<CheckinRecord[] | null> {
-  if (!token) {
-    console.error('Error: No token provided for getCheckinHistory')
-    return null
-  }
+type Query = {
+  token?: string | null
+}
 
+export async function getCheckinHistory(_query: Query): Promise<CheckinRecord[] | null> {
   try {
     const payload = await getPayload()
 
