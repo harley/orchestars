@@ -251,7 +251,8 @@
     "ticketPriceInfoLabel": "Thông tin giá vé:",
     "checkedIn": "Đã check-in:",
     "used": "Đã sử dụng",
-    "valid": "Hợp lệ"
+    "valid": "Hợp lệ",
+    "success": "Thành công"
   },
   "customerCheckinTicket": {
     "ticketCheckIn": "Tự Check In",

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
+import { revalidateTag } from 'next/cache'
 
 // Utility function to extract ID from relationship field
 const getRelationshipId = (field: any): number | null => {
@@ -136,6 +137,8 @@ export async function POST(request: Request) {
     }
 
     await Promise.all(operations)
+
+    revalidateTag('checkin-history')
 
     return NextResponse.json({
       message: 'Bulk mark-given complete',

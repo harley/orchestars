@@ -3,6 +3,7 @@ import { getPayload } from '@/payload-config/getPayloadConfig'
 import { TICKET_STATUS } from '@/collections/Tickets/constants'
 import { Event, User } from '@/payload-types'
 import { getZoneInfo } from './utils'
+import { revalidateTag } from 'next/cache'
 
 export async function POST(request: Request) {
   try {
@@ -110,7 +111,7 @@ export async function POST(request: Request) {
         checkInTime: new Date().toISOString(),
       },
     })
-    // Get zone information using the helper function
+    revalidateTag('checkin-history')
 
     // Return success response
     return NextResponse.json({

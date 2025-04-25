@@ -56,6 +56,10 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     }
     localStorage.setItem('selectedEventId', selectedEvent.id)
     localStorage.setItem('selectedScheduleId', selectedSchedule.id)
+    localStorage.setItem('eventTitle', selectedEvent.title)
+    if (selectedSchedule.date) {
+      localStorage.setItem('eventScheduleDate', format(selectedSchedule.date, 'dd-MM-yyyy'))
+    }
 
     router.push(
       `/checkin/validates?eventId=${selectedEvent.id}&scheduleId=${selectedSchedule.id}&eventLocation=${selectedEvent.eventLocation}&eventTitle=${selectedEvent.title}&eventScheduleDate=${selectedSchedule.date}`,
@@ -69,7 +73,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
   const formatDateAndTime = (isoDate: string, timeHHmm: string): string => {
     try {
       const date = new Date(isoDate)
-      const trimmedTimeHHmm = timeHHmm.trim()
+      const trimmedTimeHHmm = timeHHmm?.trim()
 
       if (isNaN(date.getTime())) {
         throw new Error('Invalid date format')

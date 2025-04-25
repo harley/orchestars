@@ -251,7 +251,8 @@
     "ticketPriceInfoLabel": "Ticket Price Info:",
     "checkedIn": "Checked in:",
     "used": "Used",
-    "valid": "Valid"
+    "valid": "Valid",
+    "success": "Success"
   },
   "customerCheckinTicket": {
     "ticketCheckIn": "Self Check-In",
