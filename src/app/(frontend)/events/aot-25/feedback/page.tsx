@@ -1,4 +1,4 @@
-const EventDisney25 = () => {
+const EventAOT25Feedback = () => {
   return (
     <div className="flex justify-center items-center h-screen pt-20">
       <iframe
@@ -15,4 +15,4 @@ const EventDisney25 = () => {
   )
 }
 
-export default EventDisney25
+export default EventAOT25Feedback
