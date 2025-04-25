@@ -33,9 +33,11 @@ export async function getTicketsForSchedule(eventId: string, scheduleId: string)
         ord.expire_at AS "expire_at",
         ord.promotion_code AS "promotionCode",
         ticket.created_at AS "createdAt",
-        ticket.updated_at AS "updatedAt"
+        ticket.updated_at AS "updatedAt",
+        users.email AS "userEmail"
       FROM tickets ticket
       LEFT JOIN orders ord ON ord.id = ticket.order_id
+      LEFT JOIN users ON users.id = ticket.user_id
       WHERE 
         ticket.event_id = ${Number(eventId)}
         AND ticket.event_schedule_id = ${scheduleId}
