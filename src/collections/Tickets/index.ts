@@ -167,4 +167,21 @@ export const Tickets: CollectionConfig = {
       },
     },
   ],
+  indexes: [
+    {
+      fields: ['ticketCode', 'seat', 'event', 'eventScheduleId', 'status'],
+    },
+    {
+      fields: ['ticketCode', 'event', 'eventScheduleId', 'status'],
+    },
+    {
+      fields: ['seat', 'event', 'eventScheduleId', 'status'],
+    },
+    {
+      fields: ['event', 'eventScheduleId'],
+    },
+    {
+      fields: ['ticketCode', 'status'],
+    },
+  ],
 }
