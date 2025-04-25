@@ -51,19 +51,19 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 bg-white border-b border-black text-black w-full transition-all duration-300 ease-in-out ${
-        scrolled ? 'py-1' : 'py-2'
+      className={`fixed top-0 left-0 right-0 z-50 bg-white shadow-md text-black w-full transition-all duration-300 ease-in-out ${
+        scrolled ? 'py-1' : 'py-0'
       } px-4 md:px-8 lg:px-16`}
     >
       <div className="container mx-auto flex items-center justify-between">
         {/* Logo - left aligned */}
-        <div className="flex-shrink-0 bg-black mr-10 p-2">
+        <div className="flex-shrink-0 mr-10">
           <Link href="/">
             <img
               src={logo?.url as string}
               alt={logo?.alt || data?.title || ''}
               className={`transition-all duration-300 ease-in-out ${
-                scrolled ? 'h-6 md:h-10' : 'h-12 md:h-16'
+                scrolled ? 'h-10 md:h-12' : 'h-20 md:h-24'
               } w-auto`}
             />
           </Link>
