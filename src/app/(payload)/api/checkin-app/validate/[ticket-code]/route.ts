@@ -7,27 +7,23 @@
 // - 300 if multiple ticket found if searched by seat label
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getPayload } from 'payload'
-import config from '@/payload.config'
 import { headers as getHeaders } from 'next/headers'
+import { getPayload } from '@/payload-config/getPayloadConfig'
 
 export async function POST(req: NextRequest) {
   try {
     // Get authorization header
-    const payload = await getPayload({ config })
+    const payload = await getPayload()
     const headers = await getHeaders()
     const { user } = await payload.auth({ headers })
 
     //Get params event-id and event-scheduler-id by url
-    const body = await req.json();
-    const eventId = body.eventId;
-    const eventScheduleId = body.eventScheduleId;
-    
+    const body = await req.json()
+    const eventId = body.eventId
+    const eventScheduleId = body.eventScheduleId
+
     if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized - Invalid admin user' },
-        { status: 401 },
-      )
+      return NextResponse.json({ error: 'Unauthorized - Invalid admin user' }, { status: 401 })
     }
     const ticketCode = req.nextUrl.pathname.split('/').pop()
 
@@ -43,6 +39,7 @@ export async function POST(req: NextRequest) {
 
     const ticketResult = await payload.find({
       collection: 'tickets',
+      depth: 1,
       where: {
         ...(isSearchBySeat
           ? {
@@ -63,66 +60,71 @@ export async function POST(req: NextRequest) {
             }),
       },
       sort: ['-createdAt'],
-    });
+    })
 
     // Get the first matching ticket
     const ticketDoc = ticketResult.docs[0]
 
-    // Return 404 if ticket not found 
+    // Return 404 if ticket not found
     if (!ticketDoc) {
       return NextResponse.json({ error: 'Ticket not found' }, { status: 404 })
     }
 
-
     // If searching by seat label and found multiple tickets
     if (isSearchBySeat && ticketResult.docs.length > 1) {
       // Get check-in records for all found tickets
-      const ticketCodes = ticketResult.docs.map(t => t.ticketCode)
+      const ticketCodes = ticketResult.docs.map((t) => t.ticketCode)
       const checkinRecordsResult = await payload.find({
         collection: 'checkinRecords',
+        depth: 0,
         where: {
           ticketCode: {
-            in: ticketCodes
+            in: ticketCodes,
           },
           deletedAt: { equals: null },
-        }
+        },
       })
 
       // Get checked in ticket IDs
-      const checkedInTicketIds = new Set(checkinRecordsResult.docs.map(r => r.ticketCode))
+      const checkedInTicketIds = new Set(checkinRecordsResult.docs.map((r) => r.ticketCode))
 
-        return NextResponse.json(
-          {
-            tickets: ticketResult.docs.map(ticketDoc => ({
-              id: ticketDoc.id,
-              attendeeName: ticketDoc.attendeeName,
-              email: typeof ticketDoc.user === 'object' && ticketDoc.user !== null
-              ? ticketDoc.user.email
-              : null,
-              phoneNumber:  typeof ticketDoc.user === 'object' && ticketDoc.user !== null
-              ? ticketDoc.user.phoneNumber
-              : null,
-              ticketCode: ticketDoc.ticketCode,
-              seat: ticketDoc.seat,
-              status: ticketDoc.status,
-              isCheckedIn: checkedInTicketIds.has(ticketDoc.ticketCode!),
-              ticketPriceInfo: ticketDoc.ticketPriceInfo,
-              checkinRecord: checkinRecordsResult.docs.find(r => r.ticketCode === ticketDoc.ticketCode)
-            })),
-          },
-          { status: 300 }
-        )
+      return NextResponse.json(
+        {
+          tickets: ticketResult.docs.map((ticketDoc) => ({
+            id: ticketDoc.id,
+            attendeeName: ticketDoc.attendeeName,
+            email:
+              typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+                ? ticketDoc.user.email
+                : null,
+            phoneNumber:
+              typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+                ? ticketDoc.user.phoneNumber
+                : null,
+            ticketCode: ticketDoc.ticketCode,
+            seat: ticketDoc.seat,
+            status: ticketDoc.status,
+            isCheckedIn: checkedInTicketIds.has(ticketDoc.ticketCode!),
+            ticketPriceInfo: ticketDoc.ticketPriceInfo,
+            checkinRecord: checkinRecordsResult.docs.find(
+              (r) => r.ticketCode === ticketDoc.ticketCode,
+            ),
+          })),
+        },
+        { status: 300 },
+      )
     }
 
     // Find any existing check-in record for this ticket
     const checkinRecordResult = await payload.find({
       collection: 'checkinRecords',
+      depth: 0,
       where: {
         ticketCode: {
-          equals: ticketDoc?.ticketCode
+          equals: ticketDoc?.ticketCode,
         },
-         deletedAt: { equals: null },
-      }
+        deletedAt: { equals: null },
+      },
     })
 
     // Return 409 if ticket already checked in
@@ -132,18 +134,20 @@ export async function POST(req: NextRequest) {
           ticket: {
             id: ticketDoc.id,
             attendeeName: ticketDoc.attendeeName,
-            email: typeof ticketDoc.user === 'object' && ticketDoc.user !== null
-            ? ticketDoc.user.email
-            : null,
-            phoneNumber:  typeof ticketDoc.user === 'object' && ticketDoc.user !== null
-            ? ticketDoc.user.phoneNumber
-            : null,
+            email:
+              typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+                ? ticketDoc.user.email
+                : null,
+            phoneNumber:
+              typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+                ? ticketDoc.user.phoneNumber
+                : null,
             ticketCode: ticketDoc.ticketCode,
             seat: ticketDoc.seat,
             status: ticketDoc.status,
             ticketPriceInfo: ticketDoc.ticketPriceInfo,
             isCheckedIn: true,
-            checkinRecord: checkinRecordResult.docs[0]
+            checkinRecord: checkinRecordResult.docs[0],
           },
           error: 'Ticket has already been checked in',
         },
@@ -152,24 +156,29 @@ export async function POST(req: NextRequest) {
     }
 
     // Return 200 if ticket valid and not checked in
-    return NextResponse.json({
-      ticket: {
-        id: ticketDoc?.id,
-        attendeeName: ticketDoc?.attendeeName,
-        email: typeof ticketDoc.user === 'object' && ticketDoc.user !== null
-        ? ticketDoc.user.email
-        : null,
-        phoneNumber:  typeof ticketDoc.user === 'object' && ticketDoc.user !== null
-        ? ticketDoc.user.phoneNumber
-        : null,
-        ticketCode: ticketDoc?.ticketCode,
-        seat: ticketDoc?.seat,
-        status: ticketDoc?.status,
-        ticketPriceInfo: ticketDoc.ticketPriceInfo,
-        isCheckedIn: false,
-        checkinRecord: null,
+    return NextResponse.json(
+      {
+        ticket: {
+          id: ticketDoc?.id,
+          attendeeName: ticketDoc?.attendeeName,
+          email:
+            typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+              ? ticketDoc.user.email
+              : null,
+          phoneNumber:
+            typeof ticketDoc.user === 'object' && ticketDoc.user !== null
+              ? ticketDoc.user.phoneNumber
+              : null,
+          ticketCode: ticketDoc?.ticketCode,
+          seat: ticketDoc?.seat,
+          status: ticketDoc?.status,
+          ticketPriceInfo: ticketDoc.ticketPriceInfo,
+          isCheckedIn: false,
+          checkinRecord: null,
+        },
       },
-    }, { status: 200 })
+      { status: 200 },
+    )
   } catch (error) {
     console.error('Validation error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

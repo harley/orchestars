@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import { getPayload } from 'payload'
-import config from '@/payload.config'
+import { getPayload } from '@/payload-config/getPayloadConfig'
 import { TICKET_STATUS } from '@/collections/Tickets/constants'
 import { Event, User } from '@/payload-types'
+import { getZoneInfo } from './utils'
 
 export async function POST(request: Request) {
   try {
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const payload = await getPayload({ config })
+    const payload = await getPayload()
 
     // Find ticket by code
     const ticket = await payload
@@ -32,10 +32,9 @@ export async function POST(request: Request) {
             equals: TICKET_STATUS.booked.value,
           },
         },
-        depth: 2,
+        depth: 1,
       })
       .then((res) => res.docs?.[0])
-
 
     // Validate ticket exists
     if (!ticket) {
@@ -57,50 +56,51 @@ export async function POST(request: Request) {
       )
     }
 
-    const sisterTickets = await payload.find({
-      collection: 'tickets',
-      where: {
-        ticketCode: { not_equals: ticketCode },
-        status: { equals: TICKET_STATUS.booked.value },
-        user: { equals: (ticket.user as User)?.id }, // ensure this is ID, not object
-        eventScheduleId: { equals: ticket.eventScheduleId },
-      },
-    }).then((res) => res.docs)
-    
     // Check if ticket is already checked in by looking up check-in records
     const existingCheckIn = await payload
       .find({
         collection: 'checkinRecords',
+        depth: 0,
         where: {
           ticketCode: {
             equals: ticketCode,
-
           },
           deletedAt: { equals: null },
         },
       })
       .then((res) => res.docs[0])
-
-
-    if (existingCheckIn) {
-      return NextResponse.json(
-        {
-          message: 'This ticket has already been checked in',
-        },
-        { status: 400 },
-      )
-    }
     const eventRecord = ticket.event as Event
     const eventId = eventRecord?.id as number
     const userId = (ticket.user as User)?.id as number
-
     const eventDate = eventRecord?.schedules?.find(
       (schedule) => schedule.id === ticket.eventScheduleId,
     )?.date
 
+    const { zoneId, zoneName } = getZoneInfo(ticket, eventRecord)
+    if (existingCheckIn) {
+      return NextResponse.json(
+        {
+          message: 'Ticket already checked in',
+          data: {
+            zoneId,
+            zoneName,
+            email: ticket.userEmail,
+            ticketCode: ticket.ticketCode,
+            attendeeName: ticket.attendeeName,
+            eventName: eventRecord?.title,
+            checkedInAt: existingCheckIn.checkInTime,
+            ticketPriceInfo: ticket.ticketPriceInfo,
+            seat: ticket.seat,
+          },
+        },
+        { status: 409 },
+      )
+    }
+
     // Create check-in record
     const checkInRecord = await payload.create({
       collection: 'checkinRecords',
+      depth: 0,
       data: {
         event: eventId,
         seat: ticket.seat!,
@@ -113,32 +113,21 @@ export async function POST(request: Request) {
       },
     })
 
-    // Get zone information from ticket price info
-    const ticketPriceInfo = ticket.ticketPriceInfo as Record<string, any>
+    // Get zone information using the helper function
 
-    let zoneId = ticketPriceInfo?.key || 'unknown'
-    if (!zoneId && eventRecord?.ticketPrices) {
-      const ticketPrice = eventRecord.ticketPrices.find(
-        (price: any) => price.id === (ticketPriceInfo?.id || ticketPriceInfo?.ticketPriceId),
-      )
-      zoneId = ticketPrice?.key || 'unknown'
-    }
     // Return success response
     return NextResponse.json({
       message: 'Check-in successful',
       data: {
         zoneId,
+        zoneName,
         email: ticket.userEmail,
         ticketCode: ticket.ticketCode,
-        sisterTickets: sisterTickets.map((t) => ({
-          ticketCode: t.ticketCode,
-          attendeeName: t.attendeeName,
-          seat: t.seat,
-        })),
         attendeeName: ticket.attendeeName,
         eventName: eventRecord?.title,
         checkedInAt: checkInRecord.checkInTime,
-        ticketPriceInfo,
+        ticketPriceInfo: ticket.ticketPriceInfo,
+        seat: ticket.seat,
       },
     })
   } catch (error) {

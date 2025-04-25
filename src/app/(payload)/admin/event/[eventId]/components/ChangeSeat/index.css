@@ -1,5 +1,5 @@
 .scheduler-root {
-  max-width: 850px;
+  max-width: 1280px;
   margin: 48px auto 0 auto;
   padding: 32px;
   background: #fff;
@@ -28,7 +28,7 @@
   gap: 24px;
   width: 100%;
 }
-@media (min-width: 768px) {
+@media (min-width: 980px) {
   .scheduler-main {
     flex-direction: row;
     justify-content: center;
@@ -41,7 +41,7 @@
   background: #f1f0fb;
   border-radius: 18px;
   padding: 22px 20px;
-  min-width: 240px;
+  min-width: 500px;
   box-shadow: 0 2px 12px 0 rgba(124, 73, 224, 0.03);
   border: 1px solid #ece5fa;
   display: flex;
@@ -97,6 +97,8 @@
 }
 
 .seat-btn {
+  text-align: center;
+  min-width: 100px;
   border-radius: 7px;
   padding: 10px 0;
   width: 100%;
@@ -125,10 +127,10 @@
   border: 2.5px solid #ad9eff;
 }
 .seat-btn-selected {
-  border: 3.5px solid #6c23ca;
+  border: 3.5px solid #333136 !important;
   box-shadow: 0 0 0 3px #e3d2f7;
-  background: #ece3fb;
-  color: #473185;
+  background: #021006 !important;
+  color: #fbfaff !important;
 }
 
 .seats-empty {
@@ -171,7 +173,7 @@
   margin: 22px 0;
   border-radius: 1px;
 }
-@media (min-width: 768px) {
+@media (min-width: 980px) {
   .scheduler-divider {
     width: 1.5px;
     height: auto;

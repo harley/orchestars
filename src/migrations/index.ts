@@ -43,6 +43,7 @@ import * as migration_20250422_172014_create_logs_collection from './20250422_17
 import * as migration_20250423_023720_add_ticket_given_time_and_ticket_given_by_to_checkin_record from './20250423_023720_add_ticket_given_time_and_ticket_given_by_to_checkin_record';
 import * as migration_20250423_054455_add_configuration_show_banner_description from './20250423_054455_add_configuration_show_banner_description';
 import * as migration_20250423_165748_add_discount_apply_scope_column_promotion from './20250423_165748_add_discount_apply_scope_column_promotion';
+import * as migration_20250424_040651_change_column_admin_id_to_usher_number_checkin_records from './20250424_040651_change_column_admin_id_to_usher_number_checkin_records';
 
 export const migrations = [
   {
@@ -268,6 +269,11 @@ export const migrations = [
   {
     up: migration_20250423_165748_add_discount_apply_scope_column_promotion.up,
     down: migration_20250423_165748_add_discount_apply_scope_column_promotion.down,
-    name: '20250423_165748_add_discount_apply_scope_column_promotion'
+    name: '20250423_165748_add_discount_apply_scope_column_promotion',
+  },
+  {
+    up: migration_20250424_040651_change_column_admin_id_to_usher_number_checkin_records.up,
+    down: migration_20250424_040651_change_column_admin_id_to_usher_number_checkin_records.down,
+    name: '20250424_040651_change_column_admin_id_to_usher_number_checkin_records'
   },
 ];

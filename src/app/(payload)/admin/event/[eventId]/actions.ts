@@ -4,7 +4,11 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { sql } from '@payloadcms/db-postgres/drizzle'
 import { Ticket } from './types'
-import { Event, OrderItem } from '@/payload-types'
+import { Event, OrderItem, User } from '@/payload-types'
+import { checkBookedOrPendingPaymentSeats } from '@/app/(payload)/api/bank-transfer/order/utils'
+import { getSeatHoldings as getCurrentSeatHoldings } from '@/app/(payload)/api/seat-holding/seat/utils'
+import { sendMailAndWriteLog } from '@/collections/Emails/utils'
+import { generateTicketBookEmailHtml } from '@/mail/templates/TicketBookedEmail'
 
 interface TicketCounts {
   [ticketPriceName: string]: {
@@ -186,6 +190,32 @@ export const getBookedSeatsByEventScheduleId = async (eventId: number, eventSche
   }
 }
 
+export const getBookedOrPendingPaymentOrHoldingSeats = async ({
+  eventId,
+  eventScheduleId,
+}: {
+  eventId: number
+  eventScheduleId: string
+}) => {
+  const payload = await getPayload({
+    config,
+  })
+
+  const unavailableSeats = await checkBookedOrPendingPaymentSeats({
+    eventId: Number(eventId),
+    eventScheduleId: eventScheduleId,
+    payload,
+  }).then((seats) => seats.map((s) => s.seatName))
+
+  const seatHoldings = await getCurrentSeatHoldings({
+    eventId: Number(eventId),
+    eventScheduleId: eventScheduleId,
+    payload,
+  })
+
+  return [...unavailableSeats, ...seatHoldings]
+}
+
 export const swapSeats = async (
   originalTicket: Ticket,
   changedData: { seat: string; eventId: number; eventScheduleId: string; ticketPriceId: string },
@@ -202,26 +232,15 @@ export const swapSeats = async (
     throw new Error('Original ticket not found')
   }
 
-  const checkExistChangedSeat = await payload
-    .find({
-      collection: 'tickets',
-      limit: 1,
-      where: {
-        seat: {
-          equals: changedData.seat,
-        },
-        eventScheduleId: {
-          equals: changedData.eventScheduleId,
-        },
-        event: {
-          equals: changedData.eventId,
-        },
-      },
-    })
-    .then((res) => res.docs?.[0])
+  const bookedOrHoldingSeats = await getBookedOrPendingPaymentOrHoldingSeats({
+    eventId: changedData.eventId,
+    eventScheduleId: changedData.eventScheduleId,
+  })
+
+  const checkExistChangedSeat = bookedOrHoldingSeats.includes(changedData.seat.toUpperCase())
 
   if (checkExistChangedSeat) {
-    throw new Error('Seat is already booked')
+    throw new Error(`Seat ${changedData.seat} is holding or already booked`)
   }
 
   const updatedData: Record<string, any> = {
@@ -267,6 +286,38 @@ export const swapSeats = async (
       })
     }
     await payload.db.commitTransaction(transactionID)
+
+    const sendUpdateMail = async () => {
+      if (updatedTicket.userEmail) {
+        const user = updatedTicket.user as User
+        const event = updatedTicket.event as Event
+        const html = await generateTicketBookEmailHtml({
+          ticketCode: updatedTicket.ticketCode || '',
+          eventName: event?.title || '',
+          eventDate: updatedTicket?.eventDate || '',
+          seat: updatedTicket.seat || '',
+        })
+
+        const resendMailData = {
+          to: updatedTicket.userEmail,
+          subject: `Update_${event?.title || ''}: Ticket Confirmation`,
+          cc: 'receipts@orchestars.vn',
+          html,
+        }
+
+        sendMailAndWriteLog({
+          payload: payload,
+          resendMailData,
+          emailData: {
+            user: user.id,
+            event: event?.id,
+            ticket: updatedTicket.id,
+          },
+        })
+      }
+    }
+
+    sendUpdateMail()
   } catch (error: any) {
     await payload.db.rollbackTransaction(transactionID)
 
