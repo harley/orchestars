@@ -1,5 +1,5 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
 import { useTranslate } from '@/providers/I18n/client'
@@ -40,7 +40,7 @@ export default function ChooseEventPage() {
     } finally {
       setLoading(false)
     }
-  }, [token, router, t])
+  }, [token, router, t, setToken])
 
   useEffect(() => {
     if (!isHydrated) return
@@ -52,16 +52,16 @@ export default function ChooseEventPage() {
     fetchEvents()
   }, [isHydrated, token, router, fetchEvents])
 
-  const handleSelectEvent = (event: any) => {
+  const handleSelectEvent = useCallback((event: any) => {
     setSelectedEvent(event)
     setSelectedSchedule(null)
-  }
+  }, [])
 
-  const handleSelectSchedule = (schedule: any) => {
+  const handleSelectSchedule = useCallback((schedule: any) => {
     setSelectedSchedule(schedule)
-  }
+  }, [])
 
-  const handleConfirm = () => {
+  const handleConfirm = useCallback(() => {
     if (!selectedEvent || !selectedSchedule) {
       alert(t('checkin.pleaseSelectEventAndSchedule'))
       return
@@ -70,14 +70,16 @@ export default function ChooseEventPage() {
     router.push(
       `/checkin/validates?eventId=${selectedEvent.id}&scheduleId=${selectedSchedule.id}&eventLocation=${selectedEvent.eventLocation}&eventTitle=${selectedEvent.title}&eventScheduleDate=${selectedSchedule.date}`,
     )
-  }
+  }, [selectedEvent, selectedSchedule, router, t])
 
-  const formatDate = (iso: string) => format(new Date(iso), 'MMMM d, yyyy, h:mm a')
-  const formatDateRange = (start: string, end: string) =>
-    `${formatDate(start)} - ${formatDate(end)}`
+  const formatDate = useCallback((iso: string) => format(new Date(iso), 'MMMM d, yyyy, h:mm a'), [])
+  const formatDateRange = useCallback(
+    (start: string, end: string) => `${formatDate(start)} - ${formatDate(end)}`,
+    [formatDate],
+  )
 
   // format date and time
-  const formatDateAndTime = (isoDate: string, timeHHmm: string): string => {
+  const formatDateAndTime = useCallback((isoDate: string, timeHHmm: string): string => {
     try {
       // Parse the ISO date
       const date = new Date(isoDate)
@@ -124,51 +126,75 @@ export default function ChooseEventPage() {
       console.error('Error formatting date and time:', error)
       return 'Invalid date or time'
     }
-  }
+  }, [])
+
+  const eventList = useMemo(() => {
+    if (loading) {
+      return (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-500">{t('checkin.loadingEvents')}</p>
+        </div>
+      )
+    }
+
+    if (!events.length) {
+      return <p className="text-center text-gray-500 py-8">{t('checkin.noEventsFound')}</p>
+    }
+
+    return events.map((event) => (
+      <div key={event.id} className="bg-white rounded-lg shadow p-4">
+        <h2 className="text-xl font-bold text-gray-900">{event.title}</h2>
+        <p className="text-sm text-gray-500 mb-2">
+          {formatDateRange(event.startDatetime, event.endDatetime)}
+        </p>
+        <button
+          onClick={() => handleSelectEvent(event)}
+          className={`w-full py-2 px-4 text-white rounded ${
+            selectedEvent?.id === event.id ? 'bg-gray-400' : 'bg-gray-900 hover:bg-black'
+          }`}
+        >
+          {selectedEvent?.id === event.id ? t('checkin.selected') : t('checkin.selectEvent')}
+        </button>
+
+        {selectedEvent?.id === event.id && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {event.schedules && event.schedules.length > 0 ? (
+              event.schedules.map((schedule: any) => (
+                <button
+                  key={schedule.id}
+                  onClick={() => handleSelectSchedule(schedule)}
+                  className={`px-3 py-2 rounded text-white text-sm ${
+                    selectedSchedule?.id === schedule.id
+                      ? 'bg-green-600'
+                      : 'bg-gray-900 hover:bg-black'
+                  }`}
+                >
+                  {formatDateAndTime(schedule.date, schedule.details[0]?.time)}
+                </button>
+              ))
+            ) : (
+              <p className="text-sm text-gray-600">{t('checkin.noSchedulesAvailable')}</p>
+            )}
+          </div>
+        )}
+      </div>
+    ))
+  }, [
+    events,
+    loading,
+    selectedEvent,
+    selectedSchedule,
+    handleSelectEvent,
+    handleSelectSchedule,
+    formatDateRange,
+    formatDateAndTime,
+    t,
+  ])
 
   return (
     <div className="min-h-screen py-12 p-6 bg-gray-100">
-      <div className="space-y-6">
-        {loading && <p className="text-center text-gray-500">{t('checkin.loadingEvents')}</p>}
-        {events?.map((event) => (
-          <div key={event.id} className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-xl font-bold text-gray-900">{event.title}</h2>
-            <p className="text-sm text-gray-500 mb-2">
-              {formatDateRange(event.startDatetime, event.endDatetime)}
-            </p>
-            <button
-              onClick={() => handleSelectEvent(event)}
-              className={`w-full py-2 px-4 text-white rounded ${
-                selectedEvent?.id === event.id ? 'bg-gray-400' : 'bg-gray-900 hover:bg-black'
-              }`}
-            >
-              {selectedEvent?.id === event.id ? t('checkin.selected') : t('checkin.selectEvent')}
-            </button>
-
-            {selectedEvent?.id === event.id && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {event.schedules && event.schedules.length > 0 ? (
-                  event.schedules.map((schedule: any) => (
-                    <button
-                      key={schedule.id}
-                      onClick={() => handleSelectSchedule(schedule)}
-                      className={`px-3 py-2 rounded text-white text-sm ${
-                        selectedSchedule?.id === schedule.id
-                          ? 'bg-green-600'
-                          : 'bg-gray-900 hover:bg-black'
-                      }`}
-                    >
-                      {formatDateAndTime(schedule.date, schedule.details[0]?.time)}
-                    </button>
-                  ))
-                ) : (
-                  <p className="text-sm text-gray-600">{t('checkin.noSchedulesAvailable')}</p>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      <div className="space-y-6">{eventList}</div>
 
       {selectedSchedule && (
         <button
