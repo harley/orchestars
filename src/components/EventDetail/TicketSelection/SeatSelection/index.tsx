@@ -6,15 +6,15 @@ import { useTranslate } from '@/providers/I18n/client'
 import { ArrowLeft, Clock, MapPin } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { format as dateFnsFormat } from 'date-fns'
-import SeatMapToolkit from '../SeatReservation/SeatMapSelection/SeatToolkit'
 import { Button } from '@/components/ui/button'
-import { SeatToolKitItem, SelectedSeat } from '../types'
 import { formatMoney } from '@/utilities/formatMoney'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import CheckoutForm from './CheckoutForm'
 import { useToast } from '@/hooks/use-toast'
 import { getCookie, setCookie } from '@/utilities/clientCookies'
 import axios from 'axios'
+import { SeatToolKitItem, SelectedSeat } from '../../types'
+import SeatMapToolkit from '../../SeatReservation/SeatMapSelection/SeatToolkit'
 
 interface SeatSelectionProps {
   event: Event

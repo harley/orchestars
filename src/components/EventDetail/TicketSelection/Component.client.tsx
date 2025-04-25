@@ -5,8 +5,8 @@ import { Event } from '@/payload-types'
 import { useTranslate } from '@/providers/I18n/client'
 import { format as dateFnsFormat } from 'date-fns'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import SeatSelection from '../SeatSelection'
 import { isSameDay } from 'date-fns'
+import SeatSelection from './SeatSelection'
 
 interface TicketSelectionProps {
   event: Event
