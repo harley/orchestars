@@ -10,10 +10,8 @@ import { useToast } from '@/hooks/use-toast'
 import { Toaster } from '@/components/ui/toaster'
 import { useEffect } from 'react'
 import { useTranslate } from '@/providers/I18n/client'
-
 import * as Sentry from '@sentry/nextjs'
 import Error from 'next/error'
-import { useEffect } from 'react'
 
 export default function GlobalError({
   error,
