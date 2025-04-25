@@ -174,7 +174,19 @@
     "ORD002": "The order does not exist",
     "ORD003": "The order has already been paid",
     "ORD004": "The order has expired",
-    "ORD005": "Please select your seat and try again"
+    "ORD005": "Please select your seat and try again",
+    "CHECKIN001": "Ticket not found",
+    "CHECKIN002": "Seat is not assigned to ticket",
+    "CHECKIN003": "Ticket has already been used for check-in",
+    "CHECKIN005": "Check-in failed",
+    "DELETECHECKIN001": "Unauthorized - Invalid admin user",
+    "DELETECHECKIN002": "Check-in record not found",
+    "GIVENTICKET001": "Admin ID and at least one ticket code are required",
+    "GIVENTICKET002": "Admin not found",
+    "GIVENTICKET003": "All ticket codes must belong to the same user",
+    "SELFCHECKIN001": "Email and ticket code are required",
+    "SELFCHECKIN002": "Invalid ticket code",
+    "SELFCHECKIN003": "Email does not match ticket records"
   },
   "error": {
     "title": "Oops! Something went wrong",

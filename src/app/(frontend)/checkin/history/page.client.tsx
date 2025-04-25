@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
 import { Clock3, X } from 'lucide-react'
 import { useTranslate } from '@/providers/I18n/client'
+import { useToast } from '@/hooks/use-toast'
 
 interface CheckinRecord {
   id: string
@@ -22,6 +23,7 @@ export default function HistoryClientPage({ history = [] }: { history: CheckinRe
   const { isHydrated, token } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const { t } = useTranslate()
+  const { toast } = useToast()
 
   useEffect(() => {
     if (!isHydrated) return
@@ -42,13 +44,24 @@ export default function HistoryClientPage({ history = [] }: { history: CheckinRe
       })
       if (!response.ok) {
         const error = await response.json()
-        alert(error.message || t('checkin.failedToDeleteRecord'))
+        toast({
+          title: t('message.operationFailed'),
+          description: error.message || t('checkin.failedToDeleteRecord'),
+          variant: 'destructive',
+        })
         return
       }
       setCheckins((prev) => prev.filter((item) => item.id !== id))
       alert(t('checkin.recordDeletedSuccessfully'))
-    } catch (_err) {
+    } catch (error: any) {
       alert(t('checkin.failedToDeleteRecord'))
+      console.error('error, ', error)
+      const messageError = error?.response?.data?.message || t('message.errorOccurred')
+      toast({
+        title: t('message.operationFailed'),
+        description: messageError,
+        variant: 'destructive',
+      })
     }
   }
 

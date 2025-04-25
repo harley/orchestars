@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { revalidateTag } from 'next/cache'
+import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
 
 // Utility function to extract ID from relationship field
 const getRelationshipId = (field: any): number | null => {
@@ -16,17 +17,14 @@ export async function POST(request: Request) {
 
     // Validate inputs
     if (!Array.isArray(ticketCodes) || ticketCodes.length === 0 || !adminId) {
-      return NextResponse.json(
-        { message: 'Admin ID and at least one ticket code are required' },
-        { status: 400 },
-      )
+      throw new Error('GIVENTICKET001')
     }
 
     const payload = await getPayload()
     const isValidUsherId = (usherId: any) =>
       !isNaN(Number(usherId)) && Number(usherId) >= 0 && Number(usherId) <= 10
     if (!isValidUsherId(adminId)) {
-      return NextResponse.json({ message: 'Admin not found' }, { status: 404 })
+      throw new Error('GIVENTICKET002')
     }
 
     // Get tickets for all provided codes with related event data
@@ -64,10 +62,7 @@ export async function POST(request: Request) {
     // Verify all tickets belong to the same user
     const userIds = new Set(tickets.map((ticket) => getRelationshipId(ticket.user)).filter(Boolean))
     if (userIds.size > 1) {
-      return NextResponse.json(
-        { message: 'All ticket codes must belong to the same user' },
-        { status: 400 },
-      )
+      throw new Error('GIVENTICKET003')
     }
 
     // Create map of ticket codes to ticket objects
@@ -146,9 +141,6 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error('Bulk mark-given error:', error)
-    return NextResponse.json(
-      { message: 'An error occurred while processing your request' },
-      { status: 500 },
-    )
+    return NextResponse.json({ message: await handleNextErrorMsgResponse(error) }, { status: 400 })
   }
 }

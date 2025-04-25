@@ -45,6 +45,7 @@ export default function TicketDetailsPage() {
       })
       if (!res.ok) {
         const err = await res.json()
+        console.error('err, ', err)
 
         toast({
           title: 'Failed',
@@ -61,10 +62,12 @@ export default function TicketDetailsPage() {
       setTimeout(() => {
         router.back()
       }, 1500)
-    } catch (err: any) {
+    } catch (error: any) {
+      console.error('error, ', error)
+      const messageError = error?.response?.data?.message || t('message.errorOccurred')
       toast({
-        title: 'Failed',
-        description: err.message || t('error.failedToCheckIn'),
+        title: t('message.operationFailed'),
+        description: messageError,
         variant: 'destructive',
       })
     } finally {

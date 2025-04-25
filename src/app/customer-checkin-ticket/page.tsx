@@ -56,14 +56,7 @@ export default function CustomerCheckInPage() {
         const res: CheckInResponse = await response.json()
         setCheckedInData(res.data)
         toast({
-          title: t('customerCheckinTicket.showTicket'),
-          description: t('customerCheckinTicket.showTicket'),
-        })
-      } else if (response.status === 409) {
-        const res: CheckInResponse = await response.json()
-        setCheckedInData(res.data)
-        toast({
-          title: t('customerCheckinTicket.alreadyCheckedIn'),
+          title: res.message,
           description: t('customerCheckinTicket.showTicket'),
         })
       } else {
@@ -74,11 +67,13 @@ export default function CustomerCheckInPage() {
           description: err.message,
         })
       }
-    } catch {
+    } catch (error: any) {
+      console.error('error, ', error)
+      const messageError = error?.response?.data?.message || t('message.errorOccurred')
       toast({
-        variant: 'destructive',
         title: t('error.failedToCheckIn'),
-        description: t('error.failedToCheckIn'),
+        description: messageError,
+        variant: 'destructive',
       })
     } finally {
       setIsLoading(false)
@@ -106,7 +101,6 @@ export default function CustomerCheckInPage() {
       })
       if (response.ok) {
         setTicketGivenConfirmed(true)
-        const _res: CheckInResponse = await response.json()
         toast({
           title: t('customerCheckinTicket.success'),
           description: t('customerCheckinTicket.confirmed'),
@@ -119,11 +113,13 @@ export default function CustomerCheckInPage() {
           description: err.message,
         })
       }
-    } catch {
+    } catch (error: any) {
+      console.error('error, ', error)
+      const messageError = error?.response?.data?.message || t('message.errorOccurred')
       toast({
+        title: t('message.operationFailed'),
+        description: messageError,
         variant: 'destructive',
-        title: t('error.unexpectedError'),
-        description: t('error.unexpectedError'),
       })
     } finally {
       setLoadingTicketGiven(false)

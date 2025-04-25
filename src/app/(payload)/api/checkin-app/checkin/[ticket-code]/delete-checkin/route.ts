@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { headers as getHeaders } from 'next/headers'
 import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 import { getPayload } from '@/payload-config/getPayloadConfig'
+import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
 // import { getClientSideURL } from '@/utilities/getURL'
 
 export async function POST(req: NextRequest) {
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
         req: { user },
       })
     ) {
-      return NextResponse.json({ error: 'Unauthorized - Invalid admin user' }, { status: 401 })
+      throw new Error('DELETECHECKIN001')
     }
 
     // Get ticket code from URL parameter
@@ -45,14 +46,12 @@ export async function POST(req: NextRequest) {
     const updatedRecord = result.docs?.[0]
 
     if (!updatedRecord) {
-      return NextResponse.json({ error: 'Check-in record not found' }, { status: 404 })
+      throw new Error('DELETECHECKIN002')
     }
 
     return NextResponse.json({ checkinRecord: updatedRecord }, { status: 200 })
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Failed to delete check-in record' },
-      { status: 500 },
-    )
+    console.error('Check-in error:', error)
+    return NextResponse.json({ message: await handleNextErrorMsgResponse(error) }, { status: 400 })
   }
 }
