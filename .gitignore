@@ -61,3 +61,5 @@ tmp
 # Supabase temporary files
 supabase/.temp/
 supabase/.bin/
+# Sentry Config File
+.env.sentry-build-plugin

@@ -11,6 +11,10 @@ import { Toaster } from '@/components/ui/toaster'
 import { useEffect } from 'react'
 import { useTranslate } from '@/providers/I18n/client'
 
+import * as Sentry from '@sentry/nextjs'
+import Error from 'next/error'
+import { useEffect } from 'react'
+
 export default function GlobalError({
   error,
 }: {
@@ -18,6 +22,7 @@ export default function GlobalError({
   reset: () => void
 }) {
   useEffect(() => {
+    Sentry.captureException(error)
     console.error('Error while loading page:', error)
     // eslint-disable-next-line
   }, [])
