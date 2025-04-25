@@ -7,6 +7,11 @@ import { formatDistanceToNow, format } from 'date-fns'
 import { getCheckinStats } from '../actions'
 import useSWR from 'swr'
 
+// Constants
+const REFRESH_INTERVAL = 60 * 1000 // 1 minute in milliseconds
+const STALE_TIME = 55 * 1000 // 55 seconds - slightly less than refresh interval
+const RETRY_COUNT = 3
+
 interface CheckinStats {
   totalTickets: number
   totalCheckins: number
@@ -15,6 +20,7 @@ interface CheckinStats {
   selfCheckins: number
   adminCheckins: number
   avgCheckinTime: number | null
+  currentTime: string // Added to track server time
 }
 
 interface Props {
@@ -33,16 +39,32 @@ const CheckinStats: React.FC<Props> = ({ event }) => {
     data: stats,
     error,
     isLoading,
+    mutate,
   } = useSWR<CheckinStats>(
     `checkin-stats-${event.id}-${selectedScheduleId || ''}`,
     () => getCheckinStats(event.id, selectedScheduleId || undefined),
     {
-      refreshInterval: 30000, // Refresh every 30 seconds
+      refreshInterval: REFRESH_INTERVAL,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: STALE_TIME,
+      focusThrottleInterval: REFRESH_INTERVAL,
+      loadingTimeout: 3000,
       onError: (err) => {
         console.error('SWR error:', err)
       },
+      errorRetryCount: RETRY_COUNT,
+      shouldRetryOnError: (err) => {
+        // Don't retry on 4xx errors
+        return !(err.status >= 400 && err.status < 500)
+      },
     },
   )
+
+  // Function to manually refresh data
+  const handleRefresh = () => {
+    mutate() // Trigger manual refresh
+  }
 
   if (isLoading) {
     return <div className="p-4">Loading statistics...</div>
@@ -83,6 +105,19 @@ const CheckinStats: React.FC<Props> = ({ event }) => {
       >
         <div style={{ flex: 1 }}>
           <div className="space-y-6">
+            <div>
+              <div className="flex items-center justify-between">
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Stats</h2>
+                <button
+                  onClick={handleRefresh}
+                  className="p-2 text-sm text-gray-600 hover:text-gray-900"
+                >
+                  Refresh
+                </button>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Auto-updates every minute</p>
+            </div>
+
             <div>
               <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Dates</h2>
               <p>
