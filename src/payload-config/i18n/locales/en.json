@@ -254,7 +254,7 @@
     "valid": "Valid"
   },
   "customerCheckinTicket": {
-    "ticketCheckIn": "Ticket Check-in",
+    "ticketCheckIn": "Self Check-In",
     "enterYourEmail": "Enter your email",
     "enterYourTicketCode": "Enter your ticket code",
     "checkIn": "Check in",

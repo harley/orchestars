@@ -711,7 +711,7 @@ const SeatAssignment: React.FC<Props> = ({ event }) => {
                                     <span
                                       style={{
                                         fontSize: '0.75rem',
-                                        padding: '0.125rem 0.375rem',
+                                        padding: '0rem 0.375rem',
                                         border: '1px dashed #6b7280',
                                         borderRadius: '4px',
                                         color: '#6b7280',
@@ -722,10 +722,27 @@ const SeatAssignment: React.FC<Props> = ({ event }) => {
                                     </span>
                                   )}
                                 </div>
-                                <div style={{ fontSize: '0.875rem', color: '#4a4a4a' }}>
+                                <div
+                                  style={{
+                                    fontSize: '0.875rem',
+                                    color: '#4a4a4a',
+                                    lineHeight: '1.2',
+                                  }}
+                                >
                                   <div>{ticket.attendeeName || '-'}</div>
                                   <div style={{ color: '#666', fontSize: '0.8125rem' }}>
                                     {ticket.userEmail || '-'}
+                                  </div>
+                                  <div
+                                    style={{
+                                      fontFamily: 'monospace',
+                                      fontSize: '0.875rem',
+                                      color: '#1a1a1a',
+                                      fontWeight: '500',
+                                      marginTop: '0.75rem',
+                                    }}
+                                  >
+                                    {ticket.ticketCode || '-'}
                                   </div>
                                 </div>
                               </div>
