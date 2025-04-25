@@ -288,6 +288,8 @@
     "markedSelectedTicketsAsGiven": "Các vé liên quan đã chọn được checkin thành công",
     "confirmTicketGiven": "Xác nhận vé này đã được giao bởi admin \"{{adminId}}\"?",
     "confirmed": "Đã xác nhận thành công",
-    "success": "Thành công"
+    "success": "Thành công",
+    "selectAll": "Chọn tất cả",
+    "deselectAll": "Bỏ chọn tất cả"
   }
 }

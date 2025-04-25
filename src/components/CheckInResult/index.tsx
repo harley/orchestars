@@ -186,6 +186,11 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
     return true
   }, [sisterTickets, markGivenResult])
 
+  const allSelectableCodes = useMemo(
+    () => sisterTicketsData.filter((s) => !markGivenResult.includes(s.ticketCode)).map((s) => s.ticketCode),
+    [sisterTicketsData, markGivenResult],
+  )
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center space-y-6 mb-6 pt-14">
       {/* Colored info panel */}
@@ -194,7 +199,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
           className="w-full max-w-md md:max-w-6xl p-6 rounded-lg shadow-lg"
           style={{
             backgroundColor: zoneCategory(data.zoneId)?.color,
-            background: markGivenResult.includes(data?.ticketCode || '')
+            background: confirmed
               ? zoneCategory(data.zoneId)?.color
               : `linear-gradient(to bottom, ${zoneCategory(data.zoneId)?.color}80 0%, ${zoneCategory(data.zoneId)?.color}30 100%)`,
           }}
@@ -223,36 +228,36 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
             </h2>
 
             <div className="space-y-2 text-gray-600">
-              <div className="flex items-center justify-between p-2 rounded bg-gray-50">
-                <span className="font-medium">{t('customerCheckinTicket.zone')}</span>
-                <span className="font-bold" style={{ color: zoneCategory(data.zoneId)?.color }}>
+              <div className="flex items-center justify-between p-2 rounded ">
+                <span className="font-medium text-start">{t('customerCheckinTicket.zone')}</span>
+                <span className="font-bold text-end" style={{ color: zoneCategory(data.zoneId)?.color }}>
                   {data.zoneName}
                 </span>
               </div>
               <div className="flex items-center justify-between p-2 rounded">
-                <span className="font-medium">{t('customerCheckinTicket.ticketCode')}</span>
-                <span>{data?.ticketCode}</span>
+                <span className="font-medium text-start">{t('customerCheckinTicket.ticketCode')}</span>
+                <span className="text-end">{data?.ticketCode}</span>
               </div>
               <div className="flex items-center justify-between p-2 rounded">
-                <span className="font-medium">{t('customerCheckinTicket.seat')}</span>
-                <span>{data?.seat}</span>
+                <span className="font-medium text-start">{t('customerCheckinTicket.seat')}</span>
+                <span className="text-end">{data?.seat}</span>
               </div>
-              <div className="flex items-center justify-between p-2 rounded bg-gray-50">
-                <span className="font-medium">{t('customerCheckinTicket.eventName')}</span>
-                <span>{data?.eventName}</span>
+              <div className="flex items-center justify-between p-2 rounded ">
+                <span className="font-medium text-start">{t('customerCheckinTicket.eventName')}</span>
+                <span className="text-end">{data?.eventName}</span>
               </div>
               <div className="flex items-center justify-between p-2 rounded">
-                <span className="font-medium">{t('customerCheckinTicket.email')}</span>
-                <span>{data?.email}</span>
+                <span className="font-medium text-start">{t('customerCheckinTicket.email')}</span>
+                <span className="text-end">{data?.email}</span>
               </div>
-              <div className="flex items-center justify-between p-2 rounded bg-gray-50">
-                <span className="font-medium">{t('customerCheckinTicket.attendeeName')}</span>
-                <span>{data?.attendeeName}</span>
+              <div className="flex items-center justify-between p-2 rounded ">
+                <span className="font-medium text-start">{t('customerCheckinTicket.attendeeName')}</span>
+                <span className="text-end">{data?.attendeeName}</span>
               </div>
               {data?.checkedInAt && (
                 <div className="flex items-center justify-between p-2 rounded">
-                  <span className="font-medium">{t('customerCheckinTicket.checkedInAt')}</span>
-                  <span>{new Date(data?.checkedInAt).toLocaleString()}</span>
+                  <span className="font-medium text-start">{t('customerCheckinTicket.checkedInAt')}</span>
+                  <span className="text-end"> {new Date(data?.checkedInAt).toLocaleString()}</span>
                 </div>
               )}
             </div>
@@ -318,6 +323,27 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
           )}
         </div>
 
+        {bulkMode === 'given' && (
+          <div className="mb-4 w-full flex">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                if (selectedCodes.length < allSelectableCodes.length) {
+                  setSelectedCodes(allSelectableCodes)
+                } else {
+                  setSelectedCodes([])
+                }
+              }}
+              className="justify-end ml-auto"
+            >
+              {selectedCodes.length < allSelectableCodes.length
+                ? t('customerCheckinTicket.selectAll') || 'Select All'
+                : t('customerCheckinTicket.deselectAll') || 'Deselect All'}
+            </Button>
+          </div>
+        )}
+
+
         {loadingSisterTickets ? (
           <div>Loading...</div>
         ) : (
@@ -337,7 +363,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
                               backgroundColor: zoneCategory(sister.zoneId)?.color,
                               background:
                                 sister.checkinRecord ||
-                                markGivenResult.includes(sister.ticketCode || '')
+                                  markGivenResult.includes(sister.ticketCode || '')
                                   ? zoneCategory(sister.zoneId)?.color
                                   : `linear-gradient(to bottom, ${zoneCategory(sister.zoneId)?.color}80 0%, ${zoneCategory(sister.zoneId)?.color}30 100%)`,
                             }}
@@ -380,28 +406,28 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
 
                                 {(sister.checkinRecord ||
                                   markGivenResult.includes(sister.ticketCode || '')) && (
-                                  <div
-                                    className="w-10 h-10 rounded-full flex items-center justify-center"
-                                    style={{
-                                      backgroundColor: zoneCategory(sister.zoneId)?.color,
-                                    }}
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      strokeWidth={2}
-                                      stroke="white"
-                                      className="w-10 h-10"
+                                    <div
+                                      className="w-10 h-10 rounded-full flex items-center justify-center"
+                                      style={{
+                                        backgroundColor: zoneCategory(sister.zoneId)?.color,
+                                      }}
                                     >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M4.5 12.75l6 6 9-13.5"
-                                      />
-                                    </svg>
-                                  </div>
-                                )}
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={2}
+                                        stroke="white"
+                                        className="w-10 h-10"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="M4.5 12.75l6 6 9-13.5"
+                                        />
+                                      </svg>
+                                    </div>
+                                  )}
                               </span>
                             </div>
                           </button>
