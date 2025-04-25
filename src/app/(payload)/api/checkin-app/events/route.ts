@@ -8,6 +8,7 @@ import { getPayload } from '@/payload-config/getPayloadConfig'
 // import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 // import { getClientSideURL } from '@/utilities/getURL'
 
+
 export async function GET() {
   // Get authorization header
   const payload = await getPayload()

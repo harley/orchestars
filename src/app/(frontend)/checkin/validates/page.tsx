@@ -179,7 +179,7 @@ export default function ValidatePage() {
 
         <div className="flex justify-end mt-4">
           <button
-            onClick={() => router.push('/checkin/history')}
+            onClick={() => window.open('/checkin/history', '_blank')}
             className="flex items-center gap-1 text-orange-600 hover:underline"
           >
             <Clock3 size={16} /> {t('checkin.viewHistory')}
