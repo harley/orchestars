@@ -240,7 +240,7 @@
     "enterTicketCodeOrSeat": "Enter ticket code/Seat",
     "validateTicket": "Validate Ticket",
     "validating": "Validating...",
-    "viewHistory": "View History",
+    "viewHistory": "View All Check-In",
     "multipleTicketsFound": "Multiple Tickets Found",
     "multipleTicketsFoundLabel": "Multiple Tickets Found",
     "pleaseEnterTicketCode": "Please enter a ticket code",
@@ -288,7 +288,7 @@
     "bulkMarkGivenSuccess": "Give Selected Tickets",
     "markedSelectedTicketsAsGiven": "Successful marked selected tickets as given",
     "confirmTicketGiven": "Confirm this ticket has been given by admin \"{{adminId}}\"?",
-    "confirmed": "Confirmed successfully",
+    "confirmed": "Ticket received!",
     "success": "Success",
     "selectAll": "Select All",
     "deselectAll": "Deselect All"

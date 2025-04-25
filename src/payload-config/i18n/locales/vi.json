@@ -240,7 +240,7 @@
     "enterTicketCodeOrSeat": "Nhập mã vé/Ghế",
     "validateTicket": "Xác thực vé",
     "validating": "Đang xác thực...",
-    "viewHistory": "Xem lịch sử",
+    "viewHistory": "Xem tất cả checkin",
     "multipleTicketsFound": "Tìm thấy nhiều vé",
     "multipleTicketsFoundLabel": "Tìm thấy nhiều vé",
     "pleaseEnterTicketCode": "Vui lòng nhập mã vé",
@@ -288,7 +288,7 @@
     "bulkMarkGivenSuccess": "Đánh dấu hàng loạt đã giao vé thành công",
     "markedSelectedTicketsAsGiven": "Các vé liên quan đã chọn được checkin thành công",
     "confirmTicketGiven": "Xác nhận vé này đã được giao bởi admin \"{{adminId}}\"?",
-    "confirmed": "Đã xác nhận thành công",
+    "confirmed": "Đã nhận vé",
     "success": "Thành công",
     "selectAll": "Chọn tất cả",
     "deselectAll": "Bỏ chọn tất cả"
