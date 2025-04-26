@@ -186,7 +186,21 @@
     "ORD002": "Đơn hàng không tồn tại",
     "ORD003": "Đơn hàng đã được thanh toán",
     "ORD004": "Đơn hàng đã hết hạn thanh toán",
-    "ORD005": "Vui lòng chọn ghế và thực hiện lại thao tác"
+    "ORD005": "Vui lòng chọn ghế và thực hiện lại thao tác",
+    "CHECKIN001": "Không tìm thấy vé",
+    "CHECKIN002": "Ghế chưa được chỉ định cho vé",
+    "CHECKIN003": "Vé này đã được check-in",
+    "CHECKIN004": "Check-in thất bại",
+    "CHECKIN005": "Không có quyền truy cập",
+    "CHECKIN006": "Không tìm thấy thông tin check-in",
+    "CHECKIN007": "Admin ID và ít nhất một mã vé là bắt buộc",
+    "CHECKIN008": "Không tìm thấy admin",
+    "CHECKIN009": "Tất cả các mã vé phải thuộc cùng một người dùng",
+    "CHECKIN010": "Email và mã vé là bắt buộc",
+    "CHECKIN011": "Mã vé không hợp lệ",
+    "CHECKIN012": "Email không khớp với thông tin vé",
+    "CHECKIN013": "Mã vé là bắt buộc",
+    "CHECKIN014": "Vui lòng chọn sự kiện"
   },
   "error": {
     "title": "Rất tiếc! Đã xảy ra lỗi",

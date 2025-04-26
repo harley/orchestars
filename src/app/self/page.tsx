@@ -55,15 +55,9 @@ export default function CustomerCheckInPage() {
       if (response.ok) {
         const res: CheckInResponse = await response.json()
         setCheckedInData(res.data)
+
         toast({
-          title: t('customerCheckinTicket.showTicket'),
-          description: t('customerCheckinTicket.showTicket'),
-        })
-      } else if (response.status === 409) {
-        const res: CheckInResponse = await response.json()
-        setCheckedInData(res.data)
-        toast({
-          title: t('customerCheckinTicket.alreadyCheckedIn'),
+          title: res.message,
           description: t('customerCheckinTicket.showTicket'),
         })
       } else {
@@ -74,11 +68,14 @@ export default function CustomerCheckInPage() {
           description: err.message,
         })
       }
-    } catch {
+    } catch (error: any) {
+      console.error('error, ', error)
+      const messageError =
+        error?.response?.data?.message || error?.message || t('message.errorOccurred')
       toast({
-        variant: 'destructive',
         title: t('error.failedToCheckIn'),
-        description: t('error.failedToCheckIn'),
+        description: messageError,
+        variant: 'destructive',
       })
     } finally {
       setIsLoading(false)
@@ -119,11 +116,14 @@ export default function CustomerCheckInPage() {
           description: err.message,
         })
       }
-    } catch {
+    } catch (error: any) {
+      console.error('error, ', error)
+      const messageError =
+        error?.response?.data?.message || error?.message || t('message.errorOccurred')
       toast({
-        variant: 'destructive',
         title: t('error.unexpectedError'),
-        description: t('error.unexpectedError'),
+        description: messageError,
+        variant: 'destructive',
       })
     } finally {
       setLoadingTicketGiven(false)

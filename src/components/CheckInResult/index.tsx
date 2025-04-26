@@ -106,11 +106,14 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
 
       setSelectedCodes([])
       setBulkMode('none')
-    } catch {
+    } catch (error: any) {
+      console.error('error, ', error)
+      const messageError =
+        error?.response?.data?.message || error?.message || t('message.errorOccurred')
       toast({
-        variant: 'destructive',
         title: t('error.bulkMarkGivenFailed'),
-        description: t('error.bulkMarkGivenFailed'),
+        description: messageError,
+        variant: 'destructive',
       })
     } finally {
       setBulkLoading(false)
@@ -136,12 +139,20 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
         const json = await res.json()
         setSisterTicketsData(json.data.sisterTickets)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading sister tickets:', error)
+      const messageError =
+        error?.response?.data?.message || error?.message || t('message.errorOccurred')
+      setSisterTicketsData([])
+      toast({
+        title: t('message.operationFailed'),
+        description: messageError,
+        variant: 'destructive',
+      })
     } finally {
       setLoadingSisterTickets(false)
     }
-  }, [data?.ticketCode])
+  }, [data?.ticketCode, t, toast])
 
   useEffect(() => {
     loadSisterTickets()
@@ -187,7 +198,10 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
   }, [sisterTickets, markGivenResult])
 
   const allSelectableCodes = useMemo(
-    () => sisterTicketsData.filter((s) => !markGivenResult.includes(s.ticketCode)).map((s) => s.ticketCode),
+    () =>
+      sisterTicketsData
+        .filter((s) => !markGivenResult.includes(s.ticketCode))
+        .map((s) => s.ticketCode),
     [sisterTicketsData, markGivenResult],
   )
 
@@ -230,12 +244,17 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
             <div className="space-y-2 text-gray-600">
               <div className="flex items-center justify-between p-2 rounded ">
                 <span className="font-medium text-start">{t('customerCheckinTicket.zone')}</span>
-                <span className="font-bold text-end" style={{ color: zoneCategory(data.zoneId)?.color }}>
+                <span
+                  className="font-bold text-end"
+                  style={{ color: zoneCategory(data.zoneId)?.color }}
+                >
                   {data.zoneName}
                 </span>
               </div>
               <div className="flex items-center justify-between p-2 rounded">
-                <span className="font-medium text-start">{t('customerCheckinTicket.ticketCode')}</span>
+                <span className="font-medium text-start">
+                  {t('customerCheckinTicket.ticketCode')}
+                </span>
                 <span className="text-end">{data?.ticketCode}</span>
               </div>
               <div className="flex items-center justify-between p-2 rounded">
@@ -243,7 +262,9 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
                 <span className="text-end">{data?.seat}</span>
               </div>
               <div className="flex items-center justify-between p-2 rounded ">
-                <span className="font-medium text-start">{t('customerCheckinTicket.eventName')}</span>
+                <span className="font-medium text-start">
+                  {t('customerCheckinTicket.eventName')}
+                </span>
                 <span className="text-end">{data?.eventName}</span>
               </div>
               <div className="flex items-center justify-between p-2 rounded">
@@ -251,12 +272,16 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
                 <span className="text-end">{data?.email}</span>
               </div>
               <div className="flex items-center justify-between p-2 rounded ">
-                <span className="font-medium text-start">{t('customerCheckinTicket.attendeeName')}</span>
+                <span className="font-medium text-start">
+                  {t('customerCheckinTicket.attendeeName')}
+                </span>
                 <span className="text-end">{data?.attendeeName}</span>
               </div>
               {data?.checkedInAt && (
                 <div className="flex items-center justify-between p-2 rounded">
-                  <span className="font-medium text-start">{t('customerCheckinTicket.checkedInAt')}</span>
+                  <span className="font-medium text-start">
+                    {t('customerCheckinTicket.checkedInAt')}
+                  </span>
                   <span className="text-end"> {new Date(data?.checkedInAt).toLocaleString()}</span>
                 </div>
               )}
@@ -343,7 +368,6 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
           </div>
         )}
 
-
         {loadingSisterTickets ? (
           <div>Loading...</div>
         ) : (
@@ -363,7 +387,7 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
                               backgroundColor: zoneCategory(sister.zoneId)?.color,
                               background:
                                 sister.checkinRecord ||
-                                  markGivenResult.includes(sister.ticketCode || '')
+                                markGivenResult.includes(sister.ticketCode || '')
                                   ? zoneCategory(sister.zoneId)?.color
                                   : `linear-gradient(to bottom, ${zoneCategory(sister.zoneId)?.color}80 0%, ${zoneCategory(sister.zoneId)?.color}30 100%)`,
                             }}
@@ -406,28 +430,28 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
 
                                 {(sister.checkinRecord ||
                                   markGivenResult.includes(sister.ticketCode || '')) && (
-                                    <div
-                                      className="w-10 h-10 rounded-full flex items-center justify-center"
-                                      style={{
-                                        backgroundColor: zoneCategory(sister.zoneId)?.color,
-                                      }}
+                                  <div
+                                    className="w-10 h-10 rounded-full flex items-center justify-center"
+                                    style={{
+                                      backgroundColor: zoneCategory(sister.zoneId)?.color,
+                                    }}
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      strokeWidth={2}
+                                      stroke="white"
+                                      className="w-10 h-10"
                                     >
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        strokeWidth={2}
-                                        stroke="white"
-                                        className="w-10 h-10"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          d="M4.5 12.75l6 6 9-13.5"
-                                        />
-                                      </svg>
-                                    </div>
-                                  )}
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M4.5 12.75l6 6 9-13.5"
+                                      />
+                                    </svg>
+                                  </div>
+                                )}
                               </span>
                             </div>
                           </button>

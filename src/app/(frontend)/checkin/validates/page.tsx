@@ -93,7 +93,7 @@ export default function ValidatePage() {
   const handleCheckIn = async () => {
     if (!ticketCode?.trim()) {
       toast({
-        title: 'Failed',
+        title: t('message.operationFailed'),
         description: t('checkin.pleaseEnterTicketCode'),
         variant: 'destructive',
       })
@@ -101,7 +101,7 @@ export default function ValidatePage() {
     }
     if (!token) {
       toast({
-        title: 'Failed',
+        title: t('message.operationFailed'),
         description: t('checkin.pleaseLoginFirst'),
         variant: 'destructive',
       })
@@ -119,6 +119,17 @@ export default function ValidatePage() {
         body: JSON.stringify({ eventId, eventScheduleId: scheduleId }),
       })
       const data = await response.json()
+
+      if (!response.ok) {
+        toast({
+          title: t('message.operationFailed'),
+          description: data.message || t('error.failedToCheckIn'),
+          variant: 'destructive',
+        })
+
+        return
+      }
+
       if (response.status === 300 && data.tickets) {
         setMultipleTickets(data.tickets || [])
         return
@@ -154,22 +165,17 @@ export default function ValidatePage() {
         )
         return
       }
-      if (response.status === 404) {
-        toast({
-          title: 'Failed',
-          description: data.error || t('checkin.ticketNotFound'),
-          variant: 'destructive',
-        })
-        return
-      }
 
       const encodedTK = encodedTicket(data.ticket)
 
       router.push(`/checkin/ticket-details?ticket=${encodedTK}`)
     } catch (error: any) {
+      console.error('error, ', error)
+      const messageError =
+        error?.response?.data?.message || error?.message || t('message.errorOccurred')
       toast({
-        title: 'Failed',
-        description: error.message || t('error.failedToCheckIn'),
+        title: t('error.failedToCheckIn'),
+        description: messageError,
         variant: 'destructive',
       })
     } finally {

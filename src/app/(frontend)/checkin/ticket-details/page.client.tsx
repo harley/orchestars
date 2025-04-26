@@ -39,7 +39,7 @@ export default function TicketDetailsPage() {
         const err = await res.json()
 
         toast({
-          title: 'Failed',
+          title: t('message.operationFailed'),
           description: err.message || t('error.failedToCheckIn'),
           variant: 'destructive',
         })
@@ -55,7 +55,7 @@ export default function TicketDetailsPage() {
       }, 1500)
     } catch (err: any) {
       toast({
-        title: 'Failed',
+        title: t('message.operationFailed'),
         description: err.message || t('error.failedToCheckIn'),
         variant: 'destructive',
       })

@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { headers as getHeaders } from 'next/headers'
 import { getPayload } from '@/payload-config/getPayloadConfig'
+import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
 
 interface TicketRecord {
   id: number
@@ -39,15 +40,15 @@ export async function POST(req: NextRequest) {
     const eventScheduleId = body.eventScheduleId
 
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized - Invalid admin user' }, { status: 401 })
+      throw new Error('CHECKIN005')
     }
     const ticketCode = req.nextUrl.pathname.split('/').pop()
 
     if (!ticketCode) {
-      return NextResponse.json({ error: 'Ticket code is required' }, { status: 400 })
+      throw new Error('CHECKIN013')
     }
     if (!eventId && !eventScheduleId) {
-      return NextResponse.json({ error: 'Please choose event, it is required' }, { status: 400 })
+      throw new Error('CHECKIN014')
     }
 
     // Determine search type (seat label or ticket code)
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
 
     // Optimize: Use a single query with JOIN to get ticket and check-in status
     const ticketResult = await payload.db.drizzle.execute(`
-      SELECT 
+      SELECT
         t.id,
         t.ticket_code,
         t.attendee_name,
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
       LEFT JOIN users u ON t.user_id = u.id
       LEFT JOIN checkin_records cr ON cr.ticket_code = t.ticket_code AND cr.deleted_at IS NULL
       LEFT JOIN admins a ON cr.checked_in_by_id = a.id
-      WHERE 
+      WHERE
         ${
           isSearchBySeat
             ? `UPPER(t.seat) = '${ticketCode.toUpperCase()}'`
@@ -89,7 +90,7 @@ export async function POST(req: NextRequest) {
 
     // Return 404 if no tickets found
     if (!tickets.length) {
-      return NextResponse.json({ error: 'Ticket not found' }, { status: 404 })
+      throw new Error('CHECKIN001')
     }
 
     // If searching by seat label and found multiple tickets
@@ -170,6 +171,6 @@ export async function POST(req: NextRequest) {
     )
   } catch (error) {
     console.error('Validation error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ message: await handleNextErrorMsgResponse(error) }, { status: 400 })
   }
 }

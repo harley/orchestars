@@ -3,6 +3,7 @@ import { TICKET_STATUS } from '@/collections/Tickets/constants'
 import { Event, User } from '@/payload-types'
 import { getZoneInfo } from '../utils'
 import { getPayload } from '@/payload-config/getPayloadConfig'
+import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
 
 // get sister tickets
 export async function GET(request: NextRequest) {
@@ -75,6 +76,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ data: { sisterTickets: sisterTicketsOutput } })
   } catch (error) {
     console.error('get sister tickets error:', error)
-    return NextResponse.json({ data: { sisterTickets: [] } })
+    return NextResponse.json({ message: await handleNextErrorMsgResponse(error) }, { status: 400 })
   }
 }
