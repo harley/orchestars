@@ -633,75 +633,85 @@ const SeatAssignment: React.FC<Props> = ({ event }) => {
                                       : 'white',
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '0.5rem',
+                            gap: '0.25rem',
                           }}
                         >
-                          <div
-                            style={{
-                              fontSize: '1.5rem',
-                              fontWeight: 'bold',
-                              color: '#1a1a1a',
-                              borderBottom: '1px solid #ddd',
-                              paddingBottom: '0.5rem',
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                            }}
-                          >
-                            {editingSeatId === ticket.id ? (
-                              <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
-                                <input
-                                  ref={inputRef}
-                                  type="text"
-                                  value={newSeatValue}
-                                  onChange={(e) => setNewSeatValue(e.target.value.toUpperCase())}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                      handleSeatSubmit(ticket.id)
-                                    } else if (e.key === 'Escape') {
-                                      setEditingSeatId(null)
-                                      setNewSeatValue('')
-                                      setAssignError(null)
-                                    }
-                                  }}
-                                  style={{
-                                    width: '80px',
-                                    padding: '0.25rem',
-                                    fontSize: '1.25rem',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px',
-                                    backgroundColor: '#f8fafc',
-                                    color: '#1a1a1a',
-                                  }}
-                                />
-                                <button
-                                  onClick={() => handleSeatSubmit(ticket.id)}
-                                  style={{
-                                    padding: '0.25rem 0.5rem',
-                                    backgroundColor: '#22c55e',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor:
-                                      loadingTicketId === ticket.id ? 'not-allowed' : 'pointer',
-                                    opacity: loadingTicketId === ticket.id ? 0.7 : 1,
-                                  }}
-                                  disabled={loadingTicketId === ticket.id}
-                                >
-                                  {loadingTicketId === ticket.id ? 'Assigning...' : 'Save'}
-                                </button>
-                              </div>
-                            ) : (
-                              <>
+                          {editingSeatId === ticket.id ? (
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                              <input
+                                ref={inputRef}
+                                type="text"
+                                value={newSeatValue}
+                                onChange={(e) => setNewSeatValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    handleSeatSubmit(ticket.id)
+                                  } else if (e.key === 'Escape') {
+                                    setEditingSeatId(null)
+                                    setNewSeatValue('')
+                                    setAssignError(null)
+                                  }
+                                }}
+                                style={{
+                                  padding: '0.25rem 0.5rem',
+                                  border: '1px solid #ddd',
+                                  borderRadius: '4px',
+                                  width: '100%',
+                                }}
+                                placeholder="Enter seat..."
+                              />
+                              <button
+                                onClick={() => handleSeatSubmit(ticket.id)}
+                                disabled={loadingTicketId === ticket.id}
+                                style={{
+                                  padding: '0.25rem 0.5rem',
+                                  backgroundColor: '#4a90e2',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '4px',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                {loadingTicketId === ticket.id ? 'Saving...' : 'Save'}
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setEditingSeatId(null)
+                                  setNewSeatValue('')
+                                  setAssignError(null)
+                                }}
+                                style={{
+                                  padding: '0.25rem 0.5rem',
+                                  backgroundColor: '#e2e8f0',
+                                  color: '#1a1a1a',
+                                  border: 'none',
+                                  borderRadius: '4px',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <div
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-start',
+                              }}
+                            >
+                              <div
+                                style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}
+                              >
                                 <div
                                   style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                                 >
-                                  <span>{ticket.seat || '-'}</span>
+                                  <span style={{ fontWeight: 'bold' }}>{ticket.seat || '-'}</span>
                                   {ticket.order?.promotion_code && (
                                     <span
                                       style={{
                                         fontSize: '0.75rem',
-                                        padding: '0.125rem 0.375rem',
+                                        padding: '0rem 0.375rem',
                                         border: '1px dashed #6b7280',
                                         borderRadius: '4px',
                                         color: '#6b7280',
@@ -712,140 +722,89 @@ const SeatAssignment: React.FC<Props> = ({ event }) => {
                                     </span>
                                   )}
                                 </div>
-                                {ticket.seat ? (
-                                  <button
-                                    onClick={async () => {
-                                      setLoadingTicketId(ticket.id)
-                                      const result = await assignSeatToTicket(ticket.id, null)
-                                      if (result.success) {
-                                        setTickets(
-                                          tickets.map((t) => {
-                                            if (t.id === ticket.id) {
-                                              return { ...t, seat: null }
-                                            }
-                                            return t
-                                          }),
-                                        )
-                                        scrollToRow('-')
-                                      } else {
-                                        setAssignError('Failed to unassign seat')
-                                      }
-                                      setLoadingTicketId(null)
-                                    }}
+                                <div
+                                  style={{
+                                    fontSize: '0.875rem',
+                                    color: '#4a4a4a',
+                                    lineHeight: '1.2',
+                                  }}
+                                >
+                                  <div>{ticket.attendeeName || '-'}</div>
+                                  <div style={{ color: '#666', fontSize: '0.8125rem' }}>
+                                    {ticket.userEmail || '-'}
+                                  </div>
+                                  <div
                                     style={{
-                                      padding: '0.25rem 0.75rem',
-                                      backgroundColor: '#e5e7eb',
-                                      color: '#4b5563',
-                                      border: 'none',
-                                      borderRadius: '4px',
-                                      cursor:
-                                        loadingTicketId === ticket.id ? 'not-allowed' : 'pointer',
-                                      opacity: loadingTicketId === ticket.id ? 0.7 : 1,
+                                      fontFamily: 'monospace',
                                       fontSize: '0.875rem',
+                                      color: '#1a1a1a',
+                                      fontWeight: '500',
+                                      marginTop: '0.75rem',
                                     }}
-                                    disabled={loadingTicketId === ticket.id}
                                   >
-                                    {loadingTicketId === ticket.id ? 'Unassigning...' : 'Unassign'}
-                                  </button>
-                                ) : (
-                                  (ticket.status === 'booked' || ticket.status === 'hold') && (
-                                    <button
-                                      onClick={() => handleSeatEdit(ticket.id)}
-                                      style={{
-                                        padding: '0.25rem 0.75rem',
-                                        backgroundColor: '#374151',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '4px',
-                                        cursor:
-                                          loadingTicketId === ticket.id ? 'not-allowed' : 'pointer',
-                                        opacity: loadingTicketId === ticket.id ? 0.7 : 1,
-                                        fontSize: '0.875rem',
-                                      }}
-                                      disabled={loadingTicketId === ticket.id}
-                                    >
-                                      {loadingTicketId === ticket.id ? 'Assigning...' : 'Assign'}
-                                    </button>
-                                  )
-                                )}
-                              </>
-                            )}
-                          </div>
+                                    {ticket.ticketCode || '-'}
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'flex-end',
+                                  gap: '0.25rem',
+                                }}
+                              >
+                                <button
+                                  onClick={() => handleSeatEdit(ticket.id)}
+                                  style={{
+                                    padding: '0.25rem 0.5rem',
+                                    backgroundColor: '#f3f4f6',
+                                    color: '#1a1a1a',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.875rem',
+                                  }}
+                                >
+                                  {ticket.seat ? 'Change' : 'Assign'}
+                                </button>
+                                <div style={{ fontSize: '0.75rem', color: '#666' }}>
+                                  {ticket.ticketPriceName}
+                                </div>
+                                <div
+                                  style={{
+                                    padding: '0.25rem 0.5rem',
+                                    borderRadius: '4px',
+                                    fontWeight: 'bold',
+                                    fontSize: '0.75rem',
+                                    textTransform: 'uppercase',
+                                    backgroundColor:
+                                      ticket.status === 'booked'
+                                        ? '#22c55e'
+                                        : ticket.status === 'pending_payment'
+                                          ? '#f97316'
+                                          : ticket.status === 'hold'
+                                            ? '#ef4444'
+                                            : '#94a3b8',
+                                    color: 'white',
+                                  }}
+                                >
+                                  {ticket.status.replace('_', ' ')}
+                                </div>
+                              </div>
+                            </div>
+                          )}
                           {assignError && editingSeatId === ticket.id && (
-                            <div style={{ color: '#ef4444', fontSize: '0.875rem' }}>
+                            <div
+                              style={{
+                                color: '#ef4444',
+                                fontSize: '0.875rem',
+                                marginTop: '0.25rem',
+                              }}
+                            >
                               {assignError}
                             </div>
                           )}
-                          <div
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: '0.25rem',
-                              color: '#4a4a4a',
-                              fontSize: '0.875rem',
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <span>{ticket.ticketCode}</span>
-                              <span style={{ color: '#666' }}>{ticket.ticketPriceName}</span>
-                            </div>
-                            <div
-                              style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <span>{ticket.attendeeName || '-'}</span>
-                              <div
-                                style={{
-                                  padding: '0.25rem 0.5rem',
-                                  borderRadius: '4px',
-                                  fontWeight: 'bold',
-                                  fontSize: '0.75rem',
-                                  textTransform: 'uppercase',
-                                  backgroundColor:
-                                    ticket.status === 'booked'
-                                      ? '#22c55e'
-                                      : ticket.status === 'pending_payment'
-                                        ? '#f97316'
-                                        : ticket.status === 'hold'
-                                          ? '#ef4444'
-                                          : '#94a3b8',
-                                  color: 'white',
-                                  maxWidth: '80px',
-                                  whiteSpace: 'nowrap',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                }}
-                              >
-                                {ticket.status.replace('_', ' ')}
-                              </div>
-                            </div>
-                            {ticket.status !== 'booked' && ticket.expire_at && (
-                              <div
-                                style={{ fontSize: '0.75rem', color: '#666', textAlign: 'right' }}
-                              >
-                                {formatDistanceToNow(new Date(ticket.expire_at), {
-                                  addSuffix: true,
-                                  includeSeconds: true,
-                                })
-                                  .replace('about ', '')
-                                  .replace(' minutes', 'm')
-                                  .replace(' minute', 'm')
-                                  .replace(' hours', 'h')
-                                  .replace(' hour', 'h')
-                                  .replace(' seconds', 's')
-                                  .replace(' second', 's')}
-                              </div>
-                            )}
-                          </div>
                         </div>
                       ))}
                     </div>

@@ -5,9 +5,10 @@
 // return ticket details
 
 import { NextRequest, NextResponse } from 'next/server'
-import { headers as getHeaders } from 'next/headers'
 import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 import { getPayload } from '@/payload-config/getPayloadConfig'
+import { revalidateTag } from 'next/cache'
+import { checkAuthenticated } from '@/utilities/checkAuthenticated'
 // import { getClientSideURL } from '@/utilities/getURL'
 
 export async function POST(req: NextRequest) {
@@ -15,17 +16,18 @@ export async function POST(req: NextRequest) {
     // Get authorization header
     const payload = await getPayload()
 
-    const headers = await getHeaders()
-    const { user } = await payload.auth({ headers })
+    const authData = await checkAuthenticated()
 
     if (
-      !user ||
+      !authData?.user ||
       !isAdminOrSuperAdminOrEventAdmin({
-        req: { user },
+        req: { user: authData.user },
       })
     ) {
       return NextResponse.json({ error: 'Unauthorized - Invalid admin user' }, { status: 401 })
     }
+
+    const user = authData.user
 
     // Get ticket code from URL parameter
     const ticketCode = req.nextUrl.pathname.split('/').pop()
@@ -35,6 +37,7 @@ export async function POST(req: NextRequest) {
     const ticket = await payload.find({
       collection: 'tickets',
       depth: 0,
+      limit: 1,
       where: {
         ticketCode: {
           equals: ticketCode,
@@ -66,6 +69,7 @@ export async function POST(req: NextRequest) {
     const existingCheckIn = await payload.find({
       collection: 'checkinRecords',
       depth: 0,
+      limit: 1,
       where: {
         ticketCode: {
           equals: ticketDoc.ticketCode,
@@ -94,8 +98,11 @@ export async function POST(req: NextRequest) {
         eventDate: eventDate || null,
         checkInTime: new Date().toISOString(),
         checkedInBy: user.id, // Use the admin's ID who performed check-in
+        ticketGivenTime: new Date().toISOString(),
       },
     })
+
+    revalidateTag('checkin-history')
 
     // return error if check-in record is not created
     if (!checkinRecord) {

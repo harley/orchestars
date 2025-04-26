@@ -4,10 +4,10 @@ export const CheckInRecords: CollectionConfig = {
   slug: 'checkinRecords',
   timestamps: true,
   access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
+    // read: () => true,
+    // create: () => true,
+    // update: () => true,
+    // delete: () => true,
   },
   admin: {
     useAsTitle: 'ticketCode',
@@ -31,22 +31,24 @@ export const CheckInRecords: CollectionConfig = {
       type: 'relationship',
       relationTo: 'tickets',
       required: true,
-      unique: true,
     },
     {
       name: 'seat',
       type: 'text',
       required: true,
+      index: true,
     },
     {
       name: 'ticketCode',
       type: 'text',
       required: true,
+      index: true,
     },
     {
       name: 'eventScheduleId',
       type: 'text',
       required: false,
+      index: true,
     },
     {
       name: 'eventDate',
@@ -77,10 +79,11 @@ export const CheckInRecords: CollectionConfig = {
     },
     {
       name: 'ticketGivenBy',
-      type: "text",
+      type: 'text',
       required: false,
     },
-    { name:'deletedAt',
+    {
+      name: 'deletedAt',
       type: 'date',
       required: false,
       admin: {
@@ -90,5 +93,12 @@ export const CheckInRecords: CollectionConfig = {
         },
       },
     },
+  ],
+  indexes: [
+    { fields: ['ticketCode', 'seat'] },
+    { fields: ['event', 'eventScheduleId'] },
+    { fields: ['ticketCode', 'seat', 'eventScheduleId'] },
+    { fields: ['ticketCode', 'eventScheduleId', 'event'] },
+    { fields: ['ticketCode', 'seat', 'eventScheduleId', 'event'] },
   ],
 }

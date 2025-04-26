@@ -1,113 +1,16 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Head from 'next/head'
-import { useAuth } from '@/providers/CheckIn/useAuth'
-import { useTranslate } from '@/providers/I18n/client'
+import React from 'react'
+import LoginPageClient from './page.client'
+import { checkAuthenticated } from '@/utilities/checkAuthenticated'
+import { redirect } from 'next/navigation'
 
-export default function Login() {
-  const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const { isHydrated, token, setToken } = useAuth()
-  const { t } = useTranslate()
+const LoginPage = async () => {
+  const authData = await checkAuthenticated()
 
-  useEffect(() => {
-    if (!isHydrated) return
-    if (token) {
-      router.replace('/checkin/events')
-    }
-  }, [isHydrated, token, router])
-
-  const handleLogin = async () => {
-    if (!email || !password) {
-      alert(t('checkin.pleaseEnterEmailAndPassword'))
-      return
-    }
-
-    try {
-      setIsLoading(true)
-
-      const res = await fetch('/api/checkin-app/auth', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      })
-
-      if (res?.ok) {
-        const token = await res.json() // or decode from cookie if SSR-only
-        setToken(token.token) // optional since cookie already stores it
-        router.replace('/checkin/events')
-      }
-    } catch (error) {
-      console.error('Login error:', error)
-      alert(t('error.loginFailed'))
-    } finally {
-      setIsLoading(false)
-    }
+  if (authData?.user) {
+    return redirect('/checkin/events')
   }
 
-  return (
-    <>
-      <Head>
-        <title>{t('checkin.login')}</title>
-      </Head>
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">
-            {t('checkin.welcomeBack')}
-          </h1>
-          <p className="text-sm text-gray-600 mb-6 text-center">
-            {t('checkin.signInToContinue')}
-          </p>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('checkin.email')}
-              </label>
-              <input
-                type="email"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-700"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t('checkin.enterYourEmail')}
-                disabled={isLoading}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('checkin.password')}
-              </label>
-              <input
-                type="password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-700"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={t('checkin.enterYourPassword')}
-                disabled={isLoading}
-              />
-            </div>
-
-            <button
-              onClick={handleLogin}
-              disabled={isLoading}
-              className={`w-full py-3 text-white rounded-lg font-semibold transition ${
-                isLoading ? 'bg-gray-700 cursor-not-allowed' : 'bg-gray-900 hover:bg-black'
-              }`}
-            >
-              {isLoading ? t('checkin.signingIn') : t('checkin.signIn')}
-            </button>
-          </div>
-        </div>
-      </div>
-    </>
-  )
+  return <LoginPageClient />
 }
+
+export default LoginPage

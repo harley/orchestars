@@ -225,7 +225,7 @@
     "unexpectedError": "Unexpected error"
   },
   "checkin": {
-    "welcomeBack": "Welcome Back",
+    "adminCheckIn": "Admin Check-In",
     "signInToContinue": "Sign in to continue",
     "email": "Email",
     "enterYourEmail": "Enter your email",
@@ -272,7 +272,7 @@
     "enterTicketCodeOrSeat": "Enter ticket code/Seat",
     "validateTicket": "Validate Ticket",
     "validating": "Validating...",
-    "viewHistory": "View History",
+    "viewHistory": "View All Check-In",
     "multipleTicketsFound": "Multiple Tickets Found",
     "multipleTicketsFoundLabel": "Multiple Tickets Found",
     "pleaseEnterTicketCode": "Please enter a ticket code",
@@ -283,16 +283,17 @@
     "ticketPriceInfoLabel": "Ticket Price Info:",
     "checkedIn": "Checked in:",
     "used": "Used",
-    "valid": "Valid"
+    "valid": "Valid",
+    "success": "Success"
   },
   "customerCheckinTicket": {
-    "ticketCheckIn": "Ticket Check-in",
+    "ticketCheckIn": "Self Check-In",
     "enterYourEmail": "Enter your email",
     "enterYourTicketCode": "Enter your ticket code",
     "checkIn": "Check in",
     "checkingIn": "Checking in...",
     "alreadyCheckedIn": "Already checked in",
-    "checkInSuccessful": "Check-in Successful!",
+    "showTicket": "Show this screen to receive ticket!",
     "confirmedSuccessfully": "Confirmed successfully",
     "zone": "Zone:",
     "ticketCode": "Ticket Code:",
@@ -319,7 +320,7 @@
     "bulkMarkGivenSuccess": "Give Selected Tickets",
     "markedSelectedTicketsAsGiven": "Successful marked selected tickets as given",
     "confirmTicketGiven": "Confirm this ticket has been given by admin \"{{adminId}}\"?",
-    "confirmed": "Confirmed successfully",
+    "confirmed": "Ticket received!",
     "success": "Success",
     "selectAll": "Select All",
     "deselectAll": "Deselect All"
