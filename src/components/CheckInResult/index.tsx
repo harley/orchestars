@@ -138,12 +138,19 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
         const json = await res.json()
         setSisterTicketsData(json.data.sisterTickets)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading sister tickets:', error)
+      const messageError = error?.response?.data?.message || t('message.errorOccurred')
+      setSisterTicketsData([])
+      toast({
+        title: t('message.operationFailed'),
+        description: messageError,
+        variant: 'destructive',
+      })
     } finally {
       setLoadingSisterTickets(false)
     }
-  }, [data?.ticketCode])
+  }, [data?.ticketCode, t, toast])
 
   useEffect(() => {
     loadSisterTickets()

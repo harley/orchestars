@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
     })
 
     if (existingCheckIn.docs?.length > 0) {
+      throw new Error('CHECKIN003')
     }
 
     // Create check-in record
@@ -98,7 +99,7 @@ export async function POST(req: NextRequest) {
 
     // return error if check-in record is not created
     if (!checkinRecord) {
-      throw new Error('CHECKIN005')
+      throw new Error('CHECKIN004')
     }
 
     return NextResponse.json({ checkinRecord }, { status: 200 })

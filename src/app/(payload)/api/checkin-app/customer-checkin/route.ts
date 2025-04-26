@@ -13,12 +13,6 @@ export async function POST(request: Request) {
     // Validate inputs
     if (!email || !ticketCode) {
       throw new Error('SELFCHECKIN001')
-      // return NextResponse.json(
-      //   {
-      //     message: 'Email and ticket code are required',
-      //   },
-      //   { status: 400 },
-      // )
     }
     const payload = await getPayload()
     // Find ticket by code

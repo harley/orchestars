@@ -178,7 +178,7 @@
     "CHECKIN001": "Ticket not found",
     "CHECKIN002": "Seat is not assigned to ticket",
     "CHECKIN003": "Ticket has already been used for check-in",
-    "CHECKIN005": "Check-in failed",
+    "CHECKIN004": "Check-in failed",
     "DELETECHECKIN001": "Unauthorized - Invalid admin user",
     "DELETECHECKIN002": "Check-in record not found",
     "GIVENTICKET001": "Admin ID and at least one ticket code are required",
