@@ -42,8 +42,13 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
   const renderBanners = useCallback(
     (evt: Event, index: number) => {
       const isUpcoming = evt.status === EVENT_STATUS.published_upcoming.value
-      const isNowShowing = evt.status === EVENT_STATUS.published_open_sales.value
-      const isPast = evt.status === EVENT_STATUS.completed.value
+      const isNowShowing =
+        evt.status === EVENT_STATUS.published_open_sales.value &&
+        evt?.endDatetime &&
+        new Date(evt?.endDatetime) > new Date()
+      const isPast =
+        evt.status === EVENT_STATUS.completed.value ||
+        (evt?.endDatetime && new Date(evt?.endDatetime) < new Date())
 
       const Banner = (
         <>
@@ -120,19 +125,14 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
                   <span className="max-w-[600px] font-medium text-lg mb-6">{evt.description}</span>
                 )}
 
-                {!isPast && (
-                  <Link
-                    href={`/events/${evt.slug}`}
-                    className="inline-block w-fit px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    {evt.status === EVENT_STATUS.published_open_sales.value && t('home.bookTicket')}
-                    {evt.status === EVENT_STATUS.published_upcoming.value &&
-                      t('home.upcomingEvents')}
-                    {evt.status !== EVENT_STATUS.published_open_sales.value &&
-                      evt.status !== EVENT_STATUS.published_upcoming.value &&
-                      t('home.viewDetail')}
-                  </Link>
-                )}
+                <Link
+                  href={`/events/${evt.slug}`}
+                  className="inline-block w-fit px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  {isNowShowing && t('home.bookTicket')}
+                  {isUpcoming && t('home.upcomingEvents')}
+                  {isPast && t('home.viewDetail')}
+                </Link>
               </div>
             </div>
           </div>
