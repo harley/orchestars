@@ -181,12 +181,12 @@
     "CHECKIN004": "Check-in thất bại",
     "CHECKIN005": "Không có quyền truy cập",
     "CHECKIN006": "Không tìm thấy thông tin check-in",
-    "GIVENTICKET001": "Admin ID và ít nhất một mã vé là bắt buộc",
-    "GIVENTICKET002": "Không tìm thấy admin",
-    "GIVENTICKET003": "Tất cả các mã vé phải thuộc cùng một người dùng",
-    "SELFCHECKIN001": "Email và mã vé là bắt buộc",
-    "SELFCHECKIN002": "Mã vé không hợp lệ",
-    "SELFCHECKIN003": "Email không khớp với thông tin vé"
+    "CHECKIN007": "Admin ID và ít nhất một mã vé là bắt buộc",
+    "CHECKIN008": "Không tìm thấy admin",
+    "CHECKIN009": "Tất cả các mã vé phải thuộc cùng một người dùng",
+    "CHECKIN010": "Email và mã vé là bắt buộc",
+    "CHECKIN011": "Mã vé không hợp lệ",
+    "CHECKIN012": "Email không khớp với thông tin vé"
   },
   "error": {
     "title": "Rất tiếc! Đã xảy ra lỗi",
