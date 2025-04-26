@@ -69,7 +69,8 @@ export default function CustomerCheckInPage() {
       }
     } catch (error: any) {
       console.error('error, ', error)
-      const messageError = error?.response?.data?.message || t('message.errorOccurred')
+      const messageError =
+        error?.response?.data?.message || error?.message || t('message.errorOccurred')
       toast({
         title: t('error.failedToCheckIn'),
         description: messageError,
@@ -115,7 +116,8 @@ export default function CustomerCheckInPage() {
       }
     } catch (error: any) {
       console.error('error, ', error)
-      const messageError = error?.response?.data?.message || t('message.errorOccurred')
+      const messageError =
+        error?.response?.data?.message || error?.message || t('message.errorOccurred')
       toast({
         title: t('message.operationFailed'),
         description: messageError,

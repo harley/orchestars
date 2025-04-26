@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       .then((res) => res.docs?.[0])
     // Validate ticket exists
     if (!ticket) {
-      throw new Error('CHECKIN011')
+      throw new Error('CHECKIN001')
     }
 
     // Validate email matches

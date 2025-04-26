@@ -108,7 +108,8 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
       setBulkMode('none')
     } catch (error: any) {
       console.error('error, ', error)
-      const messageError = error?.response?.data?.message || t('message.errorOccurred')
+      const messageError =
+        error?.response?.data?.message || error?.message || t('message.errorOccurred')
       toast({
         title: t('error.bulkMarkGivenFailed'),
         description: messageError,
@@ -140,7 +141,8 @@ const CheckInResult: React.FC<CheckInResultProps> = ({
       }
     } catch (error: any) {
       console.error('Error loading sister tickets:', error)
-      const messageError = error?.response?.data?.message || t('message.errorOccurred')
+      const messageError =
+        error?.response?.data?.message || error?.message || t('message.errorOccurred')
       setSisterTicketsData([])
       toast({
         title: t('message.operationFailed'),
