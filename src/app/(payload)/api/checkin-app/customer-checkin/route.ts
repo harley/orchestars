@@ -12,7 +12,7 @@ export async function POST(request: Request) {
 
     // Validate inputs
     if (!email || !ticketCode) {
-      throw new Error('SELFCHECKIN001')
+      throw new Error('CHECKIN010')
     }
     const payload = await getPayload()
     // Find ticket by code
@@ -33,12 +33,12 @@ export async function POST(request: Request) {
       .then((res) => res.docs?.[0])
     // Validate ticket exists
     if (!ticket) {
-      throw new Error('SELFCHECKIN002')
+      throw new Error('CHECKIN011')
     }
 
     // Validate email matches
     if (ticket.userEmail !== email) {
-      throw new Error('SELFCHECKIN003')
+      throw new Error('CHECKIN012')
     }
     // Check if ticket is already checked in by looking up check-in records
     const existingCheckIn = await payload

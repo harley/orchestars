@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
         req: { user },
       })
     ) {
-      throw new Error('DELETECHECKIN001')
+      throw new Error('CHECKIN005')
     }
 
     // Get ticket code from URL parameter
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     const updatedRecord = result.docs?.[0]
 
     if (!updatedRecord) {
-      throw new Error('DELETECHECKIN002')
+      throw new Error('CHECKIN006')
     }
 
     return NextResponse.json({ checkinRecord: updatedRecord }, { status: 200 })

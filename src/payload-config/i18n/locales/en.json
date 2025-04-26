@@ -179,14 +179,14 @@
     "CHECKIN002": "Seat is not assigned to ticket",
     "CHECKIN003": "Ticket has already been used for check-in",
     "CHECKIN004": "Check-in failed",
-    "DELETECHECKIN001": "Unauthorized - Invalid admin user",
-    "DELETECHECKIN002": "Check-in record not found",
-    "GIVENTICKET001": "Admin ID and at least one ticket code are required",
-    "GIVENTICKET002": "Admin not found",
-    "GIVENTICKET003": "All ticket codes must belong to the same user",
-    "SELFCHECKIN001": "Email and ticket code are required",
-    "SELFCHECKIN002": "Invalid ticket code",
-    "SELFCHECKIN003": "Email does not match ticket records"
+    "CHECKIN005": "Unauthorized - Invalid admin user",
+    "CHECKIN006": "Check-in record not found",
+    "CHECKIN007": "Admin ID and at least one ticket code are required",
+    "CHECKIN008": "Admin not found",
+    "CHECKIN009": "All ticket codes must belong to the same user",
+    "CHECKIN010": "Email and ticket code are required",
+    "CHECKIN011": "Invalid ticket code",
+    "CHECKIN012": "Email does not match ticket records"
   },
   "error": {
     "title": "Oops! Something went wrong",

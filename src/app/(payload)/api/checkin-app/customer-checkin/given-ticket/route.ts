@@ -17,14 +17,14 @@ export async function POST(request: Request) {
 
     // Validate inputs
     if (!Array.isArray(ticketCodes) || ticketCodes.length === 0 || !adminId) {
-      throw new Error('GIVENTICKET001')
+      throw new Error('CHECKIN007')
     }
 
     const payload = await getPayload()
     const isValidUsherId = (usherId: any) =>
       !isNaN(Number(usherId)) && Number(usherId) >= 0 && Number(usherId) <= 10
     if (!isValidUsherId(adminId)) {
-      throw new Error('GIVENTICKET002')
+      throw new Error('CHECKIN008')
     }
 
     // Get tickets for all provided codes with related event data
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     // Verify all tickets belong to the same user
     const userIds = new Set(tickets.map((ticket) => getRelationshipId(ticket.user)).filter(Boolean))
     if (userIds.size > 1) {
-      throw new Error('GIVENTICKET003')
+      throw new Error('CHECKIN009')
     }
 
     // Create map of ticket codes to ticket objects
