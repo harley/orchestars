@@ -25,6 +25,8 @@ interface TicketRecord {
   check_in_time: string | null
   checked_in_by_id: number | null
   checked_in_by_email: string | null
+  ticket_given_time: string | null
+  ticket_given_by: string | null
 }
 
 export async function POST(req: NextRequest) {
@@ -69,6 +71,8 @@ export async function POST(req: NextRequest) {
         CASE WHEN cr.id IS NOT NULL THEN true ELSE false END as is_checked_in,
         cr.check_in_time,
         cr.checked_in_by_id,
+        cr.ticket_given_time,
+        cr.ticket_given_by,
         a.email as checked_in_by_email
       FROM tickets t
       LEFT JOIN users u ON t.user_id = u.id
@@ -113,6 +117,8 @@ export async function POST(req: NextRequest) {
                   checkedInBy: {
                     email: ticket.checked_in_by_email,
                   },
+                  ticketGivenTime: ticket.ticket_given_time,
+                  ticketGivenBy: ticket.ticket_given_by,
                 }
               : null,
           })),
@@ -124,31 +130,28 @@ export async function POST(req: NextRequest) {
     // We know tickets has at least one element from the check above
     const ticket = tickets[0]!
 
-    // Return 409 if ticket already checked in
     if (ticket.is_checked_in) {
-      return NextResponse.json(
-        {
-          ticket: {
-            id: ticket.id,
-            attendeeName: ticket.attendee_name,
-            email: ticket.email,
-            phoneNumber: ticket.phone_number,
-            ticketCode: ticket.ticket_code,
-            seat: ticket.seat,
-            status: ticket.status,
-            ticketPriceInfo: ticket.ticket_price_info,
-            isCheckedIn: true,
-            checkinRecord: {
-              checkInTime: ticket.check_in_time,
-              checkedInBy: {
-                email: ticket.checked_in_by_email,
-              },
+      return NextResponse.json({
+        ticket: {
+          id: ticket.id,
+          attendeeName: ticket.attendee_name,
+          email: ticket.email,
+          phoneNumber: ticket.phone_number,
+          ticketCode: ticket.ticket_code,
+          seat: ticket.seat,
+          status: ticket.status,
+          ticketPriceInfo: ticket.ticket_price_info,
+          isCheckedIn: true,
+          checkinRecord: {
+            checkInTime: ticket.check_in_time,
+            checkedInBy: {
+              email: ticket.checked_in_by_email,
             },
+            ticketGivenTime: ticket.ticket_given_time,
+            ticketGivenBy: ticket.ticket_given_by,
           },
-          error: 'Ticket has already been checked in',
         },
-        { status: 409 },
-      )
+      })
     }
 
     // Return 200 if ticket valid and not checked in

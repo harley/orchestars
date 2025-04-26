@@ -266,7 +266,8 @@
     "checkedIn": "Checked in:",
     "used": "Used",
     "valid": "Valid",
-    "success": "Success"
+    "success": "Success",
+    "byUsher": "By Usher"
   },
   "customerCheckinTicket": {
     "ticketCheckIn": "Self Check-In",
