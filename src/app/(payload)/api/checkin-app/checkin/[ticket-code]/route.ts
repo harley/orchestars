@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
         req: { user: authData.user },
       })
     ) {
-      return NextResponse.json({ error: 'Unauthorized - Invalid admin user' }, { status: 401 })
+      throw new Error('CHECKIN005')
     }
 
     const user = authData.user

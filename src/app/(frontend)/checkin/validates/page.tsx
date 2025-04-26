@@ -93,7 +93,7 @@ export default function ValidatePage() {
   const handleCheckIn = async () => {
     if (!ticketCode?.trim()) {
       toast({
-        title: 'Failed',
+        title: t('message.operationFailed'),
         description: t('checkin.pleaseEnterTicketCode'),
         variant: 'destructive',
       })
@@ -101,7 +101,7 @@ export default function ValidatePage() {
     }
     if (!token) {
       toast({
-        title: 'Failed',
+        title: t('message.operationFailed'),
         description: t('checkin.pleaseLoginFirst'),
         variant: 'destructive',
       })
@@ -156,7 +156,7 @@ export default function ValidatePage() {
       }
       if (response.status === 404) {
         toast({
-          title: 'Failed',
+          title: t('message.operationFailed'),
           description: data.error || t('checkin.ticketNotFound'),
           variant: 'destructive',
         })
@@ -168,7 +168,7 @@ export default function ValidatePage() {
       router.push(`/checkin/ticket-details?ticket=${encodedTK}`)
     } catch (error: any) {
       toast({
-        title: 'Failed',
+        title: t('message.operationFailed'),
         description: error.message || t('error.failedToCheckIn'),
         variant: 'destructive',
       })
