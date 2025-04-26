@@ -25,6 +25,8 @@ interface TicketRecord {
   check_in_time: string | null
   checked_in_by_id: number | null
   checked_in_by_email: string | null
+  ticket_given_time: string | null
+  ticket_given_by: string | null
 }
 
 export async function POST(req: NextRequest) {
@@ -69,6 +71,8 @@ export async function POST(req: NextRequest) {
         CASE WHEN cr.id IS NOT NULL THEN true ELSE false END as is_checked_in,
         cr.check_in_time,
         cr.checked_in_by_id,
+        cr.ticket_given_time,
+        cr.ticket_given_by,
         a.email as checked_in_by_email
       FROM tickets t
       LEFT JOIN users u ON t.user_id = u.id
@@ -113,6 +117,8 @@ export async function POST(req: NextRequest) {
                   checkedInBy: {
                     email: ticket.checked_in_by_email,
                   },
+                  ticketGivenTime: ticket.ticket_given_time,
+                  ticketGivenBy: ticket.ticket_given_by,
                 }
               : null,
           })),
@@ -141,6 +147,8 @@ export async function POST(req: NextRequest) {
             checkedInBy: {
               email: ticket.checked_in_by_email,
             },
+            ticketGivenTime: ticket.ticket_given_time,
+            ticketGivenBy: ticket.ticket_given_by,
           },
         },
       })

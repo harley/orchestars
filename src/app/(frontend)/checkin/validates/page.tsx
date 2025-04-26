@@ -152,14 +152,21 @@ export default function ValidatePage() {
 
         const encodedTK = encodedTicket(minimalTicket)
 
-        const encodedCheckinRecord = encodeURIComponent(
-          JSON.stringify({
-            checkInTime: formatDate(data.ticket.checkinRecord.checkInTime),
-            checkedInBy: {
-              email: data.ticket.checkinRecord.checkedInBy?.email,
-            },
-          }),
-        )
+        const checkInRecord = {
+          checkInTime: formatDate(data.ticket.checkinRecord.checkInTime),
+          checkedInBy: {
+            email: data.ticket.checkinRecord.checkedInBy?.email,
+          },
+        } as Record<string, any>
+
+        if (data.ticket.checkinRecord.ticketGivenTime) {
+          checkInRecord.ticketGivenTime = data.ticket.checkinRecord.ticketGivenTime
+        }
+        if (data.ticket.checkinRecord.ticketGivenBy) {
+          checkInRecord.ticketGivenBy = data.ticket.checkinRecord.ticketGivenBy
+        }
+
+        const encodedCheckinRecord = encodeURIComponent(JSON.stringify(checkInRecord))
 
         router.push(
           `/checkin/ticket-details?ticket=${encodedTK}&checkinRecord=${encodedCheckinRecord}`,
