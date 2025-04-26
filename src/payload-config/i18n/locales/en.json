@@ -186,7 +186,9 @@
     "CHECKIN009": "All ticket codes must belong to the same user",
     "CHECKIN010": "Email and ticket code are required",
     "CHECKIN011": "Invalid ticket code",
-    "CHECKIN012": "Email does not match ticket records"
+    "CHECKIN012": "Email does not match ticket records",
+    "CHECKIN013": "Ticket code is required",
+    "CHECKIN014": "Please choose event, it is required"
   },
   "error": {
     "title": "Oops! Something went wrong",

@@ -186,7 +186,9 @@
     "CHECKIN009": "Tất cả các mã vé phải thuộc cùng một người dùng",
     "CHECKIN010": "Email và mã vé là bắt buộc",
     "CHECKIN011": "Mã vé không hợp lệ",
-    "CHECKIN012": "Email không khớp với thông tin vé"
+    "CHECKIN012": "Email không khớp với thông tin vé",
+    "CHECKIN013": "Mã vé là bắt buộc",
+    "CHECKIN014": "Vui lòng chọn sự kiện"
   },
   "error": {
     "title": "Rất tiếc! Đã xảy ra lỗi",
