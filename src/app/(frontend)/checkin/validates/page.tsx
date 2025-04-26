@@ -134,7 +134,8 @@ export default function ValidatePage() {
         setMultipleTickets(data.tickets || [])
         return
       }
-      if (response.status === 409) {
+
+      if (!!data?.ticket?.checkinRecord) {
         toast({ title: t('checkin.ticketAlreadyCheckedIn') })
         const minimalTicket = {
           ticketCode: data.ticket.ticketCode,

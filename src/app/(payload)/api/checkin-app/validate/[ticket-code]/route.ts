@@ -124,31 +124,26 @@ export async function POST(req: NextRequest) {
     // We know tickets has at least one element from the check above
     const ticket = tickets[0]!
 
-    // Return 409 if ticket already checked in
     if (ticket.is_checked_in) {
-      return NextResponse.json(
-        {
-          ticket: {
-            id: ticket.id,
-            attendeeName: ticket.attendee_name,
-            email: ticket.email,
-            phoneNumber: ticket.phone_number,
-            ticketCode: ticket.ticket_code,
-            seat: ticket.seat,
-            status: ticket.status,
-            ticketPriceInfo: ticket.ticket_price_info,
-            isCheckedIn: true,
-            checkinRecord: {
-              checkInTime: ticket.check_in_time,
-              checkedInBy: {
-                email: ticket.checked_in_by_email,
-              },
+      return NextResponse.json({
+        ticket: {
+          id: ticket.id,
+          attendeeName: ticket.attendee_name,
+          email: ticket.email,
+          phoneNumber: ticket.phone_number,
+          ticketCode: ticket.ticket_code,
+          seat: ticket.seat,
+          status: ticket.status,
+          ticketPriceInfo: ticket.ticket_price_info,
+          isCheckedIn: true,
+          checkinRecord: {
+            checkInTime: ticket.check_in_time,
+            checkedInBy: {
+              email: ticket.checked_in_by_email,
             },
           },
-          error: 'Ticket has already been checked in',
         },
-        { status: 409 },
-      )
+      })
     }
 
     // Return 200 if ticket valid and not checked in
