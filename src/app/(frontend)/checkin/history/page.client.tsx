@@ -52,9 +52,11 @@ export default function HistoryClientPage({ history = [] }: { history: CheckinRe
         return
       }
       setCheckins((prev) => prev.filter((item) => item.id !== id))
-      alert(t('checkin.recordDeletedSuccessfully'))
+
+      toast({
+        description: t('checkin.recordDeletedSuccessfully'),
+      })
     } catch (error: any) {
-      alert(t('checkin.failedToDeleteRecord'))
       console.error('error, ', error)
       const messageError = error?.response?.data?.message || t('message.errorOccurred')
       toast({
