@@ -254,8 +254,8 @@ const SeatMapSelection = ({
                   {t('event.selectTicket')}
                 </Button>
 
-                <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                  <DialogContent className="max-w-[90vw] w-full mx-auto my-4 h-[90vh] overflow-y-auto top-0 left-0 bottom-0 right-0 translate-x-0 translate-y-0 p-0 bg-black">
+                <Dialog open={isOpen} onOpenChange={handleCloseSeatMapSelection}>
+                  <DialogContent className="max-w-[90vw] w-full mx-auto my-4 h-[95vh] overflow-y-auto top-0 left-0 bottom-0 right-0 translate-x-0 translate-y-0 p-0 bg-black">
                     <div className="flex flex-col h-full">
                       {/* Header */}
                       <div className="bg-black text-white p-4 flex justify-between items-center">
@@ -296,9 +296,10 @@ const SeatMapSelection = ({
                                 <SeatMapToolkit
                                   onSelectSeat={handleSeatSelect}
                                   unavailableSeats={unavailableSeats}
+                                  selectedSeats={selectedSeats}
                                 />
 
-                                <div className="mt-4 text-center py-2">
+                                <div className="text-center py-2">
                                   <h3 className="font-medium">{t('event.balcony')}</h3>
                                 </div>
                               </div>
@@ -363,7 +364,7 @@ const SeatMapSelection = ({
                                   <h3 className="text-lg font-bold mb-4">
                                     {t('event.selectedSeats')}
                                   </h3>
-                                  <div className="max-h-40 overflow-y-auto space-y-2">
+                                  <div className="space-y-2">
                                     {selectedSeats.map((seat) => (
                                       <div key={seat.id} className="flex justify-between">
                                         <span>
