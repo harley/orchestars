@@ -2,7 +2,7 @@ import { Event, Media } from '@/payload-types'
 import { Calendar, MapPin } from 'lucide-react'
 import React from 'react'
 import { format as dateFnsFormat } from 'date-fns'
-
+import Image from 'next/image'
 const EventBanner = ({ event }: { event: Event }) => {
   return (
     <section className="bg-gray-100 py-20">
@@ -42,15 +42,27 @@ const EventBanner = ({ event }: { event: Event }) => {
 
           {/* Right Content - Event Banner Image */}
           <div className="md:w-7/12">
-            <div className="relative rounded-lg overflow-hidden">
-              <img
+            <div className="relative rounded-lg overflow-hidden aspect-[51/29]">
+              <Image
                 src={
-                  (event?.mobileEventBanner as Media)?.url ||
                   (event.eventBanner as Media)?.url ||
+                  (event?.mobileEventBanner as Media)?.url ||
                   '/images/logos/logo-black-adjacent.png'
                 }
+                fill
                 alt={event.title || 'Event'}
-                className="w-full h-auto object-cover rounded-lg shadow-md"
+                className="object-cover rounded-lg shadow-md hidden md:block"
+              />
+
+              <Image
+                src={
+                  (event.eventBanner as Media)?.url ||
+                  (event?.mobileEventBanner as Media)?.url ||
+                  '/images/logos/logo-black-adjacent.png'
+                }
+                fill
+                alt={event.title || 'Event'}
+                className="object-cover rounded-lg shadow-md md:hidden"
               />
             </div>
           </div>
