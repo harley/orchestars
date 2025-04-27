@@ -122,7 +122,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
                 </div>
 
                 {evt.configuration?.showBannerDescription && (
-                  <span className="max-w-[600px] font-medium text-lg mb-6 line-clamp-5">
+                  <span className="max-w-[600px] font-medium text-lg mb-6 line-clamp-4">
                     {evt.description}
                   </span>
                 )}
