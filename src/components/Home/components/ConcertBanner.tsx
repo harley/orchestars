@@ -42,7 +42,13 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
   const renderBanners = useCallback(
     (evt: Event, index: number) => {
       const isUpcoming = evt.status === EVENT_STATUS.published_upcoming.value
-      const isNowShowing = evt.status === EVENT_STATUS.published_open_sales.value
+      const isNowShowing =
+        evt.status === EVENT_STATUS.published_open_sales.value &&
+        evt?.endDatetime &&
+        new Date(evt?.endDatetime) > new Date()
+      const isPast =
+        evt.status === EVENT_STATUS.completed.value ||
+        (evt?.endDatetime && new Date(evt?.endDatetime) < new Date())
 
       const Banner = (
         <>
@@ -66,7 +72,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
       if (!isMobile) {
         return (
           <div
-            key={evt.id}
+            key={`${index}-${evt.title}`}
             className={`absolute inset-0 transition-opacity duration-1000 ${
               index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
@@ -123,11 +129,9 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
                   href={`/events/${evt.slug}`}
                   className="inline-block w-fit px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
                 >
-                  {evt.status === EVENT_STATUS.published_open_sales.value && t('home.bookTicket')}
-                  {evt.status === EVENT_STATUS.published_upcoming.value && t('home.upcomingEvents')}
-                  {evt.status !== EVENT_STATUS.published_open_sales.value &&
-                    evt.status !== EVENT_STATUS.published_upcoming.value &&
-                    t('home.viewDetail')}
+                  {isNowShowing && t('home.bookTicket')}
+                  {isUpcoming && t('home.upcomingEvents')}
+                  {isPast && t('home.viewDetail')}
                 </Link>
               </div>
             </div>
@@ -138,7 +142,7 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
       // show on mobile
       return (
         <Link
-          key={evt.id}
+          key={`${index}-${evt.title}`}
           href={`/events/${evt.slug}`}
           className={`absolute inset-0 transition-opacity duration-1000 ${
             index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -205,9 +209,9 @@ const ConcertBanner: React.FC<EventBannerProps> = ({ events = [] }) => {
       )}
 
       <div className="absolute bottom-4 md:bottom-8 left-0 right-0 z-30 flex justify-center gap-2">
-        {events?.map((_, index) => (
+        {events?.map((evt, index) => (
           <button
-            key={index}
+            key={`${index}-${evt.title}`}
             onClick={() => handleDotClick(index)}
             className={`h-2 rounded-full transition-all border border-white ${
               index === currentIndex ? 'w-8 bg-black/50' : 'w-2 bg-black/50 hover:bg-black/80'
