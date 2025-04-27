@@ -3,6 +3,8 @@ import { getPayload } from '@/payload-config/getPayloadConfig'
 import { TICKET_STATUS } from '@/collections/Tickets/constants'
 import { Event, User } from '@/payload-types'
 import { getZoneInfo } from './utils'
+import { revalidateTag } from 'next/cache'
+import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
 
 export async function POST(request: Request) {
   try {
@@ -10,20 +12,14 @@ export async function POST(request: Request) {
 
     // Validate inputs
     if (!email || !ticketCode) {
-      return NextResponse.json(
-        {
-          message: 'Email and ticket code are required',
-        },
-        { status: 400 },
-      )
+      throw new Error('CHECKIN010')
     }
-
     const payload = await getPayload()
-
     // Find ticket by code
     const ticket = await payload
       .find({
         collection: 'tickets',
+        limit: 1,
         where: {
           ticketCode: {
             equals: ticketCode,
@@ -35,32 +31,21 @@ export async function POST(request: Request) {
         depth: 1,
       })
       .then((res) => res.docs?.[0])
-
     // Validate ticket exists
     if (!ticket) {
-      return NextResponse.json(
-        {
-          message: 'Invalid ticket code',
-        },
-        { status: 400 },
-      )
+      throw new Error('CHECKIN001')
     }
 
     // Validate email matches
     if (ticket.userEmail !== email) {
-      return NextResponse.json(
-        {
-          message: 'Email does not match ticket records',
-        },
-        { status: 400 },
-      )
+      throw new Error('CHECKIN012')
     }
-
     // Check if ticket is already checked in by looking up check-in records
     const existingCheckIn = await payload
       .find({
         collection: 'checkinRecords',
         depth: 0,
+        limit: 1,
         where: {
           ticketCode: {
             equals: ticketCode,
@@ -78,23 +63,20 @@ export async function POST(request: Request) {
 
     const { zoneId, zoneName } = getZoneInfo(ticket, eventRecord)
     if (existingCheckIn) {
-      return NextResponse.json(
-        {
-          message: 'Ticket already checked in',
-          data: {
-            zoneId,
-            zoneName,
-            email: ticket.userEmail,
-            ticketCode: ticket.ticketCode,
-            attendeeName: ticket.attendeeName,
-            eventName: eventRecord?.title,
-            checkedInAt: existingCheckIn.checkInTime,
-            ticketPriceInfo: ticket.ticketPriceInfo,
-            seat: ticket.seat,
-          },
+      return NextResponse.json({
+        message: 'Ticket already checked in',
+        data: {
+          zoneId,
+          zoneName,
+          email: ticket.userEmail,
+          ticketCode: ticket.ticketCode,
+          attendeeName: ticket.attendeeName,
+          eventName: eventRecord?.title,
+          checkedInAt: existingCheckIn.checkInTime,
+          ticketPriceInfo: ticket.ticketPriceInfo,
+          seat: ticket.seat,
         },
-        { status: 409 },
-      )
+      })
     }
 
     // Create check-in record
@@ -112,8 +94,7 @@ export async function POST(request: Request) {
         checkInTime: new Date().toISOString(),
       },
     })
-
-    // Get zone information using the helper function
+    revalidateTag('checkin-history')
 
     // Return success response
     return NextResponse.json({
@@ -132,11 +113,6 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error('Check-in error:', error)
-    return NextResponse.json(
-      {
-        message: 'An error occurred while processing your request',
-      },
-      { status: 400 },
-    )
+    return NextResponse.json({ message: await handleNextErrorMsgResponse(error) }, { status: 400 })
   }
 }

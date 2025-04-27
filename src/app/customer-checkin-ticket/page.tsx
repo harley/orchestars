@@ -56,15 +56,8 @@ export default function CustomerCheckInPage() {
         const res: CheckInResponse = await response.json()
         setCheckedInData(res.data)
         toast({
-          title: t('customerCheckinTicket.checkInSuccessful'),
-          description: t('customerCheckinTicket.checkInSuccessful'),
-        })
-      } else if (response.status === 409) {
-        const res: CheckInResponse = await response.json()
-        setCheckedInData(res.data)
-        toast({
-          title: t('customerCheckinTicket.alreadyCheckedIn'),
-          description: t('customerCheckinTicket.checkInSuccessful'),
+          title: res.message,
+          description: t('customerCheckinTicket.showTicket'),
         })
       } else {
         const err: CheckInResponse = await response.json()
@@ -74,11 +67,14 @@ export default function CustomerCheckInPage() {
           description: err.message,
         })
       }
-    } catch {
+    } catch (error: any) {
+      console.error('error, ', error)
+      const messageError =
+        error?.response?.data?.message || error?.message || t('message.errorOccurred')
       toast({
-        variant: 'destructive',
         title: t('error.failedToCheckIn'),
-        description: t('error.failedToCheckIn'),
+        description: messageError,
+        variant: 'destructive',
       })
     } finally {
       setIsLoading(false)
@@ -96,8 +92,7 @@ export default function CustomerCheckInPage() {
   const handleTicketGiven = async () => {
     const adminId = window.prompt('Enter admin ID:')
     if (!adminId) return
-    const confirm = window.confirm(t('customerCheckinTicket.confirmTicketGiven', { adminId }))
-    if (!confirm) return
+
     try {
       setLoadingTicketGiven(true)
       const response = await fetch('/api/checkin-app/customer-checkin/given-ticket', {
@@ -107,7 +102,6 @@ export default function CustomerCheckInPage() {
       })
       if (response.ok) {
         setTicketGivenConfirmed(true)
-        const _res: CheckInResponse = await response.json()
         toast({
           title: t('customerCheckinTicket.success'),
           description: t('customerCheckinTicket.confirmed'),
@@ -120,11 +114,14 @@ export default function CustomerCheckInPage() {
           description: err.message,
         })
       }
-    } catch {
+    } catch (error: any) {
+      console.error('error, ', error)
+      const messageError =
+        error?.response?.data?.message || error?.message || t('message.errorOccurred')
       toast({
+        title: t('message.operationFailed'),
+        description: messageError,
         variant: 'destructive',
-        title: t('error.unexpectedError'),
-        description: t('error.unexpectedError'),
       })
     } finally {
       setLoadingTicketGiven(false)

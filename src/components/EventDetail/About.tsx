@@ -13,7 +13,11 @@ const About = ({ eventDetail }: { eventDetail: Event }) => {
       <div className="container mx-auto px-4">
         <h2 className="text-2xl md:text-4xl font-bold mb-8 uppercase">{t('event.introduction')}</h2>
 
-        <RichTextConverter data={eventDetail.detailDescription as SerializedEditorState} />
+        {eventDetail.detailDescription ? (
+          <RichTextConverter data={eventDetail.detailDescription as SerializedEditorState} />
+        ) : (
+          <p>{eventDetail.description}</p>
+        )}
       </div>
     </section>
   )

@@ -8,6 +8,7 @@ import { getPayload } from '@/payload-config/getPayloadConfig'
 // import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 // import { getClientSideURL } from '@/utilities/getURL'
 
+
 export async function GET() {
   // Get authorization header
   const payload = await getPayload()
@@ -25,6 +26,23 @@ export async function GET() {
     where: {
       status: {
         equals: 'published_open_sales',
+      },
+    },
+    limit: 50, // Add pagination limit
+    select: {
+      id: true,
+      title: true,
+      eventLocation: true,
+      startDatetime: true,
+      endDatetime: true,
+      schedules: {
+        id: true,
+        date: true,
+        details: {
+          time: true,
+          name: true,
+          description: true,
+        },
       },
     },
   })

@@ -5,9 +5,11 @@
 // return ticket details
 
 import { NextRequest, NextResponse } from 'next/server'
-import { headers as getHeaders } from 'next/headers'
 import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 import { getPayload } from '@/payload-config/getPayloadConfig'
+import { revalidateTag } from 'next/cache'
+import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
+import { checkAuthenticated } from '@/utilities/checkAuthenticated'
 // import { getClientSideURL } from '@/utilities/getURL'
 
 export async function POST(req: NextRequest) {
@@ -15,17 +17,18 @@ export async function POST(req: NextRequest) {
     // Get authorization header
     const payload = await getPayload()
 
-    const headers = await getHeaders()
-    const { user } = await payload.auth({ headers })
+    const authData = await checkAuthenticated()
 
     if (
-      !user ||
+      !authData?.user ||
       !isAdminOrSuperAdminOrEventAdmin({
-        req: { user },
+        req: { user: authData.user },
       })
     ) {
-      return NextResponse.json({ error: 'Unauthorized - Invalid admin user' }, { status: 401 })
+      throw new Error('CHECKIN005')
     }
+
+    const user = authData.user
 
     // Get ticket code from URL parameter
     const ticketCode = req.nextUrl.pathname.split('/').pop()
@@ -35,6 +38,7 @@ export async function POST(req: NextRequest) {
     const ticket = await payload.find({
       collection: 'tickets',
       depth: 0,
+      limit: 1,
       where: {
         ticketCode: {
           equals: ticketCode,
@@ -43,7 +47,7 @@ export async function POST(req: NextRequest) {
     })
 
     if (!ticket.docs?.length) {
-      return NextResponse.json({ error: 'Ticket not found' }, { status: 404 })
+      throw new Error('CHECKIN001')
     }
 
     const ticketDoc = ticket.docs[0]
@@ -54,18 +58,14 @@ export async function POST(req: NextRequest) {
       !ticketDoc.ticketCode ||
       !ticketDoc.seat
     ) {
-      return NextResponse.json(
-        {
-          error: 'Invalid ticket data - Missing required fields or Seat is not assigned to Ticket',
-        },
-        { status: 400 },
-      )
+      throw new Error('CHECKIN002')
     }
 
     // Check if ticket has already been used
     const existingCheckIn = await payload.find({
       collection: 'checkinRecords',
       depth: 0,
+      limit: 1,
       where: {
         ticketCode: {
           equals: ticketDoc.ticketCode,
@@ -75,10 +75,7 @@ export async function POST(req: NextRequest) {
     })
 
     if (existingCheckIn.docs?.length > 0) {
-      return NextResponse.json(
-        { error: 'Ticket has already been used for check-in' },
-        { status: 400 },
-      )
+      throw new Error('CHECKIN003')
     }
 
     // Create check-in record
@@ -94,17 +91,20 @@ export async function POST(req: NextRequest) {
         eventDate: eventDate || null,
         checkInTime: new Date().toISOString(),
         checkedInBy: user.id, // Use the admin's ID who performed check-in
+        ticketGivenTime: new Date().toISOString(),
       },
     })
 
+    revalidateTag('checkin-history')
+
     // return error if check-in record is not created
     if (!checkinRecord) {
-      return NextResponse.json({ error: 'Failed to create check-in record' }, { status: 500 })
+      throw new Error('CHECKIN004')
     }
 
     return NextResponse.json({ checkinRecord }, { status: 200 })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Check-in error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ message: await handleNextErrorMsgResponse(error) }, { status: 400 })
   }
 }

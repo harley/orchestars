@@ -83,6 +83,7 @@ const EventDetailPage = async (props: {
 
           {/* Ticket Section */}
           {isUpcoming && <UpcomingSaleBanner />}
+
           {isOpenForSales && (
             <SeatReservationClient
               event={eventDetail}

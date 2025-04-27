@@ -186,7 +186,21 @@
     "ORD002": "The order does not exist",
     "ORD003": "The order has already been paid",
     "ORD004": "The order has expired",
-    "ORD005": "Please select your seat and try again"
+    "ORD005": "Please select your seat and try again",
+    "CHECKIN001": "Ticket not found",
+    "CHECKIN002": "Seat is not assigned to ticket",
+    "CHECKIN003": "Ticket has already been used for check-in",
+    "CHECKIN004": "Check-in failed",
+    "CHECKIN005": "Unauthorized - Invalid admin user",
+    "CHECKIN006": "Check-in record not found",
+    "CHECKIN007": "Admin ID and at least one ticket code are required",
+    "CHECKIN008": "Admin not found",
+    "CHECKIN009": "All ticket codes must belong to the same user",
+    "CHECKIN010": "Email and ticket code are required",
+    "CHECKIN011": "Invalid ticket code",
+    "CHECKIN012": "Email does not match ticket records",
+    "CHECKIN013": "Ticket code is required",
+    "CHECKIN014": "Please choose event, it is required"
   },
   "error": {
     "title": "Oops! Something went wrong",
@@ -225,7 +239,7 @@
     "unexpectedError": "Unexpected error"
   },
   "checkin": {
-    "welcomeBack": "Welcome Back",
+    "adminCheckIn": "Admin Check-In",
     "signInToContinue": "Sign in to continue",
     "email": "Email",
     "enterYourEmail": "Enter your email",
@@ -272,7 +286,7 @@
     "enterTicketCodeOrSeat": "Enter ticket code/Seat",
     "validateTicket": "Validate Ticket",
     "validating": "Validating...",
-    "viewHistory": "View History",
+    "viewHistory": "View All Check-In",
     "multipleTicketsFound": "Multiple Tickets Found",
     "multipleTicketsFoundLabel": "Multiple Tickets Found",
     "pleaseEnterTicketCode": "Please enter a ticket code",
@@ -283,16 +297,18 @@
     "ticketPriceInfoLabel": "Ticket Price Info:",
     "checkedIn": "Checked in:",
     "used": "Used",
-    "valid": "Valid"
+    "valid": "Valid",
+    "success": "Success",
+    "byUsher": "By Usher"
   },
   "customerCheckinTicket": {
-    "ticketCheckIn": "Ticket Check-in",
+    "ticketCheckIn": "Self Check-In",
     "enterYourEmail": "Enter your email",
     "enterYourTicketCode": "Enter your ticket code",
     "checkIn": "Check in",
     "checkingIn": "Checking in...",
     "alreadyCheckedIn": "Already checked in",
-    "checkInSuccessful": "Check-in Successful!",
+    "showTicket": "Show this screen to receive ticket!",
     "confirmedSuccessfully": "Confirmed successfully",
     "zone": "Zone:",
     "ticketCode": "Ticket Code:",
@@ -319,7 +335,7 @@
     "bulkMarkGivenSuccess": "Give Selected Tickets",
     "markedSelectedTicketsAsGiven": "Successful marked selected tickets as given",
     "confirmTicketGiven": "Confirm this ticket has been given by admin \"{{adminId}}\"?",
-    "confirmed": "Confirmed successfully",
+    "confirmed": "Ticket received!",
     "success": "Success",
     "selectAll": "Select All",
     "deselectAll": "Deselect All"

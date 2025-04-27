@@ -186,7 +186,21 @@
     "ORD002": "Đơn hàng không tồn tại",
     "ORD003": "Đơn hàng đã được thanh toán",
     "ORD004": "Đơn hàng đã hết hạn thanh toán",
-    "ORD005": "Vui lòng chọn ghế và thực hiện lại thao tác"
+    "ORD005": "Vui lòng chọn ghế và thực hiện lại thao tác",
+    "CHECKIN001": "Không tìm thấy vé",
+    "CHECKIN002": "Ghế chưa được chỉ định cho vé",
+    "CHECKIN003": "Vé này đã được check-in",
+    "CHECKIN004": "Check-in thất bại",
+    "CHECKIN005": "Không có quyền truy cập",
+    "CHECKIN006": "Không tìm thấy thông tin check-in",
+    "CHECKIN007": "Admin ID và ít nhất một mã vé là bắt buộc",
+    "CHECKIN008": "Không tìm thấy admin",
+    "CHECKIN009": "Tất cả các mã vé phải thuộc cùng một người dùng",
+    "CHECKIN010": "Email và mã vé là bắt buộc",
+    "CHECKIN011": "Mã vé không hợp lệ",
+    "CHECKIN012": "Email không khớp với thông tin vé",
+    "CHECKIN013": "Mã vé là bắt buộc",
+    "CHECKIN014": "Vui lòng chọn sự kiện"
   },
   "error": {
     "title": "Rất tiếc! Đã xảy ra lỗi",
@@ -225,7 +239,7 @@
     "unexpectedError": "Lỗi không xác định"
   },
   "checkin": {
-    "welcomeBack": "Chào mừng trở lại",
+    "adminCheckIn": "Admin Soát Vé",
     "signInToContinue": "Đăng nhập để tiếp tục",
     "email": "Email",
     "enterYourEmail": "Nhập email của bạn",
@@ -272,7 +286,7 @@
     "enterTicketCodeOrSeat": "Nhập mã vé/Ghế",
     "validateTicket": "Xác thực vé",
     "validating": "Đang xác thực...",
-    "viewHistory": "Xem lịch sử",
+    "viewHistory": "Xem tất cả checkin",
     "multipleTicketsFound": "Tìm thấy nhiều vé",
     "multipleTicketsFoundLabel": "Tìm thấy nhiều vé",
     "pleaseEnterTicketCode": "Vui lòng nhập mã vé",
@@ -283,16 +297,18 @@
     "ticketPriceInfoLabel": "Thông tin giá vé:",
     "checkedIn": "Đã check-in:",
     "used": "Đã sử dụng",
-    "valid": "Hợp lệ"
+    "valid": "Hợp lệ",
+    "success": "Thành công",
+    "byUsher": "Bởi Usher"
   },
   "customerCheckinTicket": {
-    "ticketCheckIn": "Check-in Vé",
+    "ticketCheckIn": "Tự Check In",
     "enterYourEmail": "Nhập email của bạn",
     "enterYourTicketCode": "Nhập mã vé của bạn",
     "checkIn": "Check-in",
     "checkingIn": "Đang check-in...",
     "alreadyCheckedIn": "Đã check-in truớc đó",
-    "checkInSuccessful": "Check-in Thành công!",
+    "showTicket": "Hãy đưa màn hình cho nhân viên để nhận vé!",
     "confirmedSuccessfully": "Đã xác nhận thành công!",
     "zone": "Khu vực:",
     "ticketCode": "Mã vé:",
@@ -319,7 +335,7 @@
     "bulkMarkGivenSuccess": "Đánh dấu hàng loạt đã giao vé thành công",
     "markedSelectedTicketsAsGiven": "Các vé liên quan đã chọn được checkin thành công",
     "confirmTicketGiven": "Xác nhận vé này đã được giao bởi admin \"{{adminId}}\"?",
-    "confirmed": "Đã xác nhận thành công",
+    "confirmed": "Đã nhận vé",
     "success": "Thành công",
     "selectAll": "Chọn tất cả",
     "deselectAll": "Bỏ chọn tất cả"
