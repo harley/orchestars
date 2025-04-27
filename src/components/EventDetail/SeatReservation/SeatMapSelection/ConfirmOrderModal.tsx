@@ -38,13 +38,11 @@ type FormValues = {
 
 const ConfirmOrderModal = ({
   event,
-  isOpen,
   onCloseModal,
   selectedSeats,
   promotions,
 }: {
   event: Event
-  isOpen: boolean
   onCloseModal: (options?: { resetSeat?: boolean }) => void
   selectedSeats: SelectedSeat[]
   promotions: Promotion[]
@@ -200,272 +198,259 @@ const ConfirmOrderModal = ({
   const calculateTotal = calculateTotalOrder(promotionInfo, ticketSelected, event)
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => onCloseModal()}>
-      <DialogContent className="max-w-[90vw] w-full mx-auto my-4 h-[90vh] overflow-y-auto top-0 left-0 bottom-0 right-0 translate-x-0 translate-y-0">
-        <DialogHeader>
-          <DialogTitle className="text-center text-xl">
-            <h1 className="text-3xl font-bold text-center mb-8">
-              {t('event.confirmOrderAndPayment')}
-            </h1>
-          </DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit(handleConfirm)}>
-          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Left Column - User Info & Payment Methods */}
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4">{t('event.recipientInfo')}</h2>
+    <form onSubmit={handleSubmit(handleConfirm)}>
+      <div className="container mx-auto px-4">
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Left Column - User Info & Payment Methods */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-4">{t('event.recipientInfo')}</h2>
 
-                <div className="space-y-4 mb-6">
-                  <div>
-                    <Label htmlFor="lastName">{t('event.lastName')} *</Label>
-                    <Input
-                      placeholder={t('event.enterLastName')}
-                      {...register('lastName', { required: t('event.lastNameRequired') })}
-                    />
-                    {errors.lastName?.message && (
-                      <p className="text-red-500">{errors.lastName.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="firstName">{t('event.firstName')} *</Label>
-                    <Input
-                      placeholder={t('event.enterFirstName')}
-                      {...register('firstName', { required: t('event.firstNameRequired') })}
-                    />
-                    {errors.firstName?.message && (
-                      <p className="text-red-500">{errors.firstName.message}</p>
-                    )}
-                  </div>
-                  <div>
-                    <Label htmlFor="phone">{t('event.phoneNumber')} *</Label>
-                    <Input
-                      placeholder={t('event.enterPhoneNumber')}
-                      {...register('phoneNumber', {
-                        required: t('event.phoneNumberRequired'),
-                      })}
-                    />
-                    {errors.phoneNumber?.message && (
-                      <p className="text-red-500">{errors.phoneNumber.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="email">{t('event.email')} *</Label>
-                    <Input
-                      placeholder={t('event.enterEmail')}
-                      {...register('email', {
-                        required: t('event.emailRequired'),
-                        pattern: {
-                          value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                          message: t('event.emailInvalidFormat'),
-                        },
-                      })}
-                    />
-                    {errors.email?.message && (
-                      <p className="text-red-500">{errors.email.message}</p>
-                    )}
-                  </div>
-                </div>
-
-                <Separator className="my-6" />
-
-                <h2 className="text-xl font-semibold mb-4">{t('event.selectPaymentMethod')}</h2>
-
-                <RadioGroup value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
-                  <div className="space-y-2">
-                    {paymentMethods.map((method) => (
-                      <div
-                        key={method.id}
-                        className={`flex items-center space-x-2 p-3 border rounded-md cursor-pointer transition-colors ${selectedPaymentMethod === method.id ? 'border-primary bg-primary/5' : 'border-gray-200 hover:bg-gray-50'}`}
-                      >
-                        <RadioGroupItem value={method.id} id={method.id} />
-                        <Label
-                          htmlFor={method.id}
-                          className="flex items-center gap-2 cursor-pointer w-full"
-                        >
-                          {method.icon}
-                          {method.name}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </RadioGroup>
+            <div className="space-y-4 mb-6">
+              <div>
+                <Label htmlFor="lastName">{t('event.lastName')} *</Label>
+                <Input
+                  placeholder={t('event.enterLastName')}
+                  {...register('lastName', { required: t('event.lastNameRequired') })}
+                />
+                {errors.lastName?.message && (
+                  <p className="text-red-500">{errors.lastName.message}</p>
+                )}
               </div>
 
-              {/* Right Column - Order Summary */}
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4">{t('event.orderSummary')}</h2>
-
-                <div className="mb-6">
-                  <h3 className="font-medium text-lg mb-2">{t('event.ticketInfo')}</h3>
-                  <Separator className="my-4" />
-                  <h4 className="font-medium mb-2">{t('event.selectedSeats')}:</h4>
-                  {selectedSeats.map((seat) => (
-                    <div key={seat.id} className="flex justify-between mb-2">
-                      <span>
-                        {t('event.seat')} {seat.label}
-                      </span>
-                      <span>{formatMoney(seat.ticketPrice?.price || 0)}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <PromotionList
-                  promotions={promotions}
-                  selectedPromotion={promotionInfo}
-                  onSelectPromotion={(promotion) => {
-                    setPromotionInfo(promotion)
-
-                    setPromotionCode(promotion?.code || '')
-                  }}
+              <div>
+                <Label htmlFor="firstName">{t('event.firstName')} *</Label>
+                <Input
+                  placeholder={t('event.enterFirstName')}
+                  {...register('firstName', { required: t('event.firstNameRequired') })}
                 />
-
-                <div className="mb-6">
-                  <Label htmlFor="promoCode">{t('event.enterPromoCode')}</Label>
-                  <div className="grid md:grid-cols-[1fr,100px] gap-[2px]">
-                    <Input
-                      value={promotionCode}
-                      onChange={(e) => setPromotionCode(e.target.value)}
-                      placeholder={t('event.promoCode')}
-                    />
-                    <Button
-                      disabled={isSubmitting || isSubmittingPromotionForm}
-                      onClick={checkPromotionCode}
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="whitespace-nowrap border border-[#1390d6]  px-3 h-[40px] bg-[#1390d6] hover:bg-[#169eeb] !text-white"
-                    >
-                      {t('event.applyCode')}
-                    </Button>
-                  </div>
-                </div>
-
-                {promotionInfo &&
-                  promotionInfo.code === promotionCode &&
-                  (calculateTotal.canApplyPromoCode ? (
-                    <div className="p-4 border rounded-md bg-green-50">
-                      <div className="flex md:flex-row flex-col justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <Check className="h-5 w-5 text-green-600" />
-                          <span className="font-medium">
-                            {t('event.promoCode')}: {promotionCode}
-                          </span>
-                        </div>
-                        <div className="text-green-600 font-medium">
-                          <span>
-                            {promotionInfo.discountType === 'percentage'
-                              ? `${promotionInfo.discountValue}%`
-                              : `${formatMoney(promotionInfo.discountValue, 'VND')}`}
-                          </span>
-
-                          <span className="text-sm">
-                            {promotionInfo.discountApplyScope === 'total_order_value' &&
-                              ` (${t('event.discountOnTotalOrderValue')})`}
-                            {promotionInfo.discountApplyScope === 'per_order_item' &&
-                              ` (${t('event.discountOnPerOrderItem')})`}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="p-4 border rounded-md bg-red-200">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <X className="h-10 w-10 text-red-600" />
-                          <span className="font-medium text-sm">
-                            {t('event.promotionNotMeetConditions')}: {promotionCode}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                <Separator className="my-4" />
-
-                {/* Total Amount */}
-                <div className="flex justify-between items-center mb-6">
-                  <span className="text-base font-bold">{t('event.totalBeforeDiscount')}:</span>
-                  <span className="text-lg font-bold text-primary">
-                    {formatMoney(calculateTotal.amountBeforeDiscount)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center mb-6">
-                  <span className="text-base font-bold">{t('event.totalAfterDiscount')}:</span>
-                  <span className="text-lg font-bold text-primary">
-                    {formatMoney(calculateTotal.amount)}
-                  </span>
-                </div>
-
-                {selectedPaymentMethod === PAYMENT_METHODS.ZALOPAY && (
-                  <>
-                    <div className="grid xl:grid-cols-2 grid-cols-1 gap-2">
-                      <Button
-                        type="submit"
-                        className="bg-green-600 hover:bg-green-700 cursor-pointer text-white"
-                        disabled={isSubmitting || isSubmittingPromotionForm}
-                      >
-                        {isSubmitting ? (
-                          <Loader2 className={'my-28 h-16 w-16 text-primary/60 animate-spin'} />
-                        ) : (
-                          <Check className="mr-2 h-4 w-4" />
-                        )}
-                        {t('event.confirmAndPay')}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="cursor-pointer"
-                        onClick={() => onCloseModal()}
-                        disabled={isSubmitting}
-                      >
-                        <X className="mr-2 h-4 w-4" /> {t('event.close')}
-                      </Button>
-                    </div>
-                    <div className="mt-4 flex items-start gap-2 text-sm text-gray-500">
-                      <Info className="h-5 w-5 flex-shrink-0 text-gray-400" />
-                      <p>{t('event.paymentTerms')}</p>
-                    </div>
-                  </>
+                {errors.firstName?.message && (
+                  <p className="text-red-500">{errors.firstName.message}</p>
                 )}
-
-                {selectedPaymentMethod === PAYMENT_METHODS.BANK_TRANSFER && (
-                  <>
-                    <div className="grid 2xl:grid-cols-2 grid-cols-1 gap-2">
-                      <Button
-                        type="submit"
-                        className="bg-green-600 hover:bg-green-700 cursor-pointer text-white"
-                        disabled={isSubmitting || isSubmittingPromotionForm}
-                      >
-                        {isSubmitting ? (
-                          <Loader2 className={'my-28 h-16 w-16 text-primary/60 animate-spin'} />
-                        ) : (
-                          <Check className="mr-2 h-4 w-4" />
-                        )}
-                        {t('event.confirmAndGoToPayment')}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="cursor-pointer"
-                        onClick={() => onCloseModal()}
-                        disabled={isSubmitting || isSubmittingPromotionForm}
-                      >
-                        <X className="mr-2 h-4 w-4" /> {t('event.close')}
-                      </Button>
-                    </div>
-                    <div className="mt-4 flex items-start gap-2 text-sm text-gray-500">
-                      <Info className="h-5 w-5 flex-shrink-0 text-gray-400" />
-                      <p>{t('event.bankTransferTerms')}</p>
-                    </div>
-                  </>
+              </div>
+              <div>
+                <Label htmlFor="phone">{t('event.phoneNumber')} *</Label>
+                <Input
+                  placeholder={t('event.enterPhoneNumber')}
+                  {...register('phoneNumber', {
+                    required: t('event.phoneNumberRequired'),
+                  })}
+                />
+                {errors.phoneNumber?.message && (
+                  <p className="text-red-500">{errors.phoneNumber.message}</p>
                 )}
+              </div>
+
+              <div>
+                <Label htmlFor="email">{t('event.email')} *</Label>
+                <Input
+                  placeholder={t('event.enterEmail')}
+                  {...register('email', {
+                    required: t('event.emailRequired'),
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: t('event.emailInvalidFormat'),
+                    },
+                  })}
+                />
+                {errors.email?.message && <p className="text-red-500">{errors.email.message}</p>}
               </div>
             </div>
+
+            <Separator className="my-6" />
+
+            <h2 className="text-xl font-semibold mb-4">{t('event.selectPaymentMethod')}</h2>
+
+            <RadioGroup value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+              <div className="space-y-2">
+                {paymentMethods.map((method) => (
+                  <div
+                    key={method.id}
+                    className={`flex items-center space-x-2 p-3 border rounded-md cursor-pointer transition-colors ${selectedPaymentMethod === method.id ? 'border-primary bg-primary/5' : 'border-gray-200 hover:bg-gray-50'}`}
+                  >
+                    <RadioGroupItem value={method.id} id={method.id} />
+                    <Label
+                      htmlFor={method.id}
+                      className="flex items-center gap-2 cursor-pointer w-full"
+                    >
+                      {method.icon}
+                      {method.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </RadioGroup>
           </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+
+          {/* Right Column - Order Summary */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-4">{t('event.orderSummary')}</h2>
+
+            <div className="mb-6">
+              <h3 className="font-medium text-lg mb-2">{t('event.ticketInfo')}</h3>
+              <Separator className="my-4" />
+              <h4 className="font-medium mb-2">{t('event.selectedSeats')}:</h4>
+              {selectedSeats.map((seat) => (
+                <div key={seat.id} className="flex justify-between mb-2">
+                  <span>
+                    {t('event.seat')} {seat.label}
+                  </span>
+                  <span>{formatMoney(seat.ticketPrice?.price || 0)}</span>
+                </div>
+              ))}
+            </div>
+
+            <PromotionList
+              promotions={promotions}
+              selectedPromotion={promotionInfo}
+              onSelectPromotion={(promotion) => {
+                setPromotionInfo(promotion)
+
+                setPromotionCode(promotion?.code || '')
+              }}
+            />
+
+            <div className="mb-6">
+              <Label htmlFor="promoCode">{t('event.enterPromoCode')}</Label>
+              <div className="grid md:grid-cols-[1fr,100px] gap-[2px]">
+                <Input
+                  value={promotionCode}
+                  onChange={(e) => setPromotionCode(e.target.value)}
+                  placeholder={t('event.promoCode')}
+                />
+                <Button
+                  disabled={isSubmitting || isSubmittingPromotionForm}
+                  onClick={checkPromotionCode}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="whitespace-nowrap border border-[#1390d6]  px-3 h-[40px] bg-[#1390d6] hover:bg-[#169eeb] !text-white"
+                >
+                  {t('event.applyCode')}
+                </Button>
+              </div>
+            </div>
+
+            {promotionInfo &&
+              promotionInfo.code === promotionCode &&
+              (calculateTotal.canApplyPromoCode ? (
+                <div className="p-4 border rounded-md bg-green-50">
+                  <div className="flex md:flex-row flex-col justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Check className="h-5 w-5 text-green-600" />
+                      <span className="font-medium">
+                        {t('event.promoCode')}: {promotionCode}
+                      </span>
+                    </div>
+                    <div className="text-green-600 font-medium">
+                      <span>
+                        {promotionInfo.discountType === 'percentage'
+                          ? `${promotionInfo.discountValue}%`
+                          : `${formatMoney(promotionInfo.discountValue, 'VND')}`}
+                      </span>
+
+                      <span className="text-sm">
+                        {promotionInfo.discountApplyScope === 'total_order_value' &&
+                          ` (${t('event.discountOnTotalOrderValue')})`}
+                        {promotionInfo.discountApplyScope === 'per_order_item' &&
+                          ` (${t('event.discountOnPerOrderItem')})`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 border rounded-md bg-red-200">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <X className="h-10 w-10 text-red-600" />
+                      <span className="font-medium text-sm">
+                        {t('event.promotionNotMeetConditions')}: {promotionCode}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+            <Separator className="my-4" />
+
+            {/* Total Amount */}
+            <div className="flex justify-between items-center mb-6">
+              <span className="text-base font-bold">{t('event.totalBeforeDiscount')}:</span>
+              <span className="text-lg font-bold text-primary">
+                {formatMoney(calculateTotal.amountBeforeDiscount)}
+              </span>
+            </div>
+            <div className="flex justify-between items-center mb-6">
+              <span className="text-base font-bold">{t('event.totalAfterDiscount')}:</span>
+              <span className="text-lg font-bold text-primary">
+                {formatMoney(calculateTotal.amount)}
+              </span>
+            </div>
+
+            {selectedPaymentMethod === PAYMENT_METHODS.ZALOPAY && (
+              <>
+                <div className="grid xl:grid-cols-2 grid-cols-1 gap-2">
+                  <Button
+                    type="submit"
+                    className="bg-green-600 hover:bg-green-700 cursor-pointer text-white"
+                    disabled={isSubmitting || isSubmittingPromotionForm}
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className={'my-28 h-16 w-16 text-primary/60 animate-spin'} />
+                    ) : (
+                      <Check className="mr-2 h-4 w-4" />
+                    )}
+                    {t('event.confirmAndPay')}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="cursor-pointer"
+                    onClick={() => onCloseModal()}
+                    disabled={isSubmitting}
+                  >
+                    <X className="mr-2 h-4 w-4" /> {t('event.close')}
+                  </Button>
+                </div>
+                <div className="mt-4 flex items-start gap-2 text-sm text-gray-500">
+                  <Info className="h-5 w-5 flex-shrink-0 text-gray-400" />
+                  <p>{t('event.paymentTerms')}</p>
+                </div>
+              </>
+            )}
+
+            {selectedPaymentMethod === PAYMENT_METHODS.BANK_TRANSFER && (
+              <>
+                <div className="grid 2xl:grid-cols-2 grid-cols-1 gap-2">
+                  <Button
+                    type="submit"
+                    className="bg-green-600 hover:bg-green-700 cursor-pointer text-white"
+                    disabled={isSubmitting || isSubmittingPromotionForm}
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className={'my-28 h-16 w-16 text-primary/60 animate-spin'} />
+                    ) : (
+                      <Check className="mr-2 h-4 w-4" />
+                    )}
+                    {t('event.confirmAndGoToPayment')}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="cursor-pointer"
+                    onClick={() => onCloseModal()}
+                    disabled={isSubmitting || isSubmittingPromotionForm}
+                  >
+                    <X className="mr-2 h-4 w-4" /> {t('event.close')}
+                  </Button>
+                </div>
+                <div className="mt-4 flex items-start gap-2 text-sm text-gray-500">
+                  <Info className="h-5 w-5 flex-shrink-0 text-gray-400" />
+                  <p>{t('event.bankTransferTerms')}</p>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </form>
   )
 }
 
