@@ -25,7 +25,7 @@ const Schedule = ({ schedules }: { schedules: Event['schedules'] }) => {
   return (
     <section className="py-12 bg-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-8 text-center">{t('event.schedule')}</h2>
+        <h2 className="text-2xl md:text-4xl font-bold mb-8 uppercase">{t('event.schedule')}</h2>
 
         <div className="max-w-3xl mx-auto">
           {_schedules.map((schedule, idx) => (

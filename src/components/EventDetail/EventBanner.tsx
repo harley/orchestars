@@ -2,58 +2,68 @@ import { Event, Media } from '@/payload-types'
 import { Calendar, MapPin } from 'lucide-react'
 import React from 'react'
 import { format as dateFnsFormat } from 'date-fns'
-
+import Image from 'next/image'
 const EventBanner = ({ event }: { event: Event }) => {
   return (
-    <section className="relative h-[300px] lg:h-[400px] xl:h-[500px] 2xl:h-[700px] overflow-hidden">
-      <div className="absolute inset-0 z-10" />
-      {/* Desktop Banner */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden md:block"
-        style={{ backgroundImage: `url(${(event?.eventBanner as Media)?.url})` }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 to-transparent" />
-      </div>
-
-      {/* Mobile Banner */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat md:hidden"
-        style={{
-          backgroundImage: `url(${(event?.mobileEventBanner as Media)?.url || (event?.eventBanner as Media)?.url})`,
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 to-transparent" />
-      </div>
-
-      <div className="relative z-20 h-full flex items-end">
-        <div className="container mx-auto px-6 md:px-10 pb-16 md:pb-20 w-full">
-          <div className="max-w-3xl">
-            {event.title && event.configuration?.showBannerTitle && (
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 animate-fade-in">
-                {event.title}
+    <section className="bg-gray-100 py-20">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col md:flex-row gap-8 md:gap-12">
+          {/* Left Content - Event Title */}
+          <div className="flex flex-col justify-between md:w-5/12 space-y-6">
+            <div>
+              <h1 className="text-4xl sm:text-5xl font-bold text-black tracking-tight">
+                {event.title || 'Event Title'}
               </h1>
-            )}
+            </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 text-white/90 mb-8">
-              {event.configuration?.showBannerTime && (
+            <div className="space-y-3">
+              {event.startDatetime && (
                 <div className="flex items-center">
-                  <Calendar className="h-5 w-5 mr-2" />
-                  <span>
-                    {event.startDatetime &&
-                      dateFnsFormat(new Date(event.startDatetime), 'dd/MM/yyyy HH:mm a')}{' '}
-                    -{' '}
-                    {event.endDatetime &&
-                      dateFnsFormat(new Date(event.endDatetime), 'dd/MM/yyyy HH:mm a')}
-                  </span>
+                  <Calendar className="h-5 w-5 mr-3 text-black" />
+                  <div className="text-black">
+                    <span className="font-medium">
+                      {dateFnsFormat(new Date(event.startDatetime), 'HH:mm')} –&nbsp;
+                      {event.endDatetime ? dateFnsFormat(new Date(event.endDatetime), 'HH:mm') : ''}
+                    </span>
+                    <br />
+                    <span>{dateFnsFormat(new Date(event.startDatetime), 'dd-MM, yyyy')}</span>
+                  </div>
                 </div>
               )}
 
-              {event.eventLocation && event.configuration?.showBannerLocation && (
-                <div className="flex items-center">
-                  <MapPin className="h-5 w-5 mr-2" />
-                  <span>{event.eventLocation}</span>
+              {event.eventLocation && (
+                <div className="flex items-start">
+                  <MapPin className="h-5 w-5 mr-3 mt-1 text-black" />
+                  <div className="text-black whitespace-pre-line">{event.eventLocation}</div>
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Right Content - Event Banner Image */}
+          <div className="md:w-7/12">
+            <div className="relative rounded-lg overflow-hidden aspect-[51/29]">
+              <Image
+                src={
+                  (event.eventBanner as Media)?.url ||
+                  (event?.mobileEventBanner as Media)?.url ||
+                  '/images/logos/logo-black-adjacent.png'
+                }
+                fill
+                alt={event.title || 'Event'}
+                className="object-cover rounded-lg shadow-md hidden md:block"
+              />
+
+              <Image
+                src={
+                  (event.eventBanner as Media)?.url ||
+                  (event?.mobileEventBanner as Media)?.url ||
+                  '/images/logos/logo-black-adjacent.png'
+                }
+                fill
+                alt={event.title || 'Event'}
+                className="object-cover rounded-lg shadow-md md:hidden"
+              />
             </div>
           </div>
         </div>

@@ -4,12 +4,9 @@ import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 import PageClient from './page.client'
 import EventBanner from '@/components/EventDetail/EventBanner'
-// import Schedule from '@/components/EventDetail/Schedule'
 import TermCondition from '@/components/EventDetail/TermCondition'
-import SeatReservationClient from '@/components/EventDetail/SeatReservation/Component.client'
 import FeaturedPerformers from '@/components/EventDetail/FeaturedPerformers/Component'
 import FAQ from '@/components/EventDetail/FAQ/Component'
-import DetailDescriptionClient from '@/components/EventDetail/DetailDescription/Component.client'
 import { getEventCached } from './actions'
 import UpcomingSaleBanner from '@/components/EventDetail/UpcomingSale'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
@@ -17,6 +14,11 @@ import { checkBookedOrPendingPaymentSeats } from '@/app/(payload)/api/bank-trans
 import { getSeatHoldings } from '@/app/(payload)/api/seat-holding/seat/utils'
 import { cookies } from 'next/headers'
 import { getLocale } from '@/providers/I18n/server'
+import About from '@/components/EventDetail/About'
+import Partners from '@/components/Home/components/Partners'
+import { getPartnersCached } from '@/components/Home/actions'
+import { Partner } from '@/types/Partner'
+import SeatReservationClient from '@/components/EventDetail/SeatReservation/Component.client'
 
 // export const dynamic = 'force-dynamic'
 export const revalidate = 86400 // 24 hours
@@ -33,7 +35,10 @@ const EventDetailPage = async (props: {
 
   const locale = await getLocale()
 
-  const eventDetail = await getEventCached({ slug: eventSlug, locale })()
+  const [eventDetail, partnerData] = await Promise.all([
+    getEventCached({ slug: eventSlug, locale })(),
+    getPartnersCached({ locale })(),
+  ])
 
   if (!eventDetail) {
     return notFound()
@@ -67,11 +72,16 @@ const EventDetailPage = async (props: {
   }
 
   return (
-    <div className="">
+    <div className="bg-white">
       <PageClient />
       <div className="min-h-screen flex flex-col">
         <main className="flex-grow pt-2 md:pt-6">
           <EventBanner event={eventDetail} />
+
+          {/* About Section */}
+          <About eventDetail={eventDetail} />
+
+          {/* Ticket Section */}
           {isUpcoming && <UpcomingSaleBanner />}
 
           {isOpenForSales && (
@@ -80,17 +90,19 @@ const EventDetailPage = async (props: {
               unavailableSeats={unavailableSeats as string[]}
             />
           )}
-          <DetailDescriptionClient event={eventDetail} />
+
           <FeaturedPerformers eventSlug={eventSlug} />
           {!isUpcoming && (
             <>
-              {/* {!!esventDetail.schedules?.length && <Schedule schedules={eventDetail.schedules} />} */}
+              {/* {!!eventDetail.schedules?.length && <Schedule schedules={eventDetail.schedules} />} */}
               {eventDetail.eventTermsAndConditions && (
                 <TermCondition termCondition={eventDetail.eventTermsAndConditions} />
               )}
               <FAQ />
             </>
           )}
+
+          <Partners partners={partnerData as Partner[]} />
         </main>
       </div>
     </div>
