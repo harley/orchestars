@@ -108,6 +108,11 @@ export default function TicketDetailsPage() {
             <p>
               <strong>{t('checkin.by')}</strong> {checkinData.checkedInBy?.email || 'N/A'}
             </p>
+            {checkinData?.ticketGivenBy && (
+              <p>
+                <strong>{t('checkin.byUsher')}:</strong> {checkinData?.ticketGivenBy}
+              </p>
+            )}
           </div>
         )}
 

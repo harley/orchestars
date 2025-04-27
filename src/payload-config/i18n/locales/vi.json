@@ -298,7 +298,8 @@
     "checkedIn": "Đã check-in:",
     "used": "Đã sử dụng",
     "valid": "Hợp lệ",
-    "success": "Thành công"
+    "success": "Thành công",
+    "byUsher": "Bởi Usher"
   },
   "customerCheckinTicket": {
     "ticketCheckIn": "Tự Check In",

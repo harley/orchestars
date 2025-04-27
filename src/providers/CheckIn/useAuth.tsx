@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import Cookies from 'js-cookie' // Client-side cookie reader
 import { logout } from '@/app/(frontend)/checkin/logout/actions'
+import { usePathname } from 'next/navigation'
 
 type AuthContextType = {
   token: string | null
@@ -16,6 +17,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setTokenState] = useState<string | null>(null)
   const [isHydrated, setIsHydrated] = useState(false)
+
+  const path = usePathname()
+
   useEffect(() => {
     const cookieToken = Cookies.get('token')
 
@@ -44,7 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       <div className="relative">
         {children}
 
-        {token && (
+        {token && path !== '/checkin' && (
           <form action={logout}>
             <button
               type="submit"
