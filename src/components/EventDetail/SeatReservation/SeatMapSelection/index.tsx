@@ -211,7 +211,6 @@ const SeatMapSelection = ({
                     className="appearance-none w-full border border-gray-300 rounded-md py-2 pl-4 pr-10 bg-white focus:outline-none focus:ring-2 focus:ring-black"
                     onChange={handleDateSelect}
                     value={selectedSchedule?.date || undefined}
-                    defaultValue={undefined}
                   >
                     <option value="none" selected disabled hidden>
                       Select a date
