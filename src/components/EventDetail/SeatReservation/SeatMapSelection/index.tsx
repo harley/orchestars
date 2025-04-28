@@ -253,13 +253,13 @@ const SeatMapSelection = ({
                 </Button>
 
                 <Dialog open={isOpen} onOpenChange={handleCloseSeatMapSelection}>
-                  <DialogContent className="max-w-[90vw] w-full mx-auto my-4 h-[95vh] overflow-y-auto top-0 left-0 bottom-0 right-0 translate-x-0 translate-y-0 p-0 bg-black">
+                  <DialogContent className="max-w-[90vw] w-full mx-auto my-4 h-[95vh] overflow-y-auto top-0 left-0 bottom-0 right-0 translate-x-0 translate-y-0 p-0">
                     <div className="flex flex-col h-full">
                       {/* Header */}
-                      <div className="bg-black text-white p-4 flex justify-between items-center">
+                      <div className="p-4 flex justify-between items-center">
                         <button
                           onClick={handleCloseSeatMapSelection}
-                          className="flex items-center gap-2 text-white hover:text-gray-300 transition-colors"
+                          className="flex items-center gap-2 hover:text-gray-300 transition-colors"
                         >
                           <ArrowLeft size={20} />
                           <span>{t('common.back')}</span>
@@ -275,7 +275,7 @@ const SeatMapSelection = ({
                       {!showCheckout ? (
                         <>
                           {/* Legend */}
-                          <div className="bg-black text-white px-4 py-2 flex items-center gap-6">
+                          <div className="px-4 py-2 flex items-center gap-6">
                             <div className="flex items-center gap-2">
                               <div className="w-4 h-4 bg-white border border-white"></div>
                               <span>{t('event.notAvailable')}</span>
@@ -289,7 +289,7 @@ const SeatMapSelection = ({
                           {/* Main content with seat map */}
                           <div className="flex flex-col md:flex-row h-full">
                             {/* Seat map */}
-                            <div className="flex-grow bg-black text-white overflow-auto">
+                            <div className="flex-grow overflow-auto">
                               <div className="text-center py-4 px-2">
                                 <SeatMapToolkit
                                   onSelectSeat={handleSeatSelect}
@@ -304,7 +304,7 @@ const SeatMapSelection = ({
                             </div>
 
                             {/* Sidebar with event details and pricing */}
-                            <div className="md:w-96 bg-gray-900 text-white p-4">
+                            <div className="md:w-96 p-4">
                               <div className="mb-6">
                                 <h3 className="text-xl font-bold mb-2">{event.title}</h3>
 
