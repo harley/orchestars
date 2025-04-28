@@ -296,10 +296,6 @@ const SeatMapSelection = ({
                                   unavailableSeats={unavailableSeats}
                                   selectedSeats={selectedSeats}
                                 />
-
-                                <div className="text-center py-2">
-                                  <h3 className="font-medium">{t('event.balcony')}</h3>
-                                </div>
                               </div>
                             </div>
 
