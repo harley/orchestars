@@ -216,15 +216,14 @@ const SeatMapSelection = ({
                     <option value="none" selected disabled hidden>
                       Select a date
                     </option>
-                    {event.schedules.map((schedule, index) => (
-                      <>
-                        {schedule.date && (
-                          <option key={index} value={schedule.date}>
+                    {event.schedules.map(
+                      (schedule) =>
+                        schedule.date && (
+                          <option key={schedule.id ?? schedule.date} value={schedule.date}>
                             {dateFnsFormat(new Date(schedule.date), 'dd/MM/yyyy')}
                           </option>
-                        )}
-                      </>
-                    ))}
+                        ),
+                    )}
                   </select>
                 ) : (
                   <div className="py-2 pl-4">{t('event.noDateAvailable')}</div>

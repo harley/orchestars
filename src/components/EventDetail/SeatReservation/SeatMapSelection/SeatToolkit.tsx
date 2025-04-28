@@ -29,12 +29,12 @@ type SeatItem = {
 
 const SeatMapToolkit = ({
   onSelectSeat,
-  unavailableSeats,
-  selectedSeats,
+  unavailableSeats = [],
+  selectedSeats = [],
 }: {
   onSelectSeat?: (seat: any) => void
   unavailableSeats?: string[]
-  selectedSeats: SelectedSeat[]
+  selectedSeats?: SelectedSeat[]
 }) => {
   const { t } = useTranslate()
   const [loadingMap, setLoadingMap] = useState(true)
@@ -71,8 +71,8 @@ const SeatMapToolkit = ({
   }, [])
 
   useEffect(() => {
-    const unavailableSet = new Set(unavailableSeats || [])
-    const selectedSet = new Set((selectedSeats || []).map((s) => s.id))
+    const unavailableSet = new Set(unavailableSeats)
+    const selectedSet = new Set(selectedSeats.map((s) => s.id))
 
     const processedSeats = seatsJson.map((seat) => ({
       ...seat,
@@ -93,7 +93,7 @@ const SeatMapToolkit = ({
     const selectedSeatNumbersInRow = seats
       .filter(
         (s) =>
-          (selectedSeats?.some((sel) => sel.id === s.id) || s.status === 'Reserved') &&
+          (selectedSeats.some((sel) => sel.id === s.id) || s.status === SeatStatus.Reserved) &&
           s.label?.[0] === seatRowChar,
       )
       .map((s) => parseInt(s.id.split('-')[1] ?? '0', 10))
