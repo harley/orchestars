@@ -19,7 +19,6 @@ import Partners from '@/components/Home/components/Partners'
 import { getPartnersCached } from '@/components/Home/actions'
 import { Partner } from '@/types/Partner'
 import SeatReservationClient from '@/components/EventDetail/SeatReservation/Component.client'
-import TicketSelection from '@/components/EventDetail/TicketSelection/Component.client'
 
 // export const dynamic = 'force-dynamic'
 export const revalidate = 86400 // 24 hours
@@ -84,8 +83,6 @@ const EventDetailPage = async (props: {
 
           {/* Ticket Section */}
           {isUpcoming && <UpcomingSaleBanner />}
-
-          {/* <TicketSelection event={eventDetail} unavailableSeats={unavailableSeats as string[]} /> */}
 
           {isOpenForSales && (
             <SeatReservationClient
