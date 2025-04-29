@@ -169,7 +169,11 @@ const checkSeatAvailable = async (body: SeatHoldingRequest) => {
           .join(','),
       )
       .join(', ')
-    throw new Error(`SEAT002|${JSON.stringify({ seats: unavailableSeats })}`)
+
+    // handle this case: eg H3 input, but H37 matched
+    if (unavailableSeats.length) {
+      throw new Error(`SEAT002|${JSON.stringify({ seats: unavailableSeats })}`)
+    }
   }
 
   // Check all seats in parallel, grouped by event
