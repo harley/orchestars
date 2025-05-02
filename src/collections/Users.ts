@@ -1,9 +1,19 @@
 import type { CollectionConfig } from 'payload'
+import { authenticated } from '../access/authenticated'
 
 export const Users: CollectionConfig = {
   slug: 'users',
+  auth: true,
+  access: {
+    admin: authenticated,
+    create: authenticated,
+    delete: authenticated,
+    read: authenticated,
+    update: authenticated,
+  },
   admin: {
     useAsTitle: 'email',
+    defaultColumns: ['email'],
   },
   fields: [
     {
@@ -12,14 +22,13 @@ export const Users: CollectionConfig = {
       required: true,
       index: true,
     },
-    // Email added by default
     {
       name: 'phoneNumber', // default phone number
       type: 'text',
       required: false,
     },
     {
-      name: 'phoneNumbers', //support multi phone numbers
+      name: 'phoneNumbers', // support multi phone numbers
       type: 'array',
       required: false,
       fields: [
@@ -59,9 +68,34 @@ export const Users: CollectionConfig = {
       required: false,
     },
     {
+      name: 'role',
+      type: 'select',
+      options: [
+        {
+          label: 'Admin',
+          value: 'admin',
+        },
+        {
+          label: 'Super Admin',
+          value: 'super-admin',
+        },
+        {
+          label: 'Customer',
+          value: 'customer',
+        },
+        {
+          label: "Event Admin",
+          value: "event-admin"
+        }
+
+      ],
+      required: false,
+    },
+    {
       name: 'lastActive',
       type: 'date',
       required: false,
     },
   ],
+  timestamps: true,
 }

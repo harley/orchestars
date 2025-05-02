@@ -46,6 +46,8 @@ import * as migration_20250423_165748_add_discount_apply_scope_column_promotion 
 import * as migration_20250424_040651_change_column_admin_id_to_usher_number_checkin_records from './20250424_040651_change_column_admin_id_to_usher_number_checkin_records';
 import * as migration_20250425_033543_add_indexing from './20250425_033543_add_indexing';
 import * as migration_20250425_155521_drop_unique_ticket_checkin_records from './20250425_155521_drop_unique_ticket_checkin_records';
+import * as migration_20250502_075130_add_enum_user_role_event_admin_to_user from './20250502_075130_add_enum_user_role_event_admin_to_user';
+import * as migration_20250502_075615_add_auth_related_column_back_to_user from './20250502_075615_add_auth_related_column_back_to_user';
 
 export const migrations = [
   {
@@ -286,6 +288,16 @@ export const migrations = [
   {
     up: migration_20250425_155521_drop_unique_ticket_checkin_records.up,
     down: migration_20250425_155521_drop_unique_ticket_checkin_records.down,
-    name: '20250425_155521_drop_unique_ticket_checkin_records'
+    name: '20250425_155521_drop_unique_ticket_checkin_records',
+  },
+  {
+    up: migration_20250502_075130_add_enum_user_role_event_admin_to_user.up,
+    down: migration_20250502_075130_add_enum_user_role_event_admin_to_user.down,
+    name: '20250502_075130_add_enum_user_role_event_admin_to_user',
+  },
+  {
+    up: migration_20250502_075615_add_auth_related_column_back_to_user.up,
+    down: migration_20250502_075615_add_auth_related_column_back_to_user.down,
+    name: '20250502_075615_add_auth_related_column_back_to_user'
   },
 ];

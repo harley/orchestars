@@ -63,7 +63,7 @@ export type SupportedTimezones =
 
 export interface Config {
   auth: {
-    admins: AdminAuthOperations;
+    users: UserAuthOperations;
   };
   blocks: {};
   collections: {
@@ -143,8 +143,8 @@ export interface Config {
     footer: FooterSelect<false> | FooterSelect<true>;
   };
   locale: 'en' | 'vi';
-  user: Admin & {
-    collection: 'admins';
+  user: User & {
+    collection: 'users';
   };
   jobs: {
     tasks: {
@@ -157,7 +157,7 @@ export interface Config {
     workflows: unknown;
   };
 }
-export interface AdminAuthOperations {
+export interface UserAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -407,7 +407,6 @@ export interface Category {
  */
 export interface User {
   id: number;
-  email: string;
   phoneNumber?: string | null;
   phoneNumbers?:
     | {
@@ -420,9 +419,18 @@ export interface User {
   username?: string | null;
   firstName?: string | null;
   lastName?: string | null;
+  role?: ('admin' | 'super-admin' | 'customer' | 'event-admin') | null;
   lastActive?: string | null;
   updatedAt: string;
   createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  password?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -975,19 +983,12 @@ export interface Promotion {
 export interface Admin {
   id: number;
   firstName: string;
+  email: string;
   lastName: string;
   role: 'event-admin' | 'admin' | 'super-admin';
   lastActive?: string | null;
   updatedAt: string;
   createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  password?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1519,8 +1520,8 @@ export interface PayloadLockedDocument {
       } | null);
   globalSlug?: string | null;
   user: {
-    relationTo: 'admins';
-    value: number | Admin;
+    relationTo: 'users';
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -1532,8 +1533,8 @@ export interface PayloadLockedDocument {
 export interface PayloadPreference {
   id: number;
   user: {
-    relationTo: 'admins';
-    value: number | Admin;
+    relationTo: 'users';
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -1843,7 +1844,6 @@ export interface CategoriesSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
-  email?: T;
   phoneNumber?: T;
   phoneNumbers?:
     | T
@@ -1856,9 +1856,17 @@ export interface UsersSelect<T extends boolean = true> {
   username?: T;
   firstName?: T;
   lastName?: T;
+  role?: T;
   lastActive?: T;
   updatedAt?: T;
   createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2158,18 +2166,12 @@ export interface FaqsSelect<T extends boolean = true> {
  */
 export interface AdminsSelect<T extends boolean = true> {
   firstName?: T;
+  email?: T;
   lastName?: T;
   role?: T;
   lastActive?: T;
   updatedAt?: T;
   createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2646,7 +2648,7 @@ export interface TaskSchedulePublish {
           value: number | Post;
         } | null);
     global?: string | null;
-    user?: (number | null) | Admin;
+    user?: (number | null) | User;
   };
   output?: unknown;
 }

@@ -359,7 +359,8 @@
     "ticketPrice": "Hạng Ghế",
     "statusProcessing": "Đang xử lý",
     "statusHold": "Tạm giữ",
-    "statusCancelled": "Đã hủy"
+    "statusCancelled": "Đã hủy",
+    "userLogin": "Đăng Nhập"
   }
   
 }

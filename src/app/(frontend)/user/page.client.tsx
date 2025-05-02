@@ -24,7 +24,7 @@ export default function Login() {
     try {
       setIsLoading(true)
 
-      const res = await fetch('/api/checkin-app/auth', {
+      const res = await fetch('/api/user/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,12 +63,12 @@ export default function Login() {
   return (
     <>
       <Head>
-        <title>{t('checkin.login')}</title>
+        <title>{t('userprofile.userLogin')}</title>
       </Head>
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">
-            {t('checkin.adminCheckIn')}
+            {t('userprofile.userLogin')}
           </h1>
           <p className="text-sm text-gray-600 mb-6 text-center">{t('checkin.signInToContinue')}</p>
 

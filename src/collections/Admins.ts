@@ -7,7 +7,7 @@ const Admins: CollectionConfig = {
     useAsTitle: 'email',
     group: 'System',
   },
-  auth: true, // Enable authentication for this collection
+
   access: {
     read: ({ req: { user } }) => {
       if (!user) return false
@@ -29,6 +29,12 @@ const Admins: CollectionConfig = {
       name: 'firstName',
       type: 'text',
       required: true,
+    },
+    {
+      name: 'email',
+      type: 'text',
+      required: true,
+      unique: true,
     },
     {
       name: 'lastName',

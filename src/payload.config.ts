@@ -66,7 +66,7 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
-    user: 'admins',
+    user: 'users',
     livePreview: {
       breakpoints: [
         {
@@ -95,7 +95,6 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
-      
     },
     push: false,
   }),
