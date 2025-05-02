@@ -1,5 +1,5 @@
 interface AdminUser {
-  role?: 'admin' | 'super-admin' | 'event-admin'
+  role?: 'admin' | 'super-admin' | 'event-admin' | 'customer'| null
 }
 
 export const isAdminOrSuperAdmin = ({ req: { user } }: { req: { user: AdminUser | null } }) => {

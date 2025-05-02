@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
 
-    if (!isAdminOrSuperAdminOrEventAdmin({ req: { user: result.user } })) {
+    if (!isAdminOrSuperAdminOrEventAdmin({ req: { user: result?.user } })) {
       return NextResponse.json(
         { error: 'Unauthorized access. Only event admins can access the check-in app.' },
         { status: 403 },

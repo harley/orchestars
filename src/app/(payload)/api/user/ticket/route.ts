@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
         collection: 'tickets',
         where: {
           user: {
-            equals: 4,
+            equals: user.id,
           },
         },
         limit: 100, // optional limit
