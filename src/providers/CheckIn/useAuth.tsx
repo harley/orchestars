@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       <div className="relative">
         {children}
 
-        {token && path !== '/checkin' && (
+        {token && path !== '/checkin' && path !== '/user' && (
           <form action={logout}>
             <button
               type="submit"

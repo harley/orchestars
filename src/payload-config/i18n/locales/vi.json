@@ -339,5 +339,27 @@
     "success": "Thành công",
     "selectAll": "Chọn tất cả",
     "deselectAll": "Bỏ chọn tất cả"
+  },
+  "userprofile": {
+    "title": "Vé đã mua",
+    "all": "Tất cả",
+    "success": "Thành công",
+    "processing": "Đang xử lý",
+    "cancelled": "Đã huỷ",
+    "upcoming": "Sắp diễn ra",
+    "finished": "Đã kết thúc",
+    "month04": "Tháng 04",
+    "ticketTitle": "Vé của bạn",
+    "statusSuccess": "Thành công",
+    "eTicket": "Vé điện tử",
+    "orderCode": "Mã đơn hàng",
+    "dateRange": "09:00, 24 tháng 04, 2025 – 17:00, 26 tháng 04, 2025",
+    "location": "Trung tâm Hội chợ và Triển lãm Sài Gòn (SECC), 799 Nguyễn Văn Linh, Quận 7, TP. Hồ Chí Minh",
+    "seat": "Số Ghế",
+    "ticketPrice": "Hạng Ghế",
+    "statusProcessing": "Đang xử lý",
+    "statusHold": "Tạm giữ",
+    "statusCancelled": "Đã hủy"
   }
+  
 }
