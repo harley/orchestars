@@ -1,0 +1,51 @@
+digraph INFRA {
+  node [ color = "black", fillcolor = "#E6E6E6", height =1, style = "filled,bold,rounded", fontname = "Arial" ];
+  "Pages" [ label = "Pages
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Posts" [ label = "Posts
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Media" [ label = "Media
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Categories" [ label = "Categories
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Users" [ label = "Users
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "CheckInRecords" [ label = "CheckInRecords
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Events" [ label = "Events
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Promotions" [ label = "Promotions
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "UserPromotionRedemptions" [ label = "UserPromotionRedemptions
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Orders" [ label = "Orders
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "OrderItems" [ label = "OrderItems
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Payments" [ label = "Payments
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Tickets" [ label = "Tickets
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "SeatHoldings" [ label = "SeatHoldings
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Partners" [ label = "Partners
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Performers" [ label = "Performers
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Activities" [ label = "Activities
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "FAQs" [ label = "FAQs
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Admins" [ label = "Admins
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Emails" [ label = "Emails
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Logs" [ label = "Logs
+(Payload::Collection)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "PostgreSQL Database" [ label = "PostgreSQL Database
+(AWS::RDS::DBInstance)", shape =cylinder, fillcolor = "#FFCFB3" ];
+  "Resend Email Service" [ label = "Resend Email Service
+(External::EmailService)", shape =rectangle ];
+  "Cron Job" [ label = "Cron Job
+(AWS::Events::Rule)", shape =rectangle ];
+}
