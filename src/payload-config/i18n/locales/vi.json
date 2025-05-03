@@ -16,7 +16,9 @@
   "common": {
     "loading": "Đang tải...",
     "tryAgain": "Thử lại",
-    "goHome": "Về trang chủ"
+    "goHome": "Về Trang Chủ",
+    "back": "Quay Lại",
+    "cancel": "Hủy Bỏ"
   },
   "event": {
     "chooseAttendingDate": "Chọn ngày bạn muốn tham dự",
@@ -108,6 +110,15 @@
     "requiresMinimumTickets": "Yêu cầu tối thiểu {{count}} vé",
     "noPromotionsAvailable": "Hiện tại không có khuyến mãi nào",
     "promotionNotMeetConditions": "Chưa thoả mãn điều kiện tối thiểu để áp dụng mã giảm giá",
+    "dateTime": "Ngày Tháng",
+    "event": "Sự Kiện",
+    "selectTicket": "Chọn Vé",
+    "checkout": "Thanh toán",
+    "notAvailable": "Không có sẵn",
+    "selected": "Đã chọn",
+    "stage": "Sân khấu",
+    "balcony": "Ban công",
+    "ticketPrices": "Giá vé",
     "discountOnTotalOrderValue": "Áp dụng trên tổng giá trị đơn hàng",
     "discountOnPerOrderItem": "Áp dụng trên từng vé"
   },
@@ -122,7 +133,8 @@
     "holdAndPay": "Giữ chỗ và Thanh toán",
     "cannotSelectSeat": "Không chọn được ghế",
     "noEmptySeats": "Xin quý khách vui lòng không bỏ trống ghế",
-    "close": "Đóng"
+    "close": "Đóng",
+    "proceedToPayment": "Tiến hành thanh toán"
   },
   "message": {
     "errorHoldingSeatAndPayment": "Có lỗi xảy ra khi tiến hành giữ chỗ và thanh toán.",
@@ -196,6 +208,26 @@
     "tryingAgain": "Đang thử lại",
     "tryingAgainDescription": "Đang cố gắng khôi phục từ lỗi",
     "goingHome": "Đang về trang chủ",
+    "goingHomeDescription": "Đang chuyển hướng về trang chủ"
+  },
+  "checkout": {
+    "personalInfo": "Thông tin cá nhân",
+    "lastName": "Họ",
+    "firstName": "Tên",
+    "phone": "Số điện thoại",
+    "email": "Email",
+    "paymentMethod": "Phương thức thanh toán",
+    "orderSummary": "Tóm tắt đơn hàng",
+    "ticketInfo": "Thông tin vé",
+    "promoCode": "Mã giảm giá",
+    "enterPromoCode": "Nhập mã giảm giá",
+    "apply": "Áp dụng",
+    "subtotal": "Tạm tính",
+    "discount": "Giảm giá",
+    "total": "Tổng cộng",
+    "termsAgreement": "Tôi đồng ý với Điều khoản và Điều kiện và Chính sách Bảo mật. Tôi hiểu rằng vé của tôi sẽ được gửi đến email của tôi sau khi thanh toán được xác nhận.",
+    "confirmAndPay": "Xác nhận và thanh toán",
+    "disclaimer": "Vé của bạn sẽ được gửi đến email của bạn sau khi thanh toán thành công. Vui lòng kiểm tra hộp thư đến email của bạn (và thư mục spam) để xác nhận vé.",
     "goingHomeDescription": "Đang chuyển hướng về trang chủ",
     "loginFailed": "Đã xảy ra lỗi trong quá trình đăng nhập",
     "loadEventFailed": "Không thể tải sự kiện",

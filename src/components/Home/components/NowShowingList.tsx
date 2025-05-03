@@ -26,7 +26,9 @@ const NowShowingList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, clas
   const nowShowingEvents = useMemo(
     () =>
       onGoingPaginatedDocs?.docs.filter(
-        (evt) => evt.status === EVENT_STATUS.published_open_sales.value,
+        (evt) =>
+          evt.status === EVENT_STATUS.published_open_sales.value &&
+          new Date(evt.endDatetime) > new Date(),
       ),
     [onGoingPaginatedDocs?.docs],
   )

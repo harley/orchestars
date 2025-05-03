@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useTranslate } from '@/providers/I18n/client'
+import { SelectedSeat } from '../../types'
 
 type SeatItem = {
   id: string
@@ -25,15 +26,15 @@ type SeatItem = {
   status: 'Available' | 'Unavailable' | string
   category: string
 }
-const BASE_WIDTH = 1386;
-
 
 const SeatMapToolkit = ({
   onSelectSeat,
-  unavailableSeats,
+  unavailableSeats = [],
+  selectedSeats = [],
 }: {
   onSelectSeat?: (seat: any) => void
   unavailableSeats?: string[]
+  selectedSeats?: SelectedSeat[]
 }) => {
   const { t } = useTranslate()
   const [loadingMap, setLoadingMap] = useState(true)
@@ -44,53 +45,57 @@ const SeatMapToolkit = ({
     initialViewBoxScale: 0.6,
     initialViewBoxScaleForWidth: 2000,
     visibilityOffset: 0,
-  });
+  })
 
   useEffect(() => {
-    const screenWidth = window.innerWidth;
-  if (screenWidth <= 320) {
+    const screenWidth = window.innerWidth
+    if (screenWidth <= 320) {
       setWorkspace({
         initialViewBoxScale: 0.27,
         initialViewBoxScaleForWidth: 150,
         visibilityOffset: 0,
-      });
+      })
     } else if (screenWidth <= 768) {
       setWorkspace({
         initialViewBoxScale: 0.5,
         initialViewBoxScaleForWidth: 1000,
         visibilityOffset: 0,
-      });
+      })
     } else {
       setWorkspace({
         initialViewBoxScale: 0.8,
         initialViewBoxScaleForWidth: 2000,
         visibilityOffset: 0,
-      });
+      })
     }
-  }, []);
-  
+  }, [])
+
   useEffect(() => {
-    if (unavailableSeats?.length) {
-      const seatSet = new Set(unavailableSeats)
-      setSeats(
-        seatsJson.map((seat) => ({
-          ...seat,
-          status: seatSet.has(seat.label) ? 'Unavailable' : 'Available',
-        })),
-      )
-      setLoadingMap(false)
-    } else {
-      setSeats(seatsJson)
-      setLoadingMap(false)
-    }
-  }, [unavailableSeats])
+    const unavailableSet = new Set(unavailableSeats)
+    const selectedSet = new Set(selectedSeats.map((s) => s.id))
+
+    const processedSeats = seatsJson.map((seat) => ({
+      ...seat,
+      status: unavailableSet.has(seat.label)
+        ? SeatStatus.Unavailable
+        : selectedSet.has(seat.id)
+          ? SeatStatus.Reserved
+          : SeatStatus.Available,
+    }))
+    setSeats(processedSeats)
+    setLoadingMap(false)
+  }, [unavailableSeats, selectedSeats])
 
   const handleSeatClick = (seat: any) => {
     const seatRowChar = seat.label[0]
     const seatNumber = parseInt(seat.id.split('-')[1])
 
     const selectedSeatNumbersInRow = seats
-      .filter((s) => s.status === 'Reserved' && s.label?.[0] === seatRowChar)
+      .filter(
+        (s) =>
+          (selectedSeats.some((sel) => sel.id === s.id) || s.status === SeatStatus.Reserved) &&
+          s.label?.[0] === seatRowChar,
+      )
       .map((s) => parseInt(s.id.split('-')[1] ?? '0', 10))
 
     const isSelectedSeatAdjacentToAnySeatInSeatsOnRow =
@@ -103,35 +108,11 @@ const SeatMapToolkit = ({
 
     if (seat.status !== SeatStatus.Unavailable && seat.status !== SeatStatus.Locked) {
       onSelectSeat?.(seat)
-      setSeats((prevSeats) => {
-        return prevSeats.map((s) => {
-          const seatNewStatus = () => {
-            if (s.status === SeatStatus.Reserved) {
-              return SeatStatus.Available
-            } else if (isSelectedSeatAdjacentToAnySeatInSeatsOnRow) {
-              return SeatStatus.Reserved
-            } else {
-              return SeatStatus.Available
-            }
-          }
-          if (
-            s.id === seat.id &&
-            s.status !== SeatStatus.Unavailable &&
-            s.status !== SeatStatus.Locked
-          ) {
-            return {
-              ...s,
-              status: seatNewStatus(),
-            }
-          }
-          return s
-        })
-      })
     }
   }
 
   return (
-    <div className="relative md:p-0 p-6">
+    <div className="relative">
       {loadingMap && (
         <div className="absolute z-50 top-[30%] left-1/2 -translate-x-1/2 p-5 bg-gray-100/30 rounded-md flex flex-col items-center justify-center gap-2">
           <Loader2 className="w-12 h-12 animate-spin" />
@@ -140,17 +121,11 @@ const SeatMapToolkit = ({
       )}
       <SeatToolkit
         mode={'user'}
-        // styles={{
-        //   elements: {
-        //     seat: {
-        //       base: {
-        //         properties: {
-        //           cursor: 'not-allowed',
-        //         },
-        //       },
-        //     },
-        //   },
-        // }}
+        styles={{
+          root: {
+            className: 'bg-gray-100 min-h-[400px] md:min-h-[600px]',
+          },
+        }}
         events={{
           onSeatClick: handleSeatClick,
         }}
@@ -197,7 +172,7 @@ const SeatMapToolkit = ({
           ],
           polylines: [],
           images: [],
-          workspace: workspace
+          workspace,
         }}
         options={{
           shapes: {
