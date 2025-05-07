@@ -1,8 +1,10 @@
+<p align="center">
+  <img src="https://www.orchestars.vn/api/media/file/logo-white-adjacent%20copy.png" width="200" height="200" alt="OrcheSTARS Platform" />
+</p>
+
 # OrcheSTARS - Event Ticketing and Management Platform
 
 OrcheStars is a comprehensive event ticketing and management platform built on top of PayloadCMS and Next.js. The system enables organizations to create, manage, and sell tickets for events while providing a seamless check-in experience for attendees.
-
-![OrcheSTARS Platform](https://orchestars.vn/media/logo.png)
 
 ## Key Features
 
