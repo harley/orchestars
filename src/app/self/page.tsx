@@ -147,10 +147,15 @@ export default function CustomerCheckInPage() {
         <h1 className="text-2xl font-bold text-center">
           {t('customerCheckinTicket.ticketCheckIn')}
         </h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4"
+          aria-label="Ticket code verification form"
+        >
           <Input
             type="email"
             value={email}
+            name="email"
             onChange={(e) => setEmail(e.target.value)}
             placeholder={t('customerCheckinTicket.enterYourEmail')}
             required
@@ -158,6 +163,7 @@ export default function CustomerCheckInPage() {
           <Input
             type="text"
             value={ticketCode}
+            name="ticketCode"
             onChange={(e) => setTicketCode(e.target.value)}
             placeholder={t('customerCheckinTicket.enterYourTicketCode')}
             required
