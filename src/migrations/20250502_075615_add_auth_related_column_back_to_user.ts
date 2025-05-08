@@ -31,34 +31,6 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     ALTER TABLE "payload_preferences_rels" ADD COLUMN IF NOT EXISTS "users_id" integer;
   `);
 
-  // Step 5: Copy auth data from admins → users
-  await db.execute(sql`
-    UPDATE "users" u
-    SET
-      "role" = CASE 
-        WHEN a."role" = 'super-admin' THEN 'super-admin'::enum_users_role
-        WHEN a."role" = 'event-admin' THEN 'event-admin'::enum_users_role
-        ELSE 'admin'::enum_users_role
-      END,
-      "reset_password_token" = a.reset_password_token,
-      "reset_password_expiration" = a.reset_password_expiration,
-      "salt" = a.salt,
-      "hash" = a.hash,
-      "login_attempts" = a.login_attempts,
-      "lock_until" = a.lock_until
-    FROM "admins" a
-    WHERE u.email = a.email;
-  `);
-
-  // Step 6: Drop auth fields from admins (do not drop table)
-  await db.execute(sql`
-    ALTER TABLE "admins" DROP COLUMN IF EXISTS "reset_password_token";
-    ALTER TABLE "admins" DROP COLUMN IF EXISTS "reset_password_expiration";
-    ALTER TABLE "admins" DROP COLUMN IF EXISTS "salt";
-    ALTER TABLE "admins" DROP COLUMN IF EXISTS "hash";
-    ALTER TABLE "admins" DROP COLUMN IF EXISTS "login_attempts";
-    ALTER TABLE "admins" DROP COLUMN IF EXISTS "lock_until";
-  `);
 
   // Step 7: Drop old admins_id column from preferences
   await db.execute(sql`

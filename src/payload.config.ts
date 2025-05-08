@@ -66,7 +66,7 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
-    user: 'users',
+    user: 'admins',
     livePreview: {
       breakpoints: [
         {
@@ -96,7 +96,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
-    push: false,
+    push: true,
   }),
   collections: [
     Pages,

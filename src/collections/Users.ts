@@ -1,19 +1,65 @@
-import type { CollectionConfig } from 'payload'
-import { authenticated } from '../access/authenticated'
+import type { CollectionConfig, PayloadRequest, AuthStrategyFunction, AuthStrategyResult, BaseUser } from 'payload'
+
+const adminAccessControl = ({ req: { user } }): boolean | Promise<boolean> => {
+
+  if (user && (user.role?.includes('admin') || user.role?.includes('super-admin'))) {
+    return true // Allow access
+  }
+
+  return false // Deny access for all other roles
+}
+const isSuperAdmin = ({ req: { user } }) => user?.role === 'super-admin'
+const isOwnRecord = ({ req: { user }, id }) => user && user.id === id
 
 export const Users: CollectionConfig = {
   slug: 'users',
-  auth: true,
+  auth: {
+    maxLoginAttempts: 3,
+    strategies: [
+      {
+        name: 'custom-strategy',
+        authenticate: async ({ payload, headers }): Promise<AuthStrategyResult> => {
+          const authHeader = headers.get('Authorization')
+          if (!authHeader?.startsWith('Bearer ')) {
+            return { user: null }
+          }
+
+          try {
+            const { user } = await payload.auth({ headers })
+            if (!user) return { user: null }
+
+            return {
+              user: {
+                _strategy: 'custom-strategy',
+                ...user,
+              },
+              responseHeaders: new Headers({
+                'Authorization': `Bearer ${authHeader.split(' ')[1]}`,
+                'Access-Control-Expose-Headers': 'Authorization'
+              })
+            }
+          } catch (error) {
+            return { user: null }
+          }
+        }
+      }
+    ]
+  },
   access: {
-    admin: authenticated,
-    create: authenticated,
-    delete: authenticated,
-    read: authenticated,
-    update: authenticated,
+    create: () => true,
+    read: () => true,
+    update: () => true,
+    delete: isSuperAdmin,
+    admin: adminAccessControl,
+    unlock: ({ req: { user }, id }) => {
+      if (adminAccessControl({ req: { user } })) return true
+      return isOwnRecord({ req: { user }, id })
+    },
   },
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['email'],
+    group: 'Admin',
   },
   fields: [
     {
