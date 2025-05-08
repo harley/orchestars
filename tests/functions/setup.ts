@@ -11,9 +11,6 @@ process.env.PAYLOAD_SECRET = process.env.PAYLOAD_SECRET || 'test-secret'
 // process.env.DATABASE_URI is already set to postgres://postgres:123456a%40@127.0.0.1:5432/orchestars_local_test
 process.env.NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
-// Log the database connection for debugging
-console.log('Using database connection:', process.env.DATABASE_URI)
-
 // Create MSW server for mocking HTTP requests
 export const server = setupServer()
 

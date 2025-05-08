@@ -7,7 +7,8 @@ export const createUserFactory = (overrides: Partial<User> = {}): User => {
     id: faker.number.int(),
     email: faker.internet.email(),
     phone_number: faker.phone.number(),
-    name: faker.person.fullName(),
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
     createdAt: faker.date.past().toISOString(),
     updatedAt: faker.date.recent().toISOString(),
     ...overrides,
@@ -19,6 +20,8 @@ export const createAdminFactory = (overrides: Partial<Admin> = {}): Admin => {
   return {
     id: faker.number.int(),
     email: faker.internet.email(),
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
     role: faker.helpers.arrayElement(['admin', 'super-admin', 'event-admin']),
     createdAt: faker.date.past().toISOString(),
     updatedAt: faker.date.recent().toISOString(),
@@ -43,8 +46,8 @@ export const createEventFactory = (overrides: Partial<Event> = {}): Event => {
 export const createOrderFactory = (overrides: Partial<Order> = {}): Order => {
   return {
     id: faker.number.int(),
-    order_code: `ORDER-${faker.string.alphanumeric(8).toUpperCase()}`,
-    status: faker.helpers.arrayElement(['pending', 'completed', 'cancelled']),
+    orderCode: `ORDER-${faker.string.alphanumeric(8).toUpperCase()}`,
+    status: faker.helpers.arrayElement(['pending', 'completed', 'cancelled', 'failed']),
     total: faker.number.int({ min: 100000, max: 1000000 }),
     currency: 'VND',
     createdAt: faker.date.past().toISOString(),
@@ -57,10 +60,10 @@ export const createOrderFactory = (overrides: Partial<Order> = {}): Order => {
 export const createPaymentFactory = (overrides: Partial<Payment> = {}): Payment => {
   return {
     id: faker.number.int(),
-    payment_code: `PAY-${faker.string.alphanumeric(8).toUpperCase()}`,
-    status: faker.helpers.arrayElement(['pending', 'paid', 'failed']),
+    status: faker.helpers.arrayElement(['processing', 'paid', 'failed', 'canceled']),
     amount: faker.number.int({ min: 100000, max: 1000000 }),
-    payment_method: faker.helpers.arrayElement(['bank_transfer', 'zalopay']),
+    paymentMethod: faker.helpers.arrayElement(['bank_transfer', 'zalopay']),
+    total: faker.number.int({ min: 100000, max: 1000000 }),
     createdAt: faker.date.past().toISOString(),
     updatedAt: faker.date.recent().toISOString(),
     ...overrides,
@@ -71,9 +74,9 @@ export const createPaymentFactory = (overrides: Partial<Payment> = {}): Payment 
 export const createTicketFactory = (overrides: Partial<Ticket> = {}): Ticket => {
   return {
     id: faker.number.int(),
-    ticket_code: `TICKET-${faker.string.alphanumeric(8).toUpperCase()}`,
+    ticketCode: `TICKET-${faker.string.alphanumeric(8).toUpperCase()}`,
     status: faker.helpers.arrayElement(['pending', 'booked', 'checked_in']),
-    attendee_name: faker.person.fullName(),
+    attendeeName: faker.person.fullName(),
     createdAt: faker.date.past().toISOString(),
     updatedAt: faker.date.recent().toISOString(),
     ...overrides,
