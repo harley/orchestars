@@ -14,6 +14,27 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     ALTER TYPE "public"."enum_users_role" ADD VALUE IF NOT EXISTS 'event-admin';
   `);
 
+  // Step 4: Add column for FK from preferences to users
+  await db.execute(sql`
+    ALTER TABLE "payload_preferences_rels" ADD COLUMN IF NOT EXISTS "users_id" integer;
+  `);
+
+
+  // Step 7: Drop old admins_id column from preferences
+  await db.execute(sql`
+    ALTER TABLE "payload_preferences_rels" DROP COLUMN IF EXISTS "admins_id";
+  `);
+
+  // Step 8: Reconnect preferences to users
+  await db.execute(sql`
+    DO $$ BEGIN
+      ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_users_fk"
+      FOREIGN KEY ("users_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+    EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+    CREATE INDEX IF NOT EXISTS "payload_preferences_rels_users_id_idx"
+    ON "payload_preferences_rels" USING btree ("users_id");
+  `);
 
   // Step 9: Handle duplicated users, keeping the one with a booked ticket
  // Step 9: Handle duplicated users, keeping the one with a booked ticket
