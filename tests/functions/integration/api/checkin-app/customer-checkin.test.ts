@@ -219,7 +219,7 @@ describe('Customer Check-in API', () => {
     expect(responseData).toHaveProperty('message', 'Ticket code is required')
   })
 
-  it('should return 404 when ticket is not found', async () => {
+  it('should return 400 when ticket is not found', async () => {
     // Arrange
     vi.mocked(getPayload).mockResolvedValue({
       find: vi.fn().mockResolvedValue({

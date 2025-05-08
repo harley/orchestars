@@ -117,7 +117,7 @@ test.describe('Self Page', () => {
     await expect(submitButton).toBeVisible()
   })
 
-  test('should submit the form correctly', async ({ page }) => {
+  test('should validate the form before submission', async ({ page }) => {
     // Navigate to the self page
     await page.goto('/self')
 
