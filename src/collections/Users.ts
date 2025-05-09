@@ -1,15 +1,15 @@
-import type { CollectionConfig, PayloadRequest, AuthStrategyFunction, AuthStrategyResult, BaseUser } from 'payload'
+import type { CollectionConfig, PayloadRequest, AuthStrategyFunction, AuthStrategyResult } from 'payload'
+import type { User } from '@/payload-types'
 
-const adminAccessControl = ({ req: { user } }): boolean | Promise<boolean> => {
-
+const adminAccessControl = ({ req: { user } }: { req: PayloadRequest }) => {
   if (user && (user.role?.includes('admin') || user.role?.includes('super-admin'))) {
-    return true // Allow access
+    return true
   }
-
-  return false // Deny access for all other roles
+  return false
 }
-const isSuperAdmin = ({ req: { user } }) => user?.role === 'super-admin'
-const isOwnRecord = ({ req: { user }, id }) => user && user.id === id
+
+const isSuperAdmin = ({ req: { user } }: { req: PayloadRequest }) => user?.role === 'super-admin'
+const isOwnRecord = ({ req: { user }, id }: { req: PayloadRequest, id: string }) => Boolean(user && String(user.id) === String(id))
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -31,7 +31,8 @@ export const Users: CollectionConfig = {
             return {
               user: {
                 _strategy: 'custom-strategy',
-                ...user,
+                collection: 'users',
+                ...(user as User), 
               },
               responseHeaders: new Headers({
                 'Authorization': `Bearer ${authHeader.split(' ')[1]}`,

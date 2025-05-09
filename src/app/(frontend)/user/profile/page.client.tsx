@@ -27,7 +27,7 @@ const UserProfilePageClient: React.FC<{ userTickets: Ticket[] }> = ({ userTicket
 
     const filteredTickets = useMemo(() => {
 
-        return userTickets.filter((ticket) => {
+        return userTickets?.filter((ticket) => {
             const parsedDate = parse(ticket?.eventDate, 'dd/MM/yyyy', new Date())
             const now = new Date()
             const isFinished = parsedDate < now
@@ -76,7 +76,7 @@ const UserProfilePageClient: React.FC<{ userTickets: Ticket[] }> = ({ userTicket
             </div>
 
             {/* Ticket List */}
-            {filteredTickets.map((ticket) => {
+            {filteredTickets?.map((ticket) => {
                 const zoneId = getZoneId(ticket)
                 const zone = categories.find(c => c.id === zoneId)
                 const parsedDate = parse(ticket?.eventDate, 'dd/MM/yyyy', new Date())

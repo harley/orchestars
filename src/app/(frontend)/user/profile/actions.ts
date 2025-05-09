@@ -2,11 +2,14 @@ import { getPayload } from '@/payload-config/getPayloadConfig'
 import { unstable_cache } from 'next/cache'
 import { Ticket } from '@/payload-types'
 
-type Query = {
-  token?: string | null
-}
+import { User } from '@/payload-types'
 
-export async function getUserTickets(_query: Query): Promise<Ticket[] | null> {
+type Query = {
+  user?: User & {
+    collection: "users";
+}
+}
+export async function getUserTickets({user}: Query): Promise<Ticket[] | null> {
   try {
     const payload = await getPayload()
 
@@ -14,12 +17,13 @@ export async function getUserTickets(_query: Query): Promise<Ticket[] | null> {
       collection: 'tickets',
       where: {
         user: {
-          equals: user.id,
+          equals: user?.id,
         },
       },
       limit: 100, // optional limit
       sort: '-createdAt', // newest first
     })
+
 
     return result.docs as Ticket[]
   } catch (error) {
@@ -28,8 +32,10 @@ export async function getUserTickets(_query: Query): Promise<Ticket[] | null> {
   }
 }
 
-export const getUserTicketsCached = ({ token }: { token: string | null }) =>
-  unstable_cache(async () => getUserTickets({ token }), ['user-tickets'], {
+export const getUserTicketsCached = ({ user }: { user: (User & {
+  collection: "users";
+}) }) =>
+  unstable_cache(async () => getUserTickets({ user }), ['user-tickets'], {
     tags: [`user-tickets`],
-    revalidate: 86400,
+    revalidate: 86400,  
   })

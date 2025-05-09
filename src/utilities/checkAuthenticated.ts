@@ -7,6 +7,7 @@ export const checkAuthenticated = async () => {
     const headers = await getHeaders()
 
     return await payload.auth({ headers })
+    
   } catch (_error) {
     return null
   }
