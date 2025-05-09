@@ -63,3 +63,7 @@ supabase/.temp/
 supabase/.bin/
 # Sentry Config File
 .env.sentry-build-plugin
+
+# testing
+/playwright-report/
+/test-results/

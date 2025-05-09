@@ -1,272 +1,407 @@
-# Orchestars
+<p align="center">
+  <img src="https://www.orchestars.vn/api/media/file/logo-white-adjacent%20copy.png" width="200" height="200" alt="OrcheSTARS Platform" />
+</p>
 
-We used Payload CMS to build this website. See https://github.com/payloadcms/payload/blob/main/templates/website. 
+# OrcheSTARS - Event Ticketing and Management Platform
 
-Core features:
+OrcheStars is a comprehensive event ticketing and management platform built on top of PayloadCMS and Next.js. The system enables organizations to create, manage, and sell tickets for events while providing a seamless check-in experience for attendees.
 
-- [Pre-configured Payload Config](#how-it-works)
-- [Authentication](#users-authentication)
-- [Access Control](#access-control)
-- [Layout Builder](#layout-builder)
-- [Draft Preview](#draft-preview)
-- [Live Preview](#live-preview)
-- [On-demand Revalidation](#on-demand-revalidation)
-- [SEO](#seo)
-- [Search](#search)
-- [Redirects](#redirects)
-- [Jobs and Scheduled Publishing](#jobs-and-scheduled-publish)
-- [Website](#website)
+## Key Features
 
-## Quick Start
+- **Advanced Ticket Management**
+  - Zone-based ticket sales with dynamic pricing
+  - Temporary seat holding system to prevent double-booking
+  - Post-purchase seat allocation and assignment
+  - QR code ticket generation and validation
 
-To spin up this example locally, follow these steps:
+- **Multi-channel Check-in System**
+  - Staff check-in interface for event entry management
+  - Customer self-service check-in via mobile
+  - Real-time ticket validation and verification
+  - Support for group check-ins and "sister tickets"
 
+- **Flexible Payment Processing**
+  - Integration with ZaloPay payment gateway
+  - Bank transfer support with VietQR code generation
+  - Promotion and discount management
+  - Secure transaction handling
+
+- **Internationalization**
+  - Full support for multiple languages (English and Vietnamese)
+  - Localized content, dates, and currency formats
+  - Language-specific email templates
+
+- **Event Management**
+  - Complete event lifecycle from creation to completion
+  - Schedule management with multiple performance dates
+  - Performer and partner/sponsor management
+  - Rich content management for event details
+
+## Technology Stack
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| Frontend Framework | Next.js 15.2 | Server-side rendering, API routes, server components |
+| CMS | Payload CMS 3.30 | Content management, data modeling, admin interface |
+| Database | PostgreSQL | Data persistence via `@payloadcms/db-postgres` |
+| File Storage | Vercel Blob Storage | Media file storage and delivery |
+| UI Components | Radix UI, Shadcn/UI | Accessible UI components |
+| Error Monitoring | Sentry | Application monitoring and error tracking |
+| Payments | Custom integrations | ZaloPay and bank transfer support |
+| Email | Resend | Transactional emails and ticket delivery |
+
+### PayloadCMS Plugins
+
+The project leverages several PayloadCMS plugins to extend functionality:
+
+| Plugin | Purpose |
+|--------|---------|
+| `@payloadcms/plugin-form-builder` | Create and manage custom forms |
+| `@payloadcms/plugin-nested-docs` | Hierarchical content like categories |
+| `@payloadcms/plugin-redirects` | URL management and redirects |
+| `@payloadcms/plugin-seo` | SEO metadata management |
+| `@payloadcms/plugin-search` | Site-wide search functionality |
+| `@payloadcms/plugin-import-export` | Data import/export capabilities |
+| `@payloadcms/storage-vercel-blob` | Integration with Vercel Blob Storage |
+| `@payloadcms/email-resend` | Email delivery via Resend |
+| `@payloadcms/richtext-lexical` | Rich text editing with Lexical |
+
+### Project Structure
+
+```
+orchestars/
+├── src/
+│   ├── app/                 # Next.js App Router pages
+│   │   ├── (frontend)/      # Public-facing routes
+│   │   ├── (payload)/       # Admin routes
+│   │   └── api/             # API endpoints
+│   ├── blocks/              # Content blocks for layout builder
+│   ├── collections/         # PayloadCMS collections
+│   │   ├── Events/          # Event management
+│   │   ├── Orders/          # Order processing
+│   │   ├── Payments/        # Payment handling
+│   │   ├── Tickets/         # Ticket generation
+│   │   ├── Users/           # User management
+│   │   └── ...              # Other collections
+│   ├── components/          # React components
+│   ├── config/              # Configuration files
+│   ├── fields/              # Custom field types
+│   ├── hooks/               # Custom hooks
+│   ├── plugins/             # Plugin configuration
+│   ├── utilities/           # Helper functions
+│   └── payload.config.ts    # PayloadCMS configuration
+├── public/                  # Static assets
+├── .env.example             # Environment variables template
+├── next.config.js           # Next.js configuration
+├── package.json             # Dependencies and scripts
+└── tsconfig.json            # TypeScript configuration
+```
+
+## System Architecture
+
+OrcheStars extends PayloadCMS with custom functionality specifically designed for event ticketing:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Frontend Applications                   │
+│                                                             │
+│  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐   │
+│  │ Public Website│  │Check-in App   │  │Admin Panel    │   │
+│  │ (Next.js)     │  │(Next.js)      │  │(Payload CMS)  │   │
+│  └───────┬───────┘  └───────┬───────┘  └───────┬───────┘   │
+└──────────┼───────────────────┼───────────────────┼─────────┘
+           │                   │                   │
+┌──────────┼───────────────────┼───────────────────┼─────────┐
+│          │                   │                   │         │
+│  ┌───────▼───────┐  ┌────────▼──────┐  ┌─────────▼─────┐   │
+│  │ Ticket System │  │Check-in System│  │Event Management│   │
+│  └───────┬───────┘  └───────┬───────┘  └───────┬───────┘   │
+│          │                  │                  │           │
+│  ┌───────▼──────────────────▼──────────────────▼───────┐   │
+│  │                   PayloadCMS Core                   │   │
+│  └───────────────────────────┬───────────────────────┬─┘   │
+│                              │                       │     │
+│  ┌────────────────────────┐  │  ┌───────────────────┐│     │
+│  │Payment Processing      │◄─┘  │File Storage       ││     │
+│  │(ZaloPay, Bank Transfer)│     │(Vercel Blob)      ││     │
+│  └────────────────────────┘     └───────────────────┘│     │
+│                                                      │     │
+└──────────────────────────────────────────────────────┼─────┘
+                                                       │
+┌──────────────────────────────────────────────────────▼─────┐
+│                      PostgreSQL Database                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Key Workflows
+
+### Ticket Purchase Flow
+
+1. Customer browses events and selects tickets
+2. System creates temporary seat holding (20-minute duration)
+3. Customer enters information and selects payment method
+4. Payment is processed through ZaloPay or bank transfer
+5. System generates tickets with QR codes
+6. Confirmation email is sent to customer
+
+### Check-in Process
+
+1. Event staff selects event and schedule
+2. Staff scans ticket QR code or enters ticket code/seat number
+3. System validates ticket against database
+4. Staff confirms check-in and provides physical ticket/wristband
+5. System records check-in time and staff member
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 22.x
+- PostgreSQL 14+
+- pnpm 9.15.5+
+
+### Installation
+
+1. Clone the repository
 ```bash
-git clone https://github.com/harley/orchestars.git
+git clone <repository-url>
 cd orchestars
-cp .env.example .env # update with the right values
+```
+
+2. Install dependencies
+```bash
 pnpm install
+```
+
+3. Set up environment variables
+```bash
+cp .env.example .env
+```
+
+4. Configure your environment variables in the `.env` file:
+```
+# Database connection string
+DATABASE_URI=postgres://username:password@localhost:5432/orchestars
+
+# Used to encrypt JWT tokens
+PAYLOAD_SECRET=your_secret_here
+
+# Used to configure CORS, format links and more
+NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+
+# Resend API key for email delivery
+RESEND_API_KEY=re_your_key_here
+
+# Vercel Blob Storage for media files
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_your_token_here
+
+# Payment gateway credentials
+ZALO_APP_ID=your_app_id
+ZALO_KEY1=your_key1
+ZALO_KEY2=your_key2
+```
+
+5. Set up the database
+```bash
+# Option 1: Using Docker
+docker-compose up -d
+
+# Option 2: Create PostgreSQL database manually
+createdb orchestars
+
+# Run migrations
+pnpm migrate
+```
+
+6. Generate TypeScript types
+```bash
+pnpm generate:types
+```
+
+7. Start the development server
+```bash
 pnpm dev
 ```
 
-## How PayloadCMS works
+8. Access the application
+- Frontend: http://localhost:3000
+- Admin Dashboard: http://localhost:3000/admin
 
-The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:
+### Available Scripts
 
-### Collections
+| Script | Description |
+|--------|-------------|
+| `pnpm dev` | Start development server |
+| `pnpm build` | Build for production |
+| `pnpm start` | Start production server |
+| `pnpm migrate` | Run database migrations |
+| `pnpm migrate:create` | Create a new migration |
+| `pnpm generate:types` | Generate TypeScript types |
+| `pnpm generate:importmap` | Generate import map |
+| `pnpm reinstall` | Clean install dependencies |
+| `pnpm lint` | Run linter |
+| `pnpm lint:fix` | Fix linting issues |
 
-See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
+## Deployment
 
-- #### Users (Authentication)
+The application is designed to be deployed on Vercel with a PostgreSQL database:
 
-  Users are auth-enabled collections that have access to the admin panel and unpublished content. See [Access Control](#access-control) for more details.
+### Vercel Deployment
 
-  For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/main/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
+1. Configure environment variables in Vercel:
+   - `DATABASE_URI`: PostgreSQL connection string
+   - `PAYLOAD_SECRET`: Secret for JWT tokens
+   - `NEXT_PUBLIC_SERVER_URL`: Production URL
+   - `BLOB_READ_WRITE_TOKEN`: Vercel Blob Storage token
+   - `RESEND_API_KEY`: Resend API key
+   - Payment gateway credentials
 
-- #### Posts
+2. Connect your repository to Vercel
 
-  Posts are used to generate blog posts, news articles, or any other type of content that is published over time. All posts are layout builder enabled so you can generate unique layouts for each post using layout-building blocks, see [Layout Builder](#layout-builder) for more details. Posts are also draft-enabled so you can preview them before publishing them to your website, see [Draft Preview](#draft-preview) for more details.
+3. Configure build settings:
+   - Build Command: `pnpm ci`
+   - Output Directory: `.next`
+   - Install Command: `pnpm install`
 
-- #### Pages
+4. Deploy the application
 
-  All pages are layout builder enabled so you can generate unique layouts for each page using layout-building blocks, see [Layout Builder](#layout-builder) for more details. Pages are also draft-enabled so you can preview them before publishing them to your website, see [Draft Preview](#draft-preview) for more details.
+### Database Migrations
 
-- #### Media
+When deploying with schema changes:
 
-  This is the uploads enabled collection used by pages, posts, and projects to contain media like images, videos, downloads, and other assets. It features pre-configured sizes, focal point and manual resizing to help you manage your pictures.
-
-- #### Categories
-
-  A taxonomy used to group posts together. Categories can be nested inside of one another, for example "News > Technology". See the official [Payload Nested Docs Plugin](https://payloadcms.com/docs/plugins/nested-docs) for more details.
-
-### Globals
-
-See the [Globals](https://payloadcms.com/docs/configuration/globals) docs for details on how to extend this functionality.
-
-- `Header`
-
-  The data required by the header on your front-end like nav links.
-
-- `Footer`
-
-  Same as above but for the footer of your site.
-
-## Access control
-
-Basic access control is setup to limit access to various content based based on publishing status.
-
-- `users`: Users can access the admin panel and create or edit content.
-- `posts`: Everyone can access published posts, but only users can create, update, or delete them.
-- `pages`: Everyone can access published pages, but only users can create, update, or delete them.
-
-For more details on how to extend this functionality, see the [Payload Access Control](https://payloadcms.com/docs/access-control/overview#access-control) docs.
-
-## Layout Builder
-
-Create unique page layouts for any type of content using a powerful layout builder. This template comes pre-configured with the following layout building blocks:
-
-- Hero
-- Content
-- Media
-- Call To Action
-- Archive
-
-Each block is fully designed and built into the front-end website that comes with this template. See [Website](#website) for more details.
-
-## Lexical editor
-
-A deep editorial experience that allows complete freedom to focus just on writing content without breaking out of the flow with support for Payload blocks, media, links and other features provided out of the box. See [Lexical](https://payloadcms.com/docs/rich-text/overview) docs.
-
-## Draft Preview
-
-All posts and pages are draft-enabled so you can preview them before publishing them to your website. To do this, these collections use [Versions](https://payloadcms.com/docs/configuration/collections#versions) with `drafts` set to `true`. This means that when you create a new post, project, or page, it will be saved as a draft and will not be visible on your website until you publish it. This also means that you can preview your draft before publishing it to your website. To do this, we automatically format a custom URL which redirects to your front-end to securely fetch the draft version of your content.
-
-Since the front-end of this template is statically generated, this also means that pages, posts, and projects will need to be regenerated as changes are made to published documents. To do this, we use an `afterChange` hook to regenerate the front-end when a document has changed and its `_status` is `published`.
-
-For more details on how to extend this functionality, see the official [Draft Preview Example](https://github.com/payloadcms/payload/tree/examples/draft-preview).
-
-## Live preview
-
-In addition to draft previews you can also enable live preview to view your end resulting page as you're editing content with full support for SSR rendering. See [Live preview docs](https://payloadcms.com/docs/live-preview/overview) for more details.
-
-## On-demand Revalidation
-
-We've added hooks to collections and globals so that all of your pages, posts, or footer or header, change they will automatically be updated in the frontend via on-demand revalidation supported by Nextjs.
-
-> Note: if an image has been changed, for example it's been cropped, you will need to republish the page it's used on in order to be able to revalidate the Nextjs image cache.
-
-## SEO
-
-This template comes pre-configured with the official [Payload SEO Plugin](https://payloadcms.com/docs/plugins/seo) for complete SEO control from the admin panel. All SEO data is fully integrated into the front-end website that comes with this template. See [Website](#website) for more details.
-
-## Search
-
-This template also pre-configured with the official [Payload Search Plugin](https://payloadcms.com/docs/plugins/search) to showcase how SSR search features can easily be implemented into Next.js with Payload. See [Website](#website) for more details.
-
-## Redirects
-
-If you are migrating an existing site or moving content to a new URL, you can use the `redirects` collection to create a proper redirect from old URLs to new ones. This will ensure that proper request status codes are returned to search engines and that your users are not left with a broken link. This template comes pre-configured with the official [Payload Redirects Plugin](https://payloadcms.com/docs/plugins/redirects) for complete redirect control from the admin panel. All redirects are fully integrated into the front-end website that comes with this template. See [Website](#website) for more details.
-
-## Jobs and Scheduled Publish
-
-We have configured [Scheduled Publish](https://payloadcms.com/docs/versions/drafts#scheduled-publish) which uses the [jobs queue](https://payloadcms.com/docs/jobs-queue/jobs) in order to publish or unpublish your content on a scheduled time. The tasks are run on a cron schedule and can also be run as a separate instance if needed.
-
-> Note: When deployed on Vercel, depending on the plan tier, you may be limited to daily cron only.
-
-## Website
-
-This template includes a beautifully designed, production-ready front-end built with the [Next.js App Router](https://nextjs.org), served right alongside your Payload app in a instance. This makes it so that you can deploy both your backend and website where you need it.
-
-Core features:
-
-- [Next.js App Router](https://nextjs.org)
-- [TypeScript](https://www.typescriptlang.org)
-- [React Hook Form](https://react-hook-form.com)
-- [Payload Admin Bar](https://github.com/payloadcms/payload/tree/main/packages/admin-bar)
-- [TailwindCSS styling](https://tailwindcss.com/)
-- [shadcn/ui components](https://ui.shadcn.com/)
-- User Accounts and Authentication
-- Fully featured blog
-- Publication workflow
-- Dark mode
-- Pre-made layout building blocks
-- SEO
-- Search
-- Redirects
-- Live preview
-
-### Cache
-
-Although Next.js includes a robust set of caching strategies out of the box, Payload Cloud proxies and caches all files through Cloudflare using the [Official Cloud Plugin](https://www.npmjs.com/package/@payloadcms/payload-cloud). This means that Next.js caching is not needed and is disabled by default. If you are hosting your app outside of Payload Cloud, you can easily reenable the Next.js caching mechanisms by removing the `no-store` directive from all fetch requests in `./src/app/_api` and then removing all instances of `export const dynamic = 'force-dynamic'` from pages files, such as `./src/app/(pages)/[slug]/page.tsx`. For more details, see the official [Next.js Caching Docs](https://nextjs.org/docs/app/building-your-application/caching).
-
-## Development
-
-To spin up this example locally, follow the [Quick Start](#quick-start). Then [Seed](#seed) the database with a few pages, posts, and projects.
-
-### Working with Postgres
-
-Postgres and other SQL-based databases follow a strict schema for managing your data. In comparison to our MongoDB adapter, this means that there's a few extra steps to working with Postgres.
-
-Note that often times when making big schema changes you can run the risk of losing data if you're not manually migrating it.
-
-#### Local development
-
-Ideally we recommend running a local copy of your database so that schema updates are as fast as possible. By default the Postgres adapter has `push: true` for development environments. This will let you add, modify and remove fields and collections without needing to run any data migrations.
-
-If your database is pointed to production you will want to set `push: false` otherwise you will risk losing data or having your migrations out of sync.
-
-#### Migrations
-
-[Migrations](https://payloadcms.com/docs/database/migrations) are essentially SQL code versions that keeps track of your schema. When deploy with Postgres you will need to make sure you create and then run your migrations.
-
-Locally create a migration
-
+1. Create migrations locally:
 ```bash
-pnpm payload migrate:create
+pnpm migrate:create
 ```
 
-This creates the migration files you will need to push alongside with your new configuration.
+2. Commit migration files to your repository
 
-On the server after building and before running `pnpm start` you will want to run your migrations
-
+3. Run migrations on deployment:
 ```bash
-pnpm payload migrate
+pnpm migrate
 ```
 
-This command will check for any migrations that have not yet been run and try to run them and it will keep a record of migrations that have been run in the database.
+### Docker Deployment
 
-### Docker
+You can also deploy using Docker:
 
-Alternatively, you can use [Docker](https://www.docker.com) to spin up this template locally. To do so, follow these steps:
-
-1. Follow [steps 1 and 2 from above](#development), the docker-compose file will automatically use the `.env` file in your project root
-1. Next run `docker-compose up`
-1. Follow [steps 4 and 5 from above](#development) to login and create your first admin user
-
-That's it! The Docker instance will help you get up and running quickly while also standardizing the development environment across your teams.
-
-### Seed
-
-To seed the database with a few pages, posts, and projects you can click the 'seed database' link from the admin panel.
-
-The seed script will also create a demo user for demonstration purposes only:
-
-- Demo Author
-  - Email: `demo-author@payloadcms.com`
-  - Password: `password`
-
-> NOTICE: seeding the database is destructive because it drops your current database to populate a fresh one from the seed template. Only run this command if you are starting a new project or can afford to lose your current data.
-
-## Production
-
-To run Payload in production, you need to build and start the Admin panel. To do so, follow these steps:
-
-1. Invoke the `next build` script by running `pnpm build` or `npm run build` in your project root. This creates a `.next` directory with a production-ready admin bundle.
-1. Finally run `pnpm start` or `npm run start` to run Node in production and serve Payload from the `.build` directory.
-1. When you're ready to go live, see Deployment below for more details.
-
-### Deploying to Vercel
-
-This template can also be deployed to Vercel for free. You can get started by choosing the Vercel DB adapter during the setup of the template or by manually installing and configuring it:
-
+1. Build the Docker image:
 ```bash
-pnpm add @payloadcms/db-vercel-postgres
+docker build -t orchestars .
 ```
 
-```ts
-// payload.config.ts
-import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
+2. Run the container:
+```bash
+docker run -p 3000:3000 --env-file .env orchestars
+```
 
-export default buildConfig({
-  // ...
-  db: vercelPostgresAdapter({
-    pool: {
-      connectionString: process.env.POSTGRES_URL || '',
+## Data Model
+
+OrcheSTARS uses PayloadCMS collections to model the data. Here are the key collections:
+
+### Core Collections
+
+| Collection | Purpose |
+|------------|---------|
+| `Events` | Event details, schedules, and configuration |
+| `Tickets` | Generated tickets with QR codes |
+| `Orders` | Customer orders with payment status |
+| `OrderItems` | Individual items within orders |
+| `Payments` | Payment transactions and status |
+| `SeatHoldings` | Temporary seat reservations |
+| `Users` | Customer accounts |
+| `Admins` | Administrative users |
+
+### Content Collections
+
+| Collection | Purpose |
+|------------|---------|
+| `Pages` | Static pages with layout builder |
+| `Posts` | Blog posts and news articles |
+| `Media` | Images and other media files |
+| `Categories` | Content categorization |
+| `Partners` | Event partners and sponsors |
+| `Performers` | Artists and performers |
+| `FAQs` | Frequently asked questions |
+
+### Support Collections
+
+| Collection | Purpose |
+|------------|---------|
+| `Promotions` | Discount configurations |
+| `UserPromotionRedemptions` | Promotion usage tracking |
+| `CheckInRecords` | Event attendance tracking |
+| `Activities` | System activity logs |
+| `Emails` | Email tracking and history |
+| `Logs` | System logs |
+
+## Advanced Features
+
+### Scheduled Jobs
+
+The system uses PayloadCMS's job queue for scheduled tasks:
+
+```typescript
+jobs: {
+  autoRun: [
+    {
+      cron: '*/5 * * * *', // Runs every 5 minutes
+      limit: 1,
+      queue: 'updatePaymentStatus',
     },
-  }),
-  // ...
-```
-
-We also support Vercel's blob storage:
-
-```bash
-pnpm add @payloadcms/storage-vercel-blob
-```
-
-```ts
-// payload.config.ts
-import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
-
-export default buildConfig({
-  // ...
-  plugins: [
-    vercelBlobStorage({
-      collections: {
-        [Media.slug]: true,
-      },
-      token: process.env.BLOB_READ_WRITE_TOKEN || '',
-    }),
   ],
-  // ...
+}
 ```
 
+### Internationalization
+
+The application supports multiple languages through PayloadCMS's localization:
+
+```typescript
+i18n: {
+  defaultLocale: 'vi',
+  locales: ['vi', 'en'],
+},
+localization: {
+  locales: ['vi', 'en'],
+  defaultLocale: 'vi',
+  fallback: true,
+}
+```
+
+### Live Preview
+
+Content editors can preview changes in real-time using PayloadCMS's live preview feature:
+
+```typescript
+livePreview: {
+  breakpoints: [
+    {
+      label: 'Mobile',
+      name: 'mobile',
+      width: 375,
+      height: 667,
+    },
+    {
+      label: 'Tablet',
+      name: 'tablet',
+      width: 768,
+      height: 1024,
+    },
+    {
+      label: 'Desktop',
+      name: 'desktop',
+      width: 1440,
+      height: 900,
+    },
+  ],
+}
+```
+
+## Contributing
+
+Please read our contribution guidelines before submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
