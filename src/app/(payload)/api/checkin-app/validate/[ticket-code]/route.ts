@@ -10,6 +10,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { headers as getHeaders } from 'next/headers'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
+// Use sql tag from @payloadcms/db-postgres for parameterized queries to prevent SQL injection
+import { sql } from '@payloadcms/db-postgres'
 
 interface TicketRecord {
   id: number
@@ -57,7 +59,10 @@ export async function POST(req: NextRequest) {
     const isSearchBySeat = ticketCode.length <= 4
 
     // Optimize: Use a single query with JOIN to get ticket and check-in status
-    const ticketResult = await payload.db.drizzle.execute(`
+
+    const ticketCodeParam = isSearchBySeat ? ticketCode.toUpperCase() : ticketCode.toUpperCase()
+
+    const query = sql`
       SELECT
         t.id,
         t.ticket_code,
@@ -79,16 +84,14 @@ export async function POST(req: NextRequest) {
       LEFT JOIN checkin_records cr ON cr.ticket_code = t.ticket_code AND cr.deleted_at IS NULL
       LEFT JOIN admins a ON cr.checked_in_by_id = a.id
       WHERE
-        ${
-          isSearchBySeat
-            ? `UPPER(t.seat) = '${ticketCode.toUpperCase()}'`
-            : `t.ticket_code = '${ticketCode.toUpperCase()}'`
-        }
+        ${isSearchBySeat ? sql`UPPER(t.seat) = ${ticketCodeParam}` : sql`t.ticket_code = ${ticketCodeParam}`}
         AND t.event_id = ${eventId}
-        AND t.event_schedule_id = '${eventScheduleId}'
+        AND t.event_schedule_id = ${eventScheduleId}
         AND t.status = 'booked'
       ORDER BY t.created_at DESC
-    `)
+    `
+
+    const ticketResult = await payload.db.drizzle.execute(query)
 
     const tickets = (ticketResult.rows || []) as unknown as TicketRecord[]
 
