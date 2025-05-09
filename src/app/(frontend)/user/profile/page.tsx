@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslate } from '@/providers/I18n/client'
 import { useAuth } from '@/providers/CheckIn/useAuth'
-import router from 'next/router'
+import router from 'next/navigation'
 import { format, parse } from 'date-fns'
 import { categories } from '@/components/EventDetail/data/seat-maps/categories'
 

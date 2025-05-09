@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await payload.login({
-      collection: 'users',
+      collection: 'admins',
       data: {
         email,
         password,
