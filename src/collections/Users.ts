@@ -20,31 +20,29 @@ export const Users: CollectionConfig = {
         name: 'custom-strategy',
         authenticate: async ({ payload, headers }): Promise<AuthStrategyResult> => {
           const authHeader = headers.get('Authorization')
-          if (!authHeader?.startsWith('Bearer ')) {
-            return { user: null }
-          }
-
+          if (!authHeader?.startsWith('Bearer ')) return { user: null }
+        
           try {
             const { user } = await payload.auth({ headers })
             if (!user) return { user: null }
-
+        
+            const { username: _username, ...rest } = user as User & { collection: "users";}
             return {
               user: {
                 _strategy: 'custom-strategy',
-                collection: 'users',
-                ...(user as User), 
+                ...rest,                                // now type‑safe
               },
               responseHeaders: new Headers({
-                'Authorization': `Bearer ${authHeader.split(' ')[1]}`,
-                'Access-Control-Expose-Headers': 'Authorization'
-              })
+                Authorization: authHeader,
+                'Access-Control-Expose-Headers': 'Authorization',
+              }),
             }
-          } catch (error) {
+          } catch {
             return { user: null }
           }
         }
       }
-    ]
+    ],
   },
   access: {
     create: () => true,
