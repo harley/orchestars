@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
+
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { cookies } from 'next/headers'
 
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await payload.login({
-      collection: 'admins',
+      collection: 'users',
       data: {
         email,
         password,
@@ -23,13 +23,6 @@ export async function POST(req: NextRequest) {
 
     if (!result.user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
-    }
-
-    if (!isAdminOrSuperAdminOrEventAdmin({ req: { user: result?.user } })) {
-      return NextResponse.json(
-        { error: 'Unauthorized access. Only event admins can access the check-in app.' },
-        { status: 403 },
-      )
     }
 
     const cookieStore = await cookies()

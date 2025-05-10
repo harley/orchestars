@@ -63,6 +63,7 @@ export type SupportedTimezones =
 
 export interface Config {
   auth: {
+    users: UserAuthOperations;
     admins: AdminAuthOperations;
   };
   blocks: {};
@@ -143,9 +144,13 @@ export interface Config {
     footer: FooterSelect<false> | FooterSelect<true>;
   };
   locale: 'en' | 'vi';
-  user: Admin & {
-    collection: 'admins';
-  };
+  user:
+    | (User & {
+        collection: 'users';
+      })
+    | (Admin & {
+        collection: 'admins';
+      });
   jobs: {
     tasks: {
       schedulePublish: TaskSchedulePublish;
@@ -155,6 +160,24 @@ export interface Config {
       };
     };
     workflows: unknown;
+  };
+}
+export interface UserAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
   };
 }
 export interface AdminAuthOperations {
@@ -407,7 +430,6 @@ export interface Category {
  */
 export interface User {
   id: number;
-  email: string;
   phoneNumber?: string | null;
   phoneNumbers?:
     | {
@@ -420,9 +442,18 @@ export interface User {
   username?: string | null;
   firstName?: string | null;
   lastName?: string | null;
+  role?: ('admin' | 'super-admin' | 'customer' | 'event-admin') | null;
   lastActive?: string | null;
   updatedAt: string;
   createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  password?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1518,10 +1549,15 @@ export interface PayloadLockedDocument {
         value: number | PayloadJob;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'admins';
-    value: number | Admin;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'admins';
+        value: number | Admin;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -1531,10 +1567,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'admins';
-    value: number | Admin;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'admins';
+        value: number | Admin;
+      };
   key?: string | null;
   value?:
     | {
@@ -1843,7 +1884,6 @@ export interface CategoriesSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
-  email?: T;
   phoneNumber?: T;
   phoneNumbers?:
     | T
@@ -1856,9 +1896,17 @@ export interface UsersSelect<T extends boolean = true> {
   username?: T;
   firstName?: T;
   lastName?: T;
+  role?: T;
   lastActive?: T;
   updatedAt?: T;
   createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
