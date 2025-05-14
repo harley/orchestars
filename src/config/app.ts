@@ -5,3 +5,5 @@ export const DEFAULT_FALLBACK_LOCALE =
   (process.env.NEXT_PUBLIC_DEFAULT_FALLBACK_LOCALE as SupportedLocale) || 'vi'
 
 export const NODE_ENV = process.env.NODE_ENV
+
+export const IS_LOCAL_DEVELOPMENT = !NODE_ENV || ['development', 'local'].includes(NODE_ENV)

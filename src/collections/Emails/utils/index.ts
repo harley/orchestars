@@ -1,6 +1,7 @@
-import { NODE_ENV } from '@/config/app'
+import { IS_LOCAL_DEVELOPMENT } from '@/config/app'
 import { Email } from '@/payload-types'
 import { BasePayload } from 'payload'
+import { EMAIL_PROVIDER } from '@/config/email'
 
 export const sendMailAndWriteLog = async ({
   resendMailData,
@@ -39,7 +40,7 @@ const sendMail = async ({
   mailData: { to?: string; cc?: string; subject?: string; html: string }
 }) => {
   try {
-    if (!NODE_ENV || ['development', 'local'].includes(NODE_ENV)) {
+    if (IS_LOCAL_DEVELOPMENT && EMAIL_PROVIDER === 'RESEND') {
       return { id: `mock-id-${Math.random()}` }
     }
     return await payload.sendEmail(mailData)
