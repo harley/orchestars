@@ -25,7 +25,6 @@ import { Tickets } from './collections/Tickets'
 import { Partners } from './collections/Partners'
 import { Performers } from './collections/Performers'
 import { FAQs } from './collections/FAQ'
-import { resendAdapter } from '@payloadcms/email-resend'
 import { Activities } from './collections/Activities'
 import { SeatHoldings } from './collections/SeatHoldings'
 import { Promotions } from './collections/Promotion'
@@ -36,6 +35,7 @@ import { i18n } from './payload-config/i18n'
 import { localization } from './payload-config/localization'
 import { Emails } from './collections/Emails'
 import { Logs } from './collections/Logs'
+import { emailAdapter } from './payload-config/email'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -167,11 +167,7 @@ export default buildConfig({
       return true
     },
   },
-  email: resendAdapter({
-    defaultFromAddress: 'info@orchestars.vn',
-    defaultFromName: 'Orchestars',
-    apiKey: process.env.RESEND_API_KEY || '',
-  }),
+  email: emailAdapter(),
   i18n,
   localization,
 })

@@ -67,3 +67,6 @@ supabase/.bin/
 # testing
 /playwright-report/
 /test-results/
+
+# vs code
+.vscode

@@ -119,17 +119,17 @@ OrcheStars extends PayloadCMS with custom functionality specifically designed fo
 │          │                  │                  │           │
 │  ┌───────▼──────────────────▼──────────────────▼───────┐   │
 │  │                   PayloadCMS Core                   │   │
-│  └───────────────────────────┬───────────────────────┬─┘   │
-│                              │                       │     │
-│  ┌────────────────────────┐  │  ┌───────────────────┐│     │
-│  │Payment Processing      │◄─┘  │File Storage       ││     │
-│  │(ZaloPay, Bank Transfer)│     │(Vercel Blob)      ││     │
-│  └────────────────────────┘     └───────────────────┘│     │
-│                                                      │     │
-└──────────────────────────────────────────────────────┼─────┘
-                                                       │
-┌──────────────────────────────────────────────────────▼─────┐
-│                      PostgreSQL Database                   │
+│  └─────────┬─────────────────┬───────────────────────┬─┘   │
+│            │                 │                       │     │
+│  ┌─────────▼────────┐ ┌──────▼───────────┐ ┌─────────▼───┐ │
+│  │Payment Processing│ │Email Service     │ │File Storage │ │
+│  │(ZaloPay, Bank)   │ │(Resend/Nodemailer)│ │(Vercel Blob)│ │
+│  └──────────────────┘ └──────────────────┘ └─────────────┘ │
+│                                                             │
+└─────────────────────────────────┬───────────────────────────┘
+                                  │
+┌─────────────────────────────────▼───────────────────────────┐
+│                      PostgreSQL Database                    │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -157,8 +157,27 @@ OrcheStars extends PayloadCMS with custom functionality specifically designed fo
 ### Prerequisites
 
 - Node.js 22.x
-- PostgreSQL 14+
+- PostgreSQL 14+ or Supabase CLI
 - pnpm 9.15.5+
+- Docker and Docker Compose (for Supabase local development)
+
+To install the Supabase CLI:
+
+```bash
+# Using Homebrew (macOS/Linux) - Recommended
+brew install supabase/tap/supabase
+
+# Using npm (as a dev dependency, not globally)
+npm install supabase --save-dev
+
+# Using pnpm (as a dev dependency)
+pnpm add -D supabase
+
+# Using yarn (as a dev dependency)
+yarn add -D supabase
+```
+
+> **Note:** Installing Supabase CLI as a global module is not supported and will result in an error.
 
 ### Installation
 
@@ -189,8 +208,16 @@ PAYLOAD_SECRET=your_secret_here
 # Used to configure CORS, format links and more
 NEXT_PUBLIC_SERVER_URL=http://localhost:3000
 
-# Resend API key for email delivery
+# Email configuration
+EMAIL_PROVIDER=RESEND
+EMAIL_DEFAULT_FROM_ADDRESS=info@orchestars.vn
+EMAIL_DEFAULT_FROM_NAME=Orchestars
 RESEND_API_KEY=re_your_key_here
+
+# For local development with Inbucket (optional)
+# EMAIL_PROVIDER=NODEMAILER
+# SMTP_HOST=localhost
+# SMTP_PORT=2500
 
 # Vercel Blob Storage for media files
 BLOB_READ_WRITE_TOKEN=vercel_blob_rw_your_token_here
@@ -202,15 +229,32 @@ ZALO_KEY2=your_key2
 ```
 
 5. Set up the database
+
 ```bash
 # Option 1: Using Docker
 docker-compose up -d
 
-# Option 2: Create PostgreSQL database manually
+# Option 2: Using Supabase (Recommended)
+# If installed with Homebrew
+supabase start
+
+# If installed as a dev dependency with npm/pnpm/yarn
+npx supabase start
+
+# Option 3: Create PostgreSQL database manually
 createdb orchestars
 
 # Run migrations
 pnpm migrate
+```
+
+If you're using Supabase, it will provide a PostgreSQL database, along with other services like Inbucket for email testing. Update your `.env` file with:
+
+```
+DATABASE_URI=postgres://postgres:postgres@127.0.0.1:54322/postgres
+EMAIL_PROVIDER=NODEMAILER
+SMTP_HOST=localhost
+SMTP_PORT=54325
 ```
 
 6. Generate TypeScript types

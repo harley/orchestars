@@ -3,7 +3,7 @@
 ## Technology Stack
 
 - **Framework**: Next.js with Payload CMS
-- **Database**: PostgreSQL on Supabase
+- **Database**: PostgreSQL on Supabase (with local development support)
 - **Deployment**: Vercel
 - **CMS**: Payload CMS (headless)
 - **File Storage**: Vercel Blob Storage
@@ -92,29 +92,29 @@ Key collections in Payload CMS:
 collections: {
   // Admin & Authentication
   admins: Admin                   // Admin users with authentication
-  
+
   // Event Management
   events: Event                    // Event details and configuration
   performers: Performer           // Artists and performers
   partners: Partner              // Event partners and sponsors
-  
+
   // Ticketing
   orders: Order                   // Customer orders
   orderItems: OrderItem          // Individual items in orders
   payments: Payment              // Payment transactions
   tickets: Ticket                // Generated tickets
   seatHoldings: SeatHolding     // Temporary seat holds
-  
+
   // Promotions
   promotions: Promotion          // Discount configurations
   userPromotionRedemptions: UserPromotionRedemption  // Promotion usage
-  
+
   // Users & Content
   users: User                    // User accounts
   media: Media                   // Uploaded files
   pages: Page                    // Static pages
   posts: Post                    // Blog/news posts
-  
+
   // Support
   faqs: FAQ                      // Frequently asked questions
   activities: Activity           // System activities
@@ -136,7 +136,14 @@ collections: {
   - Email notifications for primary communication
   - Phone numbers stored for customer support only
   - No active phone verification required
-  - Email service: [TBD - specify current email service]
+  - Email services:
+    - Production: Resend (via `@payloadcms/email-resend`)
+    - Development: Nodemailer with Inbucket (via `@payloadcms/email-nodemailer`)
+  - Email templates for:
+    - Ticket confirmation
+    - Order status updates
+    - Event reminders
+    - Check-in instructions
 
 ### 5. Business Rules
 
@@ -249,6 +256,13 @@ ticketPrices: {
 - Backup strategy
 - Data retention policies
 
+### Supabase Integration
+- Local development using Supabase CLI
+- PostgreSQL database for development and testing
+- Inbucket for email testing
+- Database management through Supabase Studio
+- Configuration in `supabase/config.toml`
+
 ### File Structure
 ```
 src/
@@ -306,4 +320,4 @@ See `tech-FAQs.md` for detailed questions about:
 - Inventory management
 - Multi-platform integration
 - Security measures
-- Performance optimization 
+- Performance optimization
