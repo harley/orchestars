@@ -46,6 +46,11 @@
   - PostgreSQL Database
   - Inbucket Email Testing
   - Database Management
+- [Storage Setup](storage-setup.md)
+  - AWS S3 Configuration
+  - Vercel Blob Storage
+  - Local Storage
+  - Migration Guide
 
 ## Roadmap
 - [Development Roadmap](roadmap.md) [TBD]
