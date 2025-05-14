@@ -35,9 +35,21 @@
   - Configuration
   - Local Development
 
+## Integrations
+- [Email Setup](email-setup.md)
+  - Configuration
+  - Resend Integration
+  - Nodemailer with Inbucket
+  - Email Templates
+- [Supabase Setup](supabase-setup.md)
+  - Local Development
+  - PostgreSQL Database
+  - Inbucket Email Testing
+  - Database Management
+
 ## Roadmap
 - [Development Roadmap](roadmap.md) [TBD]
   - Current Sprint
   - Upcoming Features
   - Known Issues
-  - Technical Debt 
+  - Technical Debt
