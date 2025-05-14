@@ -154,9 +154,16 @@ sender_name = "Admin"
 To use Inbucket with Nodemailer in the OrcheStars application, update your `.env` file:
 
 ```
+# Email provider configuration
 EMAIL_PROVIDER=NODEMAILER
+EMAIL_DEFAULT_FROM_ADDRESS=info@orchestars.vn
+EMAIL_DEFAULT_FROM_NAME=Orchestars
+
+# SMTP server configuration
 SMTP_HOST=localhost
 SMTP_PORT=54325
+SMTP_USER=
+SMTP_PASS=
 ```
 
 This configuration will route all emails through Inbucket, where you can view them in the web interface at http://127.0.0.1:54324.

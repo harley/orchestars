@@ -1,6 +1,6 @@
 export const EMAIL_PROVIDER = (process.env.EMAIL_PROVIDER as 'RESEND' | 'NODEMAILER') || 'RESEND'
-export const EMAIL_DEFAULT_FROM_ADDRESS = 'info@orchestars.vn'
-export const EMAIL_DEFAULT_FROM_NAME = 'Orchestars'
+export const EMAIL_DEFAULT_FROM_ADDRESS = process.env.EMAIL_DEFAULT_FROM_ADDRESS || 'info@orchestars.vn'  
+export const EMAIL_DEFAULT_FROM_NAME = process.env.EMAIL_DEFAULT_FROM_NAME || 'Orchestars' 
 
 export const NODEMAILER = {
   HOST: process.env.SMTP_HOST,

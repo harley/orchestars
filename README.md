@@ -209,13 +209,21 @@ PAYLOAD_SECRET=your_secret_here
 NEXT_PUBLIC_SERVER_URL=http://localhost:3000
 
 # Email configuration
-EMAIL_PROVIDER=RESEND
+EMAIL_PROVIDER=RESEND  # Options: 'RESEND' or 'NODEMAILER'
 EMAIL_DEFAULT_FROM_ADDRESS=info@orchestars.vn
 EMAIL_DEFAULT_FROM_NAME=Orchestars
+
+# Option 1: Resend for production (when EMAIL_PROVIDER=RESEND)
 RESEND_API_KEY=re_your_key_here
 
-# For local development with Inbucket (optional)
-# EMAIL_PROVIDER=NODEMAILER
+# Option 2: SMTP configuration (when EMAIL_PROVIDER=NODEMAILER)
+# Can be used for both production SMTP servers and local development
+# SMTP_HOST=smtp.example.com  # For production: your SMTP server
+# SMTP_PORT=587              # For production: typically 587 or 465
+# SMTP_USER=your_username    # For production: SMTP username
+# SMTP_PASS=your_password    # For production: SMTP password
+
+# For local development with Inbucket
 # SMTP_HOST=localhost
 # SMTP_PORT=2500
 
@@ -251,8 +259,13 @@ pnpm migrate
 If you're using Supabase, it will provide a PostgreSQL database, along with other services like Inbucket for email testing. Update your `.env` file with:
 
 ```
+# Database connection
 DATABASE_URI=postgres://postgres:postgres@127.0.0.1:54322/postgres
+
+# Email configuration
 EMAIL_PROVIDER=NODEMAILER
+EMAIL_DEFAULT_FROM_ADDRESS=info@orchestars.vn
+EMAIL_DEFAULT_FROM_NAME=Orchestars
 SMTP_HOST=localhost
 SMTP_PORT=54325
 ```
@@ -297,7 +310,23 @@ The application is designed to be deployed on Vercel with a PostgreSQL database:
    - `PAYLOAD_SECRET`: Secret for JWT tokens
    - `NEXT_PUBLIC_SERVER_URL`: Production URL
    - `BLOB_READ_WRITE_TOKEN`: Vercel Blob Storage token
-   - `RESEND_API_KEY`: Resend API key
+
+   - Email configuration (choose one option):
+     - Option 1: Resend
+       - `EMAIL_PROVIDER`: Set to `RESEND`
+       - `EMAIL_DEFAULT_FROM_ADDRESS`: Default sender email address
+       - `EMAIL_DEFAULT_FROM_NAME`: Default sender name
+       - `RESEND_API_KEY`: Resend API key
+
+     - Option 2: SMTP Server
+       - `EMAIL_PROVIDER`: Set to `NODEMAILER`
+       - `EMAIL_DEFAULT_FROM_ADDRESS`: Default sender email address
+       - `EMAIL_DEFAULT_FROM_NAME`: Default sender name
+       - `SMTP_HOST`: Your SMTP server hostname
+       - `SMTP_PORT`: Your SMTP server port (typically 587 or 465)
+       - `SMTP_USER`: Your SMTP username
+       - `SMTP_PASS`: Your SMTP password
+
    - Payment gateway credentials
 
 2. Connect your repository to Vercel

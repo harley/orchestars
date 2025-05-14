@@ -33,7 +33,39 @@ For production environments, we use [Resend](https://resend.com/) as our email s
 RESEND_API_KEY=re_your_api_key_here
 ```
 
-### Nodemailer Configuration (Local Development)
+### Nodemailer Configuration
+
+Nodemailer can be used with any SMTP server, both for production environments and local development.
+
+#### Production SMTP Configuration
+
+For production environments, you can configure Nodemailer to use your organization's SMTP server or a third-party email service that supports SMTP (like Gmail, SendGrid, Mailgun, etc.):
+
+```
+# Email Provider
+EMAIL_PROVIDER=NODEMAILER
+
+# Default sender information
+EMAIL_DEFAULT_FROM_ADDRESS=info@orchestars.vn
+EMAIL_DEFAULT_FROM_NAME=Orchestars
+
+# SMTP Configuration for Nodemailer
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=your_username
+SMTP_PASS=your_password
+```
+
+Common SMTP configurations for popular services:
+
+| Service | SMTP Host | SMTP Port | Notes |
+|---------|-----------|-----------|-------|
+| Gmail | smtp.gmail.com | 587 | Requires app password if 2FA is enabled |
+| SendGrid | smtp.sendgrid.net | 587 | Requires API key as password |
+| Mailgun | smtp.mailgun.org | 587 | Requires SMTP credentials |
+| Office 365 | smtp.office365.com | 587 | Requires account credentials |
+
+#### Local Development Configuration
 
 For local development, you can use Nodemailer with [Inbucket](https://github.com/inbucket/inbucket), a disposable webmail testing service:
 
@@ -41,7 +73,11 @@ For local development, you can use Nodemailer with [Inbucket](https://github.com
 # Email Provider
 EMAIL_PROVIDER=NODEMAILER
 
-# SMTP Configuration for Nodemailer
+# Default sender information
+EMAIL_DEFAULT_FROM_ADDRESS=info@orchestars.vn
+EMAIL_DEFAULT_FROM_NAME=Orchestars
+
+# SMTP Configuration for Nodemailer (local)
 SMTP_HOST=localhost
 SMTP_PORT=2500
 SMTP_USER=
@@ -123,10 +159,20 @@ For more detailed information about setting up Supabase locally, see the [Supaba
 
 For testing in production-like environments:
 
+#### Testing with Resend
+
 1. Use a test Resend API key
 2. Configure your application to use Resend
 3. Send test emails to verified addresses
 4. Check the Resend dashboard for delivery status
+
+#### Testing with SMTP
+
+1. Use a test SMTP server or a test account with your email provider
+2. Configure your application to use Nodemailer with your SMTP settings
+3. Send test emails to verified addresses
+4. Check your email provider's logs or dashboard for delivery status
+5. For debugging SMTP issues, you can use tools like [MailTrap](https://mailtrap.io/) or [Ethereal Email](https://ethereal.email/)
 
 ## Troubleshooting
 
