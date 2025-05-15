@@ -227,8 +227,18 @@ RESEND_API_KEY=re_your_key_here
 # SMTP_HOST=localhost
 # SMTP_PORT=2500
 
-# Vercel Blob Storage for media files
+# Storage Configuration
+# Option 1: AWS S3 Storage (highest priority)
+# S3_ACCESS_KEY=your_access_key
+# S3_SECRET_KEY=your_secret_key
+# S3_BUCKET=your_bucket_name
+# S3_REGION=your_region
+# S3_ENDPOINT=  # Optional: For S3-compatible services
+# S3_ACL=public-read  # Optional: Default is 'public-read'
+
+# Option 2: Vercel Blob Storage (used if S3 is not configured)
 BLOB_READ_WRITE_TOKEN=vercel_blob_rw_your_token_here
+BLOB_BASE_URL=https://your-domain.com
 
 # Payment gateway credentials
 ZALO_APP_ID=your_app_id
@@ -309,7 +319,24 @@ The application is designed to be deployed on Vercel with a PostgreSQL database:
    - `DATABASE_URI`: PostgreSQL connection string
    - `PAYLOAD_SECRET`: Secret for JWT tokens
    - `NEXT_PUBLIC_SERVER_URL`: Production URL
-   - `BLOB_READ_WRITE_TOKEN`: Vercel Blob Storage token
+
+   - Storage configuration (choose one option):
+     - Option 1: Supabase Storage (recommended)
+       - `SUPABASE_STORAGE_URL`: Your Supabase project URL
+       - `SUPABASE_ANON_KEY`: Your Supabase anon key
+       - `SUPABASE_STORAGE_BUCKET`: Bucket name (default: 'media')
+
+     - Option 2: AWS S3
+       - `S3_ACCESS_KEY`: Your AWS access key
+       - `S3_SECRET_KEY`: Your AWS secret key
+       - `S3_BUCKET`: Your S3 bucket name
+       - `S3_REGION`: AWS region (e.g., us-east-1)
+       - `S3_ENDPOINT`: Optional for S3-compatible services
+       - `S3_ACL`: Optional, defaults to 'public-read'
+
+     - Option 3: Vercel Blob Storage
+       - `BLOB_READ_WRITE_TOKEN`: Vercel Blob Storage token
+       - `BLOB_BASE_URL`: Your domain for Blob Storage URLs
 
    - Email configuration (choose one option):
      - Option 1: Resend
