@@ -163,22 +163,34 @@ export interface Config {
   };
 }
 export interface UserAuthOperations {
-  forgotPassword: {
-    email: string;
-    password: string;
-  };
-  login: {
-    email: string;
-    password: string;
-  };
+  forgotPassword:
+    | {
+        email: string;
+      }
+    | {
+        username: string;
+      };
+  login:
+    | {
+        email: string;
+        password: string;
+      }
+    | {
+        password: string;
+        username: string;
+      };
   registerFirstUser: {
-    email: string;
     password: string;
-  };
-  unlock: {
+    username?: string;
     email: string;
-    password: string;
   };
+  unlock:
+    | {
+        email: string;
+      }
+    | {
+        username: string;
+      };
 }
 export interface AdminAuthOperations {
   forgotPassword: {
@@ -439,14 +451,13 @@ export interface User {
         id?: string | null;
       }[]
     | null;
-  username?: string | null;
   firstName?: string | null;
   lastName?: string | null;
-  role?: ('admin' | 'super-admin' | 'customer' | 'event-admin') | null;
   lastActive?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
+  username?: string | null;
   resetPasswordToken?: string | null;
   resetPasswordExpiration?: string | null;
   salt?: string | null;
@@ -1893,14 +1904,13 @@ export interface UsersSelect<T extends boolean = true> {
         isUsing?: T;
         id?: T;
       };
-  username?: T;
   firstName?: T;
   lastName?: T;
-  role?: T;
   lastActive?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
+  username?: T;
   resetPasswordToken?: T;
   resetPasswordExpiration?: T;
   salt?: T;

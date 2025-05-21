@@ -145,7 +145,24 @@
     "promotionSuccess": "Thành công",
     "promotionApplied": "Đã áp dụng mã giảm giá",
     "invalidPromoCode": "Mã giảm giá không hợp lệ",
-    "errorHoldingSeat": "Có lỗi xảy ra khi tiến hành giữ chỗ và thanh toán"
+    "errorHoldingSeat": "Có lỗi xảy ra khi tiến hành giữ chỗ và thanh toán",
+    "accountSettings": {
+      "infoHelper": "Cung cấp thông tin chính xác sẽ hỗ trợ bạn trong quá trình mua vé, hoặc khi cần xác thực vé",
+      "fullName": "Họ và tên",
+      "enterFullName": "Nhập họ và tên",
+      "phone": "Số điện thoại",
+      "enterPhone": "Nhập số điện thoại",
+      "email": "Email",
+      "enterEmail": "Nhập email",
+      "dob": "Ngày tháng năm sinh",
+      "enterDob": "Nhập ngày tháng năm sinh",
+      "gender": "Giới tính",
+      "selectGender": "Chọn giới tính",
+      "male": "Nam",
+      "female": "Nữ",
+      "other": "Khác",
+      "submit": "Hoàn thành"
+    }
   },
   "errorCode": {
     "SYS001": "Có lỗi xảy ra! Vui lòng thử lại",
@@ -360,7 +377,30 @@
     "statusProcessing": "Đang xử lý",
     "statusHold": "Tạm giữ",
     "statusCancelled": "Đã hủy",
-    "userLogin": "Đăng Nhập"
+    "userLogin": "Đăng Nhập",
+    "accountSettings": {
+      "infoHelper": "Cung cấp thông tin chính xác sẽ hỗ trợ bạn trong quá trình mua vé, hoặc khi cần xác thực vé",
+      "fullName": "Họ và tên",
+      "enterFullName": "Nhập họ và tên",
+      "phone": "Số điện thoại",
+      "enterPhone": "Nhập số điện thoại",
+      "email": "Email",
+      "enterEmail": "Nhập email",
+      "dob": "Ngày tháng năm sinh",
+      "enterDob": "Nhập ngày tháng năm sinh",
+      "gender": "Giới tính",
+      "selectGender": "Chọn giới tính",
+      "male": "Nam",
+      "female": "Nữ",
+      "other": "Khác",
+      "submit": "Hoàn thành"
+    },
+    "sidebar": {
+      "accountOf": "Tài khoản của",
+      "accountSettings": "Cài đặt tài khoản",
+      "accountInfo": "Thông tin tài khoản",
+      "purchasedTickets": "Vé đã mua",
+      "myEvents": "Sự kiện của tôi"
+    }
   }
-  
 }

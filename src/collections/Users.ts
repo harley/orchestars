@@ -1,14 +1,47 @@
-import type { CollectionConfig, PayloadRequest, AuthStrategyFunction, AuthStrategyResult } from 'payload'
+import type { CollectionConfig, PayloadRequest, AuthStrategyResult } from 'payload'
 import type { User } from '@/payload-types'
+import { getPayload } from '@/payload-config/getPayloadConfig'
 
-const adminAccessControl = ({ req: { user } }: { req: PayloadRequest }) => {
-  if (user && (user.role?.includes('admin') || user.role?.includes('super-admin'))) {
+const adminAccessControl = async ({ req: { user } }: { req: PayloadRequest }) => {
+  const payload = await getPayload();
+  
+  const adminFind = await payload.find({
+    collection: 'admins',
+    where: {
+      id: {
+        equals: user?.id,
+      },
+    },
+  })
+
+  if (adminFind) {
+    const admin = adminFind.docs[0]
+  if (admin && (admin.role?.includes('admin') || admin.role?.includes('super-admin'))) {
     return true
   }
   return false
 }
+}
 
-const isSuperAdmin = ({ req: { user } }: { req: PayloadRequest }) => user?.role === 'super-admin'
+const isSuperAdmin = async ({ req: { user } }: { req: PayloadRequest }) => {
+  const payload = await getPayload();
+  
+  const adminFind = await payload.find({
+    collection: 'admins',
+    where: {
+      id: {
+        equals: user?.id,
+      },
+    },
+  })
+
+  if (adminFind) {
+    const admin = adminFind.docs[0]
+  if (admin && (admin.role?.includes('super-admin'))) {
+    return true
+  }
+}
+}
 const isOwnRecord = ({ req: { user }, id }: { req: PayloadRequest, id: string }) => Boolean(user && String(user.id) === String(id))
 
 export const Users: CollectionConfig = {
@@ -43,7 +76,27 @@ export const Users: CollectionConfig = {
           }
         }
       }
-    ]
+    ],
+    tokenExpiration: 60 * 60 * 24 * 1, 
+    cookies: {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: "None",
+      domain: "localhost",
+    },
+
+    forgotPassword: {
+      generateEmailSubject: (args) => {
+        return `Hey ${args?.user?.firstName ? args?.user.firstName : args?.user.email}! Reset your password.`
+      },
+      generateEmailHTML: (args) => {
+        return `<div><h1>Hey ${args?.user?.firstName ? args?.user.firstName : args?.user.email}!</h1><br /><p>You (or someone else) requested to reset your password. If this wasn't you, you can safely ignore this email. Otherwise, reset your password by going to ${getServerSideURL()}/password-reset?token=${args?.token}</p></div>`
+      }
+    },
+    loginWithUsername: {
+      allowEmailLogin: true,
+      requireEmail: true,
+      requireUsername: false,
+    },
   },
   access: {
     create: () => true,
@@ -51,8 +104,8 @@ export const Users: CollectionConfig = {
     update: () => true,
     delete: isSuperAdmin,
     admin: adminAccessControl,
-    unlock: ({ req: { user }, id }) => {
-      if (adminAccessControl({ req: { user } })) return true
+    unlock: async ({ req: { user }, id }) => {
+      if (await adminAccessControl({ req: { user } })) return true
       return isOwnRecord({ req: { user }, id })
     },
   },
@@ -113,30 +166,7 @@ export const Users: CollectionConfig = {
       type: 'text',
       required: false,
     },
-    {
-      name: 'role',
-      type: 'select',
-      options: [
-        {
-          label: 'Admin',
-          value: 'admin',
-        },
-        {
-          label: 'Super Admin',
-          value: 'super-admin',
-        },
-        {
-          label: 'Customer',
-          value: 'customer',
-        },
-        {
-          label: "Event Admin",
-          value: "event-admin"
-        }
-
-      ],
-      required: false,
-    },
+   
     {
       name: 'lastActive',
       type: 'date',

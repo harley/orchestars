@@ -1,5 +1,5 @@
 import { Ticket } from '@/types/Ticket'
-import { getUserTicketsCached } from './actions'
+import { getUserTicketsCached, getMyEventsCached, getUserDataCached } from './actions'
 import { checkAuthenticated } from '@/utilities/checkAuthenticated'
 import { redirect } from 'next/navigation'
 import UserProfilePageClient from './page.client'
@@ -21,5 +21,21 @@ export default async function UserProfilePage() {
     console.error('Error fetching initial check-in history:', error)
   }
 
-    return <UserProfilePageClient userTickets={userTickets as unknown as Ticket[]} />
+  let events: Event[] = []
+  try {
+    const response = await getMyEventsCached({ user: authData?.user as User & { collection: "users"; } })()
+    events = response as unknown as Event[]
+  } catch (error) {
+    console.error('Error fetching initial events:', error)
+  }
+
+  let userData: User | null = null
+  try {
+    const response = await getUserDataCached({ user: authData?.user as User & { collection: "users"; } })()
+    userData = response as unknown as User
+  } catch (error) {
+    console.error('Error fetching initial user data:', error)
+  }
+
+    return <UserProfilePageClient userTickets={userTickets as unknown as Ticket[]} events={events} userData={userData} />
 }

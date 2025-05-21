@@ -360,6 +360,30 @@
     "statusProcessing": "Processing",
     "statusHold": "On Hold",
     "statusCancelled": "Cancelled",
-    "userLogin": "Login"
-  }  
+    "userLogin": "Login",
+    "accountSettings": {
+      "infoHelper": "Providing accurate information will help support you during ticket purchases or when ticket verification is needed.",
+      "fullName": "Full Name",
+      "enterFullName": "Enter your full name",
+      "phone": "Phone Number",
+      "enterPhone": "Enter your phone number",
+      "email": "Email",
+      "enterEmail": "Enter your email",
+      "dob": "Date of Birth",
+      "enterDob": "Enter your date of birth",
+      "gender": "Gender",
+      "selectGender": "Select gender",
+      "male": "Male",
+      "female": "Female",
+      "other": "Other",
+      "submit": "Submit"
+    },
+    "sidebar": {
+      "accountOf": "Account of",
+      "accountSettings": "Account Settings",
+      "accountInfo": "Account Info",
+      "purchasedTickets": "Purchased Tickets",
+      "myEvents": "My Events"
+    }
+  }
 }
