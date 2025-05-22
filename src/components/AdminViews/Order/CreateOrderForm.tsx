@@ -453,7 +453,13 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
             <Controller
               control={control}
               name="email"
-              rules={{ required: 'Email is required' }}
+              rules={{
+                required: 'Email is required',
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: 'Invalid email address',
+                },
+              }}
               render={({ field }) => (
                 <TextInput path="email" value={field.value ?? ''} onChange={field.onChange} />
               )}
@@ -514,6 +520,14 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
               <Controller
                 control={control}
                 name="adjustedTotal"
+                rules={{
+                  validate: (value) => {
+                    const num = Number(value)
+                    if (value === undefined || String(value) === '') return true
+                    if (!isNaN(num) && num >= 0) return true
+                    return 'Amount must be a non-negative number'
+                  },
+                }}
                 render={({ field }) => (
                   <TextInput
                     path="adjustedTotal"
@@ -523,6 +537,7 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
                   />
                 )}
               />
+              {errors.adjustedTotal && <div style={{ color: 'red' }}>{errors.adjustedTotal.message}</div>}
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', marginTop: 18 }}>
