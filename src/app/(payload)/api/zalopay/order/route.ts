@@ -16,6 +16,7 @@ import {
   createOrderAndTickets,
   createOrderAndTicketsWithTicketClassType,
   createUserPromotionRedemption,
+  validateCustomerInfo,
   validateOrderItemsBookingTypeSeat,
 } from '@/app/(payload)/api/bank-transfer/order/utils'
 
@@ -53,6 +54,7 @@ const handleOrderWithBookingTypeSeat = async ({ body }: { body: Record<string, a
   const order = body.order as NewInputOrder
   let orderItems = order.orderItems as NewOrderItemWithBookingType[]
 
+  await validateCustomerInfo({ customer })
   await validateOrderItemsBookingTypeSeat({ orderItems })
 
   // for booking seat, quantity always 1

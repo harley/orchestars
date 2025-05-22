@@ -187,6 +187,8 @@
     "ORD003": "The order has already been paid",
     "ORD004": "The order has expired",
     "ORD005": "Please select your seat and try again",
+    "ORD006": "The adjustment amount is invalid",
+    "ORD007": "The adjustment amount cannot be negative",
     "CHECKIN001": "Ticket not found",
     "CHECKIN002": "Seat is not assigned to ticket",
     "CHECKIN003": "Ticket has already been used for check-in",
@@ -200,7 +202,12 @@
     "CHECKIN011": "Invalid ticket code",
     "CHECKIN012": "Email does not match ticket records",
     "CHECKIN013": "Ticket code is required",
-    "CHECKIN014": "Please choose event, it is required"
+    "CHECKIN014": "Please choose event, it is required",
+    "CUS001": "First name is required",
+    "CUS002": "Last name is required",
+    "CUS003": "Phone number is required",
+    "CUS004": "Email is required",
+    "UNAUTHORIZED": "Unauthorized"
   },
   "error": {
     "title": "Oops! Something went wrong",

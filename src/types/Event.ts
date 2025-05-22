@@ -1,3 +1,26 @@
+import { Media } from "@/payload-types";
+
+export type TicketPrice = {
+  name?: string | null;
+  key?: "zone1" | "zone2" | "zone3" | "zone4" | "zone5" | null;
+  price?: number | null;
+  currency?: string | null;
+  quantity?: number | null;
+  id?: string | null;
+};
+
+export type EventSchedule = {
+  date?: string | null;
+  scheduleImage?: (number | null) | Media;
+  details?: {
+      time?: string | null;
+      name?: string | null;
+      description?: string | null;
+      id?: string | null;
+  }[] | null;
+  id?: string | null;
+}
+
 export type Event = {
   id: number
   title: string

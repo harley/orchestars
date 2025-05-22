@@ -46,6 +46,7 @@ import * as migration_20250423_165748_add_discount_apply_scope_column_promotion 
 import * as migration_20250424_040651_change_column_admin_id_to_usher_number_checkin_records from './20250424_040651_change_column_admin_id_to_usher_number_checkin_records';
 import * as migration_20250425_033543_add_indexing from './20250425_033543_add_indexing';
 import * as migration_20250425_155521_drop_unique_ticket_checkin_records from './20250425_155521_drop_unique_ticket_checkin_records';
+import * as migration_20250522_093549_add_note_created_by_columns_to_order_collection from './20250522_093549_add_note_created_by_columns_to_order_collection';
 
 export const migrations = [
   {
@@ -286,6 +287,11 @@ export const migrations = [
   {
     up: migration_20250425_155521_drop_unique_ticket_checkin_records.up,
     down: migration_20250425_155521_drop_unique_ticket_checkin_records.down,
-    name: '20250425_155521_drop_unique_ticket_checkin_records'
+    name: '20250425_155521_drop_unique_ticket_checkin_records',
+  },
+  {
+    up: migration_20250522_093549_add_note_created_by_columns_to_order_collection.up,
+    down: migration_20250522_093549_add_note_created_by_columns_to_order_collection.down,
+    name: '20250522_093549_add_note_created_by_columns_to_order_collection'
   },
 ];

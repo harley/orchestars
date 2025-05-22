@@ -1,10 +1,15 @@
 import { USER_PROMOTION_REDEMPTION_STATUS } from '@/collections/Promotion/constants/status'
 import { FieldHookArgs } from 'payload'
 
-export const afterChangeStatus = async ({ value, originalDoc, req }: FieldHookArgs) => {
+export const afterChangeStatus = async ({ value, originalDoc, req, context }: FieldHookArgs) => {
+
+  if(context.triggerAfterCreated === false) {
+    return value
+  }
   if (value === 'paid' && originalDoc.order) {
     const handler = async () => {
       const orderId = (originalDoc.order?.id || originalDoc.order) as number
+
       try {
         await req.payload.update({
           collection: 'orders',

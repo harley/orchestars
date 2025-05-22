@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { format as formatDate } from 'date-fns'
 import { TICKET_STATUSES } from './constants'
 import { afterChangeSeat } from './hooks/afterChangeSeat'
+import { getBookedSeat } from './handler/getBookedSeat'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
@@ -182,6 +183,13 @@ export const Tickets: CollectionConfig = {
     },
     {
       fields: ['ticketCode', 'status'],
+    },
+  ],
+  endpoints: [
+    {
+      path: '/booked-seats',
+      method: 'get',
+      handler: getBookedSeat,
     },
   ],
 }

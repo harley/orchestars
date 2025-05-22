@@ -933,7 +933,9 @@ export interface Order {
     | number
     | boolean
     | null;
+  note?: string | null;
   expireAt?: string | null;
+  createdByAdmin?: (number | null) | Admin;
   updatedAt: string;
   createdAt: string;
 }
@@ -2001,7 +2003,9 @@ export interface OrdersSelect<T extends boolean = true> {
   totalDiscount?: T;
   total?: T;
   customerData?: T;
+  note?: T;
   expireAt?: T;
+  createdByAdmin?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -58,6 +58,13 @@ export default buildConfig({
         Logo: '/components/Logo/Logo#Logo',
       },
       views: {
+        createOrder: {
+          Component: '@/components/AdminViews/Order/CreateOrder',
+          path: '/create-order',
+          exact: true,
+          strict: true,
+          sensitive: true,
+        },
         dashboard: {
           Component: '@/components/AdminViews/Dashboard/Component',
         },
