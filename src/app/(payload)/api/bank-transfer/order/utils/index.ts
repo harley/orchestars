@@ -1120,3 +1120,18 @@ export const checkRemainingQuantitySeats = async ({
     }
   }
 }
+
+export const validateCustomerInfo = ({ customer }: { customer: CustomerInfo }) => {
+  if (!customer.firstName) {
+    throw new Error('CUS001')
+  }
+  if (!customer.lastName) {
+    throw new Error('CUS002')
+  }
+  if (!customer.phoneNumber) {
+    throw new Error('CUS003')
+  }
+  if (!customer.email) {
+    throw new Error('CUS004')
+  }
+}

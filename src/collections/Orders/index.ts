@@ -1,11 +1,18 @@
 import type { CollectionConfig } from 'payload'
 import { afterChangeStatus } from './hooks/afterChangeStatus'
 import { ORDER_STATUSES } from './constants'
+import { createOrderHandler } from './handler/createOrder'
 
 export const Orders: CollectionConfig = {
   slug: 'orders',
+  access: {
+    create: () => false
+  },
   admin: {
     useAsTitle: 'orderCode',
+    components: {
+      beforeListTable: ['@/components/AdminViews/Order/ActionViews#ActionViews'],
+    },
   },
   fields: [
     {
@@ -65,6 +72,10 @@ export const Orders: CollectionConfig = {
       type: 'json',
     },
     {
+      name: 'note',
+      type: 'textarea',
+    },
+    {
       name: 'expireAt', // order will be expired in time
       type: 'date',
       admin: {
@@ -73,6 +84,19 @@ export const Orders: CollectionConfig = {
           timeFormat: 'HH:mm a',
         },
       },
+    },
+    {
+      name: 'createdByAdmin',
+      type: 'relationship',
+      relationTo: 'admins',
+      index: true,
+    },
+  ],
+  endpoints: [
+    {
+      path: '/custom/create-order',
+      method: 'post',
+      handler: createOrderHandler,
     },
   ],
 }

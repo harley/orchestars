@@ -187,6 +187,8 @@
     "ORD003": "Đơn hàng đã được thanh toán",
     "ORD004": "Đơn hàng đã hết hạn thanh toán",
     "ORD005": "Vui lòng chọn ghế và thực hiện lại thao tác",
+    "ORD006": "Số tiền điều chỉnh không hợp lệ",
+    "ORD007": "Số tiền điều chỉnh không được âm",
     "CHECKIN001": "Không tìm thấy vé",
     "CHECKIN002": "Ghế chưa được chỉ định cho vé",
     "CHECKIN003": "Vé này đã được check-in",
@@ -200,7 +202,12 @@
     "CHECKIN011": "Mã vé không hợp lệ",
     "CHECKIN012": "Email không khớp với thông tin vé",
     "CHECKIN013": "Mã vé là bắt buộc",
-    "CHECKIN014": "Vui lòng chọn sự kiện"
+    "CHECKIN014": "Vui lòng chọn sự kiện",
+    "CUS001": "Tên không được để trống",
+    "CUS002": "Họ không được để trống",
+    "CUS003": "Số điện thoại không được để trống",
+    "CUS004": "Email không được để trống",
+    "UNAUTHORIZED": "Không có quyền truy cập"
   },
   "error": {
     "title": "Rất tiếc! Đã xảy ra lỗi",
