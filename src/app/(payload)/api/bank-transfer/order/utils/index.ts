@@ -10,6 +10,7 @@ import { ORDER_STATUS } from '@/collections/Orders/constants'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
 import { getExistingSeatHolding } from '@/app/(payload)/api/seat-holding/seat/utils'
 import { DISCOUNT_APPLY_SCOPE } from '@/collections/Promotion/constants'
+import { sql } from '@payloadcms/db-postgres/drizzle'
 
 export const checkBookedOrPendingPaymentSeats = async ({
   eventId,
@@ -24,9 +25,16 @@ export const checkBookedOrPendingPaymentSeats = async ({
 }) => {
   const currentTime = new Date().toISOString()
 
+  let seatCondition = sql``
+  if (seats?.length) {
+    seatCondition = sql`AND ticket.seat = ANY(${sql.raw(
+      `ARRAY[${seats.map(s => `'${s.replace(/'/g, "''")}'`).join(',')}]::text[]`
+    )})`
+  }
+
   const existingSeats = await payload.db.drizzle
     .execute(
-      `
+      sql`
     SELECT 
       ticket.seat AS "seatName", COUNT(*) AS total
     FROM tickets ticket
@@ -34,13 +42,13 @@ export const checkBookedOrPendingPaymentSeats = async ({
 
     WHERE 
         ( 
-          (ord.status = '${ORDER_STATUS.completed.value}')
+          (ord.status = ${ORDER_STATUS.completed.value})
           OR
-          (ord.status = '${ORDER_STATUS.processing.value}' AND ord.expire_at >= '${currentTime}')
+          (ord.status = ${ORDER_STATUS.processing.value} AND ord.expire_at >= ${currentTime})
         )
         AND ticket.event_id = ${Number(eventId)}
-        ${seats?.length ? `AND ticket.seat = ANY('{${seats.join(',')}}')` : ''}
-        AND ticket.event_schedule_id = '${eventScheduleId}'
+        ${seatCondition}
+        AND ticket.event_schedule_id = ${eventScheduleId}
 
     GROUP BY ticket.seat
   `,

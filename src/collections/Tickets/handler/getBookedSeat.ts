@@ -14,6 +14,14 @@ export const getBookedSeat = async (req: PayloadRequest) => {
     const eventId = Number(query.eventId)
     const eventScheduleId = query.eventScheduleId as string
 
+    if (!query.eventId) {
+      throw new Error('eventId is required')
+    }
+
+    if (!query.eventScheduleId) {
+      throw new Error('eventScheduleId is required')
+    }
+
     const result = await getBookedOrPendingPaymentOrHoldingSeats({
       eventId,
       eventScheduleId,

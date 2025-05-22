@@ -67,11 +67,11 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
   })
   const [selectedEvent, setSelectedEvent] = React.useState<Event | undefined>()
   const [ticketClasses, setTicketClasses] = React.useState<
-    TicketPrice & { label: string; value: string }[]
+    (TicketPrice & { label: string; value: string })[]
   >([])
   const [freeSeats, setFreeSeats] = React.useState<FreeSeat[]>([])
   const [eventSchedules, setEventSchedules] = React.useState<
-    EventSchedule & { label: string; value: string; date: string }[]
+    (EventSchedule & { label: string; value: string; date: string })[]
   >([])
 
   // When eventId changes, update selectedEvent, ticketClasses, and eventDates
@@ -136,6 +136,9 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
             }
           })
           setFreeSeats(freeSeats)
+        })
+        .catch((err) => {
+          console.error('error when loading booked seats', err)
         })
     } else {
       setFreeSeats([])
@@ -345,17 +348,12 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
                     }}
                     render={({ field }) => {
                       const orderItem = orderItems[idx]
-
-                      console.log('orderItem', orderItem)
-
                       let seatOptions: FreeSeat[] = []
                       if (orderItem?.ticketPriceId) {
                         seatOptions = freeSeats.filter(
                           (seat) => seat.ticketPriceInfo?.id === orderItem?.ticketPriceId,
                         )
                       }
-
-                      console.log('seatOptions', seatOptions)
 
                       return (
                         <SelectInput
