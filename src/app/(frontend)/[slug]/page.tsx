@@ -13,6 +13,10 @@ import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Home } from '@/components/Home/Component'
+import { RenderPageBreadcrumb } from '@/page-breadcrumb/RenderPageBreadcrumb'
+import { RenderPageBanner } from '@/page-banner/RenderPageBanner'
+import { getLocale } from '@/providers/I18n/server'
+import { DEFAULT_FALLBACK_LOCALE, SupportedLocale } from '@/config/app'
 
 export const dynamic = 'force-dynamic' // Force dynamic rendering
 export const revalidate = 3600
@@ -20,6 +24,7 @@ export const dynamicParams = true
 // export const fetchCache = 'force-no-store' // Ensure fresh fetch
 
 export async function generateStaticParams() {
+  
   const payload = await getPayload({ config: configPromise })
   const pages = await payload.find({
     collection: 'pages',
@@ -30,6 +35,7 @@ export async function generateStaticParams() {
     select: {
       slug: true,
     },
+    locale: DEFAULT_FALLBACK_LOCALE,
   })
 
   const params = pages.docs
@@ -52,7 +58,7 @@ type Args = {
 export default async function Page({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = 'home' } = await paramsPromise
-
+  const locale = await getLocale()
   const url = '/' + slug
 
   if (slug === 'home') {
@@ -70,6 +76,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   page = await queryPageBySlug({
     slug,
+    locale
   })
 
   // Remove this code once your website is seeded
@@ -81,32 +88,39 @@ export default async function Page({ params: paramsPromise }: Args) {
     return <PayloadRedirects url={url} />
   }
 
-  const { hero, layout } = page
+  const { hero, layout, breadcrumbs, banner } = page
 
   return (
-    <article className="pt-16 pb-24">
+    <article className={`${banner ? 'pt-[25px]' : 'pt-16'}  pb-24`}>
       <PageClient />
       {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}
 
-      <RenderHero {...hero} />
-      <RenderBlocks blocks={layout} />
+      <RenderPageBanner banner={banner} />
+      <div className="px-4 md:px-8 lg:px-16">
+        <RenderPageBreadcrumb breadcrumbs={breadcrumbs} />
+
+        <RenderHero {...hero} />
+        <RenderBlocks blocks={layout} />
+      </div>
     </article>
   )
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { slug = 'home' } = await paramsPromise
+  const locale = await getLocale()
   const page = await queryPageBySlug({
     slug,
+    locale
   })
 
   return generateMeta({ doc: page })
 }
 
-const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
+const queryPageBySlug = cache(async ({ slug, locale }: { slug: string, locale?: SupportedLocale }) => {
   const { isEnabled: draft } = await draftMode()
 
   const payload = await getPayload({ config: configPromise })
@@ -122,6 +136,7 @@ const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
         equals: slug,
       },
     },
+    locale: locale || DEFAULT_FALLBACK_LOCALE,
   })
 
   return result.docs?.[0] || null

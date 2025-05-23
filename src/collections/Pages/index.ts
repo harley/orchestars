@@ -20,6 +20,8 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
+import { CardsBlock } from '@/blocks/SectionCardsBlock/config'
+import { CardDetailBlock } from '@/blocks/CardDetailBlock/config'
 
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
@@ -35,6 +37,7 @@ export const Pages: CollectionConfig<'pages'> = {
   defaultPopulate: {
     title: true,
     slug: true,
+    description: true
   },
   admin: {
     defaultColumns: ['title', 'slug', 'updatedAt'],
@@ -59,9 +62,21 @@ export const Pages: CollectionConfig<'pages'> = {
   },
   fields: [
     {
+      name: 'banner',
+      type: 'upload',
+      relationTo: 'media',
+      required: false,
+    },
+    {
       name: 'title',
       type: 'text',
+      localized: true,
       required: true,
+    },
+    {
+      name: 'description',
+      type: 'textarea',
+      localized: true,
     },
     {
       type: 'tabs',
@@ -75,7 +90,15 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock, Archive, FormBlock],
+              blocks: [
+                CallToAction,
+                Content,
+                MediaBlock,
+                Archive,
+                FormBlock,
+                CardsBlock,
+                CardDetailBlock,
+              ],
               required: true,
               admin: {
                 initCollapsed: true,
