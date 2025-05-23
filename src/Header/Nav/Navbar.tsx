@@ -2,7 +2,7 @@ import { Menu, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import type { Header as HeaderType, Media } from '@/payload-types'
+import type { Header as HeaderType, Media, Page } from '@/payload-types'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import { useTranslate } from '@/providers/I18n/client'
 import { Event } from '@/types/Event'
@@ -72,14 +72,31 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center justify-start flex-1">
           <div className="flex items-center space-x-8">
-            {navItems.map(({ link }, i) => (
-              <Link
-                key={link.url ?? link.label}
-                href={link.url || ''}
-                className="nav-link font-medium text-black/90 hover:text-black"
-              >
-                {link.label}
-              </Link>
+            {navItems.map(({ link, children }, i) => (
+              <div key={link.url ?? link.label} className="relative group">
+                <Link
+                    href={(link.reference?.value as Page)?.slug || link.url || '#'}
+                    className="nav-link font-medium text-black/90 hover:underline flex items-center"
+                  >
+                    {link.label}
+                    {!!children?.length && <ChevronDown size={16} className="ml-1" />}
+                  </Link>
+
+                {/* Dropdown for Show menu */}
+                {!!children?.length && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-800 overflow-hidden rounded-md shadow-lg opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
+                    {children.map((linkChild) => (
+                        <Link
+                          key={linkChild.id}
+                          href={(linkChild?.link?.reference?.value as Page)?.slug || linkChild?.link?.url || ''}
+                          className="block px-4 py-2 text-sm hover:text-white hover:bg-black"
+                        >
+                          {linkChild.link?.label}
+                        </Link>
+                      ))}
+                  </div>
+                )}
+              </div>
             ))}
             {navigationItems.map(({ link }, i) => (
               <div key={link.url ?? link.label} className="relative group">
