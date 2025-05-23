@@ -36,6 +36,7 @@ import { localization } from './payload-config/localization'
 import { Emails } from './collections/Emails'
 import { Logs } from './collections/Logs'
 import { emailAdapter } from './payload-config/email'
+import { IS_LOCAL_DEVELOPMENT } from './config/app'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -169,7 +170,9 @@ export default buildConfig({
       },
     ],
     shouldAutoRun: async (payload) => {
-      updatePaymentStatus({ payload })
+      if (!IS_LOCAL_DEVELOPMENT) {
+        updatePaymentStatus({ payload })
+      }
 
       return true
     },
