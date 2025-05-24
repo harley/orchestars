@@ -346,5 +346,54 @@
     "success": "Thành công",
     "selectAll": "Chọn tất cả",
     "deselectAll": "Bỏ chọn tất cả"
+  },
+  "userprofile": {
+    "title": "Vé Đã Mua",
+    "all": "Tất Cả",
+    "success": "Thành Công",
+    "processing": "Đang Xử Lý",
+    "cancelled": "Đã Hủy",
+    "upcoming": "Sắp Diễn Ra",
+    "finished": "Đã Kết Thúc",
+    "month04": "Tháng 4",
+    "ticketTitle": "Vé Của Bạn",
+    "statusSuccess": "Thành Công",
+    "eTicket": "Vé Điện Tử",
+    "orderCode": "Mã Đơn Hàng",
+    "dateRange": "09:00, Ngày 24 Tháng 4, 2025 – 17:00, Ngày 26 Tháng 4, 2025",
+    "location": "Trung Tâm Hội Nghị và Triển Lãm Sài Gòn (SECC), 799 Nguyễn Văn Linh, Quận 7, TP. Hồ Chí Minh",
+    "seat": "Chỗ Ngồi",
+    "ticketPrice": "Loại Vé",
+    "statusProcessing": "Đang Xử Lý",
+    "statusHold": "Tạm Giữ",
+    "statusCancelled": "Đã Hủy",
+    "userLogin": "Đăng Nhập",
+    "accountSettings": {
+      "infoHelper": "Cung cấp thông tin chính xác sẽ giúp hỗ trợ bạn khi mua vé hoặc khi cần xác minh vé.",
+      "fullName": "Họ và Tên",
+      "enterFullName": "Nhập họ và tên của bạn",
+      "phone": "Số Điện Thoại",
+      "enterPhone": "Nhập số điện thoại của bạn",
+      "email": "Email",
+      "enterEmail": "Nhập email của bạn",
+      "dob": "Ngày Sinh",
+      "enterDob": "Nhập ngày sinh của bạn",
+      "gender": "Giới Tính",
+      "selectGender": "Chọn giới tính",
+      "male": "Nam",
+      "female": "Nữ",
+      "other": "Khác",
+      "submit": "Gửi"
+    },
+    "sidebar": {
+      "accountOf": "Tài Khoản Của",
+      "accountSettings": "Cài Đặt Tài Khoản",
+      "accountInfo": "Thông Tin Tài Khoản",
+      "purchasedTickets": "Vé Đã Mua",
+      "myEvents": "Sự Kiện Của Tôi"
+    }
+  },
+  "auth": {
+    "signInSuccessfully": "Đăng nhập thành công"
   }
 }

@@ -346,5 +346,54 @@
     "success": "Success",
     "selectAll": "Select All",
     "deselectAll": "Deselect All"
+  },
+  "userprofile": {
+    "title": "Purchased Tickets",
+    "all": "All",
+    "success": "Success",
+    "processing": "Processing",
+    "cancelled": "Cancelled",
+    "upcoming": "Upcoming",
+    "finished": "Finished",
+    "month04": "April",
+    "ticketTitle": "Your Ticket",
+    "statusSuccess": "Success",
+    "eTicket": "E-ticket",
+    "orderCode": "Order Code",
+    "dateRange": "09:00, April 24, 2025 – 17:00, April 26, 2025",
+    "location": "Saigon Exhibition and Convention Center (SECC), 799 Nguyen Van Linh, District 7, Ho Chi Minh City",
+    "seat": "Seat",
+    "ticketPrice": "Ticket Type",
+    "statusProcessing": "Processing",
+    "statusHold": "On Hold",
+    "statusCancelled": "Cancelled",
+    "userLogin": "Login",
+    "accountSettings": {
+      "infoHelper": "Providing accurate information will help support you during ticket purchases or when ticket verification is needed.",
+      "fullName": "Full Name",
+      "enterFullName": "Enter your full name",
+      "phone": "Phone Number",
+      "enterPhone": "Enter your phone number",
+      "email": "Email",
+      "enterEmail": "Enter your email",
+      "dob": "Date of Birth",
+      "enterDob": "Enter your date of birth",
+      "gender": "Gender",
+      "selectGender": "Select gender",
+      "male": "Male",
+      "female": "Female",
+      "other": "Other",
+      "submit": "Submit"
+    },
+    "sidebar": {
+      "accountOf": "Account of",
+      "accountSettings": "Account Settings",
+      "accountInfo": "Account Info",
+      "purchasedTickets": "Purchased Tickets",
+      "myEvents": "My Events"
+    }
+  },
+  "auth": {
+    "signInSuccessfully": "Sign in successfully"
   }
 }

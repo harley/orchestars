@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const path = usePathname()
 
   useEffect(() => {
-    const cookieToken = Cookies.get('token')
+    const cookieToken = Cookies.get('authToken')
 
     if (cookieToken) {
       setTokenState(cookieToken)
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [])
 
   const setToken = (token: string) => {
-    Cookies.set('token', token, {
+    Cookies.set('authToken', token, {
       expires: 1,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
@@ -38,10 +38,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setTokenState(token)
   }
 
-  // const logout = () => {
-  //   Cookies.remove('token')
-  //   setTokenState(null)
-  // }
+  const logout = () => {
+    Cookies.remove('authToken')
+    setTokenState(null)
+  }
 
   return (
     <AuthContext.Provider value={{ token, setToken, logout, isHydrated }}>
@@ -79,6 +79,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext)
-  if (!context) throw new Error('useAuth must be used within AuthProvider')
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
   return context
 }
