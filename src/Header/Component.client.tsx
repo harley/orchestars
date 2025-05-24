@@ -12,9 +12,10 @@ import { Event } from '@/types/Event'
 interface HeaderClientProps {
   data: Header
   events: Event[]
+  authData?: any
 }
 
-export const HeaderClient: React.FC<HeaderClientProps> = ({ data, events }) => {
+export const HeaderClient: React.FC<HeaderClientProps> = ({ data, events, ...props }) => {
   /* Storing the value in a useState to avoid hydration errors */
   // const [theme, setTheme] = useState<string | null>(null)
   // const { headerTheme, setHeaderTheme } = useHeaderTheme()
@@ -30,5 +31,5 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, events }) => {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [headerTheme])
 
-  return <Navbar data={data} events={events} />
+  return <Navbar data={data} events={events} {...props} />
 }

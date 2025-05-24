@@ -419,6 +419,10 @@ export interface Category {
 export interface User {
   id: number;
   email: string;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
   phoneNumber?: string | null;
   phoneNumbers?:
     | {
@@ -1985,6 +1989,10 @@ export interface CategoriesSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   email?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
   phoneNumber?: T;
   phoneNumbers?:
     | T

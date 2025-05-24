@@ -49,6 +49,7 @@ import * as migration_20250425_155521_drop_unique_ticket_checkin_records from '.
 import * as migration_20250522_093549_add_note_created_by_columns_to_order_collection from './20250522_093549_add_note_created_by_columns_to_order_collection';
 import * as migration_20250523_053715_add_custom_block_and_support_multi_language_page_collection from './20250523_053715_add_custom_block_and_support_multi_language_page_collection';
 import * as migration_20250523_080251_add_children_navitem_header from './20250523_080251_add_children_navitem_header';
+import * as migration_20250524_133051_add_authentication_user from './20250524_133051_add_authentication_user';
 
 export const migrations = [
   {
@@ -304,6 +305,11 @@ export const migrations = [
   {
     up: migration_20250523_080251_add_children_navitem_header.up,
     down: migration_20250523_080251_add_children_navitem_header.down,
-    name: '20250523_080251_add_children_navitem_header'
+    name: '20250523_080251_add_children_navitem_header',
+  },
+  {
+    up: migration_20250524_133051_add_authentication_user.up,
+    down: migration_20250524_133051_add_authentication_user.down,
+    name: '20250524_133051_add_authentication_user'
   },
 ];

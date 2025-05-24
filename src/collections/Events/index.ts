@@ -12,7 +12,6 @@ import { EVENT_STATUSES } from './constants/status'
 
 export const Events: CollectionConfig = {
   slug: 'events',
-  access: {},
   admin: {
     useAsTitle: 'title',
   },
