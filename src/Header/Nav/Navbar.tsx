@@ -8,7 +8,7 @@ import { useTranslate } from '@/providers/I18n/client'
 import { Event } from '@/types/Event'
 import LoginForm from '@/components/LoginForm'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { useRouter } from 'next/navigation'
+import { logout } from '@/app/(frontend)/user/actions/logout'
 
 const Navbar = ({
   data,
@@ -21,7 +21,6 @@ const Navbar = ({
 }) => {
   const navItems = data?.navItems || []
   const logo = data.logo as Media
-  const router = useRouter()
   const { t } = useTranslate()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -178,12 +177,14 @@ const Navbar = ({
                 >
                   Profile
                 </Link>
-                <button
-                  // onClick={logout}
-                  className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                >
-                  Logout
-                </button>
+                <form action={logout}>
+                  <button
+                    type="submit"
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+                </form>
               </div>
             </div>
           ) : (
@@ -201,7 +202,7 @@ const Navbar = ({
                   <LoginForm
                     onSuccess={() => {
                       setLoginOpen(false)
-                      router.replace('/user/profile')
+                      window.location.href = '/user/profile'
                     }}
                   />
                 </SheetContent>
@@ -226,15 +227,14 @@ const Navbar = ({
                     >
                       Profile
                     </Link>
-                    <button
-                      onClick={() => {
-                        setIsOpen(false)
-                        // logout()
-                      }}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 mb-4"
-                    >
-                      Logout
-                    </button>
+                    <form action={logout}>
+                      <button
+                        type="submit"
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 mb-4"
+                      >
+                        Logout
+                      </button>
+                    </form>
                   </>
                 ) : (
                   <button

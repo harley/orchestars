@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const path = usePathname()
 
   useEffect(() => {
-    const cookieToken = Cookies.get('authToken')
+    const cookieToken = Cookies.get('token')
 
     if (cookieToken) {
       setTokenState(cookieToken)
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [])
 
   const setToken = (token: string) => {
-    Cookies.set('authToken', token, {
+    Cookies.set('token', token, {
       expires: 1,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
@@ -38,10 +38,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setTokenState(token)
   }
 
-  const logout = () => {
-    Cookies.remove('authToken')
-    setTokenState(null)
-  }
+  // const logout = () => {
+  //   Cookies.remove('token')
+  //   setTokenState(null)
+  // }
 
   return (
     <AuthContext.Provider value={{ token, setToken, logout, isHydrated }}>

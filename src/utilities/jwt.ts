@@ -28,12 +28,10 @@ export const jwtSign = async ({
 export const extractJWT = async (token: string, secret: string) => {
   try {
     const secretKey = new TextEncoder().encode(secret)
-    const { payload, protectedHeader } = await jwtVerify(token, secretKey)
-
-    console.log(payload, protectedHeader)
+    const { payload } = await jwtVerify(token, secretKey)
 
     return payload
-  } catch (error) {
+  } catch (_error) {
     return null
   }
 }
