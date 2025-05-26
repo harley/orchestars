@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { sendMailAndWriteLog } from '@/collections/Emails/utils'
 import { EMAIL_CC } from '@/config/email'
+import { getServerSideURL } from '@/utilities/getURL'
 
 function generateResetToken(length = 48) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -40,12 +41,16 @@ export async function POST(req: NextRequest) {
       },
     })
     // Build reset link (adjust URL as needed)
-    const resetLink = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`
-    const html = `<p>Click <a href="${resetLink}">here</a> to reset your password. This link will expire in 1 hour.</p>`
+    const resetLink = `${getServerSideURL() || 'http://localhost:3000'}/user/reset-password?token=${resetToken}`
+    const html = `<div>
+    <p>You are receiving this because you (or someone else) have requested the reset of the password for your account.</p>
+    <p>Please click on the following link, or paste this into your browser to complete the process: <a href="${resetLink}">HERE</a>, this link will expire in 1 hour.</p>
+    <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+</div>`
     await sendMailAndWriteLog({
       resendMailData: {
         to: email,
-        cc: EMAIL_CC,
+        // cc: EMAIL_CC,
         subject: 'Password Reset Request',
         html,
       },
@@ -57,4 +62,4 @@ export async function POST(req: NextRequest) {
     console.error('Forgot password error', err)
     return NextResponse.json({ error: 'Failed to process request' }, { status: 500 })
   }
-} 
+}

@@ -394,6 +394,35 @@
     }
   },
   "auth": {
-    "signInSuccessfully": "Đăng nhập thành công"
+    "signInSuccessfully": "Đăng nhập thành công",
+    "pleaseEnterEmail": "Vui lòng nhập email",
+    "forgotPasswordRequestSent": "Yêu cầu đặt lại mật khẩu đã được gửi",
+    "checkYourEmail": "Vui lòng kiểm tra email của bạn để nhận liên kết đặt lại mật khẩu",
+    "failedToSendRequest": "Gửi yêu cầu thất bại",
+    "somethingWentWrong": "Đã xảy ra lỗi",
+    "forgotPassword": "Quên mật khẩu",
+    "enterEmailForReset": "Nhập email của bạn để nhận liên kết đặt lại mật khẩu",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "enterYourEmail": "Nhập email của bạn",
+    "sendingRequest": "Đang gửi yêu cầu...",
+    "sendResetLink": "Gửi liên kết đặt lại mật khẩu",
+    "backToLogin": "Quay lại đăng nhập",
+    "missingToken": "Thiếu token",
+    "invalidResetLink": "Liên kết đặt lại mật khẩu không hợp lệ",
+    "pleaseEnterNewPassword": "Vui lòng nhập mật khẩu mới của bạn",
+    "passwordsDoNotMatch": "Mật khẩu không khớp",
+    "passwordResetSuccessful": "Đặt lại mật khẩu thành công",
+    "failedToResetPassword": "Đặt lại mật khẩu thất bại",
+    "resetPassword": "Đặt lại mật khẩu",
+    "enterNewPassword": "Nhập mật khẩu mới của bạn",
+    "newPassword": "Mật khẩu mới",
+    "confirmNewPassword": "Xác nhận mật khẩu mới",
+    "resettingPassword": "Đang đặt lại mật khẩu...",
+    "enterYourPassword": "Nhập mật khẩu của bạn",
+    "signIn": "Đăng nhập",
+    "signInToContinue": "Đăng nhập để tiếp tục",
+    "passwordMinLength": "Mật khẩu phải có ít nhất {{length}} ký tự",
+    "passwordStrength": "Mật khẩu phải chứa ít nhất hai trong các loại ký tự sau: chữ hoa, chữ thường, số hoặc ký tự đặc biệt"
   }
 }

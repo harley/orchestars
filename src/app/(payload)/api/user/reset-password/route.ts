@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { generateSalt, hashPassword } from '@/utilities/password'
+import { signJwtToken } from '../utils'
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
       collection: 'users',
       where: { resetPasswordToken: { equals: token } },
       limit: 1,
-      select: { resetPasswordExpiration: true, resetPasswordToken: true },
+      select: { resetPasswordExpiration: true, resetPasswordToken: true, email: true },
       showHiddenFields: true,
     })
     const user = userRes.docs[0]
@@ -37,7 +38,15 @@ export async function POST(req: NextRequest) {
         resetPasswordExpiration: null,
       },
     })
-    return NextResponse.json({ message: 'Password has been reset successfully.' })
+
+    await signJwtToken({
+      fieldsToSign: { id: user.id, email: user.email },
+    })
+
+    return NextResponse.json({
+      message: 'Password has been reset successfully.',
+      user: { id: user.id, email: user.email },
+    })
   } catch (err) {
     console.error('Reset password error', err)
     return NextResponse.json({ error: 'Failed to reset password' }, { status: 500 })

@@ -2,8 +2,8 @@
 import React, { useState } from 'react'
 import { useTranslate } from '@/providers/I18n/client'
 import { Ticket } from '@/types/Ticket'
-import { TicketCard } from '@/components/TicketBought/TicketCard'
-import { TimeFilterTabs } from '@/components/TicketBought/TimeFilterTabs'
+import { TicketCard } from '@/components/User/TicketBought/TicketCard'
+import { TimeFilterTabs } from '@/components/User/TicketBought/TimeFilterTabs'
 
 const TicketBought: React.FC<{ userTickets: Ticket[] }> = ({ userTickets }) => {
   const { t } = useTranslate()

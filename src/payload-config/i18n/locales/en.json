@@ -394,6 +394,35 @@
     }
   },
   "auth": {
-    "signInSuccessfully": "Sign in successfully"
+    "signInSuccessfully": "Sign in successfully",
+    "pleaseEnterEmail": "Please enter email",
+    "forgotPasswordRequestSent": "Forgot password request sent",
+    "checkYourEmail": "Please check your email for the reset link",
+    "failedToSendRequest": "Failed to send request",
+    "somethingWentWrong": "Something went wrong",
+    "forgotPassword": "Forgot Password",
+    "enterEmailForReset": "Enter your email to receive a password reset link",
+    "email": "Email",
+    "password": "Password",
+    "enterYourEmail": "Enter your email",
+    "sendingRequest": "Sending request...",
+    "sendResetLink": "Send Reset Link",
+    "backToLogin": "Back to Login",
+    "missingToken": "Missing token",
+    "invalidResetLink": "Invalid reset link",
+    "pleaseEnterNewPassword": "Please enter your new password",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "passwordResetSuccessful": "Password reset successful",
+    "failedToResetPassword": "Failed to reset password",
+    "resetPassword": "Reset Password",
+    "enterNewPassword": "Enter your new password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "resettingPassword": "Resetting password...",
+    "enterYourPassword":"Enter your password",
+    "signIn":"Sign In",
+    "signInToContinue": "Sign in to continue",
+    "passwordMinLength": "Password must be at least {{length}} characters long",
+    "passwordStrength": "Password must contain at least two of the following: uppercase letters, lowercase letters, numbers, or special characters"
   }
 }

@@ -6,7 +6,7 @@ import type { Header as HeaderType, Media, Page } from '@/payload-types'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import { useTranslate } from '@/providers/I18n/client'
 import { Event } from '@/types/Event'
-import LoginForm from '@/components/LoginForm'
+import LoginForm from '@/components/User/LoginForm'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { logout } from '@/app/(frontend)/user/actions/logout'
 

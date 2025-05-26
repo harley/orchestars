@@ -4,11 +4,11 @@ import { Ticket } from '@/types/Ticket'
 import { User } from '@/payload-types'
 import { Event } from '@/payload-types'
 
-import Sidebar from '@/components/UserProfileSidebar/Sidebar'
-import TicketBought from '@/components/TicketBought'
-import AccountSettings from '@/components/AccountSettings'
+import Sidebar from '@/components/User/UserProfileSidebar/Sidebar'
+import TicketBought from '@/components/User/TicketBought'
+import AccountSettings from '@/components/User/AccountSettings'
 
-import MyEvents from '@/components/MyEvents'
+import MyEvents from '@/components/User/MyEvents'
 
 type Section = 'tickets' | 'account' | 'events'
 

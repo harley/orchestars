@@ -30,6 +30,7 @@
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.0.1",
     "@mezh-hq/react-seat-toolkit": "^3.2.5",
     "@payloadcms/admin-bar": "^3.30.0",
     "@payloadcms/db-postgres": "^3.30.0",

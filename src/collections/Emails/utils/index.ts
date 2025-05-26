@@ -10,7 +10,7 @@ export const sendMailAndWriteLog = async ({
 }: {
   resendMailData: {
     to: string
-    cc: string
+    cc?: string
     subject: string
     html: string
   }
