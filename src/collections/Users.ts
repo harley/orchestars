@@ -5,12 +5,33 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
   },
+
   fields: [
     {
       name: 'email',
       type: 'email',
       required: true,
       index: true,
+    },
+    {
+      name: 'salt',
+      type: 'text',
+      hidden: true,
+    },
+    {
+      name: 'hash',
+      type: 'text',
+      hidden: true,
+    },
+    {
+      name: 'resetPasswordToken',
+      type: 'text',
+      hidden: true,
+    },
+    {
+      name: 'resetPasswordExpiration',
+      type: 'date',
+      hidden: true,
     },
     // Email added by default
     {

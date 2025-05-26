@@ -6,14 +6,25 @@ import type { Header as HeaderType, Media, Page } from '@/payload-types'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import { useTranslate } from '@/providers/I18n/client'
 import { Event } from '@/types/Event'
+import LoginForm from '@/components/User/LoginForm'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { logout } from '@/app/(frontend)/user/actions/logout'
 
-const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
+const Navbar = ({
+  data,
+  events,
+  authData,
+}: {
+  data: HeaderType
+  events: Event[]
+  authData?: any
+}) => {
   const navItems = data?.navItems || []
   const logo = data.logo as Media
-
   const { t } = useTranslate()
 
   const [isOpen, setIsOpen] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
   // Handle scroll events
@@ -75,25 +86,29 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
             {navItems.map(({ link, children }, i) => (
               <div key={link.url ?? link.label} className="relative group">
                 <Link
-                    href={(link.reference?.value as Page)?.slug || link.url || '#'}
-                    className="nav-link font-medium text-black/90 hover:underline flex items-center"
-                  >
-                    {link.label}
-                    {!!children?.length && <ChevronDown size={16} className="ml-1" />}
-                  </Link>
+                  href={(link.reference?.value as Page)?.slug || link.url || '#'}
+                  className="nav-link font-medium text-black/90 hover:underline flex items-center"
+                >
+                  {link.label}
+                  {!!children?.length && <ChevronDown size={16} className="ml-1" />}
+                </Link>
 
                 {/* Dropdown for Show menu */}
                 {!!children?.length && (
                   <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-800 overflow-hidden rounded-md shadow-lg opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
                     {children.map((linkChild) => (
-                        <Link
-                          key={linkChild.id}
-                          href={(linkChild?.link?.reference?.value as Page)?.slug || linkChild?.link?.url || ''}
-                          className="block px-4 py-2 text-sm hover:text-white hover:bg-black"
-                        >
-                          {linkChild.link?.label}
-                        </Link>
-                      ))}
+                      <Link
+                        key={linkChild.id}
+                        href={
+                          (linkChild?.link?.reference?.value as Page)?.slug ||
+                          linkChild?.link?.url ||
+                          ''
+                        }
+                        className="block px-4 py-2 text-sm hover:text-white hover:bg-black"
+                      >
+                        {linkChild.link?.label}
+                      </Link>
+                    ))}
                   </div>
                 )}
               </div>
@@ -147,7 +162,53 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
         {/* Language select - right aligned */}
         <div className="flex items-center space-x-4">
           <LanguageSwitcher />
-
+          {/* Authenticated: show profile menu */}
+          {authData ? (
+            <div className="relative group">
+              <button className="flex items-center focus:outline-none">
+                <Avatar>
+                  <AvatarFallback>👤</AvatarFallback>
+                </Avatar>
+              </button>
+              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-50">
+                <Link
+                  href="/user/profile"
+                  className="block px-4 py-2 text-sm text-black hover:bg-gray-100"
+                >
+                  Profile
+                </Link>
+                <form action={logout}>
+                  <button
+                    type="submit"
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+                </form>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Sign In / Sign Up button */}
+              <button
+                className="px-4 py-2 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition hidden md:block"
+                onClick={() => setLoginOpen(true)}
+              >
+                {t('userprofile.userLogin')}
+              </button>
+              {/* Login Modal */}
+              <Sheet open={loginOpen} onOpenChange={setLoginOpen}>
+                <SheetContent side="right" className="bg-white border-gray-800 max-w-md w-full">
+                  <LoginForm
+                    onSuccess={() => {
+                      setLoginOpen(false)
+                      window.location.href = '/user/profile'
+                    }}
+                  />
+                </SheetContent>
+              </Sheet>
+            </>
+          )}
           {/* Mobile menu button */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
@@ -157,6 +218,35 @@ const Navbar = ({ data, events }: { data: HeaderType; events: Event[] }) => {
             </SheetTrigger>
             <SheetContent side="right" className="bg-white border-gray-800">
               <div className="flex flex-col mt-10 space-y-6">
+                {/* Authenticated: show profile and logout in mobile menu */}
+                {authData ? (
+                  <>
+                    <Link
+                      href="/user/profile"
+                      className="block px-4 py-2 text-sm text-black hover:bg-gray-100 mb-2"
+                    >
+                      Profile
+                    </Link>
+                    <form action={logout}>
+                      <button
+                        type="submit"
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 mb-4"
+                      >
+                        Logout
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <button
+                    className="px-4 py-2 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition mb-4"
+                    onClick={() => {
+                      setIsOpen(false)
+                      setLoginOpen(true)
+                    }}
+                  >
+                    {t('userprofile.userLogin')}
+                  </button>
+                )}
                 {navItems.map(({ link }, i) => (
                   <Link
                     key={link.url ?? link.label}
