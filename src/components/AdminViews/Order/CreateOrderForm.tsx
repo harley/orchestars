@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { useForm, useFieldArray, Controller } from 'react-hook-form'
+import { useForm, useFieldArray, Controller, FormProvider } from 'react-hook-form'
 import {
   Button,
   Gutter,
@@ -17,6 +17,7 @@ import { Event } from '@/payload-types'
 import { EventSchedule, TicketPrice } from '@/types/Event'
 import { format as formatDate } from 'date-fns'
 import DEFAULT_SEATS from '@/components/EventDetail/data/seat-maps/seats.json'
+import SelectOrderCategory from './SelectOrderCategory/SelectOrderCategory'
 
 // --- Types ---
 type SeatSelection = {
@@ -49,18 +50,21 @@ type FreeSeat = {
 
 export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
   const { t } = useTranslation()
+  const formMethods = useForm<FormValues>({
+    defaultValues: {
+      orderItems: [{ ticketPriceId: '', seat: '', price: 0 }],
+    },
+  })
+
   const {
     control,
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isSubmitSuccessful },
     reset: resetForm,
-  } = useForm<FormValues>({
-    defaultValues: {
-      orderItems: [{ ticketPriceId: '', seat: '', price: 0 }],
-    },
-  })
+  } = formMethods
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'orderItems',
@@ -207,52 +211,28 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
 
   return (
     <Gutter>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <fieldset style={{ marginBottom: 24 }}>
-          <legend>Event Info</legend>
-          <div style={{ marginBottom: 16 }}>
-            <label>Event *</label>
-            <Controller
-              control={control}
-              name="eventId"
-              rules={{ required: 'Event is required' }}
-              render={({ field }) => (
-                <SelectInput
-                  path="eventId"
-                  name={field.name}
-                  options={[
-                    { label: 'Select event...', value: '' },
-                    ...events.map((ev) => ({
-                      label: ev.title as string,
-                      value: String(ev.id),
-                      event: ev,
-                    })),
-                  ]}
-                  value={field.value ?? ''}
-                  onChange={(option) =>
-                    field.onChange(
-                      Array.isArray(option) ? (option[0]?.value ?? '') : (option?.value ?? ''),
-                    )
-                  }
-                />
-              )}
-            />
-            {errors.eventId && (
-              <div style={{ color: 'red', fontSize: 12 }}>{errors.eventId.message}</div>
-            )}
-          </div>
-          <div style={{ marginBottom: 0 }}>
-            <label>Event Date *</label>
-            <Controller
-              control={control}
-              name="eventScheduleId"
-              rules={{ required: 'Event date is required' }}
-              render={({ field }) =>
-                selectedEvent ? (
+      <FormProvider {...formMethods}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <fieldset style={{ marginBottom: 24 }}>
+            <legend>Event Info</legend>
+            <div style={{ marginBottom: 16 }}>
+              <label>Event *</label>
+              <Controller
+                control={control}
+                name="eventId"
+                rules={{ required: 'Event is required' }}
+                render={({ field }) => (
                   <SelectInput
-                    path="eventScheduleId"
+                    path="eventId"
                     name={field.name}
-                    options={[{ label: 'Select date...', value: '' }, ...eventSchedules]}
+                    options={[
+                      { label: 'Select event...', value: '' },
+                      ...events.map((ev) => ({
+                        label: ev.title as string,
+                        value: String(ev.id),
+                        event: ev,
+                      })),
+                    ]}
                     value={field.value ?? ''}
                     onChange={(option) =>
                       field.onChange(
@@ -260,299 +240,338 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
                       )
                     }
                   />
-                ) : (
-                  <div style={{ pointerEvents: 'none', opacity: 0.5 }}>
+                )}
+              />
+              {errors.eventId && (
+                <div style={{ color: 'red', fontSize: 12 }}>{errors.eventId.message}</div>
+              )}
+            </div>
+            <div style={{ marginBottom: 0 }}>
+              <label>Event Date *</label>
+              <Controller
+                control={control}
+                name="eventScheduleId"
+                rules={{ required: 'Event date is required' }}
+                render={({ field }) =>
+                  selectedEvent ? (
                     <SelectInput
                       path="eventScheduleId"
                       name={field.name}
                       options={[{ label: 'Select date...', value: '' }, ...eventSchedules]}
                       value={field.value ?? ''}
-                      onChange={(option) => {}}
-                    />
-                  </div>
-                )
-              }
-            />
-            {errors.eventScheduleId && (
-              <div style={{ color: 'red', fontSize: 12 }}>{errors.eventScheduleId.message}</div>
-            )}
-          </div>
-        </fieldset>
-
-        <fieldset style={{ marginBottom: 24 }}>
-          <legend>Seat Selections</legend>
-          <div style={{ border: '1px solid #eee', borderRadius: 8, padding: 0 }}>
-            <div
-              style={{
-                display: 'flex',
-                fontWeight: 600,
-                borderBottom: '1px solid #eee',
-                padding: '8px 12px',
-                gap: '12px',
-              }}
-            >
-              <div style={{ flex: 2, minWidth: 160 }}>Ticket Class</div>
-              <div style={{ flex: 2, minWidth: 160 }}>Seat Name</div>
-              <div style={{ flex: 1, minWidth: 100 }}>Ticket Price</div>
-              <div style={{ width: 40 }}></div>
-            </div>
-            {fields.map((field, idx) => (
-              <div
-                key={field.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '12px',
-                  borderBottom: idx === fields.length - 1 ? 'none' : '1px solid #eee',
-                  padding: '8px 12px',
-                }}
-              >
-                <div style={{ flex: 2, minWidth: 160 }}>
-                  <Controller
-                    control={control}
-                    name={`orderItems.${idx}.ticketPriceId`}
-                    rules={{ required: 'Ticket class required' }}
-                    render={({ field }) => (
-                      <SelectInput
-                        path={`orderItems.${idx}.ticketPriceId`}
-                        options={[{ label: 'Select...', value: '' }, ...ticketClasses]}
-                        value={field.value ?? ''}
-                        onChange={(option) => {
-                          const selectedTicketClass = Array.isArray(option) ? option[0] : option
-                          setValue(`orderItems.${idx}.seat`, '')
-                          setValue(
-                            `orderItems.${idx}.price`,
-                            (selectedTicketClass?.ticketPrice as TicketPrice)?.price || 0,
-                          )
-
-                          return field.onChange(selectedTicketClass?.value ?? '')
-                        }}
-                        name={field.name}
-                      />
-                    )}
-                  />
-                  {errors.orderItems?.[idx]?.ticketPriceId && (
-                    <div style={{ color: 'red', fontSize: 12 }}>
-                      {errors.orderItems?.[idx]?.ticketPriceId?.message}
-                    </div>
-                  )}
-                </div>
-                <div style={{ flex: 2, minWidth: 160 }}>
-                  <Controller
-                    control={control}
-                    name={`orderItems.${idx}.seat`}
-                    rules={{
-                      required: 'Seat name required',
-                      validate: (value) =>
-                        (seatNameCounts?.[value] as number) > 1 ? 'Duplicate seat name' : true,
-                    }}
-                    render={({ field }) => {
-                      const orderItem = orderItems[idx]
-                      let seatOptions: FreeSeat[] = []
-                      if (orderItem?.ticketPriceId) {
-                        seatOptions = freeSeats.filter(
-                          (seat) => seat.ticketPriceInfo?.id === orderItem?.ticketPriceId,
+                      onChange={(option) =>
+                        field.onChange(
+                          Array.isArray(option) ? (option[0]?.value ?? '') : (option?.value ?? ''),
                         )
                       }
+                    />
+                  ) : (
+                    <div style={{ pointerEvents: 'none', opacity: 0.5 }}>
+                      <SelectInput
+                        path="eventScheduleId"
+                        name={field.name}
+                        options={[{ label: 'Select date...', value: '' }, ...eventSchedules]}
+                        value={field.value ?? ''}
+                        onChange={(option) => {}}
+                      />
+                    </div>
+                  )
+                }
+              />
+              {errors.eventScheduleId && (
+                <div style={{ color: 'red', fontSize: 12 }}>{errors.eventScheduleId.message}</div>
+              )}
+            </div>
+          </fieldset>
 
-                      return (
+          <fieldset style={{ marginBottom: 24 }}>
+            <legend>Seat Selections</legend>
+            <div style={{ border: '1px solid #eee', borderRadius: 8, padding: 0 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  fontWeight: 600,
+                  borderBottom: '1px solid #eee',
+                  padding: '8px 12px',
+                  gap: '12px',
+                }}
+              >
+                <div style={{ flex: 2, minWidth: 160 }}>Ticket Class</div>
+                <div style={{ flex: 2, minWidth: 160 }}>Seat Name</div>
+                <div style={{ flex: 1, minWidth: 100 }}>Ticket Price</div>
+                <div style={{ width: 40 }}></div>
+              </div>
+              {fields.map((field, idx) => (
+                <div
+                  key={field.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '12px',
+                    borderBottom: idx === fields.length - 1 ? 'none' : '1px solid #eee',
+                    padding: '8px 12px',
+                  }}
+                >
+                  <div style={{ flex: 2, minWidth: 160 }}>
+                    <Controller
+                      control={control}
+                      name={`orderItems.${idx}.ticketPriceId`}
+                      rules={{ required: 'Ticket class required' }}
+                      render={({ field }) => (
                         <SelectInput
-                          path={`orderItems.${idx}.seat`}
-                          options={[{ label: 'Select...', value: '' }, ...seatOptions]}
+                          path={`orderItems.${idx}.ticketPriceId`}
+                          options={[{ label: 'Select...', value: '' }, ...ticketClasses]}
                           value={field.value ?? ''}
-                          onChange={(option) =>
-                            field.onChange(
-                              Array.isArray(option)
-                                ? (option[0]?.value ?? '')
-                                : (option?.value ?? ''),
+                          onChange={(option) => {
+                            const selectedTicketClass = Array.isArray(option) ? option[0] : option
+                            setValue(`orderItems.${idx}.seat`, '')
+                            setValue(
+                              `orderItems.${idx}.price`,
+                              (selectedTicketClass?.ticketPrice as TicketPrice)?.price || 0,
                             )
-                          }
+
+                            return field.onChange(selectedTicketClass?.value ?? '')
+                          }}
                           name={field.name}
                         />
-                      )
-                    }}
-                  />
-                  {errors.orderItems?.[idx]?.seat && (
-                    <div style={{ color: 'red', fontSize: 12 }}>
-                      {errors.orderItems?.[idx]?.seat?.message}
-                    </div>
-                  )}
-                </div>
-                <div style={{ flex: 1, minWidth: 100, textAlign: 'right' }}>
-                  <TextInput
-                    path={`orderItems.${idx}.price`}
-                    value={
-                      orderItems[idx]?.price !== undefined ? String(orderItems[idx]?.price) : ''
-                    }
-                    readOnly
-                    style={{ width: 80, textAlign: 'right', background: 'white', color: 'black' }}
-                  />
-                </div>
-                <div style={{ width: 40, textAlign: 'center' }}>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      remove(idx)
-                    }}
-                    disabled={fields.length === 1}
-                    aria-label="Remove seat"
-                    style={{ cursor: fields.length > 1 ? 'pointer' : 'not-allowed' }}
-                  >
-                    X
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 12 }}>
-            <Button
-              buttonStyle="secondary"
-              icon="plus"
-              onClick={(e) => {
-                e.preventDefault()
-                append({ ticketPriceId: '', seat: '', price: 0 })
-              }}
-              aria-label="Add seat"
-            >
-              Add Seat
-            </Button>
-          </div>
-        </fieldset>
+                      )}
+                    />
+                    {errors.orderItems?.[idx]?.ticketPriceId && (
+                      <div style={{ color: 'red', fontSize: 12 }}>
+                        {errors.orderItems?.[idx]?.ticketPriceId?.message}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ flex: 2, minWidth: 160 }}>
+                    <Controller
+                      control={control}
+                      name={`orderItems.${idx}.seat`}
+                      rules={{
+                        required: 'Seat name required',
+                        validate: (value) =>
+                          (seatNameCounts?.[value] as number) > 1 ? 'Duplicate seat name' : true,
+                      }}
+                      render={({ field }) => {
+                        const orderItem = orderItems[idx]
+                        let seatOptions: FreeSeat[] = []
+                        if (orderItem?.ticketPriceId) {
+                          seatOptions = freeSeats.filter(
+                            (seat) => seat.ticketPriceInfo?.id === orderItem?.ticketPriceId,
+                          )
+                        }
 
-        <fieldset style={{ marginBottom: 24 }}>
-          <legend>Customer Info</legend>
-          <div style={{ marginBottom: 8 }}>
-            <label>First Name *</label>
-            <br />
-            <Controller
-              control={control}
-              name="firstName"
-              rules={{ required: 'First name is required' }}
-              render={({ field }) => (
-                <TextInput path="firstName" value={field.value ?? ''} onChange={field.onChange} />
-              )}
-            />
-            {errors.firstName && <div style={{ color: 'red' }}>{errors.firstName.message}</div>}
-          </div>
-          <div style={{ marginBottom: 8 }}>
-            <label>Last Name *</label>
-            <br />
-            <Controller
-              control={control}
-              name="lastName"
-              rules={{ required: 'Last name is required' }}
-              render={({ field }) => (
-                <TextInput path="lastName" value={field.value ?? ''} onChange={field.onChange} />
-              )}
-            />
-            {errors.lastName && <div style={{ color: 'red' }}>{errors.lastName.message}</div>}
-          </div>
-          <div style={{ marginBottom: 8 }}>
-            <label>Email *</label>
-            <br />
-            <Controller
-              control={control}
-              name="email"
-              rules={{
-                required: 'Email is required',
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: 'Invalid email address',
-                },
-              }}
-              render={({ field }) => (
-                <TextInput path="email" value={field.value ?? ''} onChange={field.onChange} />
-              )}
-            />
-            {errors.email && <div style={{ color: 'red' }}>{errors.email.message}</div>}
-          </div>
-          <div style={{ marginBottom: 8 }}>
-            <label>Phone Number *</label>
-            <br />
-            <Controller
-              control={control}
-              name="phoneNumber"
-              rules={{ required: 'Phone number is required' }}
-              render={({ field }) => (
-                <TextInput path="phoneNumber" value={field.value ?? ''} onChange={field.onChange} />
-              )}
-            />
-            {errors.phoneNumber && <div style={{ color: 'red' }}>{errors.phoneNumber.message}</div>}
-          </div>
-        </fieldset>
+                        return (
+                          <SelectInput
+                            path={`orderItems.${idx}.seat`}
+                            options={[{ label: 'Select...', value: '' }, ...seatOptions]}
+                            value={field.value ?? ''}
+                            onChange={(option) =>
+                              field.onChange(
+                                Array.isArray(option)
+                                  ? (option[0]?.value ?? '')
+                                  : (option?.value ?? ''),
+                              )
+                            }
+                            name={field.name}
+                          />
+                        )
+                      }}
+                    />
+                    {errors.orderItems?.[idx]?.seat && (
+                      <div style={{ color: 'red', fontSize: 12 }}>
+                        {errors.orderItems?.[idx]?.seat?.message}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 100, textAlign: 'right' }}>
+                    <TextInput
+                      path={`orderItems.${idx}.price`}
+                      value={
+                        orderItems[idx]?.price !== undefined ? String(orderItems[idx]?.price) : ''
+                      }
+                      readOnly
+                      style={{ width: 80, textAlign: 'right', background: 'white', color: 'black' }}
+                    />
+                  </div>
+                  <div style={{ width: 40, textAlign: 'center' }}>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        remove(idx)
+                      }}
+                      disabled={fields.length === 1}
+                      aria-label="Remove seat"
+                      style={{ cursor: fields.length > 1 ? 'pointer' : 'not-allowed' }}
+                    >
+                      X
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 12 }}>
+              <Button
+                buttonStyle="secondary"
+                icon="plus"
+                onClick={(e) => {
+                  e.preventDefault()
+                  append({ ticketPriceId: '', seat: '', price: 0 })
+                }}
+                aria-label="Add seat"
+              >
+                Add Seat
+              </Button>
+            </div>
+          </fieldset>
 
-        <fieldset style={{ marginBottom: 24, padding: 0 }}>
-          <legend>Order Summary</legend>
-          <div
-            style={{
-              margin: '0 auto',
-              borderRadius: 8,
-              padding: 20,
-              boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
-            }}
-          >
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ flex: 1 }}>Order Note</div>
+          <fieldset style={{ marginBottom: 24 }}>
+            <legend>Customer Info</legend>
+            <div style={{ marginBottom: 8 }}>
+              <label>First Name *</label>
+              <br />
               <Controller
                 control={control}
-                name="note"
+                name="firstName"
+                rules={{ required: 'First name is required' }}
                 render={({ field }) => (
-                  <TextareaInput
-                    path="note"
-                    value={field.value !== undefined ? String(field.value) : ''}
-                    onChange={field.onChange}
-                    style={{ textAlign: 'left', background: 'white', color: 'black' }}
-                  />
+                  <TextInput path="firstName" value={field.value ?? ''} onChange={field.onChange} />
                 )}
               />
+              {errors.firstName && <div style={{ color: 'red' }}>{errors.firstName.message}</div>}
             </div>
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ flex: 1 }}>Total Amount</div>
-              <TextInput
-                path="computedTotal"
-                value={String(formatMoney(computedTotal))}
-                readOnly
-                style={{ textAlign: 'right', background: 'white', color: 'black' }}
-              />
-            </div>
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ flex: 1 }}>Edit Total Amount</div>
+            <div style={{ marginBottom: 8 }}>
+              <label>Last Name *</label>
+              <br />
               <Controller
                 control={control}
-                name="adjustedTotal"
+                name="lastName"
+                rules={{ required: 'Last name is required' }}
+                render={({ field }) => (
+                  <TextInput path="lastName" value={field.value ?? ''} onChange={field.onChange} />
+                )}
+              />
+              {errors.lastName && <div style={{ color: 'red' }}>{errors.lastName.message}</div>}
+            </div>
+            <div style={{ marginBottom: 8 }}>
+              <label>Email *</label>
+              <br />
+              <Controller
+                control={control}
+                name="email"
                 rules={{
-                  validate: (value) => {
-                    const num = Number(value)
-                    if (value === undefined || String(value) === '') return true
-                    if (!isNaN(num) && num >= 0) return true
-                    return 'Amount must be a non-negative number'
+                  required: 'Email is required',
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: 'Invalid email address',
                   },
                 }}
                 render={({ field }) => (
+                  <TextInput path="email" value={field.value ?? ''} onChange={field.onChange} />
+                )}
+              />
+              {errors.email && <div style={{ color: 'red' }}>{errors.email.message}</div>}
+            </div>
+            <div style={{ marginBottom: 8 }}>
+              <label>Phone Number *</label>
+              <br />
+              <Controller
+                control={control}
+                name="phoneNumber"
+                rules={{ required: 'Phone number is required' }}
+                render={({ field }) => (
                   <TextInput
-                    path="adjustedTotal"
-                    value={field.value !== undefined ? String(field.value) : ''}
+                    path="phoneNumber"
+                    value={field.value ?? ''}
                     onChange={field.onChange}
-                    style={{ textAlign: 'right', background: 'white', color: 'black' }}
                   />
                 )}
               />
-              {errors.adjustedTotal && <div style={{ color: 'red' }}>{errors.adjustedTotal.message}</div>}
+              {errors.phoneNumber && (
+                <div style={{ color: 'red' }}>{errors.phoneNumber.message}</div>
+              )}
             </div>
+          </fieldset>
 
-            <div style={{ display: 'flex', alignItems: 'center', marginTop: 18 }}>
-              <div style={{ flex: 1, fontWeight: 700, fontSize: 18 }}>Final Total</div>
-              <div style={{ fontWeight: 700, fontSize: 18, textAlign: 'right', minWidth: 120 }}>
-                {formatMoney(totalAmount)}
+          <fieldset style={{ marginBottom: 24, padding: 0 }}>
+            <legend>Order Summary</legend>
+
+            <div
+              style={{
+                margin: '0 auto',
+                borderRadius: 8,
+                padding: 20,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              }}
+            >
+              <div style={{ marginBottom: 12 }}>
+                <SelectOrderCategory path="category" isSubmitSuccessful={isSubmitSuccessful} />
+              </div>
+
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ flex: 1 }}>Order Note</div>
+                <Controller
+                  control={control}
+                  name="note"
+                  render={({ field }) => (
+                    <TextareaInput
+                      path="note"
+                      value={field.value !== undefined ? String(field.value) : ''}
+                      onChange={field.onChange}
+                      style={{ textAlign: 'left', background: 'white', color: 'black' }}
+                    />
+                  )}
+                />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ flex: 1 }}>Total Amount</div>
+                <TextInput
+                  path="computedTotal"
+                  value={String(formatMoney(computedTotal))}
+                  readOnly
+                  style={{ textAlign: 'right', background: 'white', color: 'black' }}
+                />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ flex: 1 }}>Edit Total Amount</div>
+                <Controller
+                  control={control}
+                  name="adjustedTotal"
+                  rules={{
+                    validate: (value) => {
+                      const num = Number(value)
+                      if (value === undefined || String(value) === '') return true
+                      if (!isNaN(num) && num >= 0) return true
+                      return 'Amount must be a non-negative number'
+                    },
+                  }}
+                  render={({ field }) => (
+                    <TextInput
+                      path="adjustedTotal"
+                      value={field.value !== undefined ? String(field.value) : ''}
+                      onChange={field.onChange}
+                      style={{ textAlign: 'right', background: 'white', color: 'black' }}
+                    />
+                  )}
+                />
+                {errors.adjustedTotal && (
+                  <div style={{ color: 'red' }}>{errors.adjustedTotal.message}</div>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', marginTop: 18 }}>
+                <div style={{ flex: 1, fontWeight: 700, fontSize: 18 }}>Final Total</div>
+                <div style={{ fontWeight: 700, fontSize: 18, textAlign: 'right', minWidth: 120 }}>
+                  {formatMoney(totalAmount)}
+                </div>
               </div>
             </div>
-          </div>
-        </fieldset>
+          </fieldset>
 
-        <Button type="submit" buttonStyle="primary" disabled={isSubmitting}>
-          Create Order
-        </Button>
-      </form>
+          <Button type="submit" buttonStyle="primary" disabled={isSubmitting}>
+            Create Order
+          </Button>
+        </form>
+      </FormProvider>
     </Gutter>
   )
 }

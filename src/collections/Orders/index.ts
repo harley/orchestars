@@ -27,6 +27,17 @@ export const Orders: CollectionConfig = {
       index: true,
     },
     {
+      name: 'category',
+      type: 'text',
+      defaultValue: 'order_payment',
+      index: true,
+      admin: {
+        components: {
+          Field: '@/components/AdminViews/Order/SelectOrderCategory/SelectOrderCategoryPayloadComponent#SelectOrderCategory'
+        }
+      },
+    },
+    {
       name: 'status',
       type: 'select',
       defaultValue: 'processing',
@@ -91,6 +102,7 @@ export const Orders: CollectionConfig = {
       relationTo: 'admins',
       index: true,
     },
+   
   ],
   endpoints: [
     {

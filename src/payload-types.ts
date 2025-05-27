@@ -1025,6 +1025,7 @@ export interface Order {
   id: number;
   orderCode?: string | null;
   user?: (number | null) | User;
+  category?: string | null;
   status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
   currency?: string | null;
   promotion?: (number | null) | Promotion;
@@ -2181,6 +2182,7 @@ export interface UserPromotionRedemptionsSelect<T extends boolean = true> {
 export interface OrdersSelect<T extends boolean = true> {
   orderCode?: T;
   user?: T;
+  category?: T;
   status?: T;
   currency?: T;
   promotion?: T;
