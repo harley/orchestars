@@ -295,6 +295,7 @@ const SeatMapSelection = ({
                                   onSelectSeat={handleSeatSelect}
                                   unavailableSeats={unavailableSeats}
                                   selectedSeats={selectedSeats}
+                                  event={event}
                                 />
                               </div>
                             </div>

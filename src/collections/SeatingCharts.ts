@@ -12,15 +12,15 @@ export const SeatingCharts: CollectionConfig = {
       required: true,
     },
     {
-      name: 'chartMap',
-      type: 'json',
-      required: true,
+      name: 'seatMap',
+      type: 'upload',
+      relationTo: 'media',
     },
     {
-      name: 'event',
-      type: 'relationship',
-      relationTo: 'events',
+      name: 'chartMapJson',
+      type: 'json',
       required: false,
+      hidden: true,
     },
   ],
 }

@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react'
 // import '@mezh-hq/react-seat-toolkit/styles'
 import SeatToolkit, { SeatStatus } from '@mezh-hq/react-seat-toolkit'
 import { Armchair, Loader2 } from 'lucide-react'
-import seatsJson from '@/components/EventDetail/data/seat-maps/seats.json'
-import texts from '@/components/EventDetail/data/seat-maps/texts.json'
-import { categories } from '../../data/seat-maps/categories'
 import {
   Dialog,
   DialogContent,
@@ -16,29 +13,30 @@ import {
 import { Button } from '@/components/ui/button'
 import { useTranslate } from '@/providers/I18n/client'
 import { SelectedSeat } from '../../types'
-
-type SeatItem = {
-  id: string
-  x: number
-  y: number
-  label: string
-  square: boolean
-  status: 'Available' | 'Unavailable' | string
-  category: string
-}
+import { Event, Media, SeatingChart } from '@/payload-types'
+import { EventSeatChartData, SeatItemChart } from '../../types/SeatChart'
 
 const SeatMapToolkit = ({
   onSelectSeat,
   unavailableSeats = [],
   selectedSeats = [],
+  event,
 }: {
   onSelectSeat?: (seat: any) => void
   unavailableSeats?: string[]
   selectedSeats?: SelectedSeat[]
+  event: Event
 }) => {
   const { t } = useTranslate()
+  const [eventSeatChartData, setEventSeatChartData] = useState<EventSeatChartData>({
+    seats: [],
+    texts: [],
+    categories: [],
+    shapes: [],
+    sections: [],
+  })
   const [loadingMap, setLoadingMap] = useState(true)
-  const [seats, setSeats] = useState<SeatItem[]>([])
+  const [seats, setSeats] = useState<SeatItemChart[]>([])
   const [showModal, setShowModal] = useState(false)
 
   const [workspace, setWorkspace] = useState({
@@ -71,10 +69,28 @@ const SeatMapToolkit = ({
   }, [])
 
   useEffect(() => {
+    const seatingChart = event?.seatingChart as SeatingChart
+    const seatMap = seatingChart?.seatMap as Media
+    if (seatMap?.url) {
+      fetch(seatMap.url)
+        .then((res) => res.json())
+        .then((data: EventSeatChartData) => {
+          setEventSeatChartData(data)
+        })
+        .catch((err) => {
+          console.log('Error while loading seat chart', err)
+        })
+    }
+  }, [event?.seatingChart])
+
+  useEffect(() => {
+    if (!eventSeatChartData.seats?.length) {
+      return
+    }
     const unavailableSet = new Set(unavailableSeats)
     const selectedSet = new Set(selectedSeats.map((s) => s.id))
 
-    const processedSeats = seatsJson.map((seat) => ({
+    const processedSeats = eventSeatChartData.seats.map((seat) => ({
       ...seat,
       status: unavailableSet.has(seat.label)
         ? SeatStatus.Unavailable
@@ -84,7 +100,7 @@ const SeatMapToolkit = ({
     }))
     setSeats(processedSeats)
     setLoadingMap(false)
-  }, [unavailableSeats, selectedSeats])
+  }, [unavailableSeats, selectedSeats, eventSeatChartData])
 
   const handleSeatClick = (seat: any) => {
     const seatRowChar = seat.label[0]
@@ -131,45 +147,11 @@ const SeatMapToolkit = ({
         }}
         data={{
           name: 'Categorized Example',
-          categories: categories,
-          sections: [
-            {
-              id: '1636dd75-ea0a-48d6-b14c-05ac9db08f5c',
-              name: 'Section 1',
-              color: '#000000',
-              stroke: '#000000',
-              freeSeating: false,
-            },
-            {
-              id: '65dfc91f-f7aa-407a-ae55-b31f1ee3a41c',
-              name: 'Section 2',
-              color: '#FF0000',
-              stroke: '#FF0000',
-              freeSeating: false,
-            },
-            {
-              id: '6975d973-5a37-4490-bf13-85c156cbb6b3',
-              name: 'Section 3',
-              color: '#0000FF',
-              stroke: '#0000FF',
-              freeSeating: false,
-            },
-          ],
-          seats: seats,
-          text: texts,
-          shapes: [
-            {
-              id: '60a1c8d8-efd1-4506-a5a8-59ef16571836',
-              name: 'RectangleHorizontal',
-              x: 117.017578125,
-              y: -69.24331676483155,
-              width: 1100,
-              height: 100,
-              rx: 10,
-              color: '#990003',
-              stroke: '#000000',
-            },
-          ],
+          categories: eventSeatChartData.categories,
+          sections: eventSeatChartData.sections,
+          seats: eventSeatChartData.seats,
+          text: eventSeatChartData.texts,
+          shapes: eventSeatChartData.shapes,
           polylines: [],
           images: [],
           workspace,
