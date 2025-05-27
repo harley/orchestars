@@ -50,6 +50,7 @@ import * as migration_20250522_093549_add_note_created_by_columns_to_order_colle
 import * as migration_20250523_053715_add_custom_block_and_support_multi_language_page_collection from './20250523_053715_add_custom_block_and_support_multi_language_page_collection';
 import * as migration_20250523_080251_add_children_navitem_header from './20250523_080251_add_children_navitem_header';
 import * as migration_20250524_133051_add_authentication_user from './20250524_133051_add_authentication_user';
+import * as migration_20250527_035818_add_seating_chart from './20250527_035818_add_seating_chart';
 
 export const migrations = [
   {
@@ -310,6 +311,11 @@ export const migrations = [
   {
     up: migration_20250524_133051_add_authentication_user.up,
     down: migration_20250524_133051_add_authentication_user.down,
-    name: '20250524_133051_add_authentication_user'
+    name: '20250524_133051_add_authentication_user',
+  },
+  {
+    up: migration_20250527_035818_add_seating_chart.up,
+    down: migration_20250527_035818_add_seating_chart.down,
+    name: '20250527_035818_add_seating_chart'
   },
 ];

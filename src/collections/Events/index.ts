@@ -261,6 +261,11 @@ export const Events: CollectionConfig = {
       ],
     },
     {
+      type: 'relationship',
+      name: 'seatingChart',
+      relationTo: 'seatingCharts'
+    },
+    {
       name: 'status',
       type: 'select',
       required: false,

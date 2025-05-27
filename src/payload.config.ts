@@ -37,6 +37,7 @@ import { Emails } from './collections/Emails'
 import { Logs } from './collections/Logs'
 import { emailAdapter } from './payload-config/email'
 import { IS_LOCAL_DEVELOPMENT } from './config/app'
+import { SeatingCharts } from './collections/SeatingCharts'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -112,6 +113,7 @@ export default buildConfig({
     Categories,
     Users,
     CheckInRecords,
+    SeatingCharts,
     Events,
     Promotions,
     UserPromotionRedemptions,

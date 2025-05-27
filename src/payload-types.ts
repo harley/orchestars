@@ -73,6 +73,7 @@ export interface Config {
     categories: Category;
     users: User;
     checkinRecords: CheckinRecord;
+    seatingCharts: SeatingChart;
     events: Event;
     promotions: Promotion;
     userPromotionRedemptions: UserPromotionRedemption;
@@ -106,6 +107,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     checkinRecords: CheckinRecordsSelect<false> | CheckinRecordsSelect<true>;
+    seatingCharts: SeatingChartsSelect<false> | SeatingChartsSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     promotions: PromotionsSelect<false> | PromotionsSelect<true>;
     userPromotionRedemptions: UserPromotionRedemptionsSelect<false> | UserPromotionRedemptionsSelect<true>;
@@ -943,7 +945,28 @@ export interface Event {
     showBannerLocation?: boolean | null;
     showBannerDescription?: boolean | null;
   };
+  seatingChart?: (number | null) | SeatingChart;
   status?: ('draft' | 'published_upcoming' | 'published_open_sales' | 'completed' | 'cancelled') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "seatingCharts".
+ */
+export interface SeatingChart {
+  id: number;
+  title: string;
+  seatMap?: (number | null) | Media;
+  chartMapJson?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1521,6 +1544,10 @@ export interface PayloadLockedDocument {
         value: number | CheckinRecord;
       } | null)
     | ({
+        relationTo: 'seatingCharts';
+        value: number | SeatingChart;
+      } | null)
+    | ({
         relationTo: 'events';
         value: number | Event;
       } | null)
@@ -2031,6 +2058,17 @@ export interface CheckinRecordsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "seatingCharts_select".
+ */
+export interface SeatingChartsSelect<T extends boolean = true> {
+  title?: T;
+  seatMap?: T;
+  chartMapJson?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events_select".
  */
 export interface EventsSelect<T extends boolean = true> {
@@ -2084,6 +2122,7 @@ export interface EventsSelect<T extends boolean = true> {
         showBannerLocation?: T;
         showBannerDescription?: T;
       };
+  seatingChart?: T;
   status?: T;
   updatedAt?: T;
   createdAt?: T;
