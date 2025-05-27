@@ -30,6 +30,7 @@ import { InlineCodeFeatureClient as InlineCodeFeatureClient_e70f5e05f09f93e00b99
 import { SuperscriptFeatureClient as SuperscriptFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { SubscriptFeatureClient as SubscriptFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { SelectOrderCategory as SelectOrderCategory_049671e81ae6d06dcf2439baca2a6b79 } from '@/components/AdminViews/Order/SelectOrderCategory/SelectOrderCategoryPayloadComponent'
 import { ActionViews as ActionViews_c625c4a830674427dc2497d62b0046dd } from '@/components/AdminViews/Order/ActionViews'
 import { default as default_e6b30098bdd062bcc6e4cf9467eed8df } from '@/components/Tickets/Actions/SendMailButton'
 import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
@@ -81,6 +82,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#SuperscriptFeatureClient": SuperscriptFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#SubscriptFeatureClient": SubscriptFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#StrikethroughFeatureClient": StrikethroughFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@/components/AdminViews/Order/SelectOrderCategory/SelectOrderCategoryPayloadComponent#SelectOrderCategory": SelectOrderCategory_049671e81ae6d06dcf2439baca2a6b79,
   "@/components/AdminViews/Order/ActionViews#ActionViews": ActionViews_c625c4a830674427dc2497d62b0046dd,
   "@/components/Tickets/Actions/SendMailButton#default": default_e6b30098bdd062bcc6e4cf9467eed8df,
   "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
