@@ -89,6 +89,7 @@ export interface Config {
     admins: Admin;
     emails: Email;
     logs: Log;
+    marketingTrackings: MarketingTracking;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -123,6 +124,7 @@ export interface Config {
     admins: AdminsSelect<false> | AdminsSelect<true>;
     emails: EmailsSelect<false> | EmailsSelect<true>;
     logs: LogsSelect<false> | LogsSelect<true>;
+    marketingTrackings: MarketingTrackingsSelect<false> | MarketingTrackingsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -1314,6 +1316,23 @@ export interface Log {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marketingTrackings".
+ */
+export interface MarketingTracking {
+  id: number;
+  order?: (number | null) | Order;
+  description?: string | null;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  utmTerm?: string | null;
+  utmContent?: string | null;
+  conversionType?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1607,6 +1626,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'logs';
         value: number | Log;
+      } | null)
+    | ({
+        relationTo: 'marketingTrackings';
+        value: number | MarketingTracking;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -2396,6 +2419,22 @@ export interface LogsSelect<T extends boolean = true> {
   payment?: T;
   ipAddress?: T;
   userAgent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marketingTrackings_select".
+ */
+export interface MarketingTrackingsSelect<T extends boolean = true> {
+  order?: T;
+  description?: T;
+  utmSource?: T;
+  utmMedium?: T;
+  utmCampaign?: T;
+  utmTerm?: T;
+  utmContent?: T;
+  conversionType?: T;
   updatedAt?: T;
   createdAt?: T;
 }

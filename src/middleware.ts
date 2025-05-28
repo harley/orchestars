@@ -21,6 +21,21 @@ export function middleware(request: NextRequest) {
     })
   }
 
+  // --- UTM Tracking Start ---
+  const utmParameters = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
+  const expiresOneDay = new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+
+  utmParameters.forEach(param => {
+    const value = url.searchParams.get(param)
+    if (value) {
+      response.cookies.set(param, value, {
+        expires: expiresOneDay,
+        path: '/',
+      })
+    }
+  })
+  // --- UTM Tracking End ---
+
   return response
 }
 
