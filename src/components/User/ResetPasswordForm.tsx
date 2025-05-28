@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useTranslate } from '@/providers/I18n/client'
 import { useToast } from '@/hooks/use-toast'

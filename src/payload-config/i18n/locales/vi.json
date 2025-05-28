@@ -423,6 +423,12 @@
     "signIn": "Đăng nhập",
     "signInToContinue": "Đăng nhập để tiếp tục",
     "passwordMinLength": "Mật khẩu phải có ít nhất {{length}} ký tự",
-    "passwordStrength": "Mật khẩu phải chứa ít nhất hai trong các loại ký tự sau: chữ hoa, chữ thường, số hoặc ký tự đặc biệt"
+    "passwordStrength": "Mật khẩu phải chứa ít nhất hai trong các loại ký tự sau: chữ hoa, chữ thường, số hoặc ký tự đặc biệt",
+    "firstTimeLoginGuideline": "Nếu bạn đã từng đặt vé trước đây, bạn đã có tài khoản. Chỉ cần dùng email của bạn để đặt lại mật khẩu, đăng nhập và xem thông tin vé cùng các thông tin khác.",
+    "firstTimeLoginLink": "Lần đầu đăng nhập? Bấm vào đây",
+    "firstTimeLoginHeader": "Truy cập Vé Của Bạn",
+    "firstTimeLoginEmailPlaceholder": "Nhập email bạn đã dùng để đặt vé",
+    "pleaseEnterEmailAndPassword": "Vui lòng nhập cả email và mật khẩu",
+    "signingIn": "Đang đăng nhập..."
   }
 }

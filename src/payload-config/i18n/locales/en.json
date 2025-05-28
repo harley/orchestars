@@ -423,6 +423,12 @@
     "signIn":"Sign In",
     "signInToContinue": "Sign in to continue",
     "passwordMinLength": "Password must be at least {{length}} characters long",
-    "passwordStrength": "Password must contain at least two of the following: uppercase letters, lowercase letters, numbers, or special characters"
+    "passwordStrength": "Password must contain at least two of the following: uppercase letters, lowercase letters, numbers, or special characters",
+    "firstTimeLoginGuideline": "If you’ve booked tickets before, you already have an account. Just use your email to reset your password, log in, and view your tickets and other details.",
+    "firstTimeLoginLink": "First time logging in? Click here",
+    "firstTimeLoginHeader": "Access Your Tickets",
+    "firstTimeLoginEmailPlaceholder": "Enter the email you used to book tickets",
+    "pleaseEnterEmailAndPassword": "Please enter both email and password",
+    "signingIn": "Signing in..."
   }
 }

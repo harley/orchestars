@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslate } from '@/providers/I18n/client'
 import { useToast } from '@/hooks/use-toast'
 import ForgotPasswordForm from './ForgotPasswordForm'
+import { Info } from 'lucide-react'
 
 interface LoginFormProps {
   onSuccess?: () => void
@@ -13,7 +14,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [formMode, setFormMode] = useState<'login' | 'forgotPassword' | 'firstTimeLogin'>('login')
   const { t } = useTranslate()
   const { toast } = useToast()
 
@@ -67,8 +68,8 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
 
   return (
     <>
-      {showForgotPassword ? (
-        <ForgotPasswordForm onBackToLogin={() => setShowForgotPassword(false)} />
+      {formMode !== 'login' ? (
+        <ForgotPasswordForm onBackToLogin={() => setFormMode('login')} mode={formMode} />
       ) : (
         <div className="w-full p-4">
           <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">
@@ -114,11 +115,26 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
             <div className="text-center text-sm">
               <button
                 type="button"
-                onClick={() => setShowForgotPassword(true)}
-                className="font-medium text-gray-900 hover:underline focus:outline-none"
+                onClick={() => setFormMode('forgotPassword')}
+                className="font-medium text-gray-900 hover:underline focus:outline-none mr-4"
               >
                 {t('auth.forgotPassword')}
               </button>
+              <button
+                type="button"
+                onClick={() => setFormMode('firstTimeLogin')}
+                className="font-medium text-gray-900 hover:underline focus:outline-none mt-2"
+              >
+                {t('auth.firstTimeLoginLink')}
+              </button>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 p-4 mt-6 border-l-4 border-blue-500 bg-blue-50 rounded-md shadow-sm">
+            <div className="flex-shrink-0 pt-1">
+              <Info className='text-blue-500' />
+            </div>
+            <div className="text-sm text-blue-800 leading-relaxed">
+              {t('auth.firstTimeLoginGuideline')}
             </div>
           </div>
         </div>

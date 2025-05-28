@@ -4,9 +4,10 @@ import { useToast } from '@/hooks/use-toast'
 
 interface ForgotPasswordFormProps {
   onBackToLogin: () => void;
+  mode?: 'forgotPassword' | 'firstTimeLogin';
 }
 
-export default function ForgotPasswordForm({ onBackToLogin }: ForgotPasswordFormProps) {
+export default function ForgotPasswordForm({ onBackToLogin, mode = 'forgotPassword' }: ForgotPasswordFormProps) {
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const { t } = useTranslate()
@@ -54,13 +55,19 @@ export default function ForgotPasswordForm({ onBackToLogin }: ForgotPasswordForm
     }
   }
 
+  // Determine texts based on mode
+  const headerText = mode === 'firstTimeLogin' ? t('auth.firstTimeLoginHeader') : t('auth.forgotPassword');
+  const helperText = mode === 'firstTimeLogin' ? t('auth.enterEmailForReset') : t('auth.enterEmailForReset'); // Use the same helper text for now, can be changed if needed
+  const emailPlaceholder = mode === 'firstTimeLogin' ? t('auth.firstTimeLoginEmailPlaceholder') : t('auth.enterYourEmail');
+  const buttonText = mode === 'firstTimeLogin' ? t('auth.sendResetLink') : t('auth.sendResetLink'); // Same button text
+
   return (
     <div className="w-full p-4 max-w-sm mx-auto">
       <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">
-        {t('auth.forgotPassword')}
+        {headerText}
       </h1>
       <p className="text-sm text-gray-600 mb-6 text-center">
-        {t('auth.enterEmailForReset')}
+        {helperText}
       </p>
       <div className="space-y-4">
         <div>
@@ -73,7 +80,7 @@ export default function ForgotPasswordForm({ onBackToLogin }: ForgotPasswordForm
             className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-700"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder={t('auth.enterYourEmail')}
+            placeholder={emailPlaceholder}
             disabled={isLoading}
           />
         </div>
@@ -82,7 +89,7 @@ export default function ForgotPasswordForm({ onBackToLogin }: ForgotPasswordForm
           disabled={isLoading}
           className={`w-full py-3 text-white rounded-lg font-semibold transition ${isLoading ? 'bg-gray-700 cursor-not-allowed' : 'bg-gray-900 hover:bg-black'}`}
         >
-          {isLoading ? t('auth.sendingRequest') : t('auth.sendResetLink')}
+          {buttonText}
         </button>
         <div className="text-center text-sm mt-4">
           <button
