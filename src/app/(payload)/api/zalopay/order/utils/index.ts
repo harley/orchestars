@@ -8,6 +8,8 @@ import { Order, User } from '@/payload-types'
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 
 import { CustomerInfo, NewOrderItem } from '@/app/(payload)/api/bank-transfer/order/types'
+import { cookies } from 'next/headers'
+import { getPayload } from '@/payload-config/getPayloadConfig'
 
 export const generateZaloPayOrderData = ({
   orderCode,
@@ -139,4 +141,35 @@ export const createPayment = async ({
     },
     req: { transactionID },
   })
+}
+
+export const createMarketingTrackingOrder = async ({ newOrder }: { newOrder: Order }) => {
+  try {
+    const cookieStore = await cookies()
+
+    const utmSource = cookieStore.get('utm_source')?.value
+    const utmMedium = cookieStore.get('utm_medium')?.value
+    const utmCampaign = cookieStore.get('utm_campaign')?.value
+    const utmTerm = cookieStore.get('utm_term')?.value
+    const utmContent = cookieStore.get('utm_content')?.value
+
+    if (utmSource || utmMedium || utmCampaign || utmTerm || utmContent) {
+      const payload = await getPayload()
+      await payload.create({
+        collection: 'marketingTrackings',
+        data: {
+          order: newOrder.id,
+          utmSource,
+          utmMedium,
+          utmCampaign,
+          utmTerm,
+          utmContent,
+          conversionType: 'order_booked',
+        },
+      })
+      console.log('Marketing tracking entry created for order:', newOrder.id)
+    }
+  } catch (error) {
+    console.error('Error creating marketing tracking entry:', error)
+  }
 }

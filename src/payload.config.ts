@@ -38,6 +38,7 @@ import { Logs } from './collections/Logs'
 import { emailAdapter } from './payload-config/email'
 import { IS_LOCAL_DEVELOPMENT } from './config/app'
 import { SeatingCharts } from './collections/SeatingCharts'
+import { MarketingTracking } from './collections/MarketingTracking'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -129,6 +130,7 @@ export default buildConfig({
     Admins,
     Emails,
     Logs,
+    MarketingTracking
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],

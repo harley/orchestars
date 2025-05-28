@@ -25,7 +25,12 @@ import {
   NewInputOrder,
   NewOrderItemWithBookingType,
 } from '@/app/(payload)/api/bank-transfer/order/types'
-import { createPayment, createZaloPaymentLink, generateZaloPayOrderData } from './utils'
+import {
+  createMarketingTrackingOrder,
+  createPayment,
+  createZaloPaymentLink,
+  generateZaloPayOrderData,
+} from './utils'
 import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
 
 enum BOOKING_TYPE {
@@ -212,6 +217,8 @@ const handleOrderWithBookingTypeSeat = async ({ body }: { body: Record<string, a
       // clear seat holding code cookie and close session seat holding
       await clearSeatHolding({ nextResponse, payload })
 
+      createMarketingTrackingOrder({ newOrder })
+
       return nextResponse
     } catch (error: any) {
       // Rollback the transaction
@@ -343,6 +350,8 @@ const handleOrderWithBookingTypeTicketClass = async ({ body }: { body: Record<st
 
       // clear seat holding code cookie and close session seat holding
       await clearSeatHolding({ nextResponse, payload })
+
+      createMarketingTrackingOrder({ newOrder })
 
       return nextResponse
     } catch (error) {
