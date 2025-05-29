@@ -120,7 +120,8 @@
     "balcony": "Balcony",
     "ticketPrices": "Ticket Prices",
     "discountOnTotalOrderValue": "Apply on total order value",
-    "discountOnPerOrderItem": "Apply on each ticket in the order"
+    "discountOnPerOrderItem": "Apply on each ticket in the order",
+    "guideToPayment": "After selecting your seats, please scroll down to reserve and proceed with payment."
   },
   "seatSelection": {
     "booking": "Booking",

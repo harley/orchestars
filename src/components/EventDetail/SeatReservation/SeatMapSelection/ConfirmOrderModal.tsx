@@ -6,14 +6,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+// import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Check, Info, X, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { SelectedSeat } from '../../types'
 import { useToast } from '@/hooks/use-toast'
 import axios from 'axios'
 import { Event, Promotion } from '@/payload-types'
-import { useSearchParams } from 'next/navigation'
 import { useTranslate } from '@/providers/I18n/client'
 
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
@@ -41,16 +40,16 @@ const ConfirmOrderModal = ({
   onCloseModal,
   selectedSeats,
   promotions,
+  eventScheduleId,
 }: {
   event: Event
   onCloseModal: (options?: { resetSeat?: boolean }) => void
   selectedSeats: SelectedSeat[]
   promotions: Promotion[]
+  eventScheduleId?: string
 }) => {
   const { t } = useTranslate()
   const { toast } = useToast()
-  const searchParams = useSearchParams()
-  const eventScheduleId = searchParams?.get('eventScheduleId')
 
   const ticketSelected = useMemo(() => {
     return selectedSeats.reduce(
