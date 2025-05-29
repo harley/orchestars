@@ -8,7 +8,7 @@
       "label": "A1",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a3",
@@ -18,7 +18,7 @@
       "label": "A3",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a5",
@@ -28,7 +28,7 @@
       "label": "A5",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a7",
@@ -38,7 +38,7 @@
       "label": "A7",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a9",
@@ -48,7 +48,7 @@
       "label": "A9",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a11",
@@ -58,7 +58,7 @@
       "label": "A11",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a13",
@@ -68,7 +68,7 @@
       "label": "A13",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a15",
@@ -78,7 +78,7 @@
       "label": "A15",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a17",
@@ -88,7 +88,7 @@
       "label": "A17",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a19",
@@ -98,7 +98,7 @@
       "label": "A19",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a21",
@@ -108,7 +108,7 @@
       "label": "A21",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a23",
@@ -118,7 +118,7 @@
       "label": "A23",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a25",
@@ -128,7 +128,7 @@
       "label": "A25",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a27",
@@ -138,7 +138,7 @@
       "label": "A27",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a29",
@@ -148,7 +148,7 @@
       "label": "A29",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a31",
@@ -158,7 +158,7 @@
       "label": "A31",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a33",
@@ -168,7 +168,7 @@
       "label": "A33",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a35",
@@ -178,7 +178,7 @@
       "label": "A35",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a37",
@@ -298,7 +298,7 @@
       "label": "A59",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-a61",
@@ -308,7 +308,7 @@
       "label": "A61",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-a63",
@@ -318,7 +318,7 @@
       "label": "A63",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-a65",
@@ -328,7 +328,7 @@
       "label": "A65",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-a67",
@@ -338,7 +338,7 @@
       "label": "A67",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-a69",
@@ -348,7 +348,7 @@
       "label": "A69",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-a71",
@@ -358,7 +358,7 @@
       "label": "A71",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-a2",
@@ -368,7 +368,7 @@
       "label": "A2",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a4",
@@ -378,7 +378,7 @@
       "label": "A4",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a6",
@@ -388,7 +388,7 @@
       "label": "A6",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a8",
@@ -398,7 +398,7 @@
       "label": "A8",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a10",
@@ -408,7 +408,7 @@
       "label": "A10",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a12",
@@ -418,7 +418,7 @@
       "label": "A12",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a14",
@@ -428,7 +428,7 @@
       "label": "A14",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a16",
@@ -438,7 +438,7 @@
       "label": "A16",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a18",
@@ -448,7 +448,7 @@
       "label": "A18",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a20",
@@ -458,7 +458,7 @@
       "label": "A20",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a22",
@@ -468,7 +468,7 @@
       "label": "A22",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a24",
@@ -478,7 +478,7 @@
       "label": "A24",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a26",
@@ -488,7 +488,7 @@
       "label": "A26",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a28",
@@ -498,7 +498,7 @@
       "label": "A28",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a30",
@@ -508,7 +508,7 @@
       "label": "A30",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a32",
@@ -518,7 +518,7 @@
       "label": "A32",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a34",
@@ -528,7 +528,7 @@
       "label": "A34",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a36",
@@ -538,7 +538,7 @@
       "label": "A36",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-a38",
@@ -658,7 +658,7 @@
       "label": "A60",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-a62",
@@ -668,7 +668,7 @@
       "label": "A62",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-a64",
@@ -678,7 +678,7 @@
       "label": "A64",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-a66",
@@ -688,7 +688,7 @@
       "label": "A66",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-a68",
@@ -698,7 +698,7 @@
       "label": "A68",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-a70",
@@ -708,7 +708,7 @@
       "label": "A70",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-a72",
@@ -718,7 +718,7 @@
       "label": "A72",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-b1",
@@ -1018,7 +1018,7 @@
       "label": "B59",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-b61",
@@ -1028,7 +1028,7 @@
       "label": "B61",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-b63",
@@ -1038,7 +1038,7 @@
       "label": "B63",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-b65",
@@ -1048,7 +1048,7 @@
       "label": "B65",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-b67",
@@ -1058,7 +1058,7 @@
       "label": "B67",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-b69",
@@ -1068,7 +1068,7 @@
       "label": "B69",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-b71",
@@ -1078,7 +1078,7 @@
       "label": "B71",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-b2",
@@ -1378,7 +1378,7 @@
       "label": "B60",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-b62",
@@ -1388,7 +1388,7 @@
       "label": "B62",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-b64",
@@ -1398,7 +1398,7 @@
       "label": "B64",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-b66",
@@ -1408,7 +1408,7 @@
       "label": "B66",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-b68",
@@ -1418,7 +1418,7 @@
       "label": "B68",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-b70",
@@ -1428,7 +1428,7 @@
       "label": "B70",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-b72",
@@ -1438,7 +1438,7 @@
       "label": "B72",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-c1",
@@ -1738,7 +1738,7 @@
       "label": "C59",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-c61",
@@ -1748,7 +1748,7 @@
       "label": "C61",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-c63",
@@ -1758,7 +1758,7 @@
       "label": "C63",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-c65",
@@ -1768,7 +1768,7 @@
       "label": "C65",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-c67",
@@ -1778,7 +1778,7 @@
       "label": "C67",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-c69",
@@ -1788,7 +1788,7 @@
       "label": "C69",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-c71",
@@ -1798,7 +1798,7 @@
       "label": "C71",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-c2",
@@ -2098,7 +2098,7 @@
       "label": "C60",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-c62",
@@ -2108,7 +2108,7 @@
       "label": "C62",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-c64",
@@ -2118,7 +2118,7 @@
       "label": "C64",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-c66",
@@ -2128,7 +2128,7 @@
       "label": "C66",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-c68",
@@ -2138,7 +2138,7 @@
       "label": "C68",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-c70",
@@ -2148,7 +2148,7 @@
       "label": "C70",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-c72",
@@ -2158,7 +2158,7 @@
       "label": "C72",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-d1",
@@ -2458,7 +2458,7 @@
       "label": "D59",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-d61",
@@ -2468,7 +2468,7 @@
       "label": "D61",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-d63",
@@ -2478,7 +2478,7 @@
       "label": "D63",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-d65",
@@ -2488,7 +2488,7 @@
       "label": "D65",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-d67",
@@ -2498,7 +2498,7 @@
       "label": "D67",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-d69",
@@ -2508,7 +2508,7 @@
       "label": "D69",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-d71",
@@ -2518,7 +2518,7 @@
       "label": "D71",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-d2",
@@ -2818,7 +2818,7 @@
       "label": "D60",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-d62",
@@ -2828,7 +2828,7 @@
       "label": "D62",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-d64",
@@ -2838,7 +2838,7 @@
       "label": "D64",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-d66",
@@ -2848,7 +2848,7 @@
       "label": "D66",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-d68",
@@ -2858,7 +2858,7 @@
       "label": "D68",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-d70",
@@ -2868,7 +2868,7 @@
       "label": "D70",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-d72",
@@ -2878,7 +2878,7 @@
       "label": "D72",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-e1",
@@ -3178,7 +3178,7 @@
       "label": "E59",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-e61",
@@ -3188,7 +3188,7 @@
       "label": "E61",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-e63",
@@ -3198,7 +3198,7 @@
       "label": "E63",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-e65",
@@ -3208,7 +3208,7 @@
       "label": "E65",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-e67",
@@ -3218,7 +3218,7 @@
       "label": "E67",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-e69",
@@ -3228,7 +3228,7 @@
       "label": "E69",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-e71",
@@ -3238,7 +3238,7 @@
       "label": "E71",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-e2",
@@ -3538,7 +3538,7 @@
       "label": "E60",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-e62",
@@ -3548,7 +3548,7 @@
       "label": "E62",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-e64",
@@ -3558,7 +3558,7 @@
       "label": "E64",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone5"
     },
     {
       "id": "seat-e66",
@@ -3568,7 +3568,7 @@
       "label": "E66",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-e68",
@@ -3578,7 +3578,7 @@
       "label": "E68",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-e70",
@@ -3588,7 +3588,7 @@
       "label": "E70",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-e72",
@@ -3598,7 +3598,7 @@
       "label": "E72",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone5"
     },
     {
       "id": "seat-f1",
@@ -3898,7 +3898,7 @@
       "label": "F59",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-f61",
@@ -3908,7 +3908,7 @@
       "label": "F61",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-f63",
@@ -3918,7 +3918,7 @@
       "label": "F63",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-f65",
@@ -4258,7 +4258,7 @@
       "label": "F60",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-f62",
@@ -4268,7 +4268,7 @@
       "label": "F62",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-f64",
@@ -4278,7 +4278,7 @@
       "label": "F64",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-f66",
@@ -4618,7 +4618,7 @@
       "label": "G59",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-g61",
@@ -4628,7 +4628,7 @@
       "label": "G61",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-g63",
@@ -4638,7 +4638,7 @@
       "label": "G63",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-g65",
@@ -4978,7 +4978,7 @@
       "label": "G60",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-g62",
@@ -4988,7 +4988,7 @@
       "label": "G62",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-g64",
@@ -4998,7 +4998,7 @@
       "label": "G64",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-g66",
@@ -5338,7 +5338,7 @@
       "label": "H59",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-h61",
@@ -5348,7 +5348,7 @@
       "label": "H61",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-h63",
@@ -5358,7 +5358,7 @@
       "label": "H63",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-h65",
@@ -5698,7 +5698,7 @@
       "label": "H60",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-h62",
@@ -5708,7 +5708,7 @@
       "label": "H62",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-h64",
@@ -5718,7 +5718,7 @@
       "label": "H64",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-h66",
@@ -6058,7 +6058,7 @@
       "label": "I59",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-i61",
@@ -6068,7 +6068,7 @@
       "label": "I61",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-i63",
@@ -6078,7 +6078,7 @@
       "label": "I63",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-i65",
@@ -6418,7 +6418,7 @@
       "label": "I60",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-i62",
@@ -6428,7 +6428,7 @@
       "label": "I62",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-i64",
@@ -6438,7 +6438,7 @@
       "label": "I64",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-i66",
@@ -6778,7 +6778,7 @@
       "label": "J59",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-j61",
@@ -6788,7 +6788,7 @@
       "label": "J61",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-j63",
@@ -6798,7 +6798,7 @@
       "label": "J63",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-j65",
@@ -7138,7 +7138,7 @@
       "label": "J60",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-j62",
@@ -7148,7 +7148,7 @@
       "label": "J62",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-j64",
@@ -7158,7 +7158,7 @@
       "label": "J64",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-j66",
@@ -7498,7 +7498,7 @@
       "label": "K59",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-k61",
@@ -7508,7 +7508,7 @@
       "label": "K61",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-k63",
@@ -7518,7 +7518,7 @@
       "label": "K63",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-k65",
@@ -7858,7 +7858,7 @@
       "label": "K60",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-k62",
@@ -7868,7 +7868,7 @@
       "label": "K62",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-k64",
@@ -7878,7 +7878,7 @@
       "label": "K64",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-k66",
@@ -8218,7 +8218,7 @@
       "label": "L59",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-l61",
@@ -8228,7 +8228,7 @@
       "label": "L61",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-l63",
@@ -8238,7 +8238,7 @@
       "label": "L63",
       "square": true,
       "status": "Available",
-      "category": "zone3"
+      "category": "zone4"
     },
     {
       "id": "seat-l65",
@@ -8461,186 +8461,6 @@
       "category": "zone2"
     },
     {
-      "id": "seat-l38",
-      "block": "right",
-      "x": 1330,
-      "y": 490,
-      "label": "L38",
-      "square": true,
-      "status": "Available",
-      "category": "zone3"
-    },
-    {
-      "id": "seat-l40",
-      "block": "right",
-      "x": 1360,
-      "y": 490,
-      "label": "L40",
-      "square": true,
-      "status": "Available",
-      "category": "zone3"
-    },
-    {
-      "id": "seat-l42",
-      "block": "right",
-      "x": 1390,
-      "y": 490,
-      "label": "L42",
-      "square": true,
-      "status": "Available",
-      "category": "zone3"
-    },
-    {
-      "id": "seat-l44",
-      "block": "right",
-      "x": 1420,
-      "y": 490,
-      "label": "L44",
-      "square": true,
-      "status": "Available",
-      "category": "zone3"
-    },
-    {
-      "id": "seat-l46",
-      "block": "right",
-      "x": 1450,
-      "y": 490,
-      "label": "L46",
-      "square": true,
-      "status": "Available",
-      "category": "zone3"
-    },
-    {
-      "id": "seat-l48",
-      "block": "right",
-      "x": 1480,
-      "y": 490,
-      "label": "L48",
-      "square": true,
-      "status": "Available",
-      "category": "zone3"
-    },
-    {
-      "id": "seat-l50",
-      "block": "right",
-      "x": 1510,
-      "y": 490,
-      "label": "L50",
-      "square": true,
-      "status": "Available",
-      "category": "zone3"
-    },
-    {
-      "id": "seat-l52",
-      "block": "right",
-      "x": 1540,
-      "y": 490,
-      "label": "L52",
-      "square": true,
-      "status": "Available",
-      "category": "zone3"
-    },
-    {
-      "id": "seat-l54",
-      "block": "right",
-      "x": 1570,
-      "y": 490,
-      "label": "L54",
-      "square": true,
-      "status": "Available",
-      "category": "zone3"
-    },
-    {
-      "id": "seat-l56",
-      "block": "right",
-      "x": 1600,
-      "y": 490,
-      "label": "L56",
-      "square": true,
-      "status": "Available",
-      "category": "zone3"
-    },
-    {
-      "id": "seat-l58",
-      "block": "right",
-      "x": 1630,
-      "y": 490,
-      "label": "L58",
-      "square": true,
-      "status": "Available",
-      "category": "zone3"
-    },
-    {
-      "id": "seat-l60",
-      "block": "right",
-      "x": 1660,
-      "y": 490,
-      "label": "L60",
-      "square": true,
-      "status": "Available",
-      "category": "zone3"
-    },
-    {
-      "id": "seat-l62",
-      "block": "right",
-      "x": 1690,
-      "y": 490,
-      "label": "L62",
-      "square": true,
-      "status": "Available",
-      "category": "zone3"
-    },
-    {
-      "id": "seat-l64",
-      "block": "right",
-      "x": 1720,
-      "y": 490,
-      "label": "L64",
-      "square": true,
-      "status": "Available",
-      "category": "zone3"
-    },
-    {
-      "id": "seat-l66",
-      "block": "right",
-      "x": 1750,
-      "y": 490,
-      "label": "L66",
-      "square": true,
-      "status": "Available",
-      "category": "zone4"
-    },
-    {
-      "id": "seat-l68",
-      "block": "right",
-      "x": 1780,
-      "y": 490,
-      "label": "L68",
-      "square": true,
-      "status": "Available",
-      "category": "zone4"
-    },
-    {
-      "id": "seat-l70",
-      "block": "right",
-      "x": 1810,
-      "y": 490,
-      "label": "L70",
-      "square": true,
-      "status": "Available",
-      "category": "zone4"
-    },
-    {
-      "id": "seat-l72",
-      "block": "right",
-      "x": 1840,
-      "y": 490,
-      "label": "L72",
-      "square": true,
-      "status": "Available",
-      "category": "zone4"
-    },
-    {
       "id": "seat-m16",
       "block": "center",
       "x": 460,
@@ -8688,7 +8508,7 @@
       "label": "M21",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m23",
@@ -8698,7 +8518,7 @@
       "label": "M23",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m25",
@@ -8708,7 +8528,7 @@
       "label": "M25",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m27",
@@ -8718,7 +8538,7 @@
       "label": "M27",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m29",
@@ -8728,7 +8548,7 @@
       "label": "M29",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m31",
@@ -8738,7 +8558,7 @@
       "label": "M31",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m33",
@@ -8748,7 +8568,7 @@
       "label": "M33",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m35",
@@ -8758,7 +8578,7 @@
       "label": "M35",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m37",
@@ -8768,7 +8588,7 @@
       "label": "M37",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m39",
@@ -8778,7 +8598,7 @@
       "label": "M39",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m41",
@@ -8788,7 +8608,7 @@
       "label": "M41",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m43",
@@ -8798,7 +8618,7 @@
       "label": "M43",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m45",
@@ -8868,7 +8688,7 @@
       "label": "M22",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m24",
@@ -8878,7 +8698,7 @@
       "label": "M24",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m26",
@@ -8888,7 +8708,7 @@
       "label": "M26",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m28",
@@ -8898,7 +8718,7 @@
       "label": "M28",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m30",
@@ -8908,7 +8728,7 @@
       "label": "M30",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m32",
@@ -8918,7 +8738,7 @@
       "label": "M32",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m34",
@@ -8928,7 +8748,7 @@
       "label": "M34",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m36",
@@ -8938,7 +8758,7 @@
       "label": "M36",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m38",
@@ -8948,7 +8768,7 @@
       "label": "M38",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m40",
@@ -8958,7 +8778,7 @@
       "label": "M40",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m42",
@@ -8968,7 +8788,7 @@
       "label": "M42",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m44",
@@ -8978,7 +8798,7 @@
       "label": "M44",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-m50",
@@ -9068,7 +8888,7 @@
       "label": "N21",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n23",
@@ -9078,7 +8898,7 @@
       "label": "N23",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n25",
@@ -9088,7 +8908,7 @@
       "label": "N25",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n27",
@@ -9098,7 +8918,7 @@
       "label": "N27",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n29",
@@ -9108,7 +8928,7 @@
       "label": "N29",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n31",
@@ -9118,7 +8938,7 @@
       "label": "N31",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n33",
@@ -9128,7 +8948,7 @@
       "label": "N33",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n35",
@@ -9138,7 +8958,7 @@
       "label": "N35",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n37",
@@ -9148,7 +8968,7 @@
       "label": "N37",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n39",
@@ -9158,7 +8978,7 @@
       "label": "N39",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n41",
@@ -9168,7 +8988,7 @@
       "label": "N41",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n43",
@@ -9178,7 +8998,7 @@
       "label": "N43",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n45",
@@ -9308,7 +9128,7 @@
       "label": "N22",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n24",
@@ -9318,7 +9138,7 @@
       "label": "N24",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n26",
@@ -9328,7 +9148,7 @@
       "label": "N26",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n28",
@@ -9338,7 +9158,7 @@
       "label": "N28",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n30",
@@ -9348,7 +9168,7 @@
       "label": "N30",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n32",
@@ -9358,7 +9178,7 @@
       "label": "N32",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n34",
@@ -9368,7 +9188,7 @@
       "label": "N34",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n36",
@@ -9378,7 +9198,7 @@
       "label": "N36",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n38",
@@ -9388,7 +9208,7 @@
       "label": "N38",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n40",
@@ -9398,7 +9218,7 @@
       "label": "N40",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n42",
@@ -9408,7 +9228,7 @@
       "label": "N42",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n44",
@@ -9418,7 +9238,7 @@
       "label": "N44",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-n50",
@@ -9548,7 +9368,7 @@
       "label": "O21",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o23",
@@ -9558,7 +9378,7 @@
       "label": "O23",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o25",
@@ -9568,7 +9388,7 @@
       "label": "O25",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o27",
@@ -9578,7 +9398,7 @@
       "label": "O27",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o29",
@@ -9588,7 +9408,7 @@
       "label": "O29",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o31",
@@ -9598,7 +9418,7 @@
       "label": "O31",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o33",
@@ -9608,7 +9428,7 @@
       "label": "O33",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o35",
@@ -9618,7 +9438,7 @@
       "label": "O35",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o37",
@@ -9628,7 +9448,7 @@
       "label": "O37",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o39",
@@ -9638,7 +9458,7 @@
       "label": "O39",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o41",
@@ -9648,7 +9468,7 @@
       "label": "O41",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o43",
@@ -9658,7 +9478,7 @@
       "label": "O43",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o45",
@@ -9788,7 +9608,7 @@
       "label": "O22",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o24",
@@ -9798,7 +9618,7 @@
       "label": "O24",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o26",
@@ -9808,7 +9628,7 @@
       "label": "O26",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o28",
@@ -9818,7 +9638,7 @@
       "label": "O28",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o30",
@@ -9828,7 +9648,7 @@
       "label": "O30",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o32",
@@ -9838,7 +9658,7 @@
       "label": "O32",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o34",
@@ -9848,7 +9668,7 @@
       "label": "O34",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o36",
@@ -9858,7 +9678,7 @@
       "label": "O36",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o38",
@@ -9868,7 +9688,7 @@
       "label": "O38",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o40",
@@ -9878,7 +9698,7 @@
       "label": "O40",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o42",
@@ -9888,7 +9708,7 @@
       "label": "O42",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o44",
@@ -9898,7 +9718,7 @@
       "label": "O44",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-o50",
@@ -10058,7 +9878,7 @@
       "label": "P21",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p23",
@@ -10068,7 +9888,7 @@
       "label": "P23",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p25",
@@ -10078,7 +9898,7 @@
       "label": "P25",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p27",
@@ -10088,7 +9908,7 @@
       "label": "P27",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p29",
@@ -10098,7 +9918,7 @@
       "label": "P29",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p31",
@@ -10108,7 +9928,7 @@
       "label": "P31",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p33",
@@ -10118,7 +9938,7 @@
       "label": "P33",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p35",
@@ -10128,7 +9948,7 @@
       "label": "P35",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p37",
@@ -10138,7 +9958,7 @@
       "label": "P37",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p39",
@@ -10148,7 +9968,7 @@
       "label": "P39",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p41",
@@ -10158,7 +9978,7 @@
       "label": "P41",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p43",
@@ -10168,7 +9988,7 @@
       "label": "P43",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p45",
@@ -10438,7 +10258,7 @@
       "label": "P22",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p24",
@@ -10448,7 +10268,7 @@
       "label": "P24",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p26",
@@ -10458,7 +10278,7 @@
       "label": "P26",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p28",
@@ -10468,7 +10288,7 @@
       "label": "P28",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p30",
@@ -10478,7 +10298,7 @@
       "label": "P30",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p32",
@@ -10488,7 +10308,7 @@
       "label": "P32",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p34",
@@ -10498,7 +10318,7 @@
       "label": "P34",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p36",
@@ -10508,7 +10328,7 @@
       "label": "P36",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p38",
@@ -10518,7 +10338,7 @@
       "label": "P38",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p40",
@@ -10528,7 +10348,7 @@
       "label": "P40",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p42",
@@ -10538,7 +10358,7 @@
       "label": "P42",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p44",
@@ -10548,7 +10368,7 @@
       "label": "P44",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-p50",
@@ -10818,7 +10638,7 @@
       "label": "Q21",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q23",
@@ -10828,7 +10648,7 @@
       "label": "Q23",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q25",
@@ -10838,7 +10658,7 @@
       "label": "Q25",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q27",
@@ -10848,7 +10668,7 @@
       "label": "Q27",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q29",
@@ -10858,7 +10678,7 @@
       "label": "Q29",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q31",
@@ -10868,7 +10688,7 @@
       "label": "Q31",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q33",
@@ -10878,7 +10698,7 @@
       "label": "Q33",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q35",
@@ -10888,7 +10708,7 @@
       "label": "Q35",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q37",
@@ -10898,7 +10718,7 @@
       "label": "Q37",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q39",
@@ -10908,7 +10728,7 @@
       "label": "Q39",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q41",
@@ -10918,7 +10738,7 @@
       "label": "Q41",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q43",
@@ -10928,7 +10748,7 @@
       "label": "Q43",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q45",
@@ -11208,7 +11028,7 @@
       "label": "Q22",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q24",
@@ -11218,7 +11038,7 @@
       "label": "Q24",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q26",
@@ -11228,7 +11048,7 @@
       "label": "Q26",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q28",
@@ -11238,7 +11058,7 @@
       "label": "Q28",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q30",
@@ -11248,7 +11068,7 @@
       "label": "Q30",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q32",
@@ -11258,7 +11078,7 @@
       "label": "Q32",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q34",
@@ -11268,7 +11088,7 @@
       "label": "Q34",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q36",
@@ -11278,7 +11098,7 @@
       "label": "Q36",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q38",
@@ -11288,7 +11108,7 @@
       "label": "Q38",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q40",
@@ -11298,7 +11118,7 @@
       "label": "Q40",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q42",
@@ -11308,7 +11128,7 @@
       "label": "Q42",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q44",
@@ -11318,7 +11138,7 @@
       "label": "Q44",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-q50",
@@ -11488,7 +11308,7 @@
       "label": "R21",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r23",
@@ -11498,7 +11318,7 @@
       "label": "R23",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r25",
@@ -11508,7 +11328,7 @@
       "label": "R25",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r27",
@@ -11518,7 +11338,7 @@
       "label": "R27",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r29",
@@ -11528,7 +11348,7 @@
       "label": "R29",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r31",
@@ -11538,7 +11358,7 @@
       "label": "R31",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r33",
@@ -11548,7 +11368,7 @@
       "label": "R33",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r35",
@@ -11558,7 +11378,7 @@
       "label": "R35",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r37",
@@ -11568,7 +11388,7 @@
       "label": "R37",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r39",
@@ -11578,7 +11398,7 @@
       "label": "R39",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r41",
@@ -11588,7 +11408,7 @@
       "label": "R41",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r43",
@@ -11598,7 +11418,7 @@
       "label": "R43",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r45",
@@ -11778,7 +11598,7 @@
       "label": "R22",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r24",
@@ -11788,7 +11608,7 @@
       "label": "R24",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r26",
@@ -11798,7 +11618,7 @@
       "label": "R26",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r28",
@@ -11808,7 +11628,7 @@
       "label": "R28",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r30",
@@ -11818,7 +11638,7 @@
       "label": "R30",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r32",
@@ -11828,7 +11648,7 @@
       "label": "R32",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r34",
@@ -11838,7 +11658,7 @@
       "label": "R34",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r36",
@@ -11848,7 +11668,7 @@
       "label": "R36",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r38",
@@ -11858,7 +11678,7 @@
       "label": "R38",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r40",
@@ -11868,7 +11688,7 @@
       "label": "R40",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r42",
@@ -11878,7 +11698,7 @@
       "label": "R42",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r44",
@@ -11888,7 +11708,7 @@
       "label": "R44",
       "square": true,
       "status": "Available",
-      "category": "zone2"
+      "category": "zone1"
     },
     {
       "id": "seat-r50",
@@ -13838,7 +13658,7 @@
       "label": "Y45",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y47",
@@ -13848,7 +13668,7 @@
       "label": "Y47",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y49",
@@ -13858,7 +13678,7 @@
       "label": "Y49",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y51",
@@ -13868,7 +13688,7 @@
       "label": "Y51",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y53",
@@ -13878,7 +13698,7 @@
       "label": "Y53",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y55",
@@ -13888,7 +13708,7 @@
       "label": "Y55",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y57",
@@ -13898,7 +13718,7 @@
       "label": "Y57",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y59",
@@ -13908,7 +13728,7 @@
       "label": "Y59",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y61",
@@ -13918,7 +13738,7 @@
       "label": "Y61",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y10",
@@ -14148,7 +13968,7 @@
       "label": "Y50",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y52",
@@ -14158,7 +13978,7 @@
       "label": "Y52",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y54",
@@ -14168,7 +13988,7 @@
       "label": "Y54",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y56",
@@ -14178,7 +13998,7 @@
       "label": "Y56",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y58",
@@ -14188,7 +14008,7 @@
       "label": "Y58",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y60",
@@ -14198,7 +14018,7 @@
       "label": "Y60",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y62",
@@ -14208,7 +14028,7 @@
       "label": "Y62",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y64",
@@ -14218,7 +14038,7 @@
       "label": "Y64",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-y66",
@@ -14228,7 +14048,7 @@
       "label": "Y66",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z11",
@@ -14238,7 +14058,7 @@
       "label": "Z11",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z12",
@@ -14248,7 +14068,7 @@
       "label": "Z12",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z13",
@@ -14258,7 +14078,7 @@
       "label": "Z13",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z14",
@@ -14268,7 +14088,7 @@
       "label": "Z14",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z15",
@@ -14278,7 +14098,7 @@
       "label": "Z15",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z16",
@@ -14288,7 +14108,7 @@
       "label": "Z16",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z17",
@@ -14298,7 +14118,7 @@
       "label": "Z17",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z18",
@@ -14308,27 +14128,27 @@
       "label": "Z18",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z19",
-      "block": "center",
+      "block": "zone3",
       "x": 370,
       "y": 1090,
       "label": "Z19",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z20",
-      "block": "center",
+      "block": "zone3",
       "x": 340,
       "y": 1090,
       "label": "Z20",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z21",
@@ -14338,7 +14158,7 @@
       "label": "Z21",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z23",
@@ -14348,7 +14168,7 @@
       "label": "Z23",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z25",
@@ -14358,7 +14178,7 @@
       "label": "Z25",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z27",
@@ -14368,7 +14188,7 @@
       "label": "Z27",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z29",
@@ -14378,7 +14198,7 @@
       "label": "Z29",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z31",
@@ -14388,7 +14208,7 @@
       "label": "Z31",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z33",
@@ -14398,7 +14218,7 @@
       "label": "Z33",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z35",
@@ -14408,7 +14228,7 @@
       "label": "Z35",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z37",
@@ -14418,7 +14238,7 @@
       "label": "Z37",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z39",
@@ -14428,7 +14248,7 @@
       "label": "Z39",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z41",
@@ -14438,7 +14258,7 @@
       "label": "Z41",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z43",
@@ -14448,7 +14268,7 @@
       "label": "Z43",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z45",
@@ -14458,7 +14278,7 @@
       "label": "Z45",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z47",
@@ -14468,7 +14288,7 @@
       "label": "Z47",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z49",
@@ -14478,7 +14298,7 @@
       "label": "Z49",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z51",
@@ -14488,7 +14308,7 @@
       "label": "Z51",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z53",
@@ -14498,7 +14318,7 @@
       "label": "Z53",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z55",
@@ -14508,7 +14328,7 @@
       "label": "Z55",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z57",
@@ -14518,7 +14338,7 @@
       "label": "Z57",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z59",
@@ -14528,7 +14348,7 @@
       "label": "Z59",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z61",
@@ -14538,7 +14358,7 @@
       "label": "Z61",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z10",
@@ -14548,7 +14368,7 @@
       "label": "Z10",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z9",
@@ -14558,7 +14378,7 @@
       "label": "Z9",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z8",
@@ -14568,7 +14388,7 @@
       "label": "Z8",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z7",
@@ -14578,7 +14398,7 @@
       "label": "Z7",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z6",
@@ -14588,7 +14408,7 @@
       "label": "Z6",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z5",
@@ -14598,7 +14418,7 @@
       "label": "Z5",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z4",
@@ -14608,7 +14428,7 @@
       "label": "Z4",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z3",
@@ -14618,7 +14438,7 @@
       "label": "Z3",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z2",
@@ -14628,7 +14448,7 @@
       "label": "Z2",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z1",
@@ -14638,7 +14458,7 @@
       "label": "Z1",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z22",
@@ -14648,7 +14468,7 @@
       "label": "Z22",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z24",
@@ -14658,7 +14478,7 @@
       "label": "Z24",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z26",
@@ -14668,7 +14488,7 @@
       "label": "Z26",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z28",
@@ -14678,7 +14498,7 @@
       "label": "Z28",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z30",
@@ -14688,7 +14508,7 @@
       "label": "Z30",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z32",
@@ -14698,7 +14518,7 @@
       "label": "Z32",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z34",
@@ -14708,7 +14528,7 @@
       "label": "Z34",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z36",
@@ -14718,7 +14538,7 @@
       "label": "Z36",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z38",
@@ -14728,7 +14548,7 @@
       "label": "Z38",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z40",
@@ -14738,7 +14558,7 @@
       "label": "Z40",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z42",
@@ -14748,7 +14568,7 @@
       "label": "Z42",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z44",
@@ -14758,7 +14578,7 @@
       "label": "Z44",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-z50",
@@ -14768,7 +14588,7 @@
       "label": "Z50",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z52",
@@ -14778,7 +14598,7 @@
       "label": "Z52",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z54",
@@ -14788,7 +14608,7 @@
       "label": "Z54",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z56",
@@ -14798,7 +14618,7 @@
       "label": "Z56",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z58",
@@ -14808,7 +14628,7 @@
       "label": "Z58",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z60",
@@ -14818,7 +14638,7 @@
       "label": "Z60",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z62",
@@ -14828,7 +14648,7 @@
       "label": "Z62",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z64",
@@ -14838,7 +14658,7 @@
       "label": "Z64",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-z66",
@@ -14848,7 +14668,7 @@
       "label": "Z66",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa11",
@@ -14858,7 +14678,7 @@
       "label": "AA11",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa12",
@@ -14868,7 +14688,7 @@
       "label": "AA12",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa13",
@@ -14878,7 +14698,7 @@
       "label": "AA13",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa14",
@@ -14888,7 +14708,7 @@
       "label": "AA14",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa15",
@@ -14898,7 +14718,7 @@
       "label": "AA15",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa16",
@@ -14908,7 +14728,7 @@
       "label": "AA16",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa17",
@@ -14918,7 +14738,7 @@
       "label": "AA17",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa18",
@@ -14928,7 +14748,7 @@
       "label": "AA18",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa19",
@@ -14938,7 +14758,7 @@
       "label": "AA19",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa20",
@@ -14948,7 +14768,7 @@
       "label": "AA20",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa21",
@@ -14958,7 +14778,7 @@
       "label": "AA21",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa23",
@@ -14968,7 +14788,7 @@
       "label": "AA23",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa25",
@@ -14978,7 +14798,7 @@
       "label": "AA25",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa27",
@@ -14988,7 +14808,7 @@
       "label": "AA27",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa29",
@@ -14998,7 +14818,7 @@
       "label": "AA29",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa31",
@@ -15008,7 +14828,7 @@
       "label": "AA31",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa33",
@@ -15018,7 +14838,7 @@
       "label": "AA33",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa35",
@@ -15028,7 +14848,7 @@
       "label": "AA35",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa37",
@@ -15038,7 +14858,7 @@
       "label": "AA37",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa39",
@@ -15048,7 +14868,7 @@
       "label": "AA39",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa41",
@@ -15058,7 +14878,7 @@
       "label": "AA41",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa43",
@@ -15068,7 +14888,7 @@
       "label": "AA43",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa45",
@@ -15078,7 +14898,7 @@
       "label": "AA45",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa47",
@@ -15088,7 +14908,7 @@
       "label": "AA47",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa49",
@@ -15098,7 +14918,7 @@
       "label": "AA49",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa51",
@@ -15108,7 +14928,7 @@
       "label": "AA51",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa53",
@@ -15118,7 +14938,7 @@
       "label": "AA53",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa55",
@@ -15128,7 +14948,7 @@
       "label": "AA55",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa57",
@@ -15138,7 +14958,7 @@
       "label": "AA57",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa59",
@@ -15148,7 +14968,7 @@
       "label": "AA59",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa61",
@@ -15158,7 +14978,7 @@
       "label": "AA61",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa10",
@@ -15168,7 +14988,7 @@
       "label": "AA10",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa9",
@@ -15178,7 +14998,7 @@
       "label": "AA9",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa8",
@@ -15188,7 +15008,7 @@
       "label": "AA8",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa7",
@@ -15198,7 +15018,7 @@
       "label": "AA7",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa6",
@@ -15208,7 +15028,7 @@
       "label": "AA6",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa5",
@@ -15218,7 +15038,7 @@
       "label": "AA5",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa4",
@@ -15228,7 +15048,7 @@
       "label": "AA4",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa3",
@@ -15238,7 +15058,7 @@
       "label": "AA3",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa2",
@@ -15248,7 +15068,7 @@
       "label": "AA2",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa1",
@@ -15258,7 +15078,7 @@
       "label": "AA1",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa22",
@@ -15268,7 +15088,7 @@
       "label": "AA22",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa24",
@@ -15278,7 +15098,7 @@
       "label": "AA24",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa26",
@@ -15288,7 +15108,7 @@
       "label": "AA26",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa28",
@@ -15298,7 +15118,7 @@
       "label": "AA28",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa30",
@@ -15308,7 +15128,7 @@
       "label": "AA30",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa32",
@@ -15318,7 +15138,7 @@
       "label": "AA32",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa34",
@@ -15328,7 +15148,7 @@
       "label": "AA34",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa36",
@@ -15338,7 +15158,7 @@
       "label": "AA36",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa38",
@@ -15348,7 +15168,7 @@
       "label": "AA38",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa40",
@@ -15358,7 +15178,7 @@
       "label": "AA40",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa42",
@@ -15368,7 +15188,7 @@
       "label": "AA42",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa44",
@@ -15378,7 +15198,7 @@
       "label": "AA44",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-aa50",
@@ -15388,7 +15208,7 @@
       "label": "AA50",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa52",
@@ -15398,7 +15218,7 @@
       "label": "AA52",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa54",
@@ -15408,7 +15228,7 @@
       "label": "AA54",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa56",
@@ -15418,7 +15238,7 @@
       "label": "AA56",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa58",
@@ -15428,7 +15248,7 @@
       "label": "AA58",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa60",
@@ -15438,7 +15258,7 @@
       "label": "AA60",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa62",
@@ -15448,7 +15268,7 @@
       "label": "AA62",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa64",
@@ -15458,7 +15278,7 @@
       "label": "AA64",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-aa66",
@@ -15468,7 +15288,7 @@
       "label": "AA66",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-ab11",
@@ -15478,7 +15298,7 @@
       "label": "AB11",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab12",
@@ -15488,7 +15308,7 @@
       "label": "AB12",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab13",
@@ -15498,7 +15318,7 @@
       "label": "AB13",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab14",
@@ -15508,7 +15328,7 @@
       "label": "AB14",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab15",
@@ -15518,7 +15338,7 @@
       "label": "AB15",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab16",
@@ -15528,7 +15348,7 @@
       "label": "AB16",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab17",
@@ -15538,7 +15358,7 @@
       "label": "AB17",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab18",
@@ -15548,7 +15368,7 @@
       "label": "AB18",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab19",
@@ -15558,7 +15378,7 @@
       "label": "AB19",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab20",
@@ -15568,7 +15388,7 @@
       "label": "AB20",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab23",
@@ -15578,7 +15398,7 @@
       "label": "AB23",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab25",
@@ -15588,7 +15408,7 @@
       "label": "AB25",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab27",
@@ -15598,7 +15418,7 @@
       "label": "AB27",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab29",
@@ -15608,7 +15428,7 @@
       "label": "AB29",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab31",
@@ -15618,7 +15438,7 @@
       "label": "AB31",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab33",
@@ -15628,7 +15448,7 @@
       "label": "AB33",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab35",
@@ -15638,7 +15458,7 @@
       "label": "AB35",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab37",
@@ -15648,7 +15468,7 @@
       "label": "AB37",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab39",
@@ -15658,7 +15478,7 @@
       "label": "AB39",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab41",
@@ -15668,7 +15488,7 @@
       "label": "AB41",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab43",
@@ -15678,7 +15498,7 @@
       "label": "AB43",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab45",
@@ -15688,7 +15508,7 @@
       "label": "AB45",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-ab51",
@@ -15698,7 +15518,7 @@
       "label": "AB51",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-ab53",
@@ -15708,7 +15528,7 @@
       "label": "AB53",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-ab55",
@@ -15718,7 +15538,7 @@
       "label": "AB55",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-ab57",
@@ -15728,7 +15548,7 @@
       "label": "AB57",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-ab59",
@@ -15738,7 +15558,7 @@
       "label": "AB59",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-ab61",
@@ -15748,7 +15568,7 @@
       "label": "AB61",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-ab10",
@@ -15758,7 +15578,7 @@
       "label": "AB10",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab9",
@@ -15768,7 +15588,7 @@
       "label": "AB9",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab8",
@@ -15778,7 +15598,7 @@
       "label": "AB8",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab7",
@@ -15788,7 +15608,7 @@
       "label": "AB7",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab6",
@@ -15798,7 +15618,7 @@
       "label": "AB6",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab5",
@@ -15808,7 +15628,7 @@
       "label": "AB5",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab4",
@@ -15818,7 +15638,7 @@
       "label": "AB4",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab3",
@@ -15828,7 +15648,7 @@
       "label": "AB3",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab2",
@@ -15838,7 +15658,7 @@
       "label": "AB2",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab1",
@@ -15848,7 +15668,7 @@
       "label": "AB1",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab24",
@@ -15858,7 +15678,7 @@
       "label": "AB24",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab26",
@@ -15868,7 +15688,7 @@
       "label": "AB26",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab28",
@@ -15878,7 +15698,7 @@
       "label": "AB28",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab30",
@@ -15888,7 +15708,7 @@
       "label": "AB30",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab32",
@@ -15898,7 +15718,7 @@
       "label": "AB32",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab34",
@@ -15908,7 +15728,7 @@
       "label": "AB34",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab36",
@@ -15918,7 +15738,7 @@
       "label": "AB36",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab38",
@@ -15928,7 +15748,7 @@
       "label": "AB38",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab40",
@@ -15938,7 +15758,7 @@
       "label": "AB40",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab42",
@@ -15948,7 +15768,7 @@
       "label": "AB42",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab44",
@@ -15958,7 +15778,7 @@
       "label": "AB44",
       "square": true,
       "status": "Available",
-      "category": "zone4"
+      "category": "zone3"
     },
     {
       "id": "seat-ab50",
@@ -15968,7 +15788,7 @@
       "label": "AB50",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-ab56",
@@ -15978,7 +15798,7 @@
       "label": "AB56",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-ab58",
@@ -15988,7 +15808,7 @@
       "label": "AB58",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-ab60",
@@ -15998,7 +15818,7 @@
       "label": "AB60",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-ab62",
@@ -16008,7 +15828,7 @@
       "label": "AB62",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-ab64",
@@ -16018,7 +15838,7 @@
       "label": "AB64",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     },
     {
       "id": "seat-ab66",
@@ -16028,7 +15848,7 @@
       "label": "AB66",
       "square": true,
       "status": "Available",
-      "category": "zone5"
+      "category": "zone4"
     }
   ],
   "texts": [
