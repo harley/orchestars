@@ -120,7 +120,8 @@
     "balcony": "Ban công",
     "ticketPrices": "Giá vé",
     "discountOnTotalOrderValue": "Áp dụng trên tổng giá trị đơn hàng",
-    "discountOnPerOrderItem": "Áp dụng trên từng vé"
+    "discountOnPerOrderItem": "Áp dụng trên từng vé",
+    "guideToPayment": "Sau khi chọn ghế, vui lòng cuộn xuống để giữ chỗ và tiến hành thanh toán."
   },
   "seatSelection": {
     "booking": "Đặt chỗ",
