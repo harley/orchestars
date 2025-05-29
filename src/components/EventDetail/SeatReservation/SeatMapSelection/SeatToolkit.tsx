@@ -15,6 +15,7 @@ import { useTranslate } from '@/providers/I18n/client'
 import { SelectedSeat } from '../../types'
 import { Event, Media, SeatingChart } from '@/payload-types'
 import { EventSeatChartData, SeatItemChart } from '../../types/SeatChart'
+import { splitTextAndNumber } from '@/utilities/splitTextAndNumberInSeat'
 
 const SeatMapToolkit = ({
   onSelectSeat,
@@ -103,27 +104,57 @@ const SeatMapToolkit = ({
   }, [unavailableSeats, selectedSeats, eventSeatChartData])
 
   const handleSeatClick = (seat: any) => {
-    const seatRowChar = seat.label[0]
-    const seatNumber = parseInt(seat.id.split('-')[1])
-
-    const selectedSeatNumbersInRow = seats
-      .filter(
-        (s) =>
-          (selectedSeats.some((sel) => sel.id === s.id) || s.status === SeatStatus.Reserved) &&
-          s.label?.[0] === seatRowChar,
-      )
-      .map((s) => parseInt(s.id.split('-')[1] ?? '0', 10))
-
-    const isSelectedSeatAdjacentToAnySeatInSeatsOnRow =
-      selectedSeatNumbersInRow.length === 0 ||
-      selectedSeatNumbersInRow.some((num) => Math.abs(num - seatNumber) === 1)
-    if (seat.status === SeatStatus.Available && !isSelectedSeatAdjacentToAnySeatInSeatsOnRow) {
-      setShowModal(true)
+    if (seat.status === SeatStatus.Unavailable || seat.status === SeatStatus.Locked) {
       return
     }
 
-    if (seat.status !== SeatStatus.Unavailable && seat.status !== SeatStatus.Locked) {
-      onSelectSeat?.(seat)
+    const seatRow = splitTextAndNumber(seat.label)?.text
+
+    if (!seatRow) return
+
+    const allSeatsInRow = seats
+      .filter((s) => splitTextAndNumber(s.label)?.text === seatRow)
+      .sort((a, b) => a.x - b.x)
+
+    const selectedInRow = selectedSeats
+      .filter((s) => splitTextAndNumber(s.label)?.text === seatRow)
+      .sort((a, b) => a.x - b.x)
+
+    const isSelected = selectedSeats.some((s) => s.id === seat.id)
+
+    if (!isSelected) {
+      // === SELECT LOGIC ===
+      if (selectedInRow.length === 0) {
+        onSelectSeat?.(seat)
+        return
+      }
+
+      const first = selectedInRow[0]
+      const last = selectedInRow[selectedInRow.length - 1]
+
+      const seatIndex = allSeatsInRow.findIndex((s) => s.id === seat.id)
+      const firstIndex = allSeatsInRow.findIndex((s) => s.id === first?.id)
+      const lastIndex = allSeatsInRow.findIndex((s) => s.id === last?.id)
+
+      const isAdjacent = seatIndex === firstIndex - 1 || seatIndex === lastIndex + 1
+
+      if (isAdjacent) {
+        onSelectSeat?.(seat)
+      } else {
+        setShowModal(true) // 🚨 Not adjacent, show modal
+      }
+    } else {
+      // === UNSELECT LOGIC ===
+      const selectedIndex = selectedInRow.findIndex((s) => s.id === seat.id)
+
+      if (selectedIndex === 0 || selectedIndex === selectedInRow.length - 1) {
+        const index = selectedSeats.findIndex((s) => s.id === seat.id)
+        if (index > -1) {
+          onSelectSeat?.(seat)
+        }
+      } else {
+        setShowModal(true) // Not first or last — show modal
+      }
     }
   }
 
@@ -147,9 +178,9 @@ const SeatMapToolkit = ({
         }}
         data={{
           name: 'Categorized Example',
+          seats: seats,
           categories: eventSeatChartData.categories,
           sections: eventSeatChartData.sections,
-          seats: eventSeatChartData.seats,
           text: eventSeatChartData.texts,
           shapes: eventSeatChartData.shapes,
           polylines: [],
