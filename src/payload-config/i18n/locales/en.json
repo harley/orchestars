@@ -132,7 +132,7 @@
     "total": "Total",
     "holdAndPay": "Hold Seat & Pay",
     "cannotSelectSeat": "Cannot select seat",
-    "noEmptySeats": "Please do not leave empty seats",
+    "noEmptySeats": "Please select adjacent seats and avoid leaving empty seats between selected ones in the same row",
     "close": "Close",
     "proceedToPayment": "Proceed to Payment"
   },

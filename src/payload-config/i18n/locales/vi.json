@@ -132,7 +132,7 @@
     "total": "Tổng",
     "holdAndPay": "Giữ chỗ và Thanh toán",
     "cannotSelectSeat": "Không chọn được ghế",
-    "noEmptySeats": "Xin quý khách vui lòng không bỏ trống ghế",
+    "noEmptySeats": "Vui lòng chọn các ghế liền kề nhau và không để trống ghế ở giữa trong cùng một hàng",
     "close": "Đóng",
     "proceedToPayment": "Tiến hành thanh toán"
   },
