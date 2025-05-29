@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 
 import { useToast } from '@/hooks/use-toast'
@@ -41,12 +41,11 @@ const SelectTicket = ({
   const [showCheckout, setShowCheckout] = useState(false)
 
   const [selectedSeats, setSelectedSeats] = useState<SelectedSeat[]>([])
-
-  const handleSeatSelect = (seat: SeatToolKitItem) => {
+  const handleSeatSelect = useCallback((seat: SeatToolKitItem) => {
     setSelectedSeats((prev) => {
       const existingSeat = prev.find((s) => s.id === seat.id)
       if (existingSeat) {
-        return prev.filter((s) => s.id !== seat.id)
+        return [...prev].filter((s) => s.id !== seat.id)
       } else {
         const ticketPrice = event.ticketPrices?.find(
           (t: any) => t.key === seat.category?.id,
@@ -54,7 +53,7 @@ const SelectTicket = ({
         return [...prev, { ...seat, ticketPrice, eventId: event.id }]
       }
     })
-  }
+  }, [event])
 
   const ticketSelected = useMemo(() => {
     return selectedSeats.reduce(
@@ -295,8 +294,8 @@ const SelectTicket = ({
           </div>
         </div>
 
-        <Dialog open={showCheckout} onOpenChange={handleCloseCheckoutModal}>
-          <DialogContent className="max-w-[90vw] w-full mx-auto my-4 h-[95vh] overflow-y-auto top-0 left-0 bottom-0 right-0 translate-x-0 translate-y-0 p-0">
+        <Dialog open={showCheckout} onOpenChange={handleCloseCheckoutModal} >
+          <DialogContent aria-describedby={undefined} className="max-w-[90vw] w-full mx-auto my-4 h-[95vh] overflow-y-auto top-0 left-0 bottom-0 right-0 translate-x-0 translate-y-0 p-0">
             <div className="flex flex-col h-full">
               {/* Header */}
               <div className="p-4 flex justify-between items-center">

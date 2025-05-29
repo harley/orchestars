@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 // import '@mezh-hq/react-seat-toolkit/styles'
 import SeatToolkit, { SeatStatus } from '@mezh-hq/react-seat-toolkit'
 import { Armchair, Loader2 } from 'lucide-react'
@@ -6,9 +6,10 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  DialogHeader,
+  // DialogHeader,
   DialogFooter,
   DialogClose,
+  DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useTranslate } from '@/providers/I18n/client'
@@ -103,6 +104,11 @@ const SeatMapToolkit = ({
     setLoadingMap(false)
   }, [unavailableSeats, selectedSeats, eventSeatChartData])
 
+  const selectedSeatsRef = useRef<SelectedSeat[]>([])
+  useEffect(() => {
+    selectedSeatsRef.current = selectedSeats
+  }, [selectedSeats])
+
   const handleSeatClick = (seat: any) => {
     if (seat.status === SeatStatus.Unavailable || seat.status === SeatStatus.Locked) {
       return
@@ -115,6 +121,8 @@ const SeatMapToolkit = ({
     const allSeatsInRow = seats
       .filter((s) => splitTextAndNumber(s.label)?.text === seatRow)
       .sort((a, b) => a.x - b.x)
+
+    const selectedSeats = selectedSeatsRef.current || []
 
     const selectedInRow = selectedSeats
       .filter((s) => splitTextAndNumber(s.label)?.text === seatRow)
@@ -177,7 +185,7 @@ const SeatMapToolkit = ({
           onSeatClick: handleSeatClick,
         }}
         data={{
-          name: 'Categorized Example',
+          name: 'Seat Map Selection',
           seats: seats,
           categories: eventSeatChartData.categories,
           sections: eventSeatChartData.sections,
@@ -195,13 +203,11 @@ const SeatMapToolkit = ({
         }}
       />
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('seatSelection.cannotSelectSeat')}</DialogTitle>
-          </DialogHeader>
-          <div>
-            <p>{t('seatSelection.noEmptySeats')}</p>
-          </div>
+        <DialogContent aria-describedby={undefined}>
+          <DialogTitle>{t('seatSelection.cannotSelectSeat')}</DialogTitle>
+          <DialogDescription className="text-base">
+            {t('seatSelection.noEmptySeats')}
+          </DialogDescription>
           <DialogFooter>
             <DialogClose asChild>
               <Button onClick={() => setShowModal(false)}>{t('seatSelection.close')}</Button>
