@@ -1,6 +1,5 @@
 import type { CollectionConfig } from 'payload'
 import { DISCOUNT_APPLY_SCOPE, DISCOUNT_APPLY_SCOPES } from './constants'
-// import { afterChangeStatus } from './hooks/afterChangeStatus'
 
 export const Promotions: CollectionConfig = {
   slug: 'promotions',

@@ -12,14 +12,16 @@ import { useForm } from 'react-hook-form'
 import { SelectedSeat } from '../../types'
 import { useToast } from '@/hooks/use-toast'
 import axios from 'axios'
-import { Event, Promotion } from '@/payload-types'
+import { Event, Promotion, PromotionConfig } from '@/payload-types'
 import { useTranslate } from '@/providers/I18n/client'
 
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 import { formatMoney } from '@/utilities/formatMoney'
 import ZalopayIcon from '@/components/Icons/Zalopay'
-import PromotionList from '../PromotionList'
-import { calculateTotalOrder } from './utils/calculateTotal'
+// import PromotionList from '../PromotionList'
+import { calculateMultiPromotionsTotalOrder, isAppliedPromotion } from './utils/calculateTotal'
+import PromotionListCheckbox from '../PromotionListCheckbox'
+import { cn } from '@/lib/utils'
 
 interface PaymentMethod {
   id: string
@@ -41,12 +43,14 @@ const ConfirmOrderModal = ({
   selectedSeats,
   promotions,
   eventScheduleId,
+  eventPromotionConfig,
 }: {
   event: Event
   onCloseModal: (options?: { resetSeat?: boolean }) => void
   selectedSeats: SelectedSeat[]
   promotions: Promotion[]
   eventScheduleId?: string
+  eventPromotionConfig?: PromotionConfig
 }) => {
   const { t } = useTranslate()
   const { toast } = useToast()
@@ -98,6 +102,12 @@ const ConfirmOrderModal = ({
     PAYMENT_METHODS.ZALOPAY,
   )
 
+  const isAllowApplyMultiplePromotions =
+    eventPromotionConfig?.validationRules?.allowApplyingMultiplePromotions
+  const maxAppliedPromotions = eventPromotionConfig?.validationRules?.maxAppliedPromotions || 1
+
+  const [selectedPromotions, setSelectedPromotions] = useState<Promotion[]>([])
+
   const {
     register,
     handleSubmit,
@@ -117,6 +127,7 @@ const ConfirmOrderModal = ({
         order: {
           currency: 'VND',
           promotionCode,
+          promotionCodes: selectedPromotions.map((promotion) => promotion.code),
           orderItems: selectedSeats.map((seat) => ({
             price: seat.ticketPrice?.price || 0,
             quantity: 1,
@@ -156,8 +167,15 @@ const ConfirmOrderModal = ({
   const [promotionCode, setPromotionCode] = useState<string>('')
 
   const [isSubmittingPromotionForm, setIsSubmittingPromotionForm] = useState<boolean>(false)
-  const [promotionInfo, setPromotionInfo] = useState<Promotion | null>(null)
   const checkPromotionCode = async () => {
+    if (selectedPromotions.length >= maxAppliedPromotions) {
+      return toast({
+        title: t('message.promotionFailed'),
+        description: t('event.maxPromotions', { count: maxAppliedPromotions }),
+        variant: 'destructive',
+      })
+    }
+
     try {
       if (!promotionCode) {
         return toast({
@@ -174,14 +192,19 @@ const ConfirmOrderModal = ({
         })
         .then((res) => res.data)
 
-      console.log('result', promotionInfo)
+      if (!isAppliedPromotion(promotionInfo, ticketSelected, event)) {
+        return toast({
+          title: t('message.promotionFailed'),
+          description: t('event.promotionNotMeetConditions'),
+          variant: 'destructive',
+        })
+      }
 
+      setSelectedPromotions([...selectedPromotions, promotionInfo])
       toast({
         title: t('message.promotionSuccess'),
         description: t('message.promotionApplied'),
       })
-
-      setPromotionInfo(promotionInfo)
     } catch (error: any) {
       const messageError = error?.response?.data?.message || t('message.invalidPromoCode')
       toast({
@@ -194,7 +217,13 @@ const ConfirmOrderModal = ({
     }
   }
 
-  const calculateTotal = calculateTotalOrder(promotionInfo, ticketSelected, event)
+  // const calculateTotal = calculateTotalOrder(promotionInfo, ticketSelected, event)
+
+  const calculateTotal = calculateMultiPromotionsTotalOrder(
+    selectedPromotions,
+    ticketSelected,
+    event,
+  )
 
   return (
     <form onSubmit={handleSubmit(handleConfirm)}>
@@ -298,7 +327,17 @@ const ConfirmOrderModal = ({
               ))}
             </div>
 
-            <PromotionList
+            <PromotionListCheckbox
+              promotions={promotions}
+              selectedPromotions={selectedPromotions}
+              onSelectPromotions={setSelectedPromotions}
+              isAllowApplyMultiplePromotions={!!isAllowApplyMultiplePromotions}
+              maxAppliedPromotions={maxAppliedPromotions}
+              event={event}
+              ticketSelected={ticketSelected}
+            />
+
+            {/* <PromotionList
               promotions={promotions}
               selectedPromotion={promotionInfo}
               onSelectPromotion={(promotion) => {
@@ -306,7 +345,7 @@ const ConfirmOrderModal = ({
 
                 setPromotionCode(promotion?.code || '')
               }}
-            />
+            /> */}
 
             <div className="mb-6">
               <Label htmlFor="promoCode">{t('event.enterPromoCode')}</Label>
@@ -329,32 +368,39 @@ const ConfirmOrderModal = ({
               </div>
             </div>
 
-            {promotionInfo &&
-              promotionInfo.code === promotionCode &&
+            {selectedPromotions.length > 0 &&
               (calculateTotal.canApplyPromoCode ? (
-                <div className="p-4 border rounded-md bg-green-50">
-                  <div className="flex md:flex-row flex-col justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Check className="h-5 w-5 text-green-600" />
-                      <span className="font-medium">
-                        {t('event.promoCode')}: {promotionCode}
-                      </span>
+                <div className="p-4 rounded-lg bg-green-50 border border-green-200 shadow-sm divide-y divide-green-100">
+                  {selectedPromotions.map((promotionInfo, index) => (
+                    <div
+                      key={promotionInfo.id}
+                      className={cn(
+                        'flex flex-col md:flex-row md:justify-between md:items-center gap-1 md:gap-4 pt-3',
+                        index === selectedPromotions.length - 1 ? '' : 'pb-3',
+                      )}
+                    >
+                      <div className="flex items-center gap-2 text-green-700 md:max-w-[166px] w-full">
+                        <Check className="h-5 w-5 text-green-600 shrink-0" />
+                        <span className="font-semibold text-sm md:text-base md:block flex gap-1">
+                          <span className='block'>{t('event.promoCode')}<span className='md:hidden'>:</span></span>
+                          <span className="font-medium">{promotionInfo.code}</span>
+                        </span>
+                      </div>
+                      <div className="text-green-700 font-medium text-sm md:text-base text-right md:text-left flex md:flex-col flex-row items-center md:items-end gap-1 md:pl-9 pl-7">
+                        <div>
+                          {promotionInfo.discountType === 'percentage'
+                            ? `${promotionInfo.discountValue}%`
+                            : formatMoney(promotionInfo.discountValue, 'VND')}
+                        </div>
+                        <div className="text-xs text-green-600 font-normal">
+                          {promotionInfo.discountApplyScope === 'total_order_value' &&
+                            `(${t('event.discountOnTotalOrderValue')})`}
+                          {promotionInfo.discountApplyScope === 'per_order_item' &&
+                            `(${t('event.discountOnPerOrderItem')})`}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-green-600 font-medium">
-                      <span>
-                        {promotionInfo.discountType === 'percentage'
-                          ? `${promotionInfo.discountValue}%`
-                          : `${formatMoney(promotionInfo.discountValue, 'VND')}`}
-                      </span>
-
-                      <span className="text-sm">
-                        {promotionInfo.discountApplyScope === 'total_order_value' &&
-                          ` (${t('event.discountOnTotalOrderValue')})`}
-                        {promotionInfo.discountApplyScope === 'per_order_item' &&
-                          ` (${t('event.discountOnPerOrderItem')})`}
-                      </span>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               ) : (
                 <div className="p-4 border rounded-md bg-red-200">

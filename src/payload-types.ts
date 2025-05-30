@@ -76,6 +76,7 @@ export interface Config {
     seatingCharts: SeatingChart;
     events: Event;
     promotions: Promotion;
+    promotionConfigs: PromotionConfig;
     userPromotionRedemptions: UserPromotionRedemption;
     orders: Order;
     orderItems: OrderItem;
@@ -111,6 +112,7 @@ export interface Config {
     seatingCharts: SeatingChartsSelect<false> | SeatingChartsSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     promotions: PromotionsSelect<false> | PromotionsSelect<true>;
+    promotionConfigs: PromotionConfigsSelect<false> | PromotionConfigsSelect<true>;
     userPromotionRedemptions: UserPromotionRedemptionsSelect<false> | UserPromotionRedemptionsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     orderItems: OrderItemsSelect<false> | OrderItemsSelect<true>;
@@ -1030,8 +1032,25 @@ export interface Order {
   category?: string | null;
   status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
   currency?: string | null;
+  /**
+   * Legacy field for a single promotion. Use "promotionsApplied" instead.
+   */
   promotion?: (number | null) | Promotion;
+  /**
+   * Legacy field for a single promotion. Use "promotionsApplied" instead.
+   */
   promotionCode?: string | null;
+  /**
+   * List of promotions applied to this order
+   */
+  promotionsApplied?:
+    | {
+        promotion: number | Promotion;
+        promotionCode: string;
+        discountAmount: number;
+        id?: string | null;
+      }[]
+    | null;
   totalBeforeDiscount?: number | null;
   totalDiscount?: number | null;
   total?: number | null;
@@ -1103,6 +1122,33 @@ export interface Admin {
   password?: string | null;
 }
 /**
+ * Configure rules and conditions for promotions
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promotionConfigs".
+ */
+export interface PromotionConfig {
+  id: number;
+  name: string;
+  description?: string | null;
+  /**
+   * If specified, this config will only apply to promotions for this event
+   */
+  event?: (number | null) | Event;
+  validationRules?: {
+    /**
+     * Allow applying multiple promotions to the same order
+     */
+    allowApplyingMultiplePromotions?: boolean | null;
+    maxAppliedPromotions?: number | null;
+  };
+  stackingRules?: {
+    isStackable?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "userPromotionRedemptions".
  */
@@ -1128,8 +1174,25 @@ export interface Payment {
   order: number | Order;
   paymentMethod?: string | null;
   currency?: string | null;
+  /**
+   * Legacy field for a single promotion. Use "promotionsApplied" instead.
+   */
   promotion?: (number | null) | Promotion;
+  /**
+   * Legacy field for a single promotion. Use "promotionsApplied" instead.
+   */
   promotionCode?: string | null;
+  /**
+   * List of promotions applied to this order
+   */
+  promotionsApplied?:
+    | {
+        promotion: number | Promotion;
+        promotionCode: string;
+        discountAmount: number;
+        id?: string | null;
+      }[]
+    | null;
   totalBeforeDiscount?: number | null;
   totalDiscount?: number | null;
   total: number;
@@ -1574,6 +1637,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'promotions';
         value: number | Promotion;
+      } | null)
+    | ({
+        relationTo: 'promotionConfigs';
+        value: number | PromotionConfig;
       } | null)
     | ({
         relationTo: 'userPromotionRedemptions';
@@ -2185,6 +2252,28 @@ export interface PromotionsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promotionConfigs_select".
+ */
+export interface PromotionConfigsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  event?: T;
+  validationRules?:
+    | T
+    | {
+        allowApplyingMultiplePromotions?: T;
+        maxAppliedPromotions?: T;
+      };
+  stackingRules?:
+    | T
+    | {
+        isStackable?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "userPromotionRedemptions_select".
  */
 export interface UserPromotionRedemptionsSelect<T extends boolean = true> {
@@ -2210,6 +2299,14 @@ export interface OrdersSelect<T extends boolean = true> {
   currency?: T;
   promotion?: T;
   promotionCode?: T;
+  promotionsApplied?:
+    | T
+    | {
+        promotion?: T;
+        promotionCode?: T;
+        discountAmount?: T;
+        id?: T;
+      };
   totalBeforeDiscount?: T;
   totalDiscount?: T;
   total?: T;
@@ -2246,6 +2343,14 @@ export interface PaymentsSelect<T extends boolean = true> {
   currency?: T;
   promotion?: T;
   promotionCode?: T;
+  promotionsApplied?:
+    | T
+    | {
+        promotion?: T;
+        promotionCode?: T;
+        discountAmount?: T;
+        id?: T;
+      };
   totalBeforeDiscount?: T;
   totalDiscount?: T;
   total?: T;

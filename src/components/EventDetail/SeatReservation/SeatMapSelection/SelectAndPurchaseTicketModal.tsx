@@ -169,7 +169,7 @@ const SelectAndPurchaseTicketModal = ({
     fetch(`/api/promotion?eventId=${event.id}`)
       .then((res) => res.json())
       .then((data) => {
-        setPromotions(data)
+        setPromotions(data?.promotions || [])
       })
       .catch((err) => {
         console.log('Error while fetching promotions', err)

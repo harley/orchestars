@@ -6,7 +6,7 @@ import { createOrderHandler } from './handler/createOrder'
 export const Orders: CollectionConfig = {
   slug: 'orders',
   access: {
-    create: () => false
+    create: () => false,
   },
   admin: {
     useAsTitle: 'orderCode',
@@ -33,8 +33,9 @@ export const Orders: CollectionConfig = {
       index: true,
       admin: {
         components: {
-          Field: '@/components/AdminViews/Order/SelectOrderCategory/SelectOrderCategoryPayloadComponent#SelectOrderCategory'
-        }
+          Field:
+            '@/components/AdminViews/Order/SelectOrderCategory/SelectOrderCategoryPayloadComponent#SelectOrderCategory',
+        },
       },
     },
     {
@@ -57,12 +58,48 @@ export const Orders: CollectionConfig = {
       relationTo: 'promotions',
       required: false,
       index: true,
+      admin: {
+        description: 'Legacy field for a single promotion. Use "promotionsApplied" instead.',
+      },
     },
     {
       name: 'promotionCode',
       type: 'text',
       required: false,
       index: true,
+      admin: {
+        description: 'Legacy field for a single promotion. Use "promotionsApplied" instead.',
+      },
+    },
+    {
+      name: 'promotionsApplied',
+      type: 'array',
+      required: false,
+      label: 'Applied Promotions',
+      admin: {
+        description: 'List of promotions applied to this order',
+      },
+      fields: [
+        {
+          name: 'promotion',
+          type: 'relationship',
+          relationTo: 'promotions',
+          required: true,
+          index: true,
+        },
+        {
+          name: 'promotionCode',
+          type: 'text',
+          required: true,
+          index: true,
+        },
+        {
+          name: 'discountAmount',
+          type: 'number',
+          required: true,
+          min: 0,
+        },
+      ],
     },
     {
       name: 'totalBeforeDiscount',
@@ -102,7 +139,6 @@ export const Orders: CollectionConfig = {
       relationTo: 'admins',
       index: true,
     },
-   
   ],
   endpoints: [
     {

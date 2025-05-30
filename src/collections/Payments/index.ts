@@ -36,12 +36,48 @@ export const Payments: CollectionConfig = {
       type: 'relationship',
       relationTo: 'promotions',
       required: false,
+      admin: {
+        description: 'Legacy field for a single promotion. Use "promotionsApplied" instead.',
+      },
     },
     {
       name: 'promotionCode',
       type: 'text',
       index: true,
       required: false,
+      admin: {
+        description: 'Legacy field for a single promotion. Use "promotionsApplied" instead.',
+      },
+    },
+    {
+      name: 'promotionsApplied',
+      type: 'array',
+      required: false,
+      label: 'Applied Promotions',
+      admin: {
+        description: 'List of promotions applied to this order',
+      },
+      fields: [
+        {
+          name: 'promotion',
+          type: 'relationship',
+          relationTo: 'promotions',
+          required: true,
+          index: true,
+        },
+        {
+          name: 'promotionCode',
+          type: 'text',
+          required: true,
+          index: true,
+        },
+        {
+          name: 'discountAmount',
+          type: 'number',
+          required: true,
+          min: 0,
+        },
+      ],
     },
     {
       name: 'totalBeforeDiscount',
