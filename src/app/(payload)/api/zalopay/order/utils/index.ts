@@ -7,7 +7,7 @@ import { ZALO_PAYMENT } from '@/config/payment'
 import { Order, User } from '@/payload-types'
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 
-import { CustomerInfo, NewOrderItem } from '@/app/(payload)/api/bank-transfer/order/types'
+import { CustomerInfo, NewOrderItem, PromotionApplied } from '@/app/(payload)/api/bank-transfer/order/types'
 import { cookies } from 'next/headers'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 
@@ -94,6 +94,7 @@ export const createPayment = async ({
   totalBeforeDiscount,
   promotionCode,
   promotionId,
+  promotionsApplied,
   totalDiscount,
   transactionID,
   expireAt,
@@ -107,6 +108,7 @@ export const createPayment = async ({
   totalBeforeDiscount: number
   promotionId?: number
   promotionCode?: string
+  promotionsApplied?: PromotionApplied[]
   totalDiscount?: number
   expireAt: Date
   transactionID: number | Promise<number | string> | string
@@ -121,6 +123,7 @@ export const createPayment = async ({
       currency,
       promotionCode,
       promotion: promotionId,
+      promotionsApplied,
       totalBeforeDiscount,
       totalDiscount,
       total: zaloPayOrder.amount,
@@ -140,6 +143,7 @@ export const createPayment = async ({
       },
     },
     req: { transactionID },
+    depth: 0,
   })
 }
 
@@ -166,6 +170,7 @@ export const createMarketingTrackingOrder = async ({ newOrder }: { newOrder: Ord
           utmContent,
           conversionType: 'order_booked',
         },
+        depth: 0,
       })
       console.log('Marketing tracking entry created for order:', newOrder.id)
     }

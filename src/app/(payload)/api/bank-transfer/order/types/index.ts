@@ -20,8 +20,15 @@ export interface NewInputOrder {
   currency: string
   orderItems: NewOrderItem[]
   promotionCode?: string
+  promotionCodes?: string[]
 }
 
 export interface BankTransferTransaction {
   code: string
+}
+
+export type PromotionApplied = {
+  promotion: number
+  promotionCode: string
+  discountAmount: number
 }

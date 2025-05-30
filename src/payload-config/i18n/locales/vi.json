@@ -121,7 +121,8 @@
     "ticketPrices": "Giá vé",
     "discountOnTotalOrderValue": "Áp dụng trên tổng giá trị đơn hàng",
     "discountOnPerOrderItem": "Áp dụng trên từng vé",
-    "guideToPayment": "Sau khi chọn ghế, vui lòng cuộn xuống để giữ chỗ và tiến hành thanh toán."
+    "guideToPayment": "Sau khi chọn ghế, vui lòng cuộn xuống để giữ chỗ và tiến hành thanh toán.",
+    "maxPromotions": "Bạn chỉ có thể áp dụng tối đa {{count}} mã giảm giá"
   },
   "seatSelection": {
     "booking": "Đặt chỗ",
@@ -151,13 +152,16 @@
   "errorCode": {
     "SYS001": "Có lỗi xảy ra! Vui lòng thử lại",
     "PROMO001": "Mã giảm giá không được để trống",
-    "PROMO002": "Mã giảm giá không hợp lệ",
-    "PROMO003": "Mã giảm giá đã hết lượt sử dụng",
+    "PROMO002": "Mã giảm giá {{promotionCode}} không hợp lệ",
+    "PROMO003": "Mã giảm giá {{promotionCode}} đã hết lượt sử dụng",
     "PROMO004": "Không thể dùng mã giảm giá trước thời gian quy định",
     "PROMO005": "Mã giảm giá đã hết hạn",
     "PROMO006": "Chưa thoả mãn số lượng vé tối thiểu để áp dụng mã giảm giá",
-    "PROMO007": "Bạn đã dùng hết số lượt được áp dụng cho giảm giá {{promotionCode}} này",
+    "PROMO007": "Bạn đã dùng hết số lượt được áp dụng cho giảm giá {{promotionCode}}",
     "PROMO008": "Chưa thoả mãn số lượng vé tối thiểu để áp dụng mã giảm giá {{promotionCode}}",
+    "PROMO009": "Không thể áp dụng nhiều mã giảm giá cho một đơn hàng", 
+    "PROMO010": "Chỉ cho phép áp dụng tối đa {{maxAppliedPromotions}} mã giảm giá cho một đơn hàng",
+    "PROMO011": "Mã giảm giá {{promotionCodes}} không hợp lệ",
     "EVT001": "Sự kiện không được để trống",
     "EVT002": "Sự kiện không tồn tại",
     "EVT003": "Sự kiện chưa được mở bán",

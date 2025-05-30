@@ -53,6 +53,7 @@ import * as migration_20250524_133051_add_authentication_user from './20250524_1
 import * as migration_20250527_035818_add_seating_chart from './20250527_035818_add_seating_chart';
 import * as migration_20250527_170646_add_category_order from './20250527_170646_add_category_order';
 import * as migration_20250528_161621_add_marketing_tracking from './20250528_161621_add_marketing_tracking';
+import * as migration_20250530_165258_support_multi_promotion_codes from './20250530_165258_support_multi_promotion_codes';
 
 export const migrations = [
   {
@@ -328,6 +329,11 @@ export const migrations = [
   {
     up: migration_20250528_161621_add_marketing_tracking.up,
     down: migration_20250528_161621_add_marketing_tracking.down,
-    name: '20250528_161621_add_marketing_tracking'
+    name: '20250528_161621_add_marketing_tracking',
+  },
+  {
+    up: migration_20250530_165258_support_multi_promotion_codes.up,
+    down: migration_20250530_165258_support_multi_promotion_codes.down,
+    name: '20250530_165258_support_multi_promotion_codes'
   },
 ];

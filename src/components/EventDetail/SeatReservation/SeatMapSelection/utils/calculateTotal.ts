@@ -1,6 +1,6 @@
 import { Event, Promotion } from '@/payload-types'
 
-type TicketSelected = Record<
+export type TicketSelected = Record<
   string,
   {
     id: string
@@ -62,6 +62,20 @@ export const calculateTotalOrder = (
   }
 
   return calculateTotalAmount(ticketSelected)
+}
+
+export const isAppliedPromotion = (
+  promotionInfo: Promotion,
+  ticketSelected: TicketSelected,
+  event: Event,
+) => {
+  const appliedTicketClasses = promotionInfo?.appliedTicketClasses || []
+  const totalQuantityAppliedTicketClasses = calculateTotalQuantity(
+    ticketSelected,
+    event,
+    appliedTicketClasses,
+  )
+  return canApplyPromotion(promotionInfo, totalQuantityAppliedTicketClasses)
 }
 
 export function calculateTotalAmount(ticketSelected: TicketSelected) {
@@ -161,4 +175,33 @@ function isTicketApplied(
     appliedTicketClasses.length === 0 ||
     appliedTicketClasses.some((applied) => applied.ticketClass === ticketName)
   )
+}
+
+export const calculateMultiPromotionsTotalOrder = (
+  promotions: Promotion[],
+  ticketSelected: TicketSelected,
+  event: Event,
+) => {
+  if (!promotions?.length) {
+    return calculateTotalOrder(null, ticketSelected, event)
+  }
+  let amountBeforeDiscount = 0
+  let amount = 0
+  let canApplyPromoCode = false
+  let totalDiscount = 0
+
+  for (const promotion of promotions) {
+    const {
+      amountBeforeDiscount: amountBeforeDiscountPromo,
+      amount: amountPromo,
+      canApplyPromoCode: canApplyPromoCodePromo,
+    } = calculateTotalOrder(promotion, ticketSelected, event)
+    amountBeforeDiscount = amountBeforeDiscount || amountBeforeDiscountPromo
+    totalDiscount += amountBeforeDiscountPromo - amountPromo
+    canApplyPromoCode = canApplyPromoCode || canApplyPromoCodePromo
+  }
+
+  amount = amountBeforeDiscount - totalDiscount
+
+  return { amountBeforeDiscount, amount, canApplyPromoCode }
 }

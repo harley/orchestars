@@ -39,6 +39,7 @@ import { emailAdapter } from './payload-config/email'
 import { IS_LOCAL_DEVELOPMENT } from './config/app'
 import { SeatingCharts } from './collections/SeatingCharts'
 import { MarketingTracking } from './collections/MarketingTracking'
+import { PromotionConfigs } from './collections/Promotion/PromotionConfigs'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -117,6 +118,7 @@ export default buildConfig({
     SeatingCharts,
     Events,
     Promotions,
+    PromotionConfigs,
     UserPromotionRedemptions,
     Orders,
     OrderItems,

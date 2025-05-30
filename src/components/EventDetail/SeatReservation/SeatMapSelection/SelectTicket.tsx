@@ -8,7 +8,7 @@ import { ArrowLeft, Clock, Loader2, MapPin } from 'lucide-react'
 import { SeatToolKitItem, SelectedSeat, TicketPrice } from '../../types'
 import SeatMapToolkit from './SeatToolkit'
 import ConfirmOrderModal from './ConfirmOrderModal'
-import { Event, Promotion } from '@/payload-types'
+import { Event, Promotion, PromotionConfig } from '@/payload-types'
 import { useRouter } from 'next/navigation'
 import { getCookie, setCookie } from '@/utilities/clientCookies'
 import axios from 'axios'
@@ -149,6 +149,7 @@ const SelectTicket = ({
   }
 
   const [promotions, setPromotions] = useState<Promotion[]>([])
+  const [eventPromotionConfig, setEventPromotionConfig] = useState<PromotionConfig>()
 
   const handleCloseCheckoutModal = () => {
     if (showCheckout) {
@@ -161,7 +162,8 @@ const SelectTicket = ({
     fetch(`/api/promotion?eventId=${event.id}`)
       .then((res) => res.json())
       .then((data) => {
-        setPromotions(data)
+        setPromotions(data?.promotions || [])
+        setEventPromotionConfig(data?.eventPromotionConfig)
       })
       .catch((err) => {
         console.log('Error while fetching promotions', err)
@@ -325,6 +327,7 @@ const SelectTicket = ({
                 event={event}
                 promotions={promotions}
                 eventScheduleId={eventScheduleId}
+                eventPromotionConfig={eventPromotionConfig}
               />
             </div>
           </DialogContent>

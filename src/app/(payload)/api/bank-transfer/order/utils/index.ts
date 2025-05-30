@@ -1,5 +1,5 @@
 import { BasePayload } from 'payload'
-import { CustomerInfo, NewOrderItem, NewOrderItemWithBookingType } from '../types'
+import { CustomerInfo, NewOrderItem, NewOrderItemWithBookingType, PromotionApplied } from '../types'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { Event, Payment, Promotion, User } from '@/payload-types'
@@ -28,7 +28,7 @@ export const checkBookedOrPendingPaymentSeats = async ({
   let seatCondition = sql``
   if (seats?.length) {
     seatCondition = sql`AND ticket.seat = ANY(${sql.raw(
-      `ARRAY[${seats.map(s => `'${s.replace(/'/g, "''")}'`).join(',')}]::text[]`
+      `ARRAY[${seats.map((s) => `'${s.replace(/'/g, "''")}'`).join(',')}]::text[]`,
     )})`
   }
 
@@ -515,6 +515,135 @@ export const createOrderAndTickets = async ({
   return { newOrder }
 }
 
+export const createOrderWithMultiplePromotionsAndTickets = async ({
+  orderCode,
+  amount,
+  totalBeforeDiscount,
+  totalDiscount,
+  promotionsApplied,
+  customerData,
+  customerInput,
+  orderItems,
+  events,
+  transactionID,
+  currency,
+  expireAt,
+  payload,
+}: {
+  orderCode: string
+  amount: number
+  totalBeforeDiscount: number
+  totalDiscount: number
+  promotionsApplied?: PromotionApplied[]
+  customerData: User
+  customerInput: CustomerInfo
+  orderItems: NewOrderItemWithBookingType[]
+  events: Event[]
+  transactionID: number | Promise<number | string> | string
+  currency: string
+  expireAt: Date
+  payload: BasePayload
+}) => {
+  const mapObjectEvents = events.reduce(
+    (evtObj, event) => {
+      evtObj[event.id] = event
+
+      return evtObj
+    },
+    {} as Record<string, Event>,
+  )
+
+  const newOrder = await payload.create({
+    collection: 'orders',
+    data: {
+      orderCode,
+      user: customerData.id,
+      status: 'processing',
+      totalBeforeDiscount,
+      totalDiscount,
+      total: amount,
+      promotionsApplied,
+      customerData: customerInput as Record<string, any>,
+      currency,
+      expireAt: expireAt.toISOString(),
+    },
+    req: { transactionID },
+    depth: 0,
+  })
+
+  // create order items
+  const orderItemPromises = orderItems.map((item) => {
+    const event = mapObjectEvents[item.eventId]
+    const ticketPriceInfo = event?.ticketPrices?.find(
+      (ticketPrice: any) => ticketPrice.id === item.ticketPriceId,
+    )
+
+    if (!ticketPriceInfo) {
+      throw new Error('TICK004')
+    }
+
+    return payload.create({
+      collection: 'orderItems',
+      data: {
+        event: item.eventId,
+        ticketPriceId: item.ticketPriceId,
+        ticketPriceName: ticketPriceInfo.name,
+        seat: item.seat,
+        order: newOrder.id,
+        price: ticketPriceInfo.price as number,
+        quantity: 1, // for booking seat, quantity always 1
+      },
+      req: { transactionID },
+      depth: 0,
+    })
+  })
+  const newOrderItems = await Promise.all(orderItemPromises)
+
+  const ticketPromises = orderItems.map(async (itemInput) => {
+    const event = mapObjectEvents[itemInput.eventId]
+    const ticketPriceInfo = event?.ticketPrices?.find(
+      (ticketPrice: any) => ticketPrice.id === itemInput.ticketPriceId,
+    )
+
+    const orderItem = newOrderItems.find(
+      (nOrderItem) =>
+        nOrderItem.ticketPriceId === itemInput.ticketPriceId && nOrderItem.seat === itemInput.seat,
+    )
+
+    if (!orderItem) {
+      throw new Error('ORD005')
+    }
+
+    return payload.create({
+      collection: 'tickets',
+      data: {
+        ticketCode: generateCode('TK'),
+        attendeeName: `${customerData.firstName} ${customerData.lastName}`,
+        seat: itemInput.seat,
+        status: 'pending_payment',
+        ticketPriceInfo: {
+          ...(ticketPriceInfo || {}),
+          ticketPriceId: ticketPriceInfo?.id,
+          name: ticketPriceInfo?.name,
+          price: ticketPriceInfo?.price,
+        },
+        ticketPriceName: ticketPriceInfo?.name,
+        event: itemInput.eventId,
+        eventScheduleId: itemInput.eventScheduleId,
+        orderItem: orderItem?.id,
+        user: customerData.id,
+        order: newOrder.id,
+      },
+      req: { transactionID },
+      depth: 0,
+    })
+  })
+
+  await Promise.all(ticketPromises)
+
+  return { newOrder }
+}
+
 export const createOrderAndTicketsWithTicketClassType = async ({
   orderCode,
   customerData,
@@ -666,15 +795,16 @@ export const checkPromotionCode = async ({
         event: { equals: eventId },
         code: { equals: promotionCode.toUpperCase() },
       },
+      depth: 0
     })
     .then((res) => res.docs?.[0])
 
   if (!promotion) {
-    throw new Error('PROMO002')
+    throw new Error(`PROMO002|${JSON.stringify({ promotionCode: promotionCode })}`)
   }
 
   if (!promotion.maxRedemptions) {
-    throw new Error('PROMO002')
+    throw new Error(`PROMO002|${JSON.stringify({ promotionCode: promotionCode })}`)
   }
   const currentTime = new Date()
   if (promotion.startDate && isAfter(promotion.startDate, currentTime)) {
@@ -699,7 +829,7 @@ export const checkPromotionCode = async ({
     promotion.maxRedemptions - (promotion.totalUsed || 0) - userPromotionsPendingPayment
 
   if (remainNumberRedemption <= 0) {
-    throw new Error('PROMO003')
+    throw new Error(`PROMO003|${JSON.stringify({ promotionCode: promotion.code })}`)
   }
 
   const countTotalCurrentUserRedemption = await payload
@@ -952,6 +1082,7 @@ export const createUserPromotionRedemption = async ({
       status: 'pending',
     },
     req: { transactionID },
+    depth: 0,
   })
 }
 
