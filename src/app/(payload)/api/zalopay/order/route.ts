@@ -499,6 +499,8 @@ const createNewOrderWithMultiPromotions = async ({
       throw new Error(`PROMO010|${JSON.stringify({ maxAppliedPromotions })}`)
     }
 
+    // todo handle stackingRules
+
     for (const promotion of promotions) {
       if (promotion.conditions?.isApplyCondition) {
         const appliedTicketClasses = promotion?.appliedTicketClasses || []
