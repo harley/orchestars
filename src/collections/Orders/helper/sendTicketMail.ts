@@ -1,6 +1,7 @@
 import { sendMailAndWriteLog } from '@/collections/Emails/utils'
 import { EMAIL_CC } from '@/config/email'
-import { generateTicketBookEmailHtml } from '@/mail/templates/TicketBookedEmail'
+// import { generateTicketBookEmailHtml } from '@/mail/templates/TicketBookedEmail'
+import { generateTicketDisneyEventBookEmailHtml } from '@/mail/templates/TicketDisneyEventBookedEmail'
 import { Event, User } from '@/payload-types'
 import { BasePayload } from 'payload'
 
@@ -12,15 +13,16 @@ export const sendTicketMail = async ({
 }: {
   event: Event
   user: User
-  ticketData: { ticketId: number; ticketCode: string; seat: string; eventDate: string }[]
+  ticketData: { ticketId: number; ticketCode: string; seat: string; eventDate: string; eventLocation?: string }[]
   payload: BasePayload
 }) => {
   for (const data of ticketData) {
-    const html = await generateTicketBookEmailHtml({
+    const html = await generateTicketDisneyEventBookEmailHtml({
       ticketCode: data.ticketCode,
       seat: data.seat,
       eventName: event.title || '',
       eventDate: data.eventDate,
+      eventLocation: data.eventLocation
     })
 
     await new Promise((resolve) => setTimeout(resolve, 1000)) // Delay of 1 second
