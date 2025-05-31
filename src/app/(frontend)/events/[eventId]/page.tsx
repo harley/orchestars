@@ -28,6 +28,16 @@ import { getServerSideURL } from '@/utilities/getURL'
 export const revalidate = 86400 // 24 hours
 export const dynamicParams = true
 
+function encodeImagePath(path: string): string {
+  const segments = path.split('/');
+  const encodedSegments = segments.map((segment, index) => {
+    // Encode only the last part (the filename)
+    return index === segments.length - 1 ? encodeURIComponent(segment) : segment;
+  });
+  return encodedSegments.join('/');
+}
+
+
 export async function generateMetadata(
   props: {
     params: Promise<{ eventId: string }>
@@ -50,16 +60,24 @@ export async function generateMetadata(
   const previousImages = (await parent).openGraph?.images || []
 
   let imageUrl =
-    (eventDetail.eventThumbnail as Media)?.url || (eventDetail.eventBanner as Media)?.url || ''
+    (eventDetail.eventBanner as Media)?.sizes?.og?.url || (eventDetail.eventBanner as Media)?.url || ''
 
   if (imageUrl) {
-    imageUrl = `${getServerSideURL()}${imageUrl}`
+    const encodedPath = encodeImagePath(imageUrl);
+    imageUrl = `${getServerSideURL()}${encodedPath}`
+  }
+
+  const images = []
+  if (imageUrl) {
+    images.push({ url: imageUrl })
+  } else {
+    images.push(...previousImages)
   }
 
   const openGraph = mergeOpenGraph({
     title: eventDetail.title || undefined,
     description: eventDetail.description || undefined,
-    images: [...(imageUrl ? [{ url: imageUrl }] : []), ...previousImages],
+    images,
   })
 
   const metadata: Metadata = {
