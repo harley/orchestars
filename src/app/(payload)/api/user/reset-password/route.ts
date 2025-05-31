@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       !user.resetPasswordExpiration ||
       new Date(user.resetPasswordExpiration) < new Date()
     ) {
-      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 })
+      return NextResponse.json({ message: 'Invalid or expired token' }, { status: 400 })
     }
     // Generate new salt and hash for the new password
     const salt = await generateSalt()
@@ -49,6 +49,6 @@ export async function POST(req: NextRequest) {
     })
   } catch (err) {
     console.error('Reset password error', err)
-    return NextResponse.json({ error: 'Failed to reset password' }, { status: 500 })
+    return NextResponse.json({ message: 'Failed to reset password' }, { status: 500 })
   }
 }

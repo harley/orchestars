@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
     console.error('Error while fetching user events:', error)
     return NextResponse.json(
       {
-        error: 'Failed to fetch events',
+        message: 'Failed to fetch events',
         details: error.message,
       },
       { status: 500 },

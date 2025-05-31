@@ -38,7 +38,7 @@ export default function ForgotPasswordForm({ onBackToLogin, mode = 'forgotPasswo
       } else {
         const err = await res.json()
         toast({
-          title: err.error || t('auth.failedToSendRequest'),
+          title: err.message || t('auth.failedToSendRequest'),
           description: err.message || '', // Use message from API response
           variant: 'destructive',
         })

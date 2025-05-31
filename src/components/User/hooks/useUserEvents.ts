@@ -38,7 +38,7 @@ export function useUserEvents() {
 
       if (!response.ok) {
         console.error('Failed to fetch events', data)
-        throw new Error((data as any)?.error || 'Failed to fetch events')
+        throw new Error((data as any)?.message || 'Failed to fetch events')
       }
 
       // Cache the response

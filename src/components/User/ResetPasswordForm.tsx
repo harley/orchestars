@@ -106,7 +106,7 @@ export default function ResetPasswordForm({ initialToken }: ResetPasswordFormPro
         })
         setError('confirmPassword', { type: 'manual', message: '' }) // Clear confirm password error if password error is set
         toast({
-          title: err.error || t('auth.failedToResetPassword'),
+          title: err.message || t('auth.failedToResetPassword'),
           description: err.message || t('auth.somethingWentWrong'),
           variant: 'destructive',
         })

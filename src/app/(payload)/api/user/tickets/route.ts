@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
     console.error('Error while fetching user tickets:', error)
     return NextResponse.json(
       {
-        error: 'Failed to fetch tickets',
+        message: 'Failed to fetch tickets',
         details: error.message,
       },
       { status: 500 },

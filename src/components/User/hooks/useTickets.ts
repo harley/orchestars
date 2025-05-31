@@ -47,7 +47,7 @@ export function useTickets({ type }: UseTicketsProps) {
 
       if (!response.ok) {
         console.error('Failed to fetch tickets', data)
-        throw new Error((data as any)?.error || 'Failed to fetch tickets')
+        throw new Error((data as any)?.message || 'Failed to fetch tickets')
       }
 
       // Cache the response
