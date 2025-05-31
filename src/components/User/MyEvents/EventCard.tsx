@@ -13,7 +13,7 @@ const EventCard = ({ event }: EventCardProps) => {
   const formattedTime = eventDate ? format(eventDate, 'HH:mm') : ''
 
   return (
-    <Link href={`/event/${event.slug}`} className="block">
+    <Link href={`/events/${event.slug}`} className="block">
       <div className="group relative overflow-hidden rounded-lg bg-white shadow-md transition-all hover:shadow-lg">
         <div className="aspect-[16/9] relative">
           {(event?.eventThumbnail as Media)?.url || (event?.eventBanner as Media)?.url ? (

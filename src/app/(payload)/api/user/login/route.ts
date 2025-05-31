@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     const { email, password } = body
 
     if (!email || !password) {
-      return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
+      return NextResponse.json({ message: 'Email and password are required' }, { status: 400 })
     }
 
     // Find user by email
@@ -23,13 +23,13 @@ export async function POST(req: NextRequest) {
     })
     const user = userRes.docs[0]
     if (!user || !user.salt || !user.hash) {
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
+      return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 })
     }
 
     // Verify password
     const valid = await verifyPassword(password, user.salt, user.hash)
     if (!valid) {
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
+      return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 })
     }
 
     await signJwtToken({
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     console.error('Error while logging in', error)
     return NextResponse.json(
       {
-        error: 'Authentication failed',
+        message: 'Authentication failed',
         details: error.message,
       },
       { status: 500 },

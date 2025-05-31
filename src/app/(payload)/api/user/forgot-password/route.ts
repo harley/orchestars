@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { sendMailAndWriteLog } from '@/collections/Emails/utils'
-import { EMAIL_CC } from '@/config/email'
 import { getServerSideURL } from '@/utilities/getURL'
 
 function generateResetToken(length = 48) {
@@ -17,7 +16,7 @@ export async function POST(req: NextRequest) {
   try {
     const { email } = await req.json()
     if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 })
+      return NextResponse.json({ message: 'Email is required' }, { status: 400 })
     }
     const payload = await getPayload()
     const userRes = await payload.find({
@@ -60,6 +59,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: 'If the email exists, a reset link will be sent.' })
   } catch (err) {
     console.error('Forgot password error', err)
-    return NextResponse.json({ error: 'Failed to process request' }, { status: 500 })
+    return NextResponse.json({ message: 'Failed to process request' }, { status: 500 })
   }
 }

@@ -18,7 +18,13 @@
     "tryAgain": "Thử lại",
     "goHome": "Về Trang Chủ",
     "back": "Quay Lại",
-    "cancel": "Hủy Bỏ"
+    "cancel": "Hủy Bỏ",
+    "lastName": "Họ",
+    "firstName": "Tên",
+    "enterLastName": "Nhập họ của bạn",
+    "enterFirstName": "Nhập tên của bạn",
+    "enterPhoneNumber": "Nhập số điện thoại",
+    "enterEmail": "Nhập email"
   },
   "event": {
     "chooseAttendingDate": "Chọn ngày bạn muốn tham dự",
@@ -396,7 +402,14 @@
       "accountInfo": "Thông Tin Tài Khoản",
       "purchasedTickets": "Vé Đã Mua",
       "myEvents": "Sự Kiện Của Tôi"
-    }
+    },
+    "myEvents": "Sự kiện của tôi",
+    "noEvents": "Bạn chưa có sự kiện nào",
+    "upcomingTickets": "Vé sự kiện sắp diễn ra",
+    "pastTickets": "Vé sự kiện đã qua",
+    "noUpcomingTickets": "Không có vé sự kiện sắp diễn ra",
+    "noPastTickets": "Không có vé sự kiện đã qua",
+    "page": "Trang {{current}} / {{total}}"
   },
   "auth": {
     "signInSuccessfully": "Đăng nhập thành công",

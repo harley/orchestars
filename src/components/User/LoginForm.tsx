@@ -49,7 +49,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         const err = await res.json()
         console.error('err', err)
         toast({
-          title: err.error || 'Authentication failed',
+          title: err.message || 'Authentication failed',
           description: err.details || 'Invalid credentials',
           variant: 'destructive',
         })
