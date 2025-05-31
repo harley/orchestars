@@ -9,7 +9,7 @@ const TermCondition = async ({ termCondition }: { termCondition: string }) => {
   return (
     <section className="py-12">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent uppercase">
+        <h2 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-700 to-gray-950 bg-clip-text text-transparent uppercase pt-3">
           {t('event.termsAndPolicies', locale)}
         </h2>
 
