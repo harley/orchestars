@@ -75,7 +75,7 @@ export async function generateTicketDisneyEventBookEmailHtml(ticketData: TicketD
             </em>
           </p>
           
-          </br>
+          <br />
           <p>
             <strong>Điều khoản và điều kiện:</strong><br />
             <em>Terms and Conditions:</em>
