@@ -2,6 +2,7 @@ import { Event, Media } from '@/payload-types'
 import { Calendar, MapPin } from 'lucide-react'
 import React from 'react'
 import { format as dateFnsFormat } from 'date-fns'
+import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 import Image from 'next/image'
 
 const EventBanner = ({ event }: { event: Event }) => {
@@ -49,19 +50,19 @@ const EventBanner = ({ event }: { event: Event }) => {
                     </div>
                     <div className="text-gray-800">
                       <span className="font-medium">
-                        {dateFnsFormat(new Date(event.startDatetime), 'HH:mm')} –&nbsp;
+                        {tzFormat(toZonedTime(new Date(event.startDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm')} –&nbsp;
                         {event.endDatetime
-                          ? dateFnsFormat(new Date(event.endDatetime), 'HH:mm')
+                          ? tzFormat(toZonedTime(new Date(event.endDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm')
                           : ''}
                       </span>
                       <br />
                       <span className="text-gray-600">
-                        {dateFnsFormat(new Date(event.startDatetime), 'dd/MM/yyyy')}
+                        {tzFormat(toZonedTime(new Date(event.startDatetime), 'Asia/Ho_Chi_Minh'), 'dd/MM/yyyy')}
                       </span>
                       {event.endDatetime && (
                         <span className="text-gray-600">
                           {' '}
-                          - {dateFnsFormat(new Date(event.endDatetime), 'dd/MM/yyyy')}
+                          - {tzFormat(toZonedTime(new Date(event.endDatetime), 'Asia/Ho_Chi_Minh'), 'dd/MM/yyyy')}
                         </span>
                       )}
                     </div>
@@ -70,7 +71,7 @@ const EventBanner = ({ event }: { event: Event }) => {
 
                 {/* Location */}
                 {event.eventLocation && !!event.configuration?.showBannerLocation && (
-                  <div className="flex items-start group">
+                  <div className="flex items-center group">
                     <div className="p-2 bg-gray-100 rounded-lg mr-4 group-hover:bg-gray-200 transition-colors">
                       <MapPin className="h-5 w-5 text-gray-700 flex-shrink-0" />
                     </div>
