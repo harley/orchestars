@@ -139,8 +139,8 @@
     "selectedSeats": "Selected Seats",
     "total": "Total",
     "holdAndPay": "Hold Seat & Pay",
-    "cannotSelectSeat": "Cannot select seat",
-    "noEmptySeats": "Please select adjacent seats and avoid leaving empty seats between selected ones in the same row",
+    "cannotSelectSeat": "Cannot select seats together that way",
+    "noEmptySeats": "Kindly select adjacent seats to avoid empty seats in between",
     "close": "Close",
     "proceedToPayment": "Proceed to Payment"
   },
