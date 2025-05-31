@@ -19,10 +19,63 @@ import Partners from '@/components/Home/components/Partners'
 import { getPartnersCached } from '@/components/Home/actions'
 import { Partner } from '@/types/Partner'
 import SeatReservationClient from '@/components/EventDetail/SeatReservation/Component.client'
+import { Metadata, ResolvingMetadata } from 'next'
+import { Media } from '@/payload-types'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { getServerSideURL } from '@/utilities/getURL'
 
 // export const dynamic = 'force-dynamic'
 export const revalidate = 86400 // 24 hours
 export const dynamicParams = true
+
+export async function generateMetadata(
+  props: {
+    params: Promise<{ eventId: string }>
+  },
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
+  const params = await props.params
+  const eventSlug = params.eventId
+  const locale = await getLocale()
+
+  const eventDetail = await getEventCached({ slug: eventSlug, locale })()
+
+  if (!eventDetail) {
+    return {
+      title: 'Event Not Found | Orchestars',
+      description: 'Sorry, the event you are looking for does not exist.',
+    }
+  }
+
+  const previousImages = (await parent).openGraph?.images || []
+
+  let imageUrl =
+    (eventDetail.eventThumbnail as Media)?.url || (eventDetail.eventBanner as Media)?.url || ''
+
+  if (imageUrl) {
+    imageUrl = `${getServerSideURL()}${imageUrl}`
+  }
+
+  const openGraph = mergeOpenGraph({
+    title: eventDetail.title || undefined,
+    description: eventDetail.description || undefined,
+    images: [...(imageUrl ? [{ url: imageUrl }] : []), ...previousImages],
+  })
+
+  const metadata: Metadata = {
+    title: openGraph?.title,
+    description: openGraph?.description,
+    openGraph,
+    twitter: {
+      card: 'summary_large_image',
+      title: openGraph?.title,
+      description: openGraph?.description,
+      images: imageUrl ? [imageUrl] : [],
+    },
+  }
+
+  return metadata
+}
 
 const EventDetailPage = async (props: {
   params: Promise<{ eventId: string }>
