@@ -83,7 +83,7 @@ const Navbar = ({
               alt={logo?.alt || data?.title || ''}
               className={`transition-all duration-300 ease-in-out ${
                 scrolled ? 'h-10 md:h-12' : 'h-20 md:h-24'
-              } w-auto`}
+              } w-auto max-w-[150px]`}
             />
           </Link>
         </div>
