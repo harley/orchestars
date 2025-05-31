@@ -17,7 +17,7 @@ import { NextResponse } from 'next/server'
 import { PayloadRequest } from 'payload'
 import { checkSeatAvailable, createOrderAndTickets, createPayment } from './utils'
 import { sendTicketMail } from '../helper/sendTicketMail'
-
+import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 type AdminCreateOrderData = {
   customer: CustomerInfo
   order: NewInputOrder & { note?: string; adjustedTotal?: number }
@@ -107,11 +107,17 @@ export const createOrderHandler = async (req: PayloadRequest) => {
 
       // send mail
       const user = newTickets?.[0]?.user as User
+
+      const startTime = event?.startDatetime ? tzFormat(toZonedTime(new Date(event.startDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm') : ''
+        const endTime = event?.endDatetime ? tzFormat(toZonedTime(new Date(event.endDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm') : ''
+        const eventLocation = event?.eventLocation as string
+
       const ticketData = newTickets.map((tk) => ({
         ticketCode: tk?.ticketCode as string,
         seat: tk?.seat as string,
-        eventDate: tk?.eventDate as string,
         ticketId: tk?.id,
+        eventDate: `${startTime || 'N/A'} - ${endTime || 'N/A'}, ${tk?.eventDate || 'N/A'} (Giờ Việt Nam | Vietnam Time, GMT+7)`,
+        eventLocation
       }))
       sendTicketMail({
         event,

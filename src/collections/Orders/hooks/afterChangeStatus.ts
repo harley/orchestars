@@ -2,6 +2,7 @@ import { FieldHookArgs } from 'payload'
 
 import { Event, User } from '@/payload-types'
 import { sendTicketMail } from '../helper/sendTicketMail'
+import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 
 export const afterChangeStatus = async ({ value, originalDoc, req, context }: FieldHookArgs) => {
   if (context.triggerAfterCreated === false) {
@@ -44,14 +45,19 @@ export const afterChangeStatus = async ({ value, originalDoc, req, context }: Fi
         const event = tickets?.[0]?.event as Event
         const userEmail = user?.email
 
+        const startTime = event?.startDatetime ? tzFormat(toZonedTime(new Date(event.startDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm') : ''
+        const endTime = event?.endDatetime ? tzFormat(toZonedTime(new Date(event.endDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm') : ''
+        const eventLocation = event?.eventLocation as string
+
         if (userEmail) {
           const ticketData = tickets
             .filter((tk) => !!tk?.ticketCode)
             .map((tk) => ({
               ticketCode: tk?.ticketCode as string,
               seat: tk?.seat as string,
-              eventDate: tk?.eventDate as string,
               ticketId: tk?.id,
+              eventDate: `${startTime || 'N/A'} - ${endTime || 'N/A'}, ${tk?.eventDate || 'N/A'} (Giờ Việt Nam | Vietnam Time, GMT+7)`,
+              eventLocation
             }))
 
           await sendTicketMail({
