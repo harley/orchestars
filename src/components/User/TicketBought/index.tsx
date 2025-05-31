@@ -1,24 +1,24 @@
 'use client'
 import React, { useState } from 'react'
 import { useTranslate } from '@/providers/I18n/client'
-import { Ticket } from '@/types/Ticket'
-import { TicketCard } from '@/components/User/TicketBought/TicketCard'
 import { TimeFilterTabs } from '@/components/User/TicketBought/TimeFilterTabs'
+import UpcomingTickets from './UpcomingTickets'
+import FinishedTickets from './FinishedTickets'
 
-const TicketBought: React.FC<{ userTickets: Ticket[] }> = ({ userTickets }) => {
+const TicketBought = ({className}: {className?: string}) => {
   const { t } = useTranslate()
 
   const [timeFilter, setTimeFilter] = useState<'upcoming' | 'finished'>('upcoming')
 
   return (
-    <div className="bg-white min-h-screen text-black font-sans p-6">
+    <div className={`bg-white min-h-screen text-black font-sans p-6 ${className || ''}`}>
       <h1 className="text-2xl font-bold my-4">{t('userprofile.title')}</h1>
 
       <TimeFilterTabs timeFilter={timeFilter} setTimeFilter={setTimeFilter} t={t} />
 
-      {userTickets?.map(ticket => (
-        <TicketCard key={ticket.id} ticket={ticket} t={t} />
-      ))}
+      <UpcomingTickets className={timeFilter === 'upcoming' ? '' : 'hidden'} />
+
+      <FinishedTickets className={timeFilter === 'finished' ? '' : 'hidden'} />
     </div>
   )
 }

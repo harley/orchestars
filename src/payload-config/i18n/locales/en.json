@@ -18,7 +18,13 @@
     "tryAgain": "Try Again",
     "goHome": "Go Home",
     "back": "Back",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "lastName": "Last Name",
+    "firstName": "First Name",
+    "enterLastName": "Enter your last name",
+    "enterFirstName": "Enter your first name",
+    "enterPhoneNumber": "Enter your phone number",
+    "enterEmail": "Enter your email"
   },
   "event": {
     "chooseAttendingDate": "Choose Your Attending Date",
@@ -396,7 +402,14 @@
       "accountInfo": "Account Info",
       "purchasedTickets": "Purchased Tickets",
       "myEvents": "My Events"
-    }
+    },
+    "myEvents": "My Events",
+    "noEvents": "You don't have any events",
+    "upcomingTickets": "Upcoming Event Tickets",
+    "pastTickets": "Past Event Tickets",
+    "noUpcomingTickets": "No upcoming tickets found",
+    "noPastTickets": "No past tickets found",
+    "page": "Page {{current}} of {{total}}"
   },
   "auth": {
     "signInSuccessfully": "Sign in successfully",

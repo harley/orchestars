@@ -27,7 +27,7 @@ export default function ValidatePage() {
   const [isLoading, setIsLoading] = useState(false)
   const [multipleTickets, setMultipleTickets] = useState<any[]>([])
   const router = useRouter()
-  const { isHydrated, token, setToken } = useAuth()
+  const { isHydrated, token } = useAuth()
   const searchParams = useSearchParams()
   const { t } = useTranslate()
 

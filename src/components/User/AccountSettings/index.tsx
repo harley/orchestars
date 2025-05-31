@@ -1,45 +1,38 @@
 import { useForm, Controller } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui/select'
+// import { Button } from '@/components/ui/button'
+// import {
+//   Select,
+//   SelectTrigger,
+//   SelectValue,
+//   SelectContent,
+//   SelectItem,
+// } from '@/components/ui/select'
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { format } from 'date-fns'
+// import { format } from 'date-fns'
 import * as React from 'react'
 import { useTranslate } from '@/providers/I18n/client'
 import { User } from '@/payload-types'
 interface AccountSettingsForm {
-  name: string
+  firstName: string
+  lastName: string
   phone: string
   email: string
   dob: Date | null
   gender: 'male' | 'female' | 'other'
 }
 
-const defaultValues: AccountSettingsForm = {
-  name: '',
-  phone: '',
-  email: '',
-  dob: null,
-  gender: 'other',
-}
 
-const AccountSettings = ({ userData }: { userData: User }) => {
+const AccountSettings = ({ userData, className }: { userData: User; className?: string }) => {
   const {
     control,
     handleSubmit,
-    formState: { errors },
-    setValue,
-    watch,
+    formState: {  },
   } = useForm<AccountSettingsForm>({
     defaultValues: {
-      name: ((userData?.firstName || '') + ' ' + (userData?.lastName || '')).trim(),
+      firstName: userData?.firstName || '',
+      lastName: userData?.lastName || '',
       phone: userData?.phoneNumber || '',
       email: userData?.email || '',
       dob: null,
@@ -53,10 +46,9 @@ const AccountSettings = ({ userData }: { userData: User }) => {
     alert(JSON.stringify(data, null, 2))
   }
 
-  const dob = watch('dob')
-
   return (
-    <form
+    <div className={className}>
+      <form
       onSubmit={handleSubmit(onSubmit)}
       className="max-w-xl mx-auto bg-gray-100 rounded-2xl p-8 mt-8"
     >
@@ -64,9 +56,9 @@ const AccountSettings = ({ userData }: { userData: User }) => {
         <div className="relative">
           <Avatar className="h-24 w-24">
             <AvatarImage src="" alt="avatar" />
-            <AvatarFallback>👤</AvatarFallback>
+            <AvatarFallback className='text-[50px]'>👤</AvatarFallback>
           </Avatar>
-          <label
+          {/* <label
             htmlFor="avatar-upload"
             className="absolute bottom-0 right-0 bg-gray-800 rounded-full p-2 cursor-pointer border-2 border-white"
           >
@@ -74,7 +66,7 @@ const AccountSettings = ({ userData }: { userData: User }) => {
               📷
             </span>
             <input id="avatar-upload" type="file" accept="image/*" className="hidden" />
-          </label>
+          </label> */}
         </div>
         <div className="mt-2 text-lg font-semibold text-black">
           {t('userprofile.accountSettings.infoHelper')}
@@ -83,15 +75,33 @@ const AccountSettings = ({ userData }: { userData: User }) => {
       <div className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-black mb-1">
-            {t('userprofile.accountSettings.fullName')}
+            {t('common.firstName')}
           </label>
           <Controller
-            name="name"
+            name="firstName"
             control={control}
             render={({ field }) => (
               <Input
                 {...field}
-                placeholder={t('userprofile.accountSettings.enterFullName')}
+                disabled
+                placeholder={t('common.enterFirstName')}
+                className="bg-gray-100 border-gray-300 text-black"
+              />
+            )}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-black mb-1">
+            {t('common.lastName')}
+          </label>
+          <Controller
+            name="lastName"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                disabled
+                placeholder={t('common.enterLastName')}
                 className="bg-gray-100 border-gray-300 text-black"
               />
             )}
@@ -101,7 +111,7 @@ const AccountSettings = ({ userData }: { userData: User }) => {
           <label className="block text-sm font-medium text-black mb-1">
             {t('userprofile.accountSettings.phone')}
           </label>
-          <div className="flex gap-2">
+          <div className="flex">
             <span className="inline-flex items-center px-3 rounded-l border border-r-0 border-gray-300 bg-gray-100 text-black text-sm">
               +84
             </span>
@@ -111,6 +121,7 @@ const AccountSettings = ({ userData }: { userData: User }) => {
               render={({ field }) => (
                 <Input
                   {...field}
+                  disabled
                   placeholder={t('userprofile.accountSettings.enterPhone')}
                   className="bg-gray-100 border-gray-300 text-black rounded-l-none"
                 />
@@ -135,7 +146,7 @@ const AccountSettings = ({ userData }: { userData: User }) => {
             )}
           />
         </div>
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-black mb-1">
             {t('userprofile.accountSettings.dob')}
           </label>
@@ -160,8 +171,8 @@ const AccountSettings = ({ userData }: { userData: User }) => {
               </div>
             )}
           />
-        </div>
-        <div>
+        </div> */}
+        {/* <div>
           <label className="block text-sm font-medium text-black mb-1">
             {t('userprofile.accountSettings.gender')}
           </label>
@@ -181,15 +192,16 @@ const AccountSettings = ({ userData }: { userData: User }) => {
               </Select>
             )}
           />
-        </div>
+        </div> */}
       </div>
-      <Button
+      {/* <Button
         type="submit"
         className="w-full mt-8 bg-green-500 hover:bg-green-600 text-white font-semibold"
       >
         {t('userprofile.accountSettings.submit')}
-      </Button>
+      </Button> */}
     </form>
+    </div>
   )
 }
 

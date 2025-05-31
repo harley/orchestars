@@ -60,6 +60,14 @@ const Navbar = ({
     { link: { label: t('home.contact'), url: '#contact', onClick: scrollToFooter } },
   ]
 
+  const renderNavItemUrl = (link: any) => {
+    if ((link.reference?.value as Page)?.slug) {
+      return `/${(link.reference?.value as Page)?.slug}`
+    }
+
+    return link.url || '#'
+  }
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 bg-white shadow-md text-black w-full transition-all duration-300 ease-in-out ${
@@ -83,10 +91,10 @@ const Navbar = ({
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center justify-start flex-1">
           <div className="flex items-center space-x-8">
-            {navItems.map(({ link, children }, i) => (
+            {navItems.map(({ link, children }) => (
               <div key={link.url ?? link.label} className="relative group">
                 <Link
-                  href={(link.reference?.value as Page)?.slug || link.url || '#'}
+                  href={renderNavItemUrl(link)}
                   className="nav-link font-medium text-black/90 hover:underline flex items-center"
                 >
                   {link.label}
@@ -99,11 +107,7 @@ const Navbar = ({
                     {children.map((linkChild) => (
                       <Link
                         key={linkChild.id}
-                        href={
-                          (linkChild?.link?.reference?.value as Page)?.slug ||
-                          linkChild?.link?.url ||
-                          ''
-                        }
+                        href={renderNavItemUrl(linkChild?.link)}
                         className="block px-4 py-2 text-sm hover:text-white hover:bg-black"
                       >
                         {linkChild.link?.label}
@@ -113,7 +117,7 @@ const Navbar = ({
                 )}
               </div>
             ))}
-            {navigationItems.map(({ link }, i) => (
+            {navigationItems.map(({ link }) => (
               <div key={link.url ?? link.label} className="relative group">
                 {link.onClick ? (
                   <a
@@ -247,7 +251,7 @@ const Navbar = ({
                     {t('userprofile.userLogin')}
                   </button>
                 )}
-                {navItems.map(({ link }, i) => (
+                {navItems.map(({ link }) => (
                   <Link
                     key={link.url ?? link.label}
                     href={link.url || ''}
@@ -257,7 +261,7 @@ const Navbar = ({
                     {link.label}
                   </Link>
                 ))}
-                {navigationItems.map(({ link }, i) =>
+                {navigationItems.map(({ link }) =>
                   link.onClick ? (
                     <a
                       key={link.url ?? link.label}

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { sendMailAndWriteLog } from '@/collections/Emails/utils'
-import { EMAIL_CC } from '@/config/email'
 import { getServerSideURL } from '@/utilities/getURL'
 
 function generateResetToken(length = 48) {

@@ -272,7 +272,7 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
                         name={field.name}
                         options={[{ label: 'Select date...', value: '' }, ...eventSchedules]}
                         value={field.value ?? ''}
-                        onChange={(option) => {}}
+                        // onChange={(option) => {}}
                       />
                     </div>
                   )
