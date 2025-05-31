@@ -60,7 +60,7 @@
     "phoneNumberRequired": "Phone number is required",
     "emailRequired": "Email is required",
     "emailInvalidFormat": "Invalid email format",
-    "selectPaymentMethod": "Select Payment Method",
+    "selectPaymentMethod": "Pay via QR or digital wallet",
     "orderSummary": "Order Summary",
     "ticketInfo": "Ticket Information",
     "enterPromoCode": "Enter Promo Code",

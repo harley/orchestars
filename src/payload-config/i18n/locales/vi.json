@@ -60,7 +60,7 @@
     "phoneNumberRequired": "Số điện thoại không được để trống",
     "emailRequired": "Email không được để trống",
     "emailInvalidFormat": "Email không đúng định dạng",
-    "selectPaymentMethod": "Chọn phương thức thanh toán",
+    "selectPaymentMethod": "Thanh toán qua QR hoặc ví điện tử",
     "orderSummary": "Tóm tắt đơn hàng",
     "ticketInfo": "Thông tin vé",
     "enterPromoCode": "Nhập mã giảm giá",
