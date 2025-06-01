@@ -1,13 +1,18 @@
+'use client'
+
 import { Event, Media } from '@/payload-types'
 import { Calendar, MapPin } from 'lucide-react'
 import React from 'react'
 import { format as dateFnsFormat } from 'date-fns'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 import Image from 'next/image'
+import { useTranslate } from '@/providers/I18n/client'
 
 const EventBanner = ({ event }: { event: Event }) => {
+  const { t } = useTranslate()
+
   return (
-    <section className="bg-gradient-to-b from-gray-50 to-gray-100 py-20 relative">
+    <section className="bg-gradient-to-b from-gray-50 to-gray-100 py-10 relative">
       {/* Background pattern */}
       <div
         className="absolute inset-0 pointer-events-none opacity-10"
@@ -78,6 +83,22 @@ const EventBanner = ({ event }: { event: Event }) => {
                     <div className="text-gray-800 whitespace-pre-line">{event.eventLocation}</div>
                   </div>
                 )}
+              </div>
+
+              {/* CTA Button */}
+              <div className="mt-8">
+                <button
+                  type="button"
+                  className="w-full md:w-auto px-8 py-4 bg-black text-white text-lg font-bold rounded-lg shadow-lg hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                  onClick={() => {
+                    const el = document.getElementById('seat-map-date-select')
+                    if (el) {
+                      el.scrollIntoView({ behavior: 'smooth' })
+                    }
+                  }}
+                >
+                  {t('event.bookNow')}
+                </button>
               </div>
             </div>
 

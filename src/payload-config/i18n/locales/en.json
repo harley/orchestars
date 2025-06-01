@@ -128,7 +128,8 @@
     "discountOnTotalOrderValue": "Apply on total order value",
     "discountOnPerOrderItem": "Apply on each ticket in the order",
     "guideToPayment": "After selecting your seats, please scroll down to reserve and proceed with payment.",
-    "maxPromotions": "You can only apply a maximum of {{count}} promo codes"
+    "maxPromotions": "You can only apply a maximum of {{count}} promo codes",
+    "bookNow": "Book Now"
   },
   "seatSelection": {
     "booking": "Booking",
@@ -442,7 +443,7 @@
     "signInToContinue": "Sign in to continue",
     "passwordMinLength": "Password must be at least {{length}} characters long",
     "passwordStrength": "Password must contain at least two of the following: uppercase letters, lowercase letters, numbers, or special characters",
-    "firstTimeLoginGuideline": "If you’ve booked tickets before, you already have an account. Just use your email to reset your password, log in, and view your tickets and other details.",
+    "firstTimeLoginGuideline": "If you've booked tickets before, you already have an account. Just use your email to reset your password, log in, and view your tickets and other details.",
     "firstTimeLoginLink": "First time logging in? Click here",
     "firstTimeLoginHeader": "Access Your Tickets",
     "firstTimeLoginEmailPlaceholder": "Enter the email you used to book tickets",
