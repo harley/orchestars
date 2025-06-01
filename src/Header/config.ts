@@ -22,6 +22,31 @@ export const Header: GlobalConfig = {
       localized: true,
     },
     {
+      name: 'seo',
+      label: 'SEO',
+      type: 'group',
+      fields: [
+        {
+          name: 'title',
+          type: 'text',
+          localized: true,
+        },
+        {
+          name: 'description',
+          type: 'textarea',
+          localized: true,
+        },
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+          admin: {
+            description: 'Image used for social media link previews (recommended 1200x630 px).',
+          },
+        },
+      ],
+    },
+    {
       name: 'navItems',
       type: 'array',
       fields: [

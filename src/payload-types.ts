@@ -2832,6 +2832,14 @@ export interface Header {
   id: number;
   logo?: (number | null) | Media;
   title?: string | null;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Image used for social media link previews (recommended 1200x630 px).
+     */
+    image?: (number | null) | Media;
+  };
   navItems?:
     | {
         link: {
@@ -2927,6 +2935,13 @@ export interface Footer {
 export interface HeaderSelect<T extends boolean = true> {
   logo?: T;
   title?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   navItems?:
     | T
     | {
