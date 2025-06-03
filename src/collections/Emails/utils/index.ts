@@ -2,6 +2,7 @@ import { IS_LOCAL_DEVELOPMENT } from '@/config/app'
 import { Email } from '@/payload-types'
 import { BasePayload } from 'payload'
 import { EMAIL_PROVIDER } from '@/config/email'
+import { logError } from '@/collections/Logs/utils'
 
 export const sendMailAndWriteLog = async ({
   resendMailData,
@@ -44,8 +45,23 @@ const sendMail = async ({
       return { id: `mock-id-${Math.random()}` }
     }
     return await payload.sendEmail(mailData)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error while sending mail: ', error)
+
+    logError({
+      payload,
+      action: 'SEND_MAIL_ERROR',
+      description: `Error sending mail: ${error instanceof Error ? error.message : 'An unknown error occurred'}`,
+      data: {
+        error: {
+          error,
+          stack: error?.stack,
+          errorMessage:
+            error instanceof Error ? error.message : error || 'An unknown error occurred',
+        },
+        data: mailData,
+      },
+    })
   }
 }
 
@@ -61,7 +77,22 @@ const createEmailRecord = async ({
       collection: 'emails',
       data: data as any,
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error while writing email history log', error)
+
+    logError({
+      payload,
+      action: 'SAVE_MAIL_ERROR',
+      description: `Error saving mail: ${error instanceof Error ? error.message : 'An unknown error occurred'}`,
+      data: {
+        error: {
+          error,
+          stack: error?.stack,
+          errorMessage:
+            error instanceof Error ? error.message : error || 'An unknown error occurred',
+        },
+        data: data,
+      },
+    })
   }
 }
