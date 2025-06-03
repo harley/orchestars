@@ -1,9 +1,9 @@
 import { Event, Ticket } from '../../types'
 import { format as formatDate } from 'date-fns'
-import { categories } from '@/components/EventDetail/data/seat-maps/categories'
 import { formatMoney } from '@/utilities/formatMoney'
 import { Check } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { EventSeatChartData } from '@/components/EventDetail/types/SeatChart'
 type SeatPanelProps = {
   loading?: boolean
   title: string
@@ -14,6 +14,7 @@ type SeatPanelProps = {
   onSeatSelect: (seat: Ticket) => void
   seatType: 'booked' | 'free'
   event: Event
+  categories: EventSeatChartData['categories']
 }
 
 export const SeatPanel = ({
@@ -26,6 +27,7 @@ export const SeatPanel = ({
   onSeatSelect,
   seatType,
   event,
+  categories = []
 }: SeatPanelProps) => {
   const [searchSeat, setSearchSeat] = useState('')
 
