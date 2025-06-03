@@ -168,6 +168,7 @@ const checkSeatAvailable = async (body: SeatHoldingRequest) => {
           .filter((seatName: string) => arrSeatNames.includes(seatName))
           .join(','),
       )
+      .filter((seatName: string) => !!seatName)
       .join(', ')
 
     // handle this case: eg H3 input, but H37 matched
