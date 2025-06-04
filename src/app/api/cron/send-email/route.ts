@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { sendMailJob } from '@/collections/Emails/jobs/sendMail'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 // import { getServerSideURL } from '@/utilities/getURL'
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     // Check for authorization header
-    console.log('--> executing /api/execute-send-email\n')
+    console.log('--> executing /api/cron/send-email\n')
     const authHeader = req.headers.get('authorization')
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json(
