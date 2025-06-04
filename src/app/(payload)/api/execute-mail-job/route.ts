@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { sendMailJob } from '@/collections/Emails/jobs/sendMail'
 import { getPayload } from '@/payload-config/getPayloadConfig'
-import { getServerSideURL } from '@/utilities/getURL'
+// import { getServerSideURL } from '@/utilities/getURL'
 
 export async function GET(req: Request) {
   try {
@@ -15,20 +15,20 @@ export async function GET(req: Request) {
     }
 
     // Validate request origin
-    const origin = req.headers.get('origin')
-    const referer = req.headers.get('referer')
-    const serverUrl = getServerSideURL()
+    // const origin = req.headers.get('origin')
+    // const referer = req.headers.get('referer')
+    // const serverUrl = getServerSideURL()
     
-    // Allow requests from Vercel cron jobs (no origin/referer) or from the same domain
-    const isValidOrigin = !origin || origin === serverUrl
-    const isValidReferer = !referer || referer.startsWith(serverUrl)
+    // // Allow requests from Vercel cron jobs (no origin/referer) or from the same domain
+    // const isValidOrigin = !origin || origin === serverUrl
+    // const isValidReferer = !referer || referer.startsWith(serverUrl)
     
-    if (!isValidOrigin || !isValidReferer) {
-      return NextResponse.json(
-        { error: 'Invalid request origin' },
-        { status: 403 }
-      )
-    }
+    // if (!isValidOrigin || !isValidReferer) {
+    //   return NextResponse.json(
+    //     { error: 'Invalid request origin' },
+    //     { status: 403 }
+    //   )
+    // }
 
     // Initialize Payload
     const payload = await getPayload()
