@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/execute-send-email",
+      "path": "/api/cron/send-email",
       "schedule": "* * * * *"
     },
     {
