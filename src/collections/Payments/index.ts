@@ -39,6 +39,7 @@ export const Payments: CollectionConfig = {
       admin: {
         description: 'Legacy field for a single promotion. Use "promotionsApplied" instead.',
       },
+      hidden: true,
     },
     {
       name: 'promotionCode',
@@ -47,6 +48,21 @@ export const Payments: CollectionConfig = {
       required: false,
       admin: {
         description: 'Legacy field for a single promotion. Use "promotionsApplied" instead.',
+        readOnly: true,
+      },
+      hooks: {
+        afterRead: [
+          async ({  data }) => {
+            if (data?.promotionsApplied?.length) {
+              return data.promotionsApplied
+                .map((promo: any) => promo.promotionCode)
+                .filter((exist: string) => !!exist)
+                .join(', ')
+            }
+
+            return data?.promotionCode
+          },
+        ],
       },
     },
     {
