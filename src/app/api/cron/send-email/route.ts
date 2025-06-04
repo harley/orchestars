@@ -3,6 +3,8 @@ import { sendMailJob } from '@/collections/Emails/jobs/sendMail'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 // import { getServerSideURL } from '@/utilities/getURL'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     // Check for authorization header
