@@ -35,7 +35,7 @@ export const afterChangeSeat = async ({ value, originalDoc, data, req }: FieldHo
             : ''
           const eventLocation = event?.eventLocation as string
 
-          const html = await generateTicketDisneyEventBookEmailHtml({
+          const html = generateTicketDisneyEventBookEmailHtml({
             ticketCode: originalDoc.ticketCode,
             eventName: event?.title || '',
             eventDate: `${startTime || 'N/A'} - ${endTime || 'N/A'}, ${originalDoc?.eventDate || 'N/A'} (Giờ Việt Nam | Vietnam Time, GMT+7)`,
@@ -57,6 +57,7 @@ export const afterChangeSeat = async ({ value, originalDoc, data, req }: FieldHo
               user: user.id,
               event: event?.id,
               ticket: originalDoc.id,
+              status: 'sent'
             },
           })
         }

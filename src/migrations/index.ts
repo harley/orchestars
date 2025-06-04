@@ -54,6 +54,7 @@ import * as migration_20250527_035818_add_seating_chart from './20250527_035818_
 import * as migration_20250527_170646_add_category_order from './20250527_170646_add_category_order';
 import * as migration_20250528_161621_add_marketing_tracking from './20250528_161621_add_marketing_tracking';
 import * as migration_20250530_165258_support_multi_promotion_codes from './20250530_165258_support_multi_promotion_codes';
+import * as migration_20250604_053644_add_columns_email from './20250604_053644_add_columns_email';
 
 export const migrations = [
   {
@@ -334,6 +335,11 @@ export const migrations = [
   {
     up: migration_20250530_165258_support_multi_promotion_codes.up,
     down: migration_20250530_165258_support_multi_promotion_codes.down,
-    name: '20250530_165258_support_multi_promotion_codes'
+    name: '20250530_165258_support_multi_promotion_codes',
+  },
+  {
+    up: migration_20250604_053644_add_columns_email.up,
+    down: migration_20250604_053644_add_columns_email.down,
+    name: '20250604_053644_add_columns_email'
   },
 ];
