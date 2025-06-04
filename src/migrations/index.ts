@@ -55,6 +55,7 @@ import * as migration_20250527_170646_add_category_order from './20250527_170646
 import * as migration_20250528_161621_add_marketing_tracking from './20250528_161621_add_marketing_tracking';
 import * as migration_20250530_165258_support_multi_promotion_codes from './20250530_165258_support_multi_promotion_codes';
 import * as migration_20250604_053644_add_columns_email from './20250604_053644_add_columns_email';
+import * as migration_20250604_160223_add_seo_columns from './20250604_160223_add_seo_columns';
 
 export const migrations = [
   {
@@ -340,6 +341,11 @@ export const migrations = [
   {
     up: migration_20250604_053644_add_columns_email.up,
     down: migration_20250604_053644_add_columns_email.down,
-    name: '20250604_053644_add_columns_email'
+    name: '20250604_053644_add_columns_email',
+  },
+  {
+    up: migration_20250604_160223_add_seo_columns.up,
+    down: migration_20250604_160223_add_seo_columns.down,
+    name: '20250604_160223_add_seo_columns'
   },
 ];
