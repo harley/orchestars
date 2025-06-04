@@ -155,10 +155,12 @@ export default buildConfig({
     }
     if (!initializedSendMailJob) {
       console.log('-->payload onInit fired')
+      // todo, using env instead
+      const TIME_OUT = 60000
       initializedSendMailJob = true
       setInterval(() => {
         sendMailJob({ payload })
-      }, 60000)
+      }, TIME_OUT)
     }
   },
   jobs: {

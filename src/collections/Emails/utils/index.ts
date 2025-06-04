@@ -28,6 +28,7 @@ export const sendMailAndWriteLog = async ({
         from: emailData.from || EMAIL_DEFAULT_FROM_ADDRESS,
         extraData: resendResult as Record<string, any>,
         sentAt: new Date().toISOString(),
+        status: 'sent'
       },
       payload,
     })
@@ -181,7 +182,7 @@ export const addQueueEmail = async ({
     data: {
       ...resendMailData,
       ...emailData,
-      from: EMAIL_DEFAULT_FROM_ADDRESS,
+      from: emailData.from || EMAIL_DEFAULT_FROM_ADDRESS,
       status: 'pending',
     },
     payload,
