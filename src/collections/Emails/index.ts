@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { EMAIL_STATUSES } from './constant'
-import { executeSendingMailHandler } from './handler/executeSendingMail'
+// import { executeSendingMailHandler } from './handler/executeSendingMail'
 
 export const Emails: CollectionConfig = {
   slug: 'emails',
@@ -47,11 +47,11 @@ export const Emails: CollectionConfig = {
       },
     },
   ],
-  endpoints: [
-    {
-      path: '/job/send-mail',
-      method: 'get',
-      handler: executeSendingMailHandler,
-    },
-  ],
+  // endpoints: [
+  //   {
+  //     path: '/job/send-mail',
+  //     method: 'get',
+  //     handler: executeSendingMailHandler,
+  //   },
+  // ],
 }
