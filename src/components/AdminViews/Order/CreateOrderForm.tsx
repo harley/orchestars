@@ -36,6 +36,7 @@ type FormValues = {
   adjustedTotal?: number
   note?: string
   currency?: string
+  category?: string
 }
 
 type FreeSeat = {
@@ -205,6 +206,7 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
       }))
       const order = {
         currency: data.currency || 'VND',
+        category: data.category,
         orderItems,
         adjustedTotal:
           data.adjustedTotal !== undefined &&
@@ -215,6 +217,7 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
         note: data.note,
       }
       const payload = { customer, order }
+
       await axios.post('/api/orders/custom/create-order', payload)
 
       toast.success(t('general:successfullyCreated', { label: 'Order' }))
