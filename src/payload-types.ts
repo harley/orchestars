@@ -1321,6 +1321,7 @@ export interface Email {
   event?: (number | null) | Event;
   ticket?: (number | null) | Ticket;
   to: string;
+  from?: string | null;
   cc?: string | null;
   subject: string;
   html?: string | null;
@@ -1335,6 +1336,7 @@ export interface Email {
     | number
     | boolean
     | null;
+  status?: ('pending' | 'sent' | 'failed') | null;
   sentAt?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -2500,12 +2502,14 @@ export interface EmailsSelect<T extends boolean = true> {
   event?: T;
   ticket?: T;
   to?: T;
+  from?: T;
   cc?: T;
   subject?: T;
   html?: T;
   text?: T;
   provider?: T;
   extraData?: T;
+  status?: T;
   sentAt?: T;
   updatedAt?: T;
   createdAt?: T;

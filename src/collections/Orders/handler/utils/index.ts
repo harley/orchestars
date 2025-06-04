@@ -77,6 +77,7 @@ export const checkSeatAvailable = async ({
 }
 
 export const createOrderAndTickets = async ({
+  orderData,
   orderCode,
   customerData,
   customerInput,
@@ -89,6 +90,7 @@ export const createOrderAndTickets = async ({
   payload,
   req,
 }: {
+  orderData?: Partial<Order>
   orderCode: string
   customerData: User
   customerInput: CustomerInfo
@@ -115,6 +117,7 @@ export const createOrderAndTickets = async ({
   const newOrder = await payload.create({
     collection: 'orders',
     data: {
+      ...(orderData || {}),
       orderCode,
       user: customerData.id,
       status: 'completed',

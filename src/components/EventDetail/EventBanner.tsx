@@ -1,13 +1,18 @@
+'use client'
+
 import { Event, Media } from '@/payload-types'
 import { Calendar, MapPin } from 'lucide-react'
 import React from 'react'
 import { format as dateFnsFormat } from 'date-fns'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 import Image from 'next/image'
+import { useTranslate } from '@/providers/I18n/client'
 
 const EventBanner = ({ event }: { event: Event }) => {
+  const { t } = useTranslate()
+
   return (
-    <section className="bg-gradient-to-b from-gray-50 to-gray-100 py-20 relative">
+    <section className="bg-gradient-to-b from-gray-50 to-gray-100 py-10 relative">
       {/* Background pattern */}
       <div
         className="absolute inset-0 pointer-events-none opacity-10"
@@ -79,12 +84,28 @@ const EventBanner = ({ event }: { event: Event }) => {
                   </div>
                 )}
               </div>
+
+              {/* CTA Button */}
+              <div className="mt-8">
+                <button
+                  type="button"
+                  className="w-full md:w-auto px-8 py-4 bg-black text-white text-lg font-bold rounded-lg shadow-lg hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                  onClick={() => {
+                    const el = document.getElementById('seat-map-date-select')
+                    if (el) {
+                      el.scrollIntoView({ behavior: 'smooth' })
+                    }
+                  }}
+                >
+                  {t('event.bookNow')}
+                </button>
+              </div>
             </div>
 
             {/* Right Content - Event Banner Image */}
             {event.slug === 'disney-25' ? (
               <div className="relative w-full md:min-w-[200px] md:max-w-[40vw] flex-shrink-0 flex-grow-0 flex items-center justify-center p-4 md:p-0">
-                <div className="relative w-full h-[60vw] max-h-[400px] md:h-[500px] aspect-[3/4] flex items-center justify-center">
+                <div className="relative w-full h-[60vw] md:h-[500px] aspect-[3/4] flex items-center justify-center">
                   <Image
                     src={(event.eventThumbnail as Media)?.url || '/images/logos/logo-black-adjacent.png'}
                     alt={event.title || 'Event'}

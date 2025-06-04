@@ -128,7 +128,8 @@
     "discountOnTotalOrderValue": "Áp dụng trên tổng giá trị đơn hàng",
     "discountOnPerOrderItem": "Áp dụng trên từng vé",
     "guideToPayment": "Sau khi chọn ghế, vui lòng cuộn xuống để giữ chỗ và tiến hành thanh toán.",
-    "maxPromotions": "Bạn chỉ có thể áp dụng tối đa {{count}} mã giảm giá"
+    "maxPromotions": "Bạn chỉ có thể áp dụng tối đa {{count}} mã giảm giá",
+    "bookNow": "Mua vé ngay"
   },
   "seatSelection": {
     "booking": "Đặt chỗ",

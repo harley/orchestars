@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm, useFieldArray, Controller, FormProvider } from 'react-hook-form'
 import {
   Button,
@@ -13,11 +13,11 @@ import {
 } from '@payloadcms/ui'
 import { formatMoney } from '@/utilities/formatMoney'
 import axios from 'axios'
-import { Event } from '@/payload-types'
+import { Event, Media, SeatingChart } from '@/payload-types'
 import { EventSchedule, TicketPrice } from '@/types/Event'
 import { format as formatDate } from 'date-fns'
-import DEFAULT_SEATS from '@/components/EventDetail/data/seat-maps/seats.json'
 import SelectOrderCategory from './SelectOrderCategory/SelectOrderCategory'
+import { EventSeatChartData } from '@/components/EventDetail/types/SeatChart'
 
 // --- Types ---
 type SeatSelection = {
@@ -36,6 +36,7 @@ type FormValues = {
   adjustedTotal?: number
   note?: string
   currency?: string
+  category?: string
 }
 
 type FreeSeat = {
@@ -112,9 +113,28 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
     setValue('orderItems', [{ ticketPriceId: '', seat: '', price: 0 }])
   }, [eventId, events, setValue])
 
+  const [allSeats, setAllSeats] = useState<EventSeatChartData['seats']>([])
+
+  useEffect(() => {
+    const seatChartUrl = ((selectedEvent?.seatingChart as SeatingChart)?.seatMap as Media)?.url
+    if(!seatChartUrl) {
+      return
+    }
+
+    
+    fetch(seatChartUrl)
+      .then(res => res.json())
+      .then((data: EventSeatChartData) => {
+        setAllSeats(data.seats)
+      })
+      .catch(err => {
+        console.error('Error fetching seat chart:', err)  
+      })
+  }, [selectedEvent?.seatingChart])
+
   // Fetch mock data
   useEffect(() => {
-    if (selectedEvent && eventScheduleId) {
+    if (selectedEvent && eventScheduleId && allSeats?.length) {
       axios
         .get(
           `/api/tickets/booked-seats?eventId=${selectedEvent.id}&eventScheduleId=${eventScheduleId}`,
@@ -123,7 +143,7 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
           const bookedSeats = (res.data.data as string[]) || []
 
           const freeSeats: FreeSeat[] = []
-          DEFAULT_SEATS.forEach((s) => {
+          allSeats.forEach((s) => {
             if (!bookedSeats.includes(s.label.toUpperCase())) {
               const ticketPriceInfo = selectedEvent?.ticketPrices?.find(
                 (tPrice) => tPrice.key === s.category,
@@ -147,7 +167,7 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
     } else {
       setFreeSeats([])
     }
-  }, [eventScheduleId, selectedEvent])
+  }, [eventScheduleId, selectedEvent, allSeats])
 
   // Watch seats for duplicate seat name validation and price auto-fill
   const orderItems = watch('orderItems') || []
@@ -186,6 +206,7 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
       }))
       const order = {
         currency: data.currency || 'VND',
+        category: data.category,
         orderItems,
         adjustedTotal:
           data.adjustedTotal !== undefined &&
@@ -196,6 +217,7 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
         note: data.note,
       }
       const payload = { customer, order }
+
       await axios.post('/api/orders/custom/create-order', payload)
 
       toast.success(t('general:successfullyCreated', { label: 'Order' }))

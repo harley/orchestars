@@ -1,6 +1,5 @@
-import { sendMailAndWriteLog } from '@/collections/Emails/utils'
+import { addQueueEmail } from '@/collections/Emails/utils'
 import { EMAIL_CC } from '@/config/email'
-// import { generateTicketBookEmailHtml } from '@/mail/templates/TicketBookedEmail'
 import { generateTicketDisneyEventBookEmailHtml } from '@/mail/templates/TicketDisneyEventBookedEmail'
 import { Event, User } from '@/payload-types'
 import { BasePayload } from 'payload'
@@ -17,7 +16,7 @@ export const sendTicketMail = async ({
   payload: BasePayload
 }) => {
   for (const data of ticketData) {
-    const html = await generateTicketDisneyEventBookEmailHtml({
+    const html = generateTicketDisneyEventBookEmailHtml({
       ticketCode: data.ticketCode,
       seat: data.seat,
       eventName: event.title || '',
@@ -34,8 +33,8 @@ export const sendTicketMail = async ({
       html,
     }
 
-    sendMailAndWriteLog({
-      payload: payload,
+    await addQueueEmail({
+      payload,
       resendMailData,
       emailData: {
         user: user.id,

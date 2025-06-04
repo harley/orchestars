@@ -1,3 +1,5 @@
+import { SeatingChart } from "@/payload-types"
+
 export interface Event {
   id: string
   title: string
@@ -14,7 +16,8 @@ export interface Event {
       description: string
     }>
   }>
-  ticketPrices?: Array<TicketPrice>
+  ticketPrices?: Array<TicketPrice>,
+  seatingChart: SeatingChart
 }
 
 export interface TicketPrice {

@@ -20,7 +20,7 @@ import { sendTicketMail } from '../helper/sendTicketMail'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 type AdminCreateOrderData = {
   customer: CustomerInfo
-  order: NewInputOrder & { note?: string; adjustedTotal?: number }
+  order: NewInputOrder & { note?: string; adjustedTotal?: number; category?: string }
 }
 
 export const createOrderHandler = async (req: PayloadRequest) => {
@@ -88,6 +88,9 @@ export const createOrderHandler = async (req: PayloadRequest) => {
         req,
         adjustedTotal,
         note: order.note,
+        orderData: {
+          category: order.category
+        }
       })
 
       // create payment record
