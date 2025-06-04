@@ -17,6 +17,10 @@ import { RenderPageBreadcrumb } from '@/page-breadcrumb/RenderPageBreadcrumb'
 import { RenderPageBanner } from '@/page-banner/RenderPageBanner'
 import { getLocale } from '@/providers/I18n/server'
 import { DEFAULT_FALLBACK_LOCALE, SupportedLocale } from '@/config/app'
+import { getCachedGlobal } from '@/utilities/getGlobals'
+import type { Header as HeaderType } from '@/payload-types'
+
+
 
 export const dynamic = 'force-dynamic' // Force dynamic rendering
 export const revalidate = 3600
@@ -117,7 +121,16 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     locale
   })
 
-  return generateMeta({ doc: page })
+  const headerData: HeaderType = await getCachedGlobal('header', 1, locale)()
+
+  return generateMeta({ doc: {
+    ...page,
+    meta: {
+      title: page?.meta?.title || headerData?.seo?.title,
+      description: page?.meta?.description || headerData?.seo?.description,
+      image: page?.meta?.image || headerData?.seo?.image,
+    }
+  } })
 }
 
 const queryPageBySlug = cache(async ({ slug, locale }: { slug: string, locale?: SupportedLocale }) => {
