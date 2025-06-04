@@ -8,8 +8,8 @@ import { Event, OrderItem, User } from '@/payload-types'
 import { checkBookedOrPendingPaymentSeats } from '@/app/(payload)/api/bank-transfer/order/utils'
 import { getSeatHoldings as getCurrentSeatHoldings } from '@/app/(payload)/api/seat-holding/seat/utils'
 import { sendMailAndWriteLog } from '@/collections/Emails/utils'
-import { generateTicketBookEmailHtml } from '@/mail/templates/TicketBookedEmail'
-
+import { generateTicketDisneyEventBookEmailHtml } from '@/mail/templates/TicketDisneyEventBookedEmail'
+import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 interface TicketCounts {
   [ticketPriceName: string]: {
     [scheduleId: string]: number
@@ -293,11 +293,21 @@ export const swapSeats = async (
       if (updatedTicket.userEmail) {
         const user = updatedTicket.user as User
         const event = updatedTicket.event as Event
-        const html = await generateTicketBookEmailHtml({
+
+        const startTime = event?.startDatetime
+          ? tzFormat(toZonedTime(new Date(event.startDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm')
+          : ''
+        const endTime = event?.endDatetime
+          ? tzFormat(toZonedTime(new Date(event.endDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm')
+          : ''
+        const eventLocation = event?.eventLocation as string
+
+        const html = generateTicketDisneyEventBookEmailHtml({
           ticketCode: updatedTicket.ticketCode || '',
           eventName: event?.title || '',
-          eventDate: updatedTicket?.eventDate || '',
+          eventDate: `${startTime || 'N/A'} - ${endTime || 'N/A'}, ${updatedTicket?.eventDate || 'N/A'} (Giờ Việt Nam | Vietnam Time, GMT+7)`,
           seat: updatedTicket.seat || '',
+          eventLocation,
         })
 
         const resendMailData = {

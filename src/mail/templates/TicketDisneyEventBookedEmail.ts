@@ -8,7 +8,7 @@ export interface TicketData {
 
 // todo
 // using dynamic template set on Admin Panel instead of this static template
-export async function generateTicketDisneyEventBookEmailHtml(ticketData: TicketData) {
+export function generateTicketDisneyEventBookEmailHtml(ticketData: TicketData) {
   return `
   <!DOCTYPE html>
     <html lang="en">
