@@ -324,6 +324,7 @@ export const swapSeats = async (
             user: user.id,
             event: event?.id,
             ticket: updatedTicket.id,
+            status: 'sent'
           },
         })
       }

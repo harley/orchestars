@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { EMAIL_STATUSES } from './constant'
 
 export const Emails: CollectionConfig = {
   slug: 'emails',
@@ -25,16 +26,18 @@ export const Emails: CollectionConfig = {
       required: false,
     },
     { name: 'to', type: 'email', required: true },
+    { name: 'from', type: 'email', required: false },
     { name: 'cc', type: 'text', required: false },
     { name: 'subject', type: 'text', required: true },
     { name: 'html', type: 'textarea' },
     { name: 'text', type: 'textarea' },
     { name: 'provider', type: 'text', defaultValue: 'RESEND' },
     { name: 'extraData', type: 'json' },
+    { name: 'status', type: 'select', options: EMAIL_STATUSES },
     {
       name: 'sentAt',
       type: 'date',
-      defaultValue: () => new Date(),
+      // defaultValue: () => new Date(),
       admin: {
         date: {
           pickerAppearance: 'dayAndTime',

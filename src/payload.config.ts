@@ -40,9 +40,12 @@ import { IS_LOCAL_DEVELOPMENT } from './config/app'
 import { SeatingCharts } from './collections/SeatingCharts'
 import { MarketingTracking } from './collections/MarketingTracking'
 import { PromotionConfigs } from './collections/Promotion/PromotionConfigs'
+import { sendMailJob } from './collections/Emails/jobs/sendMail'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+
+let initializedSendMailJob = false
 
 export default buildConfig({
   admin: {
@@ -132,7 +135,7 @@ export default buildConfig({
     Admins,
     Emails,
     Logs,
-    MarketingTracking
+    MarketingTracking,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
@@ -145,14 +148,19 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  // onInit: async (payload) => {
-  //   payload.jobs
-  //     .run()
-  //     .then(() => console.log('Initialized cron job'))
-  //     .catch((err) => {
-  //       console.error('Error while initializing cron job', err)
-  //     })
-  // },
+  onInit: async (payload) => {
+    console.log('SKIP_PAYLOAD_INIT', process.env.SKIP_PAYLOAD_INIT === 'true')
+    if (process.env.SKIP_PAYLOAD_INIT === 'true') {
+      return
+    }
+    if (!initializedSendMailJob) {
+      console.log('-->payload onInit fired')
+      initializedSendMailJob = true
+      setInterval(() => {
+        sendMailJob({ payload })
+      }, 60000)
+    }
+  },
   jobs: {
     access: {
       run: ({ req }: { req: PayloadRequest }): boolean => {

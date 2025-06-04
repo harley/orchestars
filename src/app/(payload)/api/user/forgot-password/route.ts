@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
         subject: 'Password Reset Request',
         html,
       },
-      emailData: { user: user.id },
+      emailData: { user: user.id, status: 'sent' },
       payload,
     })
     return NextResponse.json({ message: 'If the email exists, a reset link will be sent.' })

@@ -4,8 +4,18 @@ import { PAYMENT_STATUS } from '../constants'
 import { ORDER_STATUS } from '@/collections/Orders/constants'
 import { TICKET_STATUS } from '@/collections/Tickets/constants'
 
+// Add debounce tracking
+let lastRunTime = 0
+const DEBOUNCE_INTERVAL = 10000 // 10s
+
 export const updatePaymentStatus = async ({ payload }: { payload: BasePayload }) => {
   try {
+    const now = Date.now()
+
+    if (now - lastRunTime < DEBOUNCE_INTERVAL) {
+      return
+    }
+    lastRunTime = now
     const last30minutes = subMinutes(new Date(), 30).toISOString()
     console.log(
       'Running update payment status: processing payments that expired after 30 minutes will be updated to cancel',
