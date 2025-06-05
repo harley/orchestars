@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
     const payload = await getPayload()
 
     // Execute the mail job
-    sendMailJob({ payload })
+    await sendMailJob({ payload })
 
     return NextResponse.json(
       { message: 'Mail job executed successfully' },
