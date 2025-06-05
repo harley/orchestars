@@ -82,7 +82,7 @@ const createEmailRecord = async ({
   } catch (error: any) {
     console.error('Error while writing email log', error)
 
-    logError({
+    await logError({
       payload,
       action: 'SAVE_MAIL_ERROR',
       description: `Error saving mail: ${error instanceof Error ? error.message : 'An unknown error occurred'}`,
