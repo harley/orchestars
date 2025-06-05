@@ -26,9 +26,15 @@ export const sendMailJob = async ({ payload }: { payload: BasePayload }) => {
       depth: 0,
     })
 
-    console.log(`---> Total mail sending ${pendingEmails.docs?.length}\n`)
+    const emails = pendingEmails.docs
 
-    for (const email of pendingEmails.docs) {
+    if (!emails.length) {
+      return
+    }
+
+    console.log(`---> Total mail sending ${emails?.length}\n`)
+
+    for (const email of emails) {
       const resendMailData = {
         to: email.to,
         cc: email.cc as string,

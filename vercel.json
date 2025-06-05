@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/send-email",
-      "schedule": "* * * * *"
+      "schedule": "*/2 * * * *"
     },
     {
       "path": "/api/payload-jobs/run",

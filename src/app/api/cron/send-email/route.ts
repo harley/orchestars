@@ -4,6 +4,7 @@ import { getPayload } from '@/payload-config/getPayloadConfig'
 // import { getServerSideURL } from '@/utilities/getURL'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 120; 
 
 export async function GET(req: NextRequest) {
   try {
@@ -37,7 +38,7 @@ export async function GET(req: NextRequest) {
     const payload = await getPayload()
 
     // Execute the mail job
-    await sendMailJob({ payload })
+    sendMailJob({ payload })
 
     return NextResponse.json(
       { message: 'Mail job executed successfully' },
