@@ -21,7 +21,7 @@ export const sendMailAndWriteLog = async ({
   const resendResult = await sendMail({ payload, mailData: resendMailData })
 
   if (resendResult) {
-    createEmailRecord({
+    await createEmailRecord({
       data: {
         ...resendMailData,
         ...emailData,
@@ -50,7 +50,7 @@ const sendMail = async ({
   } catch (error: any) {
     console.error('Error while sending mail: ', error)
 
-    logError({
+    await logError({
       payload,
       action: 'SEND_MAIL_ERROR',
       description: `Error sending mail: ${error instanceof Error ? error.message : 'An unknown error occurred'}`,
@@ -116,7 +116,7 @@ export const sendMailAndUpdateEmailRecord = async ({
   const mailResult = await sendMail({ payload, mailData: resendMailData })
 
   if (mailResult) {
-    updateEmailRecord({
+    await updateEmailRecord({
       id: emailId,
       data: {
         status: 'sent',
@@ -147,7 +147,7 @@ export const updateEmailRecord = async ({
   } catch (error: any) {
     console.error('Error while updating email log', error)
 
-    logError({
+    await logError({
       payload,
       action: 'UPDATE_MAIL_ERROR',
       description: `Error updating mail: ${error instanceof Error ? error.message : 'An unknown error occurred'}`,

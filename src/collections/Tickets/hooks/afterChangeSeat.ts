@@ -50,7 +50,7 @@ export const afterChangeSeat = async ({ value, originalDoc, data, req }: FieldHo
             html,
           }
 
-          sendMailAndWriteLog({
+          await sendMailAndWriteLog({
             payload: req.payload,
             resendMailData,
             emailData: {

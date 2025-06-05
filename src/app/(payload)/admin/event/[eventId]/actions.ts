@@ -317,7 +317,7 @@ export const swapSeats = async (
           html,
         }
 
-        sendMailAndWriteLog({
+        await sendMailAndWriteLog({
           payload: payload,
           resendMailData,
           emailData: {
