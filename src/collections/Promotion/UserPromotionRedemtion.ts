@@ -3,6 +3,7 @@ import {
   USER_PROMOTION_REDEMPTION_STATUS,
   USER_PROMOTION_REDEMPTION_STATUSES,
 } from './constants/status'
+import { updateTotalUsedPromotionAfterChangeStatus } from './hooks/updateTotalUsedPromotion'
 // import { afterChangeStatus } from './hooks/afterChangeStatus'
 
 export const UserPromotionRedemptions: CollectionConfig = {
@@ -58,6 +59,9 @@ export const UserPromotionRedemptions: CollectionConfig = {
       options: USER_PROMOTION_REDEMPTION_STATUSES,
       required: true,
       defaultValue: USER_PROMOTION_REDEMPTION_STATUS.pending.value,
+      hooks: {
+        afterChange: [updateTotalUsedPromotionAfterChangeStatus],
+      },
     },
   ],
 }

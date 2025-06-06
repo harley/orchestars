@@ -1,0 +1,69 @@
+.container {
+  margin-bottom: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  height: 20px;
+  width: 20px;
+  color: #dddfe5; /* primary color */
+}
+
+.title {
+  font-weight: 500;
+}
+
+.maxPromotions {
+  font-size: 0.75rem;
+  color: #f7f7f7; /* muted foreground */
+}
+
+.promotionList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.promotionItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  transition: background 0.2s;
+}
+
+.promotionItem:hover {
+  background: #151515;
+}
+
+.promotionItem.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkbox {
+  margin-top: 0.25rem;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.discountInfo {
+  font-size: 12px;
+  font-weight: 500;
+  color: #f0f0f0;
+}
+
+.conditionText {
+  font-size: 0.75rem;
+  color: #f87171;
+  margin-top: 2px;
+} 

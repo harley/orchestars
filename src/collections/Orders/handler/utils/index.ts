@@ -1,10 +1,15 @@
 import {
   CustomerInfo,
   NewOrderItemWithBookingType,
+  PromotionApplied,
 } from '@/app/(payload)/api/bank-transfer/order/types'
-import { checkBookedOrPendingPaymentSeats } from '@/app/(payload)/api/bank-transfer/order/utils'
+import {
+  calculateTotalDiscountBookingTypeSeat,
+  checkBookedOrPendingPaymentSeats,
+  checkPromotionCode,
+} from '@/app/(payload)/api/bank-transfer/order/utils'
 import { getExistingSeatHolding } from '@/app/(payload)/api/seat-holding/seat/utils'
-import { Event, Order, User } from '@/payload-types'
+import { Event, Order, Payment, Promotion, User } from '@/payload-types'
 import { generateCode } from '@/utilities/generateCode'
 import { BasePayload, PayloadRequest } from 'payload'
 
@@ -86,7 +91,6 @@ export const createOrderAndTickets = async ({
   transactionID,
   currency,
   note,
-  adjustedTotal,
   payload,
   req,
 }: {
@@ -99,7 +103,6 @@ export const createOrderAndTickets = async ({
   transactionID: number | Promise<number | string> | string
   currency: string
   note?: string
-  adjustedTotal?: number
   payload: BasePayload
   req: PayloadRequest
 }) => {
@@ -112,7 +115,7 @@ export const createOrderAndTickets = async ({
     {} as Record<string, Event>,
   )
 
-  const totalBeforeDiscount = orderItems.reduce((acc, item) => acc + item.price, 0)
+  // const totalBeforeDiscount = orderItems.reduce((acc, item) => acc + item.price, 0)
 
   const newOrder = await payload.create({
     collection: 'orders',
@@ -121,9 +124,9 @@ export const createOrderAndTickets = async ({
       orderCode,
       user: customerData.id,
       status: 'completed',
-      totalBeforeDiscount,
-      totalDiscount: 0,
-      total: adjustedTotal ?? totalBeforeDiscount,
+      // totalBeforeDiscount,
+      // totalDiscount: 0,
+      // total: adjustedTotal ?? totalBeforeDiscount,
       customerData: customerInput as Record<string, any>,
       currency,
       note,
@@ -133,6 +136,7 @@ export const createOrderAndTickets = async ({
     context: {
       triggerAfterCreated: false,
     },
+    depth: 0,
   })
 
   // create order items
@@ -207,6 +211,7 @@ export const createOrderAndTickets = async ({
 }
 
 export const createPayment = async ({
+  paymentEntityData,
   customerData,
   newOrder,
   totalBeforeDiscount,
@@ -216,6 +221,7 @@ export const createPayment = async ({
   currency,
   payload,
 }: {
+  paymentEntityData: Partial<Payment>
   customerData: User
   newOrder: Order
   currency: string
@@ -228,6 +234,7 @@ export const createPayment = async ({
   return await payload.create({
     collection: 'payments',
     data: {
+      ...(paymentEntityData || {}),
       user: customerData.id,
       order: newOrder.id,
       currency,
@@ -236,11 +243,155 @@ export const createPayment = async ({
       total,
       status: 'paid',
       paymentData: {},
-      paidAt: new Date().toISOString()
+      paidAt: new Date().toISOString(),
     },
     req: { transactionID },
     context: {
       triggerAfterCreated: false,
     },
+    depth: 0,
   })
+}
+
+export const processPromotionsApplied = async ({
+  promotionCodes,
+  orderItems,
+  event,
+  userId,
+  payload,
+}: {
+  promotionCodes?: string[]
+  orderItems: NewOrderItemWithBookingType[]
+  event: Event
+  userId: number
+  payload: BasePayload
+}) => {
+  let promotions: Promotion[] = []
+
+  const eventId = event?.id
+
+  if (promotionCodes?.length) {
+    const _promotionCodes = [...new Set(promotionCodes)]
+
+    const eventPromotionConfig = await payload
+      .find({
+        collection: 'promotionConfigs',
+        limit: 1,
+        where: {
+          event: { equals: Number(eventId) },
+        },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          event: true,
+          validationRules: true,
+          stackingRules: true,
+        },
+        depth: 0,
+      })
+      .then((res) => res.docs?.[0])
+
+    promotions = await Promise.all(
+      _promotionCodes.map((promotionCode) =>
+        checkPromotionCode({
+          promotionCode,
+          eventId,
+          userId,
+          payload,
+        }),
+      ),
+    )
+
+    const allowApplyingMultiplePromotions =
+      eventPromotionConfig?.validationRules?.allowApplyingMultiplePromotions
+    const maxAppliedPromotions = eventPromotionConfig?.validationRules?.maxAppliedPromotions || 1
+
+    if (!allowApplyingMultiplePromotions && promotions.length > 1) {
+      throw new Error('PROMO009')
+    }
+
+    if (allowApplyingMultiplePromotions && promotions.length > maxAppliedPromotions) {
+      throw new Error(`PROMO010|${JSON.stringify({ maxAppliedPromotions })}`)
+    }
+
+    // todo handle stackingRules
+
+    for (const promotion of promotions) {
+      if (promotion.conditions?.isApplyCondition) {
+        const appliedTicketClasses = promotion?.appliedTicketClasses || []
+
+        const totalQuantityAppliedTicketClasses = orderItems.reduce((totalQuantity, orderItem) => {
+          const ticketPriceInfo = event?.ticketPrices?.find(
+            (ticketPrice: any) => ticketPrice.id === orderItem.ticketPriceId,
+          )
+
+          const appliedForTicket =
+            appliedTicketClasses.length === 0 ||
+            appliedTicketClasses.some((applied) => applied.ticketClass === ticketPriceInfo?.name)
+
+          const quantity = 1 // for booking type seat, quantity always 1
+
+          if (appliedForTicket) {
+            totalQuantity += quantity
+          }
+
+          return totalQuantity
+        }, 0)
+
+        const canApplyPromoCode =
+          !!promotion.conditions?.minTickets &&
+          totalQuantityAppliedTicketClasses >= (promotion.conditions?.minTickets as number)
+
+        if (!canApplyPromoCode) {
+          throw new Error(`PROMO008|${JSON.stringify({ promotionCode: promotion.code })}`)
+        }
+      }
+    }
+  }
+
+  let totalBeforeDiscount = 0
+  let totalDiscount = 0
+
+  const promotionsApplied: PromotionApplied[] = []
+
+  if (promotions.length) {
+    for (const promotion of promotions) {
+      const calculateData = calculateTotalDiscountBookingTypeSeat({
+        orderItems,
+        promotion,
+        event,
+      })
+
+      if (!totalBeforeDiscount) {
+        totalBeforeDiscount = calculateData.totalBeforeDiscount
+      }
+
+      totalDiscount += calculateData.totalBeforeDiscount - calculateData.amount
+
+      promotionsApplied.push({
+        promotion: promotion.id,
+        promotionCode: promotion.code,
+        discountAmount: calculateData.totalBeforeDiscount - calculateData.amount,
+      })
+    }
+  } else {
+    const calculateData = calculateTotalDiscountBookingTypeSeat({
+      orderItems,
+      event,
+    })
+    totalBeforeDiscount = calculateData.totalBeforeDiscount
+    totalDiscount = calculateData.totalDiscount
+  }
+
+  let amount = totalBeforeDiscount - totalDiscount
+  amount = amount < 0 ? 0 : amount
+
+  return {
+    amount,
+    totalBeforeDiscount,
+    totalDiscount,
+    promotionsApplied,
+    promotions
+  }
 }

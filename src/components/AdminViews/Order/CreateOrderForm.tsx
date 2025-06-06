@@ -13,17 +13,20 @@ import {
 } from '@payloadcms/ui'
 import { formatMoney } from '@/utilities/formatMoney'
 import axios from 'axios'
-import { Event, Media, SeatingChart } from '@/payload-types'
+import { Event, Media, Promotion, PromotionConfig, SeatingChart } from '@/payload-types'
 import { EventSchedule, TicketPrice } from '@/types/Event'
 import { format as formatDate } from 'date-fns'
 import SelectOrderCategory from './SelectOrderCategory/SelectOrderCategory'
 import { EventSeatChartData } from '@/components/EventDetail/types/SeatChart'
+import PromotionListCheckbox from './PromotionListCheckbox'
+import { calculateMultiPromotionsTotalOrder, TicketSelected } from '@/components/EventDetail/SeatReservation/SeatMapSelection/utils/calculateTotal'
 
 // --- Types ---
 type SeatSelection = {
   ticketPriceId: string // ticketPriceId
   seat: string // seat
   price: number // price
+  ticketPriceInfo?: TicketPrice
 }
 type FormValues = {
   eventId?: string
@@ -82,6 +85,7 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
   // When eventId changes, update selectedEvent, ticketClasses, and eventDates
   const eventId = watch('eventId')
   const eventScheduleId = watch('eventScheduleId')
+  
   useEffect(() => {
     if (eventId) {
       const event = events.find((e) => e.id === Number(eventId))
@@ -117,18 +121,17 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
 
   useEffect(() => {
     const seatChartUrl = ((selectedEvent?.seatingChart as SeatingChart)?.seatMap as Media)?.url
-    if(!seatChartUrl) {
+    if (!seatChartUrl) {
       return
     }
 
-    
     fetch(seatChartUrl)
-      .then(res => res.json())
+      .then((res) => res.json())
       .then((data: EventSeatChartData) => {
         setAllSeats(data.seats)
       })
-      .catch(err => {
-        console.error('Error fetching seat chart:', err)  
+      .catch((err) => {
+        console.error('Error fetching seat chart:', err)
       })
   }, [selectedEvent?.seatingChart])
 
@@ -172,19 +175,27 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
   // Watch seats for duplicate seat name validation and price auto-fill
   const orderItems = watch('orderItems') || []
 
-  // Compute total
-  const computedTotal = orderItems.reduce((sum, seat) => sum + (Number(seat.price) || 0), 0)
-  const adjustedTotal = watch('adjustedTotal')
-  const totalAmount =
-    adjustedTotal !== undefined && adjustedTotal !== null && String(adjustedTotal) !== ''
-      ? Number(adjustedTotal)
-      : computedTotal
-
-  // Prevent duplicate seat names
-  const seatNameCounts = orderItems.reduce<Record<string, number>>((acc, seat) => {
-    if (seat.seat) acc[seat.seat] = (acc[seat.seat] || 0) + 1
-    return acc
-  }, {})
+  const [promotions, setPromotions] = useState<Promotion[]>([])
+  const [eventPromotionConfig, setEventPromotionConfig] = useState<PromotionConfig>()
+  const [selectedPromotions, setSelectedPromotions] = useState<Promotion[]>([])
+  
+  useEffect(() => {
+    if (!eventId) {
+      setPromotions([])
+      setEventPromotionConfig(undefined)
+      setSelectedPromotions([])
+      return
+    }
+    fetch(`/api/promotion?eventId=${eventId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setPromotions(data?.promotions || [])
+        setEventPromotionConfig(data?.eventPromotionConfig)
+      })
+      .catch((err) => {
+        console.log('Error while fetching promotions', err)
+      })
+  }, [eventId])
 
   // Form submit
   const onSubmit = async (data: FormValues) => {
@@ -208,6 +219,7 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
         currency: data.currency || 'VND',
         category: data.category,
         orderItems,
+        promotionCodes: selectedPromotions.map((promotion) => promotion.code),
         adjustedTotal:
           data.adjustedTotal !== undefined &&
           data.adjustedTotal !== null &&
@@ -223,6 +235,7 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
       toast.success(t('general:successfullyCreated', { label: 'Order' }))
 
       resetForm({ orderItems: [{ ticketPriceId: '', seat: '', price: 0 }] })
+      setSelectedPromotions([])
     } catch (error: any) {
       console.log('error', error)
       const messageError = error?.response?.data?.message || t('message.errorOccurred' as any)
@@ -230,6 +243,54 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
       toast.error(messageError)
     }
   }
+
+
+  const isAllowApplyMultiplePromotions =
+    eventPromotionConfig?.validationRules?.allowApplyingMultiplePromotions
+  const maxAppliedPromotions = eventPromotionConfig?.validationRules?.maxAppliedPromotions || 1
+
+  const ticketSelected = orderItems.reduce((obj, oItem) => {
+
+    if(!oItem.ticketPriceInfo || !oItem.seat) {
+      return obj
+    }
+
+    const ticketName = oItem.ticketPriceInfo?.name as string
+    if (!obj[ticketName]) {
+      obj[ticketName] = {
+        id: oItem.ticketPriceId,
+        ticketName: ticketName,
+        seats: [],
+        total: 0,
+        quantity: 0,
+      }
+    }
+
+    obj[ticketName].seats.push(oItem.seat)
+    obj[ticketName].total += oItem.price
+    obj[ticketName].quantity += 1
+
+    return obj
+  }, {} as TicketSelected)
+  
+  const calculateTotal = calculateMultiPromotionsTotalOrder(
+    selectedPromotions,
+    ticketSelected,
+    selectedEvent as Event,
+  )
+
+  // Compute total
+  const adjustedTotal = watch('adjustedTotal')
+  const totalAmount =
+    adjustedTotal !== undefined && adjustedTotal !== null && String(adjustedTotal) !== ''
+      ? Number(adjustedTotal)
+      : calculateTotal.amount
+
+  // Prevent duplicate seat names
+  const seatNameCounts = orderItems.reduce<Record<string, number>>((acc, seat) => {
+    if (seat.seat) acc[seat.seat] = (acc[seat.seat] || 0) + 1
+    return acc
+  }, {})
 
   return (
     <Gutter>
@@ -346,7 +407,9 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
                           value={field.value ?? ''}
                           onChange={(option) => {
                             const selectedTicketClass = Array.isArray(option) ? option[0] : option
+
                             setValue(`orderItems.${idx}.seat`, '')
+                            setValue(`orderItems.${idx}.ticketPriceInfo`, (selectedTicketClass as any)?.ticketPrice as TicketPrice)
                             setValue(
                               `orderItems.${idx}.price`,
                               (selectedTicketClass?.ticketPrice as TicketPrice)?.price || 0,
@@ -544,11 +607,32 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
                   )}
                 />
               </div>
+              {/* PromotionListCheckbox */}
+              <div style={{ marginBottom: 16 }}>
+                <PromotionListCheckbox
+                  promotions={promotions}
+                  selectedPromotions={selectedPromotions}
+                  onSelectPromotions={setSelectedPromotions}
+                  isAllowApplyMultiplePromotions={isAllowApplyMultiplePromotions as boolean}
+                  maxAppliedPromotions={maxAppliedPromotions}
+                  ticketSelected={ticketSelected}
+                  event={selectedEvent as Event}
+                />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ flex: 1 }}>Total Before Discount</div>
+                <TextInput
+                  path="totalBeforeDiscount"
+                  value={String(formatMoney(calculateTotal.amountBeforeDiscount))}
+                  readOnly
+                  style={{ textAlign: 'right', background: 'white', color: 'black' }}
+                />
+              </div>
               <div style={{ marginBottom: 12 }}>
                 <div style={{ flex: 1 }}>Total Amount</div>
                 <TextInput
                   path="computedTotal"
-                  value={String(formatMoney(computedTotal))}
+                  value={String(formatMoney(calculateTotal.amount))}
                   readOnly
                   style={{ textAlign: 'right', background: 'white', color: 'black' }}
                 />
