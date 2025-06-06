@@ -45,7 +45,6 @@ export const createOrderHandler = async (req: PayloadRequest) => {
     const customer = body.customer
 
     const order = body.order
-    console.log('order', order)
 
     let orderItems = order.orderItems as NewOrderItemWithBookingType[]
 

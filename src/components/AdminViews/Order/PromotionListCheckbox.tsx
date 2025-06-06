@@ -77,7 +77,7 @@ const PromotionListCheckbox: React.FC<PromotionListCheckboxProps> = ({
                   e.preventDefault()
                   e.stopPropagation()
                   if (isDisabled) return
-                  handlePromotionChange(promotion, !e.target.checked)
+                  handlePromotionChange(promotion, e.target.checked)
                 }}
                 className={styles.checkbox}
               />
