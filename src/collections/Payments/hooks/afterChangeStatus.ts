@@ -2,8 +2,7 @@ import { USER_PROMOTION_REDEMPTION_STATUS } from '@/collections/Promotion/consta
 import { FieldHookArgs } from 'payload'
 
 export const afterChangeStatus = async ({ value, originalDoc, req, context }: FieldHookArgs) => {
-
-  if(context.triggerAfterCreated === false) {
+  if (context.triggerAfterCreated === false) {
     return value
   }
   if (value === 'paid' && originalDoc.order) {
@@ -15,6 +14,7 @@ export const afterChangeStatus = async ({ value, originalDoc, req, context }: Fi
           collection: 'orders',
           id: orderId,
           data: { status: 'completed' },
+          req: { transactionID: req.transactionID as string },
         })
       } catch (error) {
         console.error('Error updating order status:', error)
@@ -38,30 +38,8 @@ export const afterChangeStatus = async ({ value, originalDoc, req, context }: Fi
             status: USER_PROMOTION_REDEMPTION_STATUS.used.value,
             redeemAt: new Date().toISOString(),
           },
+          req: { transactionID: req.transactionID as string },
         })
-
-        // update promotion total used
-        const promotionId = originalDoc.promotion?.id || originalDoc.promotion
-        if (promotionId) {
-          console.log('----> Updating promotion total used')
-          const countTotalUserUsed = await req.payload
-            .count({
-              collection: 'userPromotionRedemptions',
-              where: {
-                promotion: { equals: promotionId },
-                status: { equals: USER_PROMOTION_REDEMPTION_STATUS.used.value },
-              },
-            })
-            .then((res) => res.totalDocs)
-
-          await req.payload.update({
-            collection: 'promotions',
-            id: promotionId,
-            data: {
-              totalUsed: countTotalUserUsed,
-            },
-          })
-        }
       } catch (error) {
         console.error('Error updating userPromotionRedemptions status:', error)
       }

@@ -15,12 +15,23 @@ import { generateCode } from '@/utilities/generateCode'
 import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
 import { NextResponse } from 'next/server'
 import { PayloadRequest } from 'payload'
-import { checkSeatAvailable, createOrderAndTickets, createPayment } from './utils'
+import {
+  checkSeatAvailable,
+  createOrderAndTickets,
+  createPayment,
+  processPromotionsApplied,
+} from './utils'
 import { sendTicketMail } from '../helper/sendTicketMail'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
+import { USER_PROMOTION_REDEMPTION_STATUS } from '@/collections/Promotion/constants/status'
 type AdminCreateOrderData = {
   customer: CustomerInfo
-  order: NewInputOrder & { note?: string; adjustedTotal?: number; category?: string }
+  order: NewInputOrder & {
+    note?: string
+    adjustedTotal?: number
+    category?: string
+    promotionCodes?: string[]
+  }
 }
 
 export const createOrderHandler = async (req: PayloadRequest) => {
@@ -34,6 +45,7 @@ export const createOrderHandler = async (req: PayloadRequest) => {
     const customer = body.customer
 
     const order = body.order
+
     let orderItems = order.orderItems as NewOrderItemWithBookingType[]
 
     await validateCustomerInfo({ customer })
@@ -75,6 +87,15 @@ export const createOrderHandler = async (req: PayloadRequest) => {
       // 1 check user info, it not exist, will create a new one
       const customerData = await createCustomerIfNotExist({ customer, transactionID, payload })
 
+      const { amount, totalBeforeDiscount, totalDiscount, promotionsApplied, promotions } =
+        await processPromotionsApplied({
+          promotionCodes: order.promotionCodes,
+          orderItems,
+          event,
+          userId: customerData.id,
+          payload,
+        })
+
       // create order
       const { newOrder, newTickets } = await createOrderAndTickets({
         orderCode,
@@ -86,15 +107,18 @@ export const createOrderHandler = async (req: PayloadRequest) => {
         payload,
         customerInput: customer,
         req,
-        adjustedTotal,
         note: order.note,
         orderData: {
-          category: order.category
-        }
+          category: order.category,
+          totalBeforeDiscount,
+          totalDiscount,
+          total: adjustedTotal ?? amount,
+          promotionsApplied,
+        },
       })
 
       // create payment record
-      await createPayment({
+      const payment = await createPayment({
         customerData,
         newOrder,
         totalDiscount: newOrder.totalDiscount as number,
@@ -103,7 +127,30 @@ export const createOrderHandler = async (req: PayloadRequest) => {
         transactionID,
         currency: order.currency,
         payload,
+        paymentEntityData: {
+          promotionsApplied,
+        },
       })
+
+      if (promotions.length) {
+        await Promise.all(
+          promotions.map((promotion) =>
+            payload.create({
+              collection: 'userPromotionRedemptions',
+              data: {
+                promotion: promotion.id,
+                user: customerData.id,
+                event: event?.id,
+                payment: payment.id,
+                status: USER_PROMOTION_REDEMPTION_STATUS.used.value,
+                redeemAt: new Date().toISOString(),
+              },
+              req: { transactionID },
+              depth: 0,
+            }),
+          ),
+        )
+      }
 
       // Commit the transaction
       await payload.db.commitTransaction(transactionID)
@@ -111,22 +158,28 @@ export const createOrderHandler = async (req: PayloadRequest) => {
       // send mail
       const user = newTickets?.[0]?.user as User
 
-      const startTime = event?.startDatetime ? tzFormat(toZonedTime(new Date(event.startDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm') : ''
-        const endTime = event?.endDatetime ? tzFormat(toZonedTime(new Date(event.endDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm') : ''
-        const eventLocation = event?.eventLocation as string
+      const startTime = event?.startDatetime
+        ? tzFormat(toZonedTime(new Date(event.startDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm')
+        : ''
+      const endTime = event?.endDatetime
+        ? tzFormat(toZonedTime(new Date(event.endDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm')
+        : ''
+      const eventLocation = event?.eventLocation as string
 
       const ticketData = newTickets.map((tk) => ({
         ticketCode: tk?.ticketCode as string,
         seat: tk?.seat as string,
         ticketId: tk?.id,
         eventDate: `${startTime || 'N/A'} - ${endTime || 'N/A'}, ${tk?.eventDate || 'N/A'} (Giờ Việt Nam | Vietnam Time, GMT+7)`,
-        eventLocation
+        eventLocation,
       }))
-      sendTicketMail({
+      await sendTicketMail({
         event,
         user,
         ticketData,
         payload,
+      }).catch((err) => {
+        console.error('Error while sending ticket mail in create order admin handler:', err)
       })
 
       const nextResponse = NextResponse.json({}, { status: 200 })
