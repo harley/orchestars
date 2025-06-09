@@ -238,18 +238,38 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
 
     Promise.all([
       fetch(`/api/promotions?${queryPromotion}`)
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) {
+            return res.text().then((text) => {
+              throw new Error(
+                `Failed to fetch promotions: ${res.status} ${res.statusText} - ${text}`,
+              )
+            })
+          }
+          return res.json()
+        })
         .catch((err) => {
-          console.log('Error while fetching promotions', err)
+          console.error('Error while fetching promotions', err)
+          return { docs: [] }
         }),
       fetch(`/api/promotionConfigs?${queryConfigPromotion}`)
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) {
+            return res.text().then((text) => {
+              throw new Error(
+                `Failed to fetch promotion config: ${res.status} ${res.statusText} - ${text}`,
+              )
+            })
+          }
+          return res.json()
+        })
         .catch((err) => {
-          console.log('Error while fetching promotion config', err)
+          console.error('Error while fetching promotion config', err)
+          return { docs: [] }
         }),
     ]).then((result) => {
       const promotions = result?.[0]?.docs || []
-      const eventPromotionConfig = result?.[1]?.docs?.[0] || []
+      const eventPromotionConfig = result?.[1]?.docs?.[0]
       setPromotions(promotions)
       setEventPromotionConfig(eventPromotionConfig)
     })
