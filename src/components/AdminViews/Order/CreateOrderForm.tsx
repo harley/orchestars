@@ -19,7 +19,11 @@ import { format as formatDate } from 'date-fns'
 import SelectOrderCategory from './SelectOrderCategory/SelectOrderCategory'
 import { EventSeatChartData } from '@/components/EventDetail/types/SeatChart'
 import PromotionListCheckbox from './PromotionListCheckbox'
-import { calculateMultiPromotionsTotalOrder, TicketSelected } from '@/components/EventDetail/SeatReservation/SeatMapSelection/utils/calculateTotal'
+import {
+  calculateMultiPromotionsTotalOrder,
+  TicketSelected,
+} from '@/components/EventDetail/SeatReservation/SeatMapSelection/utils/calculateTotal'
+import qs from 'qs'
 
 // --- Types ---
 type SeatSelection = {
@@ -85,7 +89,7 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
   // When eventId changes, update selectedEvent, ticketClasses, and eventDates
   const eventId = watch('eventId')
   const eventScheduleId = watch('eventScheduleId')
-  
+
   useEffect(() => {
     if (eventId) {
       const event = events.find((e) => e.id === Number(eventId))
@@ -178,7 +182,7 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
   const [promotions, setPromotions] = useState<Promotion[]>([])
   const [eventPromotionConfig, setEventPromotionConfig] = useState<PromotionConfig>()
   const [selectedPromotions, setSelectedPromotions] = useState<Promotion[]>([])
-  
+
   useEffect(() => {
     if (!eventId) {
       setPromotions([])
@@ -186,15 +190,79 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
       setSelectedPromotions([])
       return
     }
-    fetch(`/api/promotion?eventId=${eventId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setPromotions(data?.promotions || [])
-        setEventPromotionConfig(data?.eventPromotionConfig)
-      })
-      .catch((err) => {
-        console.log('Error while fetching promotions', err)
-      })
+    const currentTime = new Date().toISOString()
+    const queryPromotion = qs.stringify({
+      where: {
+        status: {
+          equals: 'active',
+        },
+        event: {
+          equals: eventId,
+        },
+        startDate: { less_than_equal: currentTime },
+        endDate: { greater_than_equal: currentTime },
+      },
+      select: {
+        id: true,
+        code: true,
+        appliedTicketClasses: true,
+        perUserLimit: true,
+        discountType: true,
+        discountValue: true,
+        startDate: true,
+        endDate: true,
+        conditions: true,
+        discountApplyScope: true,
+      },
+      limit: 100,
+      depth: 0,
+    })
+
+    const queryConfigPromotion = qs.stringify({
+      where: {
+        event: {
+          equals: eventId,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        event: true,
+        validationRules: true,
+        stackingRules: true,
+      },
+      limit: 1,
+      depth: 0,
+    })
+
+    Promise.all([
+      fetch(`/api/promotions?${queryPromotion}`)
+        .then((res) => res.json())
+        .catch((err) => {
+          console.log('Error while fetching promotions', err)
+        }),
+      fetch(`/api/promotionConfigs?${queryConfigPromotion}`)
+        .then((res) => res.json())
+        .catch((err) => {
+          console.log('Error while fetching promotion config', err)
+        }),
+    ]).then((result) => {
+      const promotions = result?.[0]?.docs || []
+      const eventPromotionConfig = result?.[1]?.docs?.[0] || []
+      setPromotions(promotions)
+      setEventPromotionConfig(eventPromotionConfig)
+    })
+
+    // fetch(`/api/promotion?eventId=${eventId}`)
+    //   .then((res) => res.json())
+    //   .then((data) => {
+    //     setPromotions(data?.promotions || [])
+    //     setEventPromotionConfig(data?.eventPromotionConfig)
+    //   })
+    //   .catch((err) => {
+    //     console.log('Error while fetching promotions', err)
+    //   })
   }, [eventId])
 
   // Form submit
@@ -244,14 +312,12 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
     }
   }
 
-
   const isAllowApplyMultiplePromotions =
     eventPromotionConfig?.validationRules?.allowApplyingMultiplePromotions
   const maxAppliedPromotions = eventPromotionConfig?.validationRules?.maxAppliedPromotions || 1
 
   const ticketSelected = orderItems.reduce((obj, oItem) => {
-
-    if(!oItem.ticketPriceInfo || !oItem.seat) {
+    if (!oItem.ticketPriceInfo || !oItem.seat) {
       return obj
     }
 
@@ -272,7 +338,7 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
 
     return obj
   }, {} as TicketSelected)
-  
+
   const calculateTotal = calculateMultiPromotionsTotalOrder(
     selectedPromotions,
     ticketSelected,
@@ -409,7 +475,10 @@ export const CreateOrderForm: React.FC<{ events: Event[] }> = ({ events }) => {
                             const selectedTicketClass = Array.isArray(option) ? option[0] : option
 
                             setValue(`orderItems.${idx}.seat`, '')
-                            setValue(`orderItems.${idx}.ticketPriceInfo`, (selectedTicketClass as any)?.ticketPrice as TicketPrice)
+                            setValue(
+                              `orderItems.${idx}.ticketPriceInfo`,
+                              (selectedTicketClass as any)?.ticketPrice as TicketPrice,
+                            )
                             setValue(
                               `orderItems.${idx}.price`,
                               (selectedTicketClass?.ticketPrice as TicketPrice)?.price || 0,
