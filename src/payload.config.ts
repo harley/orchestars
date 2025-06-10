@@ -40,6 +40,9 @@ import { IS_LOCAL_DEVELOPMENT } from './config/app'
 import { SeatingCharts } from './collections/SeatingCharts'
 import { MarketingTracking } from './collections/MarketingTracking'
 import { PromotionConfigs } from './collections/Promotion/PromotionConfigs'
+import { AffiliateLinks } from './collections/Affiliate/AffiliateLinks'
+import { AffiliateClickLogs } from './collections/Affiliate/AffiliateClickLogs'
+import { AffiliateSettings } from './collections/Affiliate/AffiliateSettings'
 // import { sendMailJob } from './collections/Emails/jobs/sendMail'
 
 const filename = fileURLToPath(import.meta.url)
@@ -136,6 +139,9 @@ export default buildConfig({
     Emails,
     Logs,
     MarketingTracking,
+    AffiliateLinks,
+    AffiliateClickLogs,
+    AffiliateSettings,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
