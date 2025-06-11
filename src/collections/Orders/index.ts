@@ -74,7 +74,7 @@ export const Orders: CollectionConfig = {
       },
       hooks: {
         afterRead: [
-          async ({  data }) => {
+          async ({ data }) => {
             if (data?.promotionsApplied?.length) {
               return data.promotionsApplied
                 .map((promo: any) => promo.promotionCode)
@@ -138,6 +138,51 @@ export const Orders: CollectionConfig = {
     {
       name: 'note',
       type: 'textarea',
+    },
+    {
+      name: 'affiliate',
+      type: 'group',
+      admin: {
+        description: 'Affiliate information'
+      },
+      fields: [
+        {
+          name: 'affiliateLink',
+          type: 'relationship',
+          relationTo: 'affiliate-links',
+          required: false,
+          index: true,
+          admin: {
+            description: 'Affiliate link used for this order',
+          },
+        },
+        {
+          name: 'affiliateCode',
+          type: 'text',
+          required: false,
+          index: true,
+          admin: {
+            description: 'Affiliate code used for this order',
+          },
+        },
+        {
+          name: 'affiliateUser',
+          type: 'relationship',
+          relationTo: 'users',
+          required: false,
+          index: true,
+          admin: {
+            description: 'Affiliate user who referred this order',
+          },
+          filterOptions: () => {
+            return {
+              role: {
+                equals: 'affiliate',
+              },
+            }
+          },
+        },
+      ],
     },
     {
       name: 'expireAt', // order will be expired in time

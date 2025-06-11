@@ -1071,6 +1071,23 @@ export interface Order {
     | boolean
     | null;
   note?: string | null;
+  /**
+   * Affiliate information
+   */
+  affiliate?: {
+    /**
+     * Affiliate link used for this order
+     */
+    affiliateLink?: (number | null) | AffiliateLink;
+    /**
+     * Affiliate code used for this order
+     */
+    affiliateCode?: string | null;
+    /**
+     * Affiliate user who referred this order
+     */
+    affiliateUser?: (number | null) | User;
+  };
   expireAt?: string | null;
   createdByAdmin?: (number | null) | Admin;
   updatedAt: string;
@@ -1104,6 +1121,36 @@ export interface Promotion {
   endDate: string;
   status: 'draft' | 'active' | 'disabled';
   isPrivate?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-links".
+ */
+export interface AffiliateLink {
+  id: number;
+  affiliateUser: number | User;
+  event?: (number | null) | Event;
+  affiliateCode: string;
+  promotionCode?: string | null;
+  /**
+   * UTM parameters (auto or manual)
+   */
+  utmParams?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Target link for the affiliate
+   */
+  targetLink?: string | null;
+  status?: ('active' | 'disabled') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1400,36 +1447,6 @@ export interface MarketingTracking {
   utmTerm?: string | null;
   utmContent?: string | null;
   conversionType?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "affiliate-links".
- */
-export interface AffiliateLink {
-  id: number;
-  affiliateUser: number | User;
-  event?: (number | null) | Event;
-  affiliateCode: string;
-  promotionCode?: string | null;
-  /**
-   * UTM parameters (auto or manual)
-   */
-  utmParams?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  /**
-   * Target link for the affiliate
-   */
-  targetLink?: string | null;
-  status?: ('active' | 'disabled') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2508,6 +2525,13 @@ export interface OrdersSelect<T extends boolean = true> {
   total?: T;
   customerData?: T;
   note?: T;
+  affiliate?:
+    | T
+    | {
+        affiliateLink?: T;
+        affiliateCode?: T;
+        affiliateUser?: T;
+      };
   expireAt?: T;
   createdByAdmin?: T;
   updatedAt?: T;
