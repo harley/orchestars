@@ -84,5 +84,16 @@ export const Users: CollectionConfig = {
       type: 'date',
       required: false,
     },
+    {
+      name: 'role',
+      type: 'select',
+      options: [
+        { label: 'Affiliate', value: 'affiliate' },
+        { label: 'User', value: 'user' },
+      ],
+      // required: true,
+      defaultValue: 'user',
+      // admin: { position: 'sidebar' },
+    },
   ],
 }

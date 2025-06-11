@@ -91,6 +91,9 @@ export interface Config {
     emails: Email;
     logs: Log;
     marketingTrackings: MarketingTracking;
+    'affiliate-links': AffiliateLink;
+    'affiliate-click-logs': AffiliateClickLog;
+    'affiliate-settings': AffiliateSetting;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -127,6 +130,9 @@ export interface Config {
     emails: EmailsSelect<false> | EmailsSelect<true>;
     logs: LogsSelect<false> | LogsSelect<true>;
     marketingTrackings: MarketingTrackingsSelect<false> | MarketingTrackingsSelect<true>;
+    'affiliate-links': AffiliateLinksSelect<false> | AffiliateLinksSelect<true>;
+    'affiliate-click-logs': AffiliateClickLogsSelect<false> | AffiliateClickLogsSelect<true>;
+    'affiliate-settings': AffiliateSettingsSelect<false> | AffiliateSettingsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -442,6 +448,7 @@ export interface User {
   firstName?: string | null;
   lastName?: string | null;
   lastActive?: string | null;
+  role?: ('affiliate' | 'user') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1398,6 +1405,180 @@ export interface MarketingTracking {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-links".
+ */
+export interface AffiliateLink {
+  id: number;
+  affiliateUser: number | User;
+  event?: (number | null) | Event;
+  affiliateCode: string;
+  promotionCode?: string | null;
+  /**
+   * UTM parameters (auto or manual)
+   */
+  utmParams?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Target link for the affiliate
+   */
+  targetLink?: string | null;
+  status?: ('active' | 'disabled') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Track affiliate link clicks and user interactions
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-click-logs".
+ */
+export interface AffiliateClickLog {
+  id: number;
+  affiliateUser: number | User;
+  affiliateLink: number | AffiliateLink;
+  /**
+   * Unique session identifier to prevent duplicate tracking
+   */
+  sessionId?: string | null;
+  /**
+   * Client IP address
+   */
+  ip?: string | null;
+  /**
+   * Geographic location (if available)
+   */
+  location?: string | null;
+  /**
+   * HTTP referrer header
+   */
+  referrer?: string | null;
+  /**
+   * Browser user agent string
+   */
+  userAgent?: string | null;
+  /**
+   * Additional tracking data including device info, promo codes, etc.
+   */
+  moreInformation?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Configure tier-based affiliate reward systems with commission percentages and free ticket rewards
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-settings".
+ */
+export interface AffiliateSetting {
+  id: number;
+  /**
+   * A descriptive name for this affiliate tier configuration (e.g. "Concert XYZ Affiliate Program")
+   */
+  name: string;
+  /**
+   * The event this affiliate setting applies to
+   */
+  event: number | Event;
+  /**
+   * The affiliate user setting applies to
+   */
+  affiliateUser: number | User;
+  /**
+   * Whether this affiliate setting is currently active
+   */
+  isActive?: boolean | null;
+  /**
+   * Optional description of this affiliate program
+   */
+  description?: string | null;
+  /**
+   * Define the tier system with different reward levels based on performance
+   */
+  tiers: {
+    /**
+     * Name for this tier (e.g. "Beginner", "Intermediate", "Professional")
+     */
+    tierName: string;
+    /**
+     * Numeric level for this tier (1 = lowest, higher numbers = higher tiers)
+     */
+    tierLevel: number;
+    /**
+     * Define how affiliates qualify for this tier
+     */
+    quaCriteria: {
+      /**
+       * Minimum number of tickets that must be sold to reach this tier
+       */
+      minTicketsSold: number;
+      /**
+       * Maximum number of tickets for this tier (leave empty for unlimited)
+       */
+      maxTicketsSold?: number | null;
+      /**
+       * Alternative qualification: minimum net revenue in VND
+       */
+      minNetRevenue?: number | null;
+      /**
+       * Maximum net revenue for this tier (leave empty for unlimited)
+       */
+      maxNetRevenue?: number | null;
+      /**
+       * Which ticket types count towards tier qualification (leave empty for all types)
+       */
+      eligTicketTypes?: ('zone1' | 'zone2' | 'zone3' | 'zone4' | 'zone5')[] | null;
+    };
+    /**
+     * Define the rewards for reaching this tier
+     */
+    rewards: {
+      /**
+       * Percentage of net revenue to pay as commission (e.g. 5 for 5%)
+       */
+      commissionPercentage: number;
+      /**
+       * Free tickets awarded when reaching this tier
+       */
+      freeTickets?:
+        | {
+            /**
+             * Class of free ticket to award. The value decreases by zone, with Zone 1 being the most expensive ticket.
+             */
+            ticketClass: 'zone1' | 'zone2' | 'zone3' | 'zone4' | 'zone5';
+            /**
+             * Number of free tickets to award
+             */
+            quantity: number;
+            /**
+             * Amount (in VND) to be used as a substitute if free tickets are not available.
+             */
+            ticketValue?: number | null;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    id?: string | null;
+  }[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1699,6 +1880,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'marketingTrackings';
         value: number | MarketingTracking;
+      } | null)
+    | ({
+        relationTo: 'affiliate-links';
+        value: number | AffiliateLink;
+      } | null)
+    | ({
+        relationTo: 'affiliate-click-logs';
+        value: number | AffiliateClickLog;
+      } | null)
+    | ({
+        relationTo: 'affiliate-settings';
+        value: number | AffiliateSetting;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -2126,6 +2319,7 @@ export interface UsersSelect<T extends boolean = true> {
   firstName?: T;
   lastName?: T;
   lastActive?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2544,6 +2738,79 @@ export interface MarketingTrackingsSelect<T extends boolean = true> {
   utmTerm?: T;
   utmContent?: T;
   conversionType?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-links_select".
+ */
+export interface AffiliateLinksSelect<T extends boolean = true> {
+  affiliateUser?: T;
+  event?: T;
+  affiliateCode?: T;
+  promotionCode?: T;
+  utmParams?: T;
+  targetLink?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-click-logs_select".
+ */
+export interface AffiliateClickLogsSelect<T extends boolean = true> {
+  affiliateUser?: T;
+  affiliateLink?: T;
+  sessionId?: T;
+  ip?: T;
+  location?: T;
+  referrer?: T;
+  userAgent?: T;
+  moreInformation?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-settings_select".
+ */
+export interface AffiliateSettingsSelect<T extends boolean = true> {
+  name?: T;
+  event?: T;
+  affiliateUser?: T;
+  isActive?: T;
+  description?: T;
+  tiers?:
+    | T
+    | {
+        tierName?: T;
+        tierLevel?: T;
+        quaCriteria?:
+          | T
+          | {
+              minTicketsSold?: T;
+              maxTicketsSold?: T;
+              minNetRevenue?: T;
+              maxNetRevenue?: T;
+              eligTicketTypes?: T;
+            };
+        rewards?:
+          | T
+          | {
+              commissionPercentage?: T;
+              freeTickets?:
+                | T
+                | {
+                    ticketClass?: T;
+                    quantity?: T;
+                    ticketValue?: T;
+                    id?: T;
+                  };
+            };
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
