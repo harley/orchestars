@@ -130,7 +130,7 @@ export function CreateAffiliateLinkDialog({
     if (watchedValues.event) {
       const selectedEvent = events.find((evt) => String(evt.id) === watchedValues.event)
       if (selectedEvent) {
-        url = `/${selectedEvent.slug}`
+        url += `/${selectedEvent.slug}`
       }
     }
 
