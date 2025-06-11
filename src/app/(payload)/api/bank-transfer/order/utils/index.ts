@@ -12,6 +12,40 @@ import { getExistingSeatHolding } from '@/app/(payload)/api/seat-holding/seat/ut
 import { DISCOUNT_APPLY_SCOPE } from '@/collections/Promotion/constants'
 import { sql } from '@payloadcms/db-postgres/drizzle'
 
+// Utility function to get affiliate data from cookies
+export const getAffiliateDataFromCookies = async (payload: BasePayload) => {
+  const cookieStore = await cookies()
+
+  const affiliateCode = cookieStore.get('affiliate_code')?.value
+
+  // If we have an affiliate code, try to find the affiliate user
+  if (affiliateCode) {
+    try {
+      const affiliateLink = await payload
+        .find({
+          collection: 'affiliate-links',
+          where: {
+            affiliateCode: { equals: affiliateCode },
+            status: { equals: 'active' },
+          },
+          limit: 1,
+          depth: 0,
+        })
+        .then((res) => res.docs?.[0])
+      if (!affiliateLink) {
+        return
+      }
+      return {
+        affiliateLink: affiliateLink.id,
+        affiliateCode,
+        affiliateUser: affiliateLink.affiliateUser,
+      }
+    } catch (error) {
+      console.error(`Error finding affiliate code ${affiliateCode}:`, error)
+    }
+  }
+}
+
 export const checkBookedOrPendingPaymentSeats = async ({
   eventId,
   eventScheduleId,
@@ -426,6 +460,9 @@ export const createOrderAndTickets = async ({
     event: events[0] as Event,
   })
 
+  // Get affiliate data from cookies
+  const affiliateData = await getAffiliateDataFromCookies(payload)
+
   const newOrder = await payload.create({
     collection: 'orders',
     data: {
@@ -440,6 +477,8 @@ export const createOrderAndTickets = async ({
       customerData: customerInput as Record<string, any>,
       currency,
       expireAt: expireAt.toISOString(),
+      // Add affiliate tracking data
+      affiliate: affiliateData,
     },
     req: { transactionID },
   })
@@ -553,6 +592,9 @@ export const createOrderWithMultiplePromotionsAndTickets = async ({
     {} as Record<string, Event>,
   )
 
+  // Get affiliate data from cookies
+  const affiliateData = await getAffiliateDataFromCookies(payload)
+
   const newOrder = await payload.create({
     collection: 'orders',
     data: {
@@ -566,6 +608,7 @@ export const createOrderWithMultiplePromotionsAndTickets = async ({
       customerData: customerInput as Record<string, any>,
       currency,
       expireAt: expireAt.toISOString(),
+      affiliate: affiliateData,
     },
     req: { transactionID },
     depth: 0,
@@ -682,6 +725,9 @@ export const createOrderAndTicketsWithTicketClassType = async ({
     event: events[0] as Event,
   })
 
+  // Get affiliate data from cookies
+  const affiliateData = await getAffiliateDataFromCookies(payload)
+
   const newOrder = await payload.create({
     collection: 'orders',
     data: {
@@ -696,6 +742,7 @@ export const createOrderAndTicketsWithTicketClassType = async ({
       currency,
       customerData: customerInput as Record<string, any>,
       expireAt: expireAt.toISOString(),
+      affiliate: affiliateData,
     },
     req: { transactionID },
   })
@@ -795,7 +842,7 @@ export const checkPromotionCode = async ({
         event: { equals: eventId },
         code: { equals: promotionCode.toUpperCase() },
       },
-      depth: 0
+      depth: 0,
     })
     .then((res) => res.docs?.[0])
 
