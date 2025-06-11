@@ -1434,6 +1434,8 @@ export interface AffiliateLink {
   createdAt: string;
 }
 /**
+ * Track affiliate link clicks and user interactions
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "affiliate-click-logs".
  */
@@ -1441,10 +1443,29 @@ export interface AffiliateClickLog {
   id: number;
   affiliateUser: number | User;
   affiliateLink: number | AffiliateLink;
+  /**
+   * Unique session identifier to prevent duplicate tracking
+   */
+  sessionId?: string | null;
+  /**
+   * Client IP address
+   */
   ip?: string | null;
+  /**
+   * Geographic location (if available)
+   */
   location?: string | null;
+  /**
+   * HTTP referrer header
+   */
   referrer?: string | null;
+  /**
+   * Browser user agent string
+   */
   userAgent?: string | null;
+  /**
+   * Additional tracking data including device info, promo codes, etc.
+   */
   moreInformation?:
     | {
         [k: string]: unknown;
@@ -2742,6 +2763,7 @@ export interface AffiliateLinksSelect<T extends boolean = true> {
 export interface AffiliateClickLogsSelect<T extends boolean = true> {
   affiliateUser?: T;
   affiliateLink?: T;
+  sessionId?: T;
   ip?: T;
   location?: T;
   referrer?: T;

@@ -57,6 +57,7 @@ import * as migration_20250530_165258_support_multi_promotion_codes from './2025
 import * as migration_20250604_053644_add_columns_email from './20250604_053644_add_columns_email';
 import * as migration_20250604_160223_add_seo_columns from './20250604_160223_add_seo_columns';
 import * as migration_20250610_164256_add_affiliate_feature from './20250610_164256_add_affiliate_feature';
+import * as migration_20250611_030117_add_session_id_affiliate_click_logs from './20250611_030117_add_session_id_affiliate_click_logs';
 
 export const migrations = [
   {
@@ -352,6 +353,11 @@ export const migrations = [
   {
     up: migration_20250610_164256_add_affiliate_feature.up,
     down: migration_20250610_164256_add_affiliate_feature.down,
-    name: '20250610_164256_add_affiliate_feature'
+    name: '20250610_164256_add_affiliate_feature',
+  },
+  {
+    up: migration_20250611_030117_add_session_id_affiliate_click_logs.up,
+    down: migration_20250611_030117_add_session_id_affiliate_click_logs.down,
+    name: '20250611_030117_add_session_id_affiliate_click_logs'
   },
 ];
