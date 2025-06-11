@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { X_API_KEY } from './config/app'
 
 const SUPPORTED_LOCALES = ['vi', 'en'] as const
 
@@ -130,7 +131,7 @@ async function logAffiliateClick(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Api-Key': process.env.X_API_KEY || 'default-key', // Mark as internal request
+        'X-Api-Key': X_API_KEY, // Mark as internal request
       },
       body: JSON.stringify(trackingData),
     })
