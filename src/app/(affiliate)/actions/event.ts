@@ -31,8 +31,6 @@ export const fetchOngoingEvents = async (query?: LocaleQuery) => {
         return []
       })
 
-      console.log('result', result)
-
     return result
   } catch (error) {
     console.error('Error while fetching fetchOngoingEvents', error)

@@ -318,7 +318,7 @@ export function EditAffiliateLinkDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-white">
-                        <SelectItem value="None">No specific event</SelectItem>
+                        {/* <SelectItem value="None">No specific event</SelectItem> */}
                         {eventOptions.map((event) => (
                           <SelectItem key={event.value} value={event.value}>
                             {event.label}
