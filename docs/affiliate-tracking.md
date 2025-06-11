@@ -77,7 +77,7 @@ The system prevents duplicate click logging by:
 
 ### Internal API Protection
 The tracking API endpoint is protected:
-- Requires `X-Internal-Request: true` header
+- Requires `X-Api-Key` header matching configured value
 - Only accepts requests from middleware
 - Validates affiliate codes before logging
 
