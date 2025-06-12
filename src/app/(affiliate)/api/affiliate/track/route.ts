@@ -3,8 +3,7 @@ import { getPayload } from '@/payload-config/getPayloadConfig'
 import { X_API_KEY } from '@/config/app'
 
 interface AffiliateTrackingData {
-  affiliateCode: string
-  promoCode?: string | null
+  affiliatePromoCode: string
   sessionId: string
   ip: string
   userAgent: string
@@ -20,41 +19,58 @@ export async function POST(request: NextRequest) {
     const xApiKeyRequest = request.headers.get('X-Api-Key')
 
     if (xApiKeyRequest !== X_API_KEY) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
 
     const body: AffiliateTrackingData = await request.json()
-    const { affiliateCode, promoCode, sessionId, ip, userAgent, referrer, url, timestamp, utmParams } = body
+    const { affiliatePromoCode, sessionId, ip, userAgent, referrer, url, timestamp, utmParams } =
+      body
 
-    if (!affiliateCode || !sessionId) {
+    if (!affiliatePromoCode || !sessionId) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
     const payload = await getPayload()
 
+    const promotion = await payload
+      .find({
+        collection: 'promotions',
+        where: {
+          code: { equals: affiliatePromoCode },
+          status: { equals: 'active' },
+        },
+        limit: 1,
+        depth: 0,
+      })
+      .then((res) => res.docs?.[0])
+      .catch((_err) => {
+        // Ignore error
+      })
+
+    if (!promotion) {
+      return NextResponse.json({ success: false, error: 'APC not found' }, { status: 404 })
+    }
+
     // Find the affiliate link by code
     const affiliateLinkResult = await payload.find({
       collection: 'affiliate-links',
       where: {
-        affiliateCode: { equals: affiliateCode },
-        status: { equals: 'active' }
+        affiliatePromotion: { equals: promotion.id },
+        status: { equals: 'active' },
       },
       limit: 1,
-      depth: 0
+      depth: 0,
     })
 
-    const affiliateLink = affiliateLinkResult.docs[0]
+    const affiliateLink = affiliateLinkResult.docs?.[0]
     if (!affiliateLink) {
-      console.warn(`Affiliate link not found for code: ${affiliateCode}`)
+      console.warn(`Affiliate link not found for code: ${affiliatePromoCode}`)
       return NextResponse.json(
         { success: false, error: 'Affiliate link not found' },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -63,17 +79,17 @@ export async function POST(request: NextRequest) {
       collection: 'affiliate-click-logs',
       where: {
         affiliateLink: { equals: affiliateLink.id },
-        sessionId: { equals: sessionId }
+        sessionId: { equals: sessionId },
       },
       limit: 1,
-      depth: 0
+      depth: 0,
     })
 
     if (existingLogResult.docs.length > 0) {
       console.log(`Duplicate click detected for session: ${sessionId}`)
       return NextResponse.json(
         { success: true, message: 'Click already logged for this session' },
-        { status: 200 }
+        { status: 200 },
       )
     }
 
@@ -81,18 +97,19 @@ export async function POST(request: NextRequest) {
     const moreInformation = {
       url,
       timestamp,
-      promoCode: promoCode || null,
       sessionId,
+      affiliatePromoCode,
       // Parse user agent for basic device info
       deviceInfo: parseUserAgent(userAgent),
       // Include UTM parameters if they exist
-      utmParams: utmParams || null
+      utmParams: utmParams || null,
     }
 
     // Get affiliate user ID
-    const affiliateUserId = typeof affiliateLink.affiliateUser === 'object' 
-      ? affiliateLink.affiliateUser.id 
-      : affiliateLink.affiliateUser
+    const affiliateUserId =
+      typeof affiliateLink.affiliateUser === 'object'
+        ? affiliateLink.affiliateUser.id
+        : affiliateLink.affiliateUser
 
     // Create the click log entry
     const clickLog = await payload.create({
@@ -104,29 +121,28 @@ export async function POST(request: NextRequest) {
         userAgent,
         referrer,
         sessionId,
-        moreInformation
+        moreInformation,
       },
-      depth: 0
+      depth: 0,
     })
 
-    console.log(`Affiliate click logged: ${affiliateCode} - Session: ${sessionId}`)
+    console.log(`Affiliate click logged: ${affiliatePromoCode} - Session: ${sessionId}`)
 
     return NextResponse.json({
       success: true,
       data: {
         id: clickLog.id,
-        affiliateCode,
+        affiliatePromoCode,
         sessionId,
         timestamp: clickLog.createdAt,
-        utmParams: utmParams || null
-      }
+        utmParams: utmParams || null,
+      },
     })
-
   } catch (error) {
     console.error('Error logging affiliate click:', error)
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
+      { success: false, error: 'Error logging affiliate click' },
+      { status: 400 },
     )
   }
 }
@@ -148,7 +164,8 @@ function parseUserAgent(userAgent: string) {
   else if (userAgent.includes('Mac')) os = 'macOS'
   else if (userAgent.includes('Linux')) os = 'Linux'
   else if (userAgent.includes('Android')) os = 'Android'
-  else if (userAgent.includes('iOS') || userAgent.includes('iPhone') || userAgent.includes('iPad')) os = 'iOS'
+  else if (userAgent.includes('iOS') || userAgent.includes('iPhone') || userAgent.includes('iPad'))
+    os = 'iOS'
 
   return {
     deviceType: isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop',
@@ -156,6 +173,6 @@ function parseUserAgent(userAgent: string) {
     os,
     isMobile,
     isTablet,
-    isDesktop
+    isDesktop,
   }
 }

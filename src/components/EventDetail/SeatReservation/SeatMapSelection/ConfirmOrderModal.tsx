@@ -168,7 +168,7 @@ const ConfirmOrderModal = ({
 
   useEffect(() => {
     let cancelled = false
-    const affiliatePromotionCode = Cookies.get('affiliate_promo_code')
+    const affiliatePromotionCode = Cookies.get('apc')
     if (affiliatePromotionCode) {
       const applyAffiliatePromoCode = async () => {
         try {

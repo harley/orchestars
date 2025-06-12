@@ -33,6 +33,7 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { SelectOrderCategory as SelectOrderCategory_049671e81ae6d06dcf2439baca2a6b79 } from '@/components/AdminViews/Order/SelectOrderCategory/SelectOrderCategoryPayloadComponent'
 import { ActionViews as ActionViews_c625c4a830674427dc2497d62b0046dd } from '@/components/AdminViews/Order/ActionViews'
 import { default as default_e6b30098bdd062bcc6e4cf9467eed8df } from '@/components/Tickets/Actions/SendMailButton'
+import { TargetLink as TargetLink_fee2cd5f2a9fe1a01c55a441ca6e0d70 } from '@/components/AdminViews/Affiliate/Links/TargetLink'
 import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { SortBy as SortBy_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
@@ -85,6 +86,7 @@ export const importMap = {
   "@/components/AdminViews/Order/SelectOrderCategory/SelectOrderCategoryPayloadComponent#SelectOrderCategory": SelectOrderCategory_049671e81ae6d06dcf2439baca2a6b79,
   "@/components/AdminViews/Order/ActionViews#ActionViews": ActionViews_c625c4a830674427dc2497d62b0046dd,
   "@/components/Tickets/Actions/SendMailButton#default": default_e6b30098bdd062bcc6e4cf9467eed8df,
+  "@/components/AdminViews/Affiliate/Links/TargetLink#TargetLink": TargetLink_fee2cd5f2a9fe1a01c55a441ca6e0d70,
   "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/plugin-import-export/rsc#SortBy": SortBy_cdf7e044479f899a31f804427d568b36,

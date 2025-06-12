@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
   const utmParameters = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
   const expiresOneDay = new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
 
-  utmParameters.forEach(param => {
+  utmParameters.forEach((param) => {
     const value = url.searchParams.get(param)
     if (value) {
       response.cookies.set(param, value, {
@@ -40,19 +40,23 @@ export async function middleware(request: NextRequest) {
 
   // --- Affiliate Tracking Start ---
   const affiliateCode = url.searchParams.get('affiliate')
-  const promoCode = url.searchParams.get('affiliate_promo_code')
+  const affiliatePromoCode = url.searchParams.get('apc')
 
-  if (affiliateCode) {
+  console.log('affiliatePromoCode', affiliatePromoCode)
+
+  if (affiliatePromoCode) {
     // Store affiliate data in cookies for attribution
     const expiresSevenDays = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
 
-    response.cookies.set('affiliate_code', affiliateCode, {
-      expires: expiresSevenDays,
-      path: '/',
-    })
+    if (affiliateCode) {
+      response.cookies.set('affiliate_code', affiliateCode, {
+        expires: expiresSevenDays,
+        path: '/',
+      })
+    }
 
-    if (promoCode) {
-      response.cookies.set('affiliate_promo_code', promoCode, {
+    if (affiliatePromoCode) {
+      response.cookies.set('apc', affiliatePromoCode, {
         expires: expiresSevenDays,
         path: '/',
       })
@@ -71,7 +75,10 @@ export async function middleware(request: NextRequest) {
       })
 
       // Trigger affiliate click logging asynchronously
-      logAffiliateClick(request, affiliateCode, promoCode, currentSessionId).catch(error => {
+      logAffiliateClick(request, {
+        affiliatePromoCode,
+        sessionId: currentSessionId,
+      }).catch((error) => {
         console.error('Failed to log affiliate click:', error)
       })
     }
@@ -89,9 +96,11 @@ function generateSessionId(): string {
 // Log affiliate click asynchronously
 async function logAffiliateClick(
   request: NextRequest,
-  affiliateCode: string,
-  promoCode: string | null,
-  sessionId: string
+  data: {
+    affiliatePromoCode: string
+    promoCode?: string
+    sessionId: string
+  },
 ) {
   try {
     const url = new URL(request.url)
@@ -100,7 +109,7 @@ async function logAffiliateClick(
     const utmParams: Record<string, string> = {}
     const utmParameters = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
 
-    utmParameters.forEach(param => {
+    utmParameters.forEach((param) => {
       const value = url.searchParams.get(param)
       if (value) {
         utmParams[param] = value
@@ -114,9 +123,7 @@ async function logAffiliateClick(
     })
 
     const trackingData = {
-      affiliateCode,
-      promoCode,
-      sessionId,
+      ...data,
       ip: getClientIP(request),
       userAgent: request.headers.get('user-agent') || '',
       referrer: request.headers.get('referer') || '',
@@ -159,9 +166,5 @@ function getClientIP(request: NextRequest): string {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: [
-    '/',
-    '/events/:path*',
-    '/((?!api|_next/static|_next/image|favicon.ico|admin).*)',
-  ],
+  matcher: ['/', '/events/:path*', '/((?!api|_next/static|_next/image|favicon.ico|admin).*)'],
 }

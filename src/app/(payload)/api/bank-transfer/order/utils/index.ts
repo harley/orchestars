@@ -19,32 +19,34 @@ export const getAffiliateDataFromCookies = async (
 ) => {
   const cookieStore = await cookies()
 
-  const affiliateCode = cookieStore.get('affiliate_code')?.value
+  const affiliatePromoCode = cookieStore.get('apc')?.value
 
   // If we have an affiliate code, try to find the affiliate user
-  if (affiliateCode) {
+  if (affiliatePromoCode) {
     try {
       const affiliateLink = await payload
         .find({
           collection: 'affiliate-links',
           where: {
-            affiliateCode: { equals: affiliateCode },
+            promotionCode: { equals: affiliatePromoCode },
             status: { equals: 'active' },
           },
           limit: 1,
           depth: 0,
+          showHiddenFields: true
         })
         .then((res) => res.docs?.[0])
+
       if (!affiliateLink) {
         return
       }
       return {
         affiliateLink: affiliateLink.id,
-        affiliateCode,
+        affiliateCode: affiliateLink.affiliateCode,
         affiliateUser: affiliateLink.affiliateUser,
       }
     } catch (error) {
-      console.log(`Ignore: Not found finding affiliate code ${affiliateCode}:`, error)
+      console.log(`Ignore: Not found finding affiliate code ${affiliatePromoCode}:`, error)
     }
   } else if (data?.promotionCodes?.length) {
     const affiliatePromotionCodes = [...new Set(data.promotionCodes)]
@@ -58,6 +60,7 @@ export const getAffiliateDataFromCookies = async (
           },
           limit: 1,
           depth: 0,
+          showHiddenFields: true
         })
         .then((res) => res.docs?.[0])
 
