@@ -167,6 +167,7 @@ const ConfirmOrderModal = ({
   const [promotionCode, setPromotionCode] = useState<string>('')
 
   useEffect(() => {
+    let cancelled = false
     const affiliatePromotionCode = Cookies.get('affiliate_promo_code')
     if (affiliatePromotionCode) {
       const applyAffiliatePromoCode = async () => {
@@ -178,7 +179,7 @@ const ConfirmOrderModal = ({
             })
             .then((res) => res.data)
 
-          if (isAppliedPromotion(affiliatePromotionInfo, ticketSelected, event)) {
+          if (!cancelled && isAppliedPromotion(affiliatePromotionInfo, ticketSelected, event)) {
             setSelectedPromotions((oldSltPromos) => {
               const newArrPromos = [...oldSltPromos]
               if (!newArrPromos.find((promo) => promo.code === affiliatePromotionInfo.code)) {
@@ -195,7 +196,11 @@ const ConfirmOrderModal = ({
 
       applyAffiliatePromoCode()
     }
-  }, [event.id, ticketSelected, event])
+
+    return () => {
+      cancelled = true
+    }
+  }, [ticketSelected, event])
 
   const [isSubmittingPromotionForm, setIsSubmittingPromotionForm] = useState<boolean>(false)
   const checkPromotionCode = async () => {
