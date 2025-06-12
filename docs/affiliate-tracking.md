@@ -15,12 +15,12 @@ The affiliate tracking system captures and logs clicks on affiliate links to pro
 
 Affiliate links follow this format:
 ```
-http://localhost:3000/events/hxh-future-event?affiliate=kola&promo_code=EARLYBIRD&utm_source=facebook&utm_medium=affiliate&utm_campaign=summer-promo&utm_term=orchestars
+http://localhost:3000/events/hxh-future-event?affiliate=kola&affiliate_promo_code=EARLYBIRD&utm_source=facebook&utm_medium=affiliate&utm_campaign=summer-promo&utm_term=orchestars
 ```
 
 ### Parameters:
 - `affiliate` (required): The affiliate code
-- `promo_code` (optional): Promotion code associated with the link
+- `affiliate_promo_code` (optional): Promotion code associated with the link
 - `utm_*` (optional): UTM tracking parameters
 
 ## How It Works
@@ -99,7 +99,7 @@ The system automatically detects:
 
 ### Affiliate Cookies (7 days)
 - `affiliate_code`: The affiliate code
-- `promo_code`: Associated promo code (if any)
+- `affiliate_promo_code`: Associated promo code (if any)
 
 ### Session Cookies (30 minutes)
 - `affiliate_session`: Unique session identifier
@@ -118,7 +118,7 @@ To test the affiliate tracking:
 
 Example test URL:
 ```
-http://localhost:3000/events/test-event?affiliate=TEST123&promo_code=SAVE10&utm_source=test
+http://localhost:3000/events/test-event?affiliate=TEST123&affiliate_promo_code=SAVE10&utm_source=test
 ```
 
 ## Troubleshooting
