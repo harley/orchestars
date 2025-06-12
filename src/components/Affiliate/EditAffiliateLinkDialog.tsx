@@ -152,7 +152,7 @@ export function EditAffiliateLinkDialog({
       params.append('affiliate', watchedValues.affiliateCode)
     }
     if (watchedValues.promotionCode) {
-      params.append('promo_code', watchedValues.promotionCode)
+      params.append('affiliate_promo_code', watchedValues.promotionCode)
     }
 
     if (watchedValues.utmParams?.utm_source) {

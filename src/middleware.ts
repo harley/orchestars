@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
 
   // --- Affiliate Tracking Start ---
   const affiliateCode = url.searchParams.get('affiliate')
-  const promoCode = url.searchParams.get('promo_code')
+  const promoCode = url.searchParams.get('affiliate_promo_code')
 
   if (affiliateCode) {
     // Store affiliate data in cookies for attribution
@@ -52,7 +52,7 @@ export async function middleware(request: NextRequest) {
     })
 
     if (promoCode) {
-      response.cookies.set('promo_code', promoCode, {
+      response.cookies.set('affiliate_promo_code', promoCode, {
         expires: expiresSevenDays,
         path: '/',
       })

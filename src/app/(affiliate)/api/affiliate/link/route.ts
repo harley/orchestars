@@ -159,20 +159,20 @@ export async function GET(request: NextRequest) {
 
     // Format the response data
     const formattedData = affiliateLinks.docs.map((link: any) => {
-      const params = new URLSearchParams()
-      params.append('affiliate', link.affiliateCode)
+      // const params = new URLSearchParams()
+      // params.append('affiliate', link.affiliateCode)
 
-      if (link.promotionCode) {
-        params.append('promo_code', link.promotionCode)
-      }
+      // if (link.promotionCode) {
+      //   params.append('affiliate_promo_code', link.promotionCode)
+      // }
 
-      if (link.utmParams) {
-        if (link.utmParams.source) params.append('utm_source', link.utmParams.source)
-        if (link.utmParams.medium) params.append('utm_medium', link.utmParams.medium)
-        if (link.utmParams.campaign) params.append('utm_campaign', link.utmParams.campaign)
-        if (link.utmParams.term) params.append('utm_term', link.utmParams.term)
-        if (link.utmParams.content) params.append('utm_content', link.utmParams.content)
-      }
+      // if (link.utmParams) {
+      //   if (link.utmParams.source) params.append('utm_source', link.utmParams.source)
+      //   if (link.utmParams.medium) params.append('utm_medium', link.utmParams.medium)
+      //   if (link.utmParams.campaign) params.append('utm_campaign', link.utmParams.campaign)
+      //   if (link.utmParams.term) params.append('utm_term', link.utmParams.term)
+      //   if (link.utmParams.content) params.append('utm_content', link.utmParams.content)
+      // }
 
       return {
         id: link.id,

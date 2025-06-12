@@ -1516,6 +1516,18 @@ export interface AffiliateSetting {
    */
   affiliateUser: number | User;
   /**
+   * Promotions that are valid for this affiliate user
+   */
+  promotions?:
+    | {
+        /**
+         * Promotions filtered by event
+         */
+        promotion: number | Promotion;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Whether this affiliate setting is currently active
    */
   isActive?: boolean | null;
@@ -2804,6 +2816,12 @@ export interface AffiliateSettingsSelect<T extends boolean = true> {
   name?: T;
   event?: T;
   affiliateUser?: T;
+  promotions?:
+    | T
+    | {
+        promotion?: T;
+        id?: T;
+      };
   isActive?: T;
   description?: T;
   tiers?:

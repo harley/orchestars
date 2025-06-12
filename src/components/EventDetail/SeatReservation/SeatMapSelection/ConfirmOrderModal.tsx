@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -22,7 +22,7 @@ import ZalopayIcon from '@/components/Icons/Zalopay'
 import { calculateMultiPromotionsTotalOrder, isAppliedPromotion } from './utils/calculateTotal'
 import PromotionListCheckbox from '../PromotionListCheckbox'
 import { cn } from '@/lib/utils'
-
+import Cookies from 'js-cookie'
 interface PaymentMethod {
   id: string
   name: string
@@ -165,6 +165,37 @@ const ConfirmOrderModal = ({
   }
 
   const [promotionCode, setPromotionCode] = useState<string>('')
+
+  useEffect(() => {
+    const affiliatePromotionCode = Cookies.get('affiliate_promo_code')
+    if (affiliatePromotionCode) {
+      const applyAffiliatePromoCode = async () => {
+        try {
+          const affiliatePromotionInfo = await axios
+            .post('/api/promotion', {
+              code: affiliatePromotionCode,
+              eventId: event.id,
+            })
+            .then((res) => res.data)
+
+          if (isAppliedPromotion(affiliatePromotionInfo, ticketSelected, event)) {
+            setSelectedPromotions((oldSltPromos) => {
+              const newArrPromos = [...oldSltPromos]
+              if (!newArrPromos.find((promo) => promo.code === affiliatePromotionInfo.code)) {
+                newArrPromos.push(affiliatePromotionInfo)
+              }
+
+              return newArrPromos
+            })
+          }
+        } catch (error) {
+          console.error('Error while applying affiliate promotion code', error)
+        }
+      }
+
+      applyAffiliatePromoCode()
+    }
+  }, [event.id, ticketSelected, event])
 
   const [isSubmittingPromotionForm, setIsSubmittingPromotionForm] = useState<boolean>(false)
   const checkPromotionCode = async () => {
@@ -382,7 +413,10 @@ const ConfirmOrderModal = ({
                       <div className="flex items-center gap-2 text-green-700 md:max-w-[166px] w-full">
                         <Check className="h-5 w-5 text-green-600 shrink-0" />
                         <span className="font-semibold text-sm md:text-base md:block flex gap-1">
-                          <span className='block'>{t('event.promoCode')}<span className='md:hidden'>:</span></span>
+                          <span className="block">
+                            {t('event.promoCode')}
+                            <span className="md:hidden">:</span>
+                          </span>
                           <span className="font-medium">{promotionInfo.code}</span>
                         </span>
                       </div>

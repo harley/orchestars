@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import { APIError, type CollectionConfig } from 'payload'
 
 export const AffiliateSettings: CollectionConfig = {
   slug: 'affiliate-settings',
@@ -45,6 +45,87 @@ export const AffiliateSettings: CollectionConfig = {
             equals: 'affiliate',
           },
         }
+      },
+    },
+    {
+      name: 'promotions',
+      label: 'Applied promotions',
+      type: 'array',
+      required: false,
+      admin: {
+        description: 'Promotions that are valid for this affiliate user',
+      },
+      fields: [
+        {
+          name: 'promotion',
+          type: 'relationship',
+          relationTo: 'promotions',
+          admin: {
+            description: 'Promotions filtered by event',
+          },
+          required: true,
+          filterOptions: ({ data }) => {
+            console.log('data', data)
+
+            // if data.event is not defined, return empty promotions
+
+            const eventId = data.event || -1
+
+            return {
+              event: {
+                equals: eventId,
+              },
+            }
+          },
+        },
+      ],
+      hooks: {
+        beforeValidate: [
+          ({ value }) => {
+            if (Array.isArray(value)) {
+              const ids = value.map((item) => item.promotion)
+              const hasDuplicates = new Set(ids).size !== ids.length
+              if (hasDuplicates) {
+                // handle specific promotion error
+                const existIds = new Set()
+                const duplicatePromotions: Array<{ promotion: number; index: number }> =
+                  value.reduce(
+                    (existArr, item, idx) => {
+                      if (!existIds.has(item.promotion)) {
+                        existIds.add(item.promotion)
+                      } else {
+                        existArr.push({
+                          promotion: item.promotion,
+                          index: idx,
+                        })
+                      }
+
+                      return existArr
+                    },
+                    [] as Array<{ promotion: number; index: number }>,
+                  )
+
+                const errors = duplicatePromotions.map((item) => {
+                  return {
+                    message: `This promotion has already been added.`,
+                    path: `promotions.${item.index}.promotion`,
+                  }
+                })
+
+                throw new APIError(
+                  'Promotions can not be duplicated',
+                  400,
+                  {
+                    promotions: value,
+                    errors: errors,
+                  },
+                  true,
+                )
+              }
+            }
+            return value
+          },
+        ],
       },
     },
     {

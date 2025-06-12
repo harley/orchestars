@@ -59,6 +59,7 @@ import * as migration_20250604_160223_add_seo_columns from './20250604_160223_ad
 import * as migration_20250610_164256_add_affiliate_feature from './20250610_164256_add_affiliate_feature';
 import * as migration_20250611_030117_add_session_id_affiliate_click_logs from './20250611_030117_add_session_id_affiliate_click_logs';
 import * as migration_20250611_080103_add_affiliate_to_order_collection from './20250611_080103_add_affiliate_to_order_collection';
+import * as migration_20250612_060257_add_promotions_to_affiliate_setting from './20250612_060257_add_promotions_to_affiliate_setting';
 
 export const migrations = [
   {
@@ -364,6 +365,11 @@ export const migrations = [
   {
     up: migration_20250611_080103_add_affiliate_to_order_collection.up,
     down: migration_20250611_080103_add_affiliate_to_order_collection.down,
-    name: '20250611_080103_add_affiliate_to_order_collection'
+    name: '20250611_080103_add_affiliate_to_order_collection',
+  },
+  {
+    up: migration_20250612_060257_add_promotions_to_affiliate_setting.up,
+    down: migration_20250612_060257_add_promotions_to_affiliate_setting.down,
+    name: '20250612_060257_add_promotions_to_affiliate_setting'
   },
 ];
