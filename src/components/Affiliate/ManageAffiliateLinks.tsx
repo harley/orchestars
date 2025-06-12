@@ -41,12 +41,12 @@ import {
   ChevronRight,
   ExternalLink,
   Settings,
-  Plus
+  Plus,
 } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
-import { format } from 'date-fns'
 import { EditAffiliateLinkDialog } from './EditAffiliateLinkDialog'
 import { CreateAffiliateLinkDialog } from './CreateAffiliateLinkDialog'
+import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 
 interface AffiliateLink {
   id: number
@@ -94,7 +94,7 @@ export function ManageAffiliateLinks() {
     hasNextPage: false,
     hasPrevPage: false,
   })
-  
+
   // Filters
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -113,7 +113,7 @@ export function ManageAffiliateLinks() {
         page: page.toString(),
         limit: pagination.limit.toString(),
       })
-      
+
       if (status !== 'all') {
         params.append('status', status)
       }
@@ -199,9 +199,11 @@ export function ManageAffiliateLinks() {
           description: `Affiliate link ${newStatus === 'active' ? 'activated' : 'disabled'} successfully`,
         })
         // Update the local state
-        setLinks(links.map(link => 
-          link.id === id ? { ...link, status: newStatus as 'active' | 'disabled' } : link
-        ))
+        setLinks(
+          links.map((link) =>
+            link.id === id ? { ...link, status: newStatus as 'active' | 'disabled' } : link,
+          ),
+        )
       } else {
         toast({
           title: 'Error',
@@ -229,9 +231,9 @@ export function ManageAffiliateLinks() {
   }
 
   // Filter links based on search term
-  const filteredLinks = links.filter(link =>
-    link.affiliateCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (link.promotionCode && link.promotionCode.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredLinks = links.filter(
+    (link) =>
+      link.promotionCode && link.promotionCode.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
   useEffect(() => {
@@ -271,9 +273,7 @@ export function ManageAffiliateLinks() {
                 <Settings className="h-5 w-5" />
                 Manage Affiliate Links
               </CardTitle>
-              <CardDescription>
-                View, edit, and manage your affiliate links
-              </CardDescription>
+              <CardDescription>View, edit, and manage your affiliate links</CardDescription>
             </div>
             <Button onClick={() => setCreateDialogOpen(true)} variant={'secondary'}>
               <Plus className="h-4 w-4 mr-2" />
@@ -313,11 +313,12 @@ export function ManageAffiliateLinks() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Affiliate Code</TableHead>
+                  {/* <TableHead>Affiliate Code</TableHead> */}
+                  <TableHead>Promotion Code</TableHead>
+                  <TableHead>Event</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>UTM Campaign</TableHead>
-                  <TableHead>Promotion Code</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead>Created At</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -337,11 +338,11 @@ export function ManageAffiliateLinks() {
                 ) : (
                   filteredLinks.map((link) => (
                     <TableRow key={link.id}>
-                      <TableCell className="font-medium">
-                        {link.affiliateCode}
-                      </TableCell>
+                      {/* <TableCell className="font-medium">{link.affiliateCode}</TableCell> */}
+                      <TableCell className="font-medium">{link.promotionCode || '-'}</TableCell>
+                      <TableCell>{link.event?.title || '-'}</TableCell>
                       <TableCell>
-                        <Badge 
+                        <Badge
                           variant={link.status === 'active' ? 'default' : 'secondary'}
                           className="cursor-pointer"
                           onClick={() => toggleStatus(link.id, link.status)}
@@ -349,15 +350,8 @@ export function ManageAffiliateLinks() {
                           {link.status}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        {link.utmParams?.campaign || '-'}
-                      </TableCell>
-                      <TableCell>
-                        {link.promotionCode || '-'}
-                      </TableCell>
-                      <TableCell>
-                        {format(new Date(link.createdAt), 'MMM dd, yyyy')}
-                      </TableCell>
+                      <TableCell>{link.utmParams?.campaign || '-'}</TableCell>
+                      <TableCell>{tzFormat(toZonedTime(new Date(link.createdAt), 'Asia/Ho_Chi_Minh'), 'MMM dd, yyyy HH:mm')}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           {link.targetLink && (
@@ -378,11 +372,7 @@ export function ManageAffiliateLinks() {
                               <ExternalLink className="h-4 w-4" />
                             </Button>
                           )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditLink(link)}
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => handleEditLink(link)}>
                             <Edit className="h-4 w-4" />
                           </Button>
                           {/* <AlertDialog>
@@ -427,7 +417,7 @@ export function ManageAffiliateLinks() {
           {pagination.totalPages > 1 && (
             <div className="flex items-center justify-between">
               <div className="text-sm text-muted-foreground">
-                Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
+                Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
                 {Math.min(pagination.page * pagination.limit, pagination.totalDocs)} of{' '}
                 {pagination.totalDocs} results
               </div>

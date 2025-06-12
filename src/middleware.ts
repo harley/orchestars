@@ -42,8 +42,6 @@ export async function middleware(request: NextRequest) {
   const affiliateCode = url.searchParams.get('affiliate')
   const affiliatePromoCode = url.searchParams.get('apc')
 
-  console.log('affiliatePromoCode', affiliatePromoCode)
-
   if (affiliatePromoCode) {
     // Store affiliate data in cookies for attribution
     const expiresSevenDays = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000)

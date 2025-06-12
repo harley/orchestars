@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAffiliateLinkSchema } from './validation'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { authorizeApiRequest } from '@/app/(affiliate)/utils/authorizeApiRequest'
+import { generateCode } from '@/utilities/generateCode'
 
 // POST - Create new affiliate link
 export async function POST(request: NextRequest) {
@@ -74,14 +75,37 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const promotion = await payload
+      .find({
+        collection: 'promotions',
+        where: {
+          code: { equals: value.promotionCode },
+          status: { equals: 'active' },
+        },
+        limit: 1,
+        depth: 0,
+      })
+      .then((res) => res.docs?.[0])
+
+    if (!promotion) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid promotion code provided',
+        },
+        { status: 400 },
+      )
+    }
+
     // Create the affiliate link
     const affiliateLink = await payload.create({
       collection: 'affiliate-links',
       data: {
         affiliateUser: userRequest.id,
         event: value.event,
-        affiliateCode: value.affiliateCode,
-        promotionCode: value.promotionCode || null,
+        affiliateCode: generateCode('AFF', { timestampLength: 9 }),
+        affiliatePromotion: promotion.id,
+        promotionCode: value.promotionCode,
         utmParams: value.utmParams,
         targetLink: value.targetLink,
         status: value.status || 'active',
@@ -159,7 +183,6 @@ export async function GET(request: NextRequest) {
 
     // Format the response data
     const formattedData = affiliateLinks.docs.map((link: any) => {
-
       return {
         id: link.id,
         affiliateCode: link.affiliateCode,
@@ -167,7 +190,15 @@ export async function GET(request: NextRequest) {
         utmParams: link.utmParams,
         targetLink: link.targetLink,
         status: link.status,
-        event: link.event,
+        event: link.event
+          ? {
+              id: link.event.id,
+              title: link.event.title,
+              slug: link.event.slug,
+              eventLocation: link.event.eventLocation,
+              description: link.event.description,
+            }
+          : null,
         createdAt: link.createdAt,
         updatedAt: link.updatedAt,
       }
