@@ -65,10 +65,7 @@ export const AffiliateSettings: CollectionConfig = {
           },
           required: true,
           filterOptions: ({ data }) => {
-            console.log('data', data)
-
             // if data.event is not defined, return empty promotions
-
             const eventId = data.event || -1
 
             return {
