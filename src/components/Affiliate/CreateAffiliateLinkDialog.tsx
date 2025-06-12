@@ -25,7 +25,7 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
+  // FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -37,15 +37,6 @@ import { Plus } from 'lucide-react'
 
 // Zod validation schema
 const affiliateLinkSchema = z.object({
-  affiliateCode: z
-    .string()
-    .min(3, 'Affiliate code must be at least 3 characters')
-    .max(50, 'Affiliate code must not exceed 50 characters')
-    .regex(
-      /^[a-zA-Z0-9_-]+$/,
-      'Affiliate code can only contain letters, numbers, underscores, and hyphens',
-    )
-    .nonempty('Affiliate code is required'),
   utmParams: z.object({
     utm_source: z.string().max(100, 'UTM Source must not exceed 100 characters').optional(),
     utm_medium: z.string().max(100, 'UTM Medium must not exceed 100 characters').optional(),
@@ -54,13 +45,12 @@ const affiliateLinkSchema = z.object({
     utm_content: z.string().max(100, 'UTM Content must not exceed 100 characters').optional(),
   }),
   event: z.string().nonempty('Event is required'),
-  promotionCode: z.string().max(50, 'Promotion code must not exceed 50 characters').optional(),
+  promotionCode: z.string().max(50, 'Promotion code must not exceed 50 characters').nonempty('Promotion code is required'),
 })
 
 type AffiliateLinkFormData = z.infer<typeof affiliateLinkSchema>
 
 interface CreateAffiliateLinkRequest {
-  affiliateCode: string
   targetLink: string
   utmParams: {
     source: string
@@ -99,7 +89,7 @@ export function CreateAffiliateLinkDialog({
   const form = useForm<AffiliateLinkFormData>({
     resolver: zodResolver(affiliateLinkSchema),
     defaultValues: {
-      affiliateCode: '',
+      // affiliateCode: '',
       utmParams: {
         utm_source: '',
         utm_medium: 'affiliate',
@@ -133,12 +123,8 @@ export function CreateAffiliateLinkDialog({
         url += `/${selectedEvent.slug}`
       }
     }
-
-    if (watchedValues.affiliateCode) {
-      params.append('affiliate', watchedValues.affiliateCode)
-    }
     if (watchedValues.promotionCode) {
-      params.append('affiliate_promo_code', watchedValues.promotionCode)
+      params.append('apc', watchedValues.promotionCode)
     }
 
     if (watchedValues.utmParams?.utm_source) {
@@ -164,7 +150,6 @@ export function CreateAffiliateLinkDialog({
   const onSubmit = async (data: AffiliateLinkFormData) => {
     try {
       const requestData: CreateAffiliateLinkRequest = {
-        affiliateCode: data.affiliateCode,
         targetLink: generateTargetLink(),
         utmParams: {
           source: data.utmParams.utm_source || '',
@@ -173,8 +158,8 @@ export function CreateAffiliateLinkDialog({
           term: data.utmParams.utm_term || undefined,
           content: data.utmParams.utm_content || undefined,
         },
-        event: data.event ? Number(data.event) : undefined,
-        promotionCode: data.promotionCode || undefined,
+        event: Number(data.event),
+        promotionCode: data.promotionCode,
       }
 
       const response = await fetch('/api/affiliate/link', {
@@ -248,7 +233,7 @@ export function CreateAffiliateLinkDialog({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Affiliate Code Section */}
-            <FormField
+            {/* <FormField
               control={form.control}
               name="affiliateCode"
               render={({ field }) => (
@@ -263,7 +248,7 @@ export function CreateAffiliateLinkDialog({
                   <FormMessage className='text-red-600' />
                 </FormItem>
               )}
-            />
+            /> */}
 
             {/* todo should be get setting from admin */}
             <div className="grid gap-4 md:grid-cols-2">
@@ -272,7 +257,7 @@ export function CreateAffiliateLinkDialog({
                 name="event"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Target Event</FormLabel>
+                    <FormLabel>Target Event (*)</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -301,7 +286,7 @@ export function CreateAffiliateLinkDialog({
                 name="promotionCode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Promotion Code (Optional)</FormLabel>
+                    <FormLabel>Promotion Code (*)</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., SUMMER20, EARLYBIRD" {...field} />
                     </FormControl>

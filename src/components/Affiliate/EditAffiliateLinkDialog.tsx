@@ -35,14 +35,6 @@ import { useEvents } from '@/app/(affiliate)/providers/Affiliate'
 
 // Zod validation schema for editing
 const editAffiliateLinkSchema = z.object({
-  affiliateCode: z
-    .string()
-    .min(3, 'Affiliate code must be at least 3 characters')
-    .max(50, 'Affiliate code must not exceed 50 characters')
-    .regex(
-      /^[a-zA-Z0-9_-]+$/,
-      'Affiliate code can only contain letters, numbers, underscores, and hyphens',
-    ),
   utmParams: z.object({
     utm_source: z.string().max(100, 'UTM Source must not exceed 100 characters').optional(),
     utm_medium: z.string().max(100, 'UTM Medium must not exceed 100 characters').optional(),
@@ -50,8 +42,8 @@ const editAffiliateLinkSchema = z.object({
     utm_term: z.string().max(100, 'UTM Term must not exceed 100 characters').optional(),
     utm_content: z.string().max(100, 'UTM Content must not exceed 100 characters').optional(),
   }),
-  event: z.string().optional(),
-  promotionCode: z.string().max(50, 'Promotion code must not exceed 50 characters').optional(),
+  event: z.string().nonempty('Event is required'),
+  promotionCode: z.string().max(50, 'Promotion code must not exceed 50 characters').nonempty('Promotion code is required'),
   status: z.enum(['active', 'disabled']),
 })
 
@@ -59,7 +51,6 @@ type EditAffiliateLinkFormData = z.infer<typeof editAffiliateLinkSchema>
 
 interface AffiliateLink {
   id: number
-  affiliateCode: string
   promotionCode?: string | null
   utmParams?: {
     source?: string
@@ -94,7 +85,6 @@ export function EditAffiliateLinkDialog({
   const form = useForm<EditAffiliateLinkFormData>({
     resolver: zodResolver(editAffiliateLinkSchema),
     defaultValues: {
-      affiliateCode: '',
       utmParams: {
         utm_source: '',
         utm_medium: '',
@@ -112,7 +102,6 @@ export function EditAffiliateLinkDialog({
   useEffect(() => {
     if (link) {
       form.reset({
-        affiliateCode: link.affiliateCode,
         utmParams: {
           utm_source: link.utmParams?.source || '',
           utm_medium: link.utmParams?.medium || '',
@@ -148,11 +137,8 @@ export function EditAffiliateLinkDialog({
       }
     }
 
-    if (watchedValues.affiliateCode) {
-      params.append('affiliate', watchedValues.affiliateCode)
-    }
     if (watchedValues.promotionCode) {
-      params.append('affiliate_promo_code', watchedValues.promotionCode)
+      params.append('apc', watchedValues.promotionCode)
     }
 
     if (watchedValues.utmParams?.utm_source) {
@@ -182,7 +168,6 @@ export function EditAffiliateLinkDialog({
       const targetLink = generateTargetLink()
 
       const requestData = {
-        affiliateCode: data.affiliateCode,
         targetLink,
         utmParams: {
           source: data.utmParams.utm_source || '',
@@ -191,8 +176,8 @@ export function EditAffiliateLinkDialog({
           term: data.utmParams.utm_term || undefined,
           content: data.utmParams.utm_content || undefined,
         },
-        event: data.event ? Number(data.event) : undefined,
-        promotionCode: data.promotionCode || undefined,
+        event: Number(data.event),
+        promotionCode: data.promotionCode,
         status: data.status,
       }
 
@@ -270,51 +255,14 @@ export function EditAffiliateLinkDialog({
             <div className="grid gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
-                name="affiliateCode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Affiliate Code *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., kol123, influencer456" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-white">
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="disabled">Disabled</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
                 name="event"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Target Event (Optional)</FormLabel>
+                    <FormLabel>Target Event (*)</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select an event (optional)" />
+                          <SelectValue placeholder="Select an event" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-white">
@@ -340,10 +288,33 @@ export function EditAffiliateLinkDialog({
                 name="promotionCode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Promotion Code (Optional)</FormLabel>
+                    <FormLabel>Promotion Code (*)</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., SUMMER20, EARLYBIRD" {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="grid gap-4">
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-white">
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="disabled">Disabled</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -29,7 +29,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     // Check if the link belongs to the current user
     const affiliateUserId =
-      typeof affiliateLink.affiliateUser === 'object' ? affiliateLink.affiliateUser.id : affiliateLink.affiliateUser
+      typeof affiliateLink.affiliateUser === 'object'
+        ? affiliateLink.affiliateUser.id
+        : affiliateLink.affiliateUser
     if (affiliateUserId !== userRequest.id) {
       return NextResponse.json(
         {
@@ -100,6 +102,32 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     const payload = await getPayload()
 
+    if (value.promotionCode) {
+      const promotion = await payload
+        .find({
+          collection: 'promotions',
+          where: {
+            code: { equals: value.promotionCode },
+            status: { equals: 'active' },
+          },
+          limit: 1,
+          depth: 0,
+        })
+        .then((res) => res.docs?.[0])
+
+      if (!promotion) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Invalid promotion code provided',
+          },
+          { status: 400 },
+        )
+      }
+
+      value.affiliatePromotion = promotion.id
+    }
+
     // First, check if the affiliate link exists and belongs to the user
     const existingLink = await payload.findByID({
       collection: 'affiliate-links',
@@ -118,7 +146,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     // Check ownership
     const affiliateUserId =
-      typeof existingLink.affiliateUser === 'object' ? existingLink.affiliateUser.id : existingLink.affiliateUser
+      typeof existingLink.affiliateUser === 'object'
+        ? existingLink.affiliateUser.id
+        : existingLink.affiliateUser
     if (affiliateUserId !== userRequest.id) {
       return NextResponse.json(
         {
@@ -127,38 +157,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         },
         { status: 403 },
       )
-    }
-
-    // Check if affiliate code is already in use by another link (if being updated)
-    if (value.affiliateCode && value.affiliateCode !== existingLink.affiliateCode) {
-      const duplicateCheck = await payload.find({
-        collection: 'affiliate-links',
-        where: {
-          and: [
-            {
-              affiliateCode: {
-                equals: value.affiliateCode,
-              },
-            },
-            {
-              id: {
-                not_equals: parseInt(id),
-              },
-            },
-          ],
-        },
-        limit: 1,
-      })
-
-      if (duplicateCheck.docs.length > 0) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'This affiliate code is already in use. Please choose a different one.',
-          },
-          { status: 400 },
-        )
-      }
     }
 
     // Validate event exists if provided
@@ -187,9 +185,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       id: parseInt(id),
       data: {
         ...value,
-        event: value.event || null,
-        promotionCode: value.promotionCode || null,
       },
+      depth: 0
     })
 
     return NextResponse.json({
