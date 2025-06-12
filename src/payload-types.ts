@@ -89,11 +89,11 @@ export interface Config {
     faqs: Faq;
     admins: Admin;
     emails: Email;
-    logs: Log;
-    marketingTrackings: MarketingTracking;
     'affiliate-links': AffiliateLink;
-    'affiliate-click-logs': AffiliateClickLog;
     'affiliate-settings': AffiliateSetting;
+    'affiliate-click-logs': AffiliateClickLog;
+    marketingTrackings: MarketingTracking;
+    logs: Log;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -128,11 +128,11 @@ export interface Config {
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     admins: AdminsSelect<false> | AdminsSelect<true>;
     emails: EmailsSelect<false> | EmailsSelect<true>;
-    logs: LogsSelect<false> | LogsSelect<true>;
-    marketingTrackings: MarketingTrackingsSelect<false> | MarketingTrackingsSelect<true>;
     'affiliate-links': AffiliateLinksSelect<false> | AffiliateLinksSelect<true>;
-    'affiliate-click-logs': AffiliateClickLogsSelect<false> | AffiliateClickLogsSelect<true>;
     'affiliate-settings': AffiliateSettingsSelect<false> | AffiliateSettingsSelect<true>;
+    'affiliate-click-logs': AffiliateClickLogsSelect<false> | AffiliateClickLogsSelect<true>;
+    marketingTrackings: MarketingTrackingsSelect<false> | MarketingTrackingsSelect<true>;
+    logs: LogsSelect<false> | LogsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -1133,19 +1133,36 @@ export interface AffiliateLink {
   affiliateUser: number | User;
   event?: (number | null) | Event;
   affiliateCode: string;
+  /**
+   * Promotion filtered by event
+   */
+  affiliatePromotion?: (number | null) | Promotion;
   promotionCode?: string | null;
   /**
    * UTM parameters (auto or manual)
    */
-  utmParams?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+  utmParams?: {
+    /**
+     * UTM Source (Optional)
+     */
+    source?: string | null;
+    /**
+     * UTM Medium (Optional)
+     */
+    medium?: string | null;
+    /**
+     * UTM Campaign (Optional)
+     */
+    campaign?: string | null;
+    /**
+     * UTM Term (Optional)
+     */
+    term?: string | null;
+    /**
+     * UTM Content (Optional)
+     */
+    content?: string | null;
+  };
   /**
    * Target link for the affiliate
    */
@@ -1396,106 +1413,6 @@ export interface Email {
   createdAt: string;
 }
 /**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "logs".
- */
-export interface Log {
-  id: number;
-  action: string;
-  description?: string | null;
-  timestamp: string;
-  status?: ('success' | 'error' | 'warning' | 'info') | null;
-  /**
-   * Additional data related to this log entry
-   */
-  data?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  /**
-   * Related order (if applicable)
-   */
-  order?: (number | null) | Order;
-  /**
-   * Related payment (if applicable)
-   */
-  payment?: (number | null) | Payment;
-  /**
-   * IP address where the action originated
-   */
-  ipAddress?: string | null;
-  userAgent?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "marketingTrackings".
- */
-export interface MarketingTracking {
-  id: number;
-  order?: (number | null) | Order;
-  description?: string | null;
-  utmSource?: string | null;
-  utmMedium?: string | null;
-  utmCampaign?: string | null;
-  utmTerm?: string | null;
-  utmContent?: string | null;
-  conversionType?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Track affiliate link clicks and user interactions
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "affiliate-click-logs".
- */
-export interface AffiliateClickLog {
-  id: number;
-  affiliateUser: number | User;
-  affiliateLink: number | AffiliateLink;
-  /**
-   * Unique session identifier to prevent duplicate tracking
-   */
-  sessionId?: string | null;
-  /**
-   * Client IP address
-   */
-  ip?: string | null;
-  /**
-   * Geographic location (if available)
-   */
-  location?: string | null;
-  /**
-   * HTTP referrer header
-   */
-  referrer?: string | null;
-  /**
-   * Browser user agent string
-   */
-  userAgent?: string | null;
-  /**
-   * Additional tracking data including device info, promo codes, etc.
-   */
-  moreInformation?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * Configure tier-based affiliate reward systems with commission percentages and free ticket rewards
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1603,6 +1520,106 @@ export interface AffiliateSetting {
     };
     id?: string | null;
   }[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Track affiliate link clicks and user interactions
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-click-logs".
+ */
+export interface AffiliateClickLog {
+  id: number;
+  affiliateUser: number | User;
+  affiliateLink: number | AffiliateLink;
+  /**
+   * Unique session identifier to prevent duplicate tracking
+   */
+  sessionId?: string | null;
+  /**
+   * Client IP address
+   */
+  ip?: string | null;
+  /**
+   * Geographic location (if available)
+   */
+  location?: string | null;
+  /**
+   * HTTP referrer header
+   */
+  referrer?: string | null;
+  /**
+   * Browser user agent string
+   */
+  userAgent?: string | null;
+  /**
+   * Additional tracking data including device info, promo codes, etc.
+   */
+  moreInformation?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marketingTrackings".
+ */
+export interface MarketingTracking {
+  id: number;
+  order?: (number | null) | Order;
+  description?: string | null;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  utmTerm?: string | null;
+  utmContent?: string | null;
+  conversionType?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "logs".
+ */
+export interface Log {
+  id: number;
+  action: string;
+  description?: string | null;
+  timestamp: string;
+  status?: ('success' | 'error' | 'warning' | 'info') | null;
+  /**
+   * Additional data related to this log entry
+   */
+  data?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Related order (if applicable)
+   */
+  order?: (number | null) | Order;
+  /**
+   * Related payment (if applicable)
+   */
+  payment?: (number | null) | Payment;
+  /**
+   * IP address where the action originated
+   */
+  ipAddress?: string | null;
+  userAgent?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1903,24 +1920,24 @@ export interface PayloadLockedDocument {
         value: number | Email;
       } | null)
     | ({
-        relationTo: 'logs';
-        value: number | Log;
-      } | null)
-    | ({
-        relationTo: 'marketingTrackings';
-        value: number | MarketingTracking;
-      } | null)
-    | ({
         relationTo: 'affiliate-links';
         value: number | AffiliateLink;
+      } | null)
+    | ({
+        relationTo: 'affiliate-settings';
+        value: number | AffiliateSetting;
       } | null)
     | ({
         relationTo: 'affiliate-click-logs';
         value: number | AffiliateClickLog;
       } | null)
     | ({
-        relationTo: 'affiliate-settings';
-        value: number | AffiliateSetting;
+        relationTo: 'marketingTrackings';
+        value: number | MarketingTracking;
+      } | null)
+    | ({
+        relationTo: 'logs';
+        value: number | Log;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -2746,65 +2763,25 @@ export interface EmailsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "logs_select".
- */
-export interface LogsSelect<T extends boolean = true> {
-  action?: T;
-  description?: T;
-  timestamp?: T;
-  status?: T;
-  data?: T;
-  order?: T;
-  payment?: T;
-  ipAddress?: T;
-  userAgent?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "marketingTrackings_select".
- */
-export interface MarketingTrackingsSelect<T extends boolean = true> {
-  order?: T;
-  description?: T;
-  utmSource?: T;
-  utmMedium?: T;
-  utmCampaign?: T;
-  utmTerm?: T;
-  utmContent?: T;
-  conversionType?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "affiliate-links_select".
  */
 export interface AffiliateLinksSelect<T extends boolean = true> {
   affiliateUser?: T;
   event?: T;
   affiliateCode?: T;
+  affiliatePromotion?: T;
   promotionCode?: T;
-  utmParams?: T;
+  utmParams?:
+    | T
+    | {
+        source?: T;
+        medium?: T;
+        campaign?: T;
+        term?: T;
+        content?: T;
+      };
   targetLink?: T;
   status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "affiliate-click-logs_select".
- */
-export interface AffiliateClickLogsSelect<T extends boolean = true> {
-  affiliateUser?: T;
-  affiliateLink?: T;
-  sessionId?: T;
-  ip?: T;
-  location?: T;
-  referrer?: T;
-  userAgent?: T;
-  moreInformation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2853,6 +2830,55 @@ export interface AffiliateSettingsSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-click-logs_select".
+ */
+export interface AffiliateClickLogsSelect<T extends boolean = true> {
+  affiliateUser?: T;
+  affiliateLink?: T;
+  sessionId?: T;
+  ip?: T;
+  location?: T;
+  referrer?: T;
+  userAgent?: T;
+  moreInformation?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marketingTrackings_select".
+ */
+export interface MarketingTrackingsSelect<T extends boolean = true> {
+  order?: T;
+  description?: T;
+  utmSource?: T;
+  utmMedium?: T;
+  utmCampaign?: T;
+  utmTerm?: T;
+  utmContent?: T;
+  conversionType?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "logs_select".
+ */
+export interface LogsSelect<T extends boolean = true> {
+  action?: T;
+  description?: T;
+  timestamp?: T;
+  status?: T;
+  data?: T;
+  order?: T;
+  payment?: T;
+  ipAddress?: T;
+  userAgent?: T;
   updatedAt?: T;
   createdAt?: T;
 }
