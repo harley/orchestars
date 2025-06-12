@@ -13,7 +13,10 @@ import { DISCOUNT_APPLY_SCOPE } from '@/collections/Promotion/constants'
 import { sql } from '@payloadcms/db-postgres/drizzle'
 
 // Utility function to get affiliate data from cookies
-export const getAffiliateDataFromCookies = async (payload: BasePayload) => {
+export const getAffiliateDataFromCookies = async (
+  payload: BasePayload,
+  data?: { promotionCodes?: string[] },
+) => {
   const cookieStore = await cookies()
 
   const affiliateCode = cookieStore.get('affiliate_code')?.value
@@ -41,7 +44,33 @@ export const getAffiliateDataFromCookies = async (payload: BasePayload) => {
         affiliateUser: affiliateLink.affiliateUser,
       }
     } catch (error) {
-      console.error(`Error finding affiliate code ${affiliateCode}:`, error)
+      console.log(`Ignore: Not found finding affiliate code ${affiliateCode}:`, error)
+    }
+  } else if (data?.promotionCodes?.length) {
+    const affiliatePromotionCodes = [...new Set(data.promotionCodes)]
+    try {
+      const affiliateLinkByPromoCode = await payload
+        .find({
+          collection: 'affiliate-links',
+          where: {
+            promotionCode: { in: affiliatePromotionCodes },
+            status: { equals: 'active' },
+          },
+          limit: 1,
+          depth: 0,
+        })
+        .then((res) => res.docs?.[0])
+
+      if (!affiliateLinkByPromoCode) {
+        return
+      }
+      return {
+        affiliateLink: affiliateLinkByPromoCode.id,
+        affiliateCode: affiliateLinkByPromoCode.affiliateCode,
+        affiliateUser: affiliateLinkByPromoCode.affiliateUser,
+      }
+    } catch (error) {
+      console.log(`Ignore: Not found affiliate by promo codes ${affiliatePromotionCodes}:`, error)
     }
   }
 }
@@ -461,7 +490,8 @@ export const createOrderAndTickets = async ({
   })
 
   // Get affiliate data from cookies
-  const affiliateData = await getAffiliateDataFromCookies(payload)
+  const promotionCodes = promotion?.code ? [promotion.code] : []
+  const affiliateData = await getAffiliateDataFromCookies(payload, { promotionCodes })
 
   const newOrder = await payload.create({
     collection: 'orders',
@@ -593,7 +623,10 @@ export const createOrderWithMultiplePromotionsAndTickets = async ({
   )
 
   // Get affiliate data from cookies
-  const affiliateData = await getAffiliateDataFromCookies(payload)
+  const promotionCodes = promotionsApplied?.length
+    ? promotionsApplied.map((promo) => promo.promotionCode)
+    : []
+  const affiliateData = await getAffiliateDataFromCookies(payload, { promotionCodes })
 
   const newOrder = await payload.create({
     collection: 'orders',
@@ -726,7 +759,8 @@ export const createOrderAndTicketsWithTicketClassType = async ({
   })
 
   // Get affiliate data from cookies
-  const affiliateData = await getAffiliateDataFromCookies(payload)
+  const promotionCodes = promotion?.code ? [promotion.code] : []
+  const affiliateData = await getAffiliateDataFromCookies(payload, { promotionCodes })
 
   const newOrder = await payload.create({
     collection: 'orders',
