@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { sendAffiliateSetupEmail } from './hooks/sendAffiliateSetupEmail'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -96,4 +97,7 @@ export const Users: CollectionConfig = {
       // admin: { position: 'sidebar' },
     },
   ],
+  hooks: {
+    afterChange: [sendAffiliateSetupEmail],
+  },
 }
