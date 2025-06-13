@@ -3,11 +3,13 @@ import { Email } from '@/payload-types'
 import { BasePayload } from 'payload'
 import { EMAIL_DEFAULT_FROM_ADDRESS, EMAIL_PROVIDER } from '@/config/email'
 import { logError } from '@/collections/Logs/utils'
+import { TransactionID } from '@/types/TransactionID'
 
 export const sendMailAndWriteLog = async ({
   resendMailData,
   emailData,
   payload,
+  transactionID
 }: {
   resendMailData: {
     to: string
@@ -17,6 +19,7 @@ export const sendMailAndWriteLog = async ({
   }
   emailData: Partial<Email>
   payload: BasePayload
+  transactionID?: TransactionID
 }) => {
   const resendResult = await sendMail({ payload, mailData: resendMailData })
 
@@ -31,6 +34,7 @@ export const sendMailAndWriteLog = async ({
         status: 'sent'
       },
       payload,
+      transactionID
     })
   }
 }
@@ -70,14 +74,18 @@ const sendMail = async ({
 const createEmailRecord = async ({
   data,
   payload,
+  transactionID
 }: {
   payload: BasePayload
   data: Partial<Email>
+  transactionID?: TransactionID
 }) => {
   try {
     return payload.create({
       collection: 'emails',
       data: data as any,
+      req: { transactionID },
+      depth: 0,
     })
   } catch (error: any) {
     console.error('Error while writing email log', error)
