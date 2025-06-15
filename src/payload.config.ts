@@ -78,6 +78,13 @@ export default buildConfig({
         dashboard: {
           Component: '@/components/AdminViews/Dashboard/Component',
         },
+        affiliateManagement: {
+          Component: '@/app/(payload)/admin/affiliate/page',
+          path: '/affiliate',
+          exact: true,
+          strict: true,
+          sensitive: true,
+        },
       },
     },
     importMap: {
