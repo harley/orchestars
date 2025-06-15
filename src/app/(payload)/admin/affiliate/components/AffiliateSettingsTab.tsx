@@ -18,6 +18,7 @@ import {
   PayloadModalBody,
 } from './PayloadUIComponents'
 import AffiliateSettingsForm from './AffiliateSettingsForm'
+import qs from 'qs'
 
 interface Props {
   selectedUser: User
@@ -33,10 +34,7 @@ interface PaginationInfo {
   hasPrevPage: boolean
 }
 
-const AffiliateSettingsTab: React.FC<Props> = ({
-  selectedUser,
-  onCountUpdate,
-}) => {
+const AffiliateSettingsTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editingSetting, setEditingSetting] = useState<AffiliateSetting | null>(null)
@@ -61,15 +59,22 @@ const AffiliateSettingsTab: React.FC<Props> = ({
     setError(null)
 
     try {
-      const whereQuery = JSON.stringify({
-        affiliateUser: {
-          equals: selectedUser.id,
+      console.log('selectedUser', selectedUser)
+
+      const queryStr = qs.stringify({
+        where: {
+          affiliateUser: {
+            equals: selectedUser.id,
+          },
         },
+
+        depth: 2,
+        page,
+        limit: 10,
+        sort: '-createdAt',
       })
 
-      const response = await fetch(
-        `/api/affiliate-settings?where=${encodeURIComponent(whereQuery)}&page=${page}&limit=10&depth=2&sort=-createdAt`
-      )
+      const response = await fetch(`/api/affiliate-settings?${queryStr}`)
       const result = await response.json()
 
       if (response.ok) {
@@ -126,11 +131,12 @@ const AffiliateSettingsTab: React.FC<Props> = ({
       const formattedData = {
         ...data,
         event: parseInt(data.event),
-        affiliateUser: parseInt(data.affiliateUser),
-        promotions: data.promotions?.map((promo: any) => ({
-          ...promo,
-          promotion: parseInt(promo.promotion)
-        })) || []
+        affiliateUser: selectedUser.id,
+        promotions:
+          data.promotions?.map((promo: any) => ({
+            ...promo,
+            promotion: parseInt(promo.promotion),
+          })) || [],
       }
 
       const response = await fetch('/api/affiliate-settings', {
@@ -147,18 +153,20 @@ const AffiliateSettingsTab: React.FC<Props> = ({
         setIsCreateModalOpen(false)
         // Refetch data to show the new setting
         await fetchAffiliateSettings(pagination.page)
-        alert('Create successfully!')
+        alert('Created successfully!')
       } else {
         // Handle PayloadCMS validation errors
         if (result.errors && Array.isArray(result.errors)) {
-          const errorMessages = result.errors.map((error: any) => {
-            if (error.data?.errors) {
-              return error.data.errors.map((fieldError: any) =>
-                `${fieldError.label}: ${fieldError.message}`
-              ).join('\n')
-            }
-            return error.message || 'Unknown error'
-          }).join('\n')
+          const errorMessages = result.errors
+            .map((error: any) => {
+              if (error.data?.errors) {
+                return error.data.errors
+                  .map((fieldError: any) => `${fieldError.label}: ${fieldError.message}`)
+                  .join('\n')
+              }
+              return error.message || 'Unknown error'
+            })
+            .join('\n')
 
           alert(`Validation Error:\n${errorMessages}`)
         } else {
@@ -186,15 +194,14 @@ const AffiliateSettingsTab: React.FC<Props> = ({
         ...data,
         event: parseInt(data.event),
         affiliateUser: parseInt(data.affiliateUser),
-        promotions: data.promotions?.map((promo: any) => ({
-          ...promo,
-          promotion: parseInt(promo.promotion)
-        })) || []
+        promotions:
+          data.promotions?.map((promo: any) => ({
+            ...promo,
+            promotion: parseInt(promo.promotion),
+          })) || [],
       }
 
       console.log('formattedData', formattedData)
-
-      debugger
 
       const response = await fetch(`/api/affiliate-settings/${editingSetting.id}`, {
         method: 'PATCH',
@@ -215,14 +222,16 @@ const AffiliateSettingsTab: React.FC<Props> = ({
       } else {
         // Handle PayloadCMS validation errors
         if (result.errors && Array.isArray(result.errors)) {
-          const errorMessages = result.errors.map((error: any) => {
-            if (error.data?.errors) {
-              return error.data.errors.map((fieldError: any) =>
-                `${fieldError.label}: ${fieldError.message}`
-              ).join('\n')
-            }
-            return error.message || 'Unknown error'
-          }).join('\n')
+          const errorMessages = result.errors
+            .map((error: any) => {
+              if (error.data?.errors) {
+                return error.data.errors
+                  .map((fieldError: any) => `${fieldError.label}: ${fieldError.message}`)
+                  .join('\n')
+              }
+              return error.message || 'Unknown error'
+            })
+            .join('\n')
 
           alert(`Validation Error:\n${errorMessages}`)
         } else {
@@ -258,26 +267,26 @@ const AffiliateSettingsTab: React.FC<Props> = ({
       {/* Header */}
       <div className="payload-flex payload-flex--between payload-mb">
         <div>
-          <h3 style={{
-            fontSize: 'var(--font-size-h4)',
-            fontWeight: 'var(--font-weight-medium)',
-            margin: '0 0 calc(var(--base) / 4) 0'
-          }}>
+          <h3
+            style={{
+              fontSize: 'var(--font-size-h4)',
+              fontWeight: 'var(--font-weight-medium)',
+              margin: '0 0 calc(var(--base) / 4) 0',
+            }}
+          >
             Affiliate Settings
           </h3>
-          <p style={{
-            fontSize: 'var(--font-size-small)',
-            color: 'var(--theme-elevation-600)',
-            margin: 0
-          }}>
+          <p
+            style={{
+              fontSize: 'var(--font-size-small)',
+              color: 'var(--theme-elevation-600)',
+              margin: 0,
+            }}
+          >
             Manage affiliate program configurations for {selectedUser.email}
           </p>
         </div>
-        <Button
-          buttonStyle="primary"
-          size="small"
-          onClick={() => setIsCreateModalOpen(true)}
-        >
+        <Button buttonStyle="primary" size="small" onClick={() => setIsCreateModalOpen(true)}>
           <div className="payload-flex payload-flex--gap">
             <Plus style={{ width: '16px', height: '16px' }} />
             Add New Setting
@@ -326,7 +335,9 @@ const AffiliateSettingsTab: React.FC<Props> = ({
               <PayloadCardHeader>
                 <div className="payload-flex payload-flex--between">
                   <div className="payload-flex payload-flex--gap">
-                    <Settings style={{ width: '20px', height: '20px', color: 'var(--theme-elevation-600)' }} />
+                    <Settings
+                      style={{ width: '20px', height: '20px', color: 'var(--theme-elevation-600)' }}
+                    />
                     <div>
                       <PayloadCardTitle>{setting.name}</PayloadCardTitle>
                       <PayloadCardDescription>
@@ -335,7 +346,7 @@ const AffiliateSettingsTab: React.FC<Props> = ({
                     </div>
                   </div>
                   <div className="payload-flex payload-flex--gap">
-                    <PayloadBadge variant={setting.isActive ? "success" : "secondary"}>
+                    <PayloadBadge variant={setting.isActive ? 'success' : 'secondary'}>
                       {setting.isActive ? 'Active' : 'Inactive'}
                     </PayloadBadge>
                     <Button
@@ -354,8 +365,12 @@ const AffiliateSettingsTab: React.FC<Props> = ({
           {/* Pagination */}
           {pagination.totalPages > 1 && (
             <div className="payload-flex payload-flex--between payload-mt">
-              <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--theme-elevation-600)' }}>
-                Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.totalDocs)} of {pagination.totalDocs} settings
+              <div
+                style={{ fontSize: 'var(--font-size-small)', color: 'var(--theme-elevation-600)' }}
+              >
+                Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
+                {Math.min(pagination.page * pagination.limit, pagination.totalDocs)} of{' '}
+                {pagination.totalDocs} settings
               </div>
               <div className="payload-flex payload-flex--gap">
                 <Button
@@ -367,12 +382,14 @@ const AffiliateSettingsTab: React.FC<Props> = ({
                   <ChevronLeft style={{ width: '16px', height: '16px' }} />
                   Previous
                 </Button>
-                <span style={{
-                  padding: '0 var(--base)',
-                  fontSize: 'var(--font-size-small)',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
+                <span
+                  style={{
+                    padding: '0 var(--base)',
+                    fontSize: 'var(--font-size-small)',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
                   Page {pagination.page} of {pagination.totalPages}
                 </span>
                 <Button
@@ -398,14 +415,10 @@ const AffiliateSettingsTab: React.FC<Props> = ({
               <Settings />
               <h3>No Settings Found</h3>
               <p>
-                This affiliate user does not have any settings configured yet.
-                Create a new setting to get started.
+                This affiliate user does not have any settings configured yet. Create a new setting
+                to get started.
               </p>
-              <Button
-                buttonStyle="primary"
-                size="small"
-                onClick={() => setIsCreateModalOpen(true)}
-              >
+              <Button buttonStyle="primary" size="small" onClick={() => setIsCreateModalOpen(true)}>
                 <div className="payload-flex payload-flex--gap">
                   <Plus style={{ width: '16px', height: '16px' }} />
                   Create First Setting
@@ -417,10 +430,7 @@ const AffiliateSettingsTab: React.FC<Props> = ({
       )}
 
       {/* Create Modal */}
-      <PayloadModal
-        isOpen={isCreateModalOpen}
-        onClose={closeModals}
-      >
+      <PayloadModal isOpen={isCreateModalOpen} onClose={closeModals}>
         <PayloadModalHeader>
           <PayloadModalTitle>Create Affiliate Setting</PayloadModalTitle>
         </PayloadModalHeader>
@@ -435,10 +445,7 @@ const AffiliateSettingsTab: React.FC<Props> = ({
       </PayloadModal>
 
       {/* Edit Modal */}
-      <PayloadModal
-        isOpen={isEditModalOpen}
-        onClose={closeModals}
-      >
+      <PayloadModal isOpen={isEditModalOpen} onClose={closeModals}>
         <PayloadModalHeader>
           <PayloadModalTitle>Edit Affiliate Setting</PayloadModalTitle>
         </PayloadModalHeader>

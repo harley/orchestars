@@ -13,6 +13,7 @@ import {
   PayloadDescription,
   PayloadTextarea,
 } from './PayloadUIComponents'
+import qs from 'qs'
 
 interface Props {
   selectedUser: User
@@ -49,8 +50,14 @@ const AffiliateLinkForm: React.FC<Props> = ({
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [isCopied, setIsCopied] = useState(false)
   const [formData, setFormData] = useState<AffiliateLinkFormData>({
-    event: typeof link?.event === 'object' && link.event ? link.event.id.toString() : link?.event?.toString() || '',
-    affiliatePromotion: typeof link?.affiliatePromotion === 'object' && link.affiliatePromotion ? link.affiliatePromotion.id.toString() : link?.affiliatePromotion?.toString() || '',
+    event:
+      typeof link?.event === 'object' && link.event
+        ? link.event.id.toString()
+        : link?.event?.toString() || '',
+    affiliatePromotion:
+      typeof link?.affiliatePromotion === 'object' && link.affiliatePromotion
+        ? link.affiliatePromotion.id.toString()
+        : link?.affiliatePromotion?.toString() || '',
     promotionCode: link?.promotionCode || '',
     utmParams: {
       source: link?.utmParams?.source || '',
@@ -63,31 +70,89 @@ const AffiliateLinkForm: React.FC<Props> = ({
     status: link?.status || 'active',
   })
 
-  // Fetch events and promotions
+  // Fetch events on component mount
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchEvents = async () => {
       try {
-        const [eventsRes, promotionsRes] = await Promise.all([
-          fetch('/api/events'),
-          fetch('/api/promotions')
-        ])
-
+        const eventsRes = await fetch('/api/events')
         if (eventsRes.ok) {
           const eventsData = await eventsRes.json()
           setEvents(eventsData.docs || [])
         }
+      } catch (error) {
+        console.error('Failed to fetch events:', error)
+      }
+    }
+
+    fetchEvents()
+  }, [])
+
+  // Fetch promotions when event is selected
+  useEffect(() => {
+    const fetchPromotions = async () => {
+      if (!formData.event) {
+        setPromotions([])
+        // Clear selected promotion when no event is selected
+        setFormData((prev) => ({
+          ...prev,
+          affiliatePromotion: '',
+          promotionCode: '',
+        }))
+        return
+      }
+
+      try {
+        const queryStr = qs.stringify({
+          where: {
+            event: {
+              equals: parseInt(formData.event),
+            },
+          },
+          depth: 1,
+          limit: 100,
+        })
+
+        const promotionsRes = await fetch(`/api/promotions?${queryStr}`)
 
         if (promotionsRes.ok) {
           const promotionsData = await promotionsRes.json()
           setPromotions(promotionsData.docs || [])
+
+          // Clear selected promotion when event changes (unless it's the initial load with existing link data)
+          if (
+            !link ||
+            (link &&
+              typeof link.event === 'object' &&
+              link.event?.id.toString() !== formData.event) ||
+            (link && typeof link.event === 'number' && link.event.toString() !== formData.event)
+          ) {
+            setFormData((prev) => ({
+              ...prev,
+              affiliatePromotion: '',
+              promotionCode: '',
+            }))
+          }
+        } else {
+          setPromotions([])
+          setFormData((prev) => ({
+            ...prev,
+            affiliatePromotion: '',
+            promotionCode: '',
+          }))
         }
       } catch (error) {
-        console.error('Failed to fetch data:', error)
+        console.error('Failed to fetch promotions:', error)
+        setPromotions([])
+        setFormData((prev) => ({
+          ...prev,
+          affiliatePromotion: '',
+          promotionCode: '',
+        }))
       }
     }
 
-    fetchData()
-  }, [])
+    fetchPromotions()
+  }, [formData.event]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Generate target link automatically
   useEffect(() => {
@@ -101,7 +166,7 @@ const AffiliateLinkForm: React.FC<Props> = ({
       url += '/events'
 
       // Find selected event
-      const selectedEvent = events.find(e => e.id.toString() === formData.event)
+      const selectedEvent = events.find((e) => e.id.toString() === formData.event)
       if (selectedEvent) {
         url += `/${selectedEvent.slug}`
       }
@@ -109,7 +174,9 @@ const AffiliateLinkForm: React.FC<Props> = ({
       const params = new URLSearchParams()
 
       // Find selected promotion
-      const selectedPromotion = promotions.find(p => p.id.toString() === formData.affiliatePromotion)
+      const selectedPromotion = promotions.find(
+        (p) => p.id.toString() === formData.affiliatePromotion,
+      )
       if (selectedPromotion) {
         params.append('apc', selectedPromotion.code)
       }
@@ -138,21 +205,33 @@ const AffiliateLinkForm: React.FC<Props> = ({
     }
 
     const newTargetLink = generateTargetLink()
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      targetLink: newTargetLink
+      targetLink: newTargetLink,
     }))
-  }, [formData.event, formData.affiliatePromotion, formData.utmParams.source, formData.utmParams.medium, formData.utmParams.campaign, formData.utmParams.term, formData.utmParams.content, events, promotions])
+  }, [
+    formData.event,
+    formData.affiliatePromotion,
+    formData.utmParams.source,
+    formData.utmParams.medium,
+    formData.utmParams.campaign,
+    formData.utmParams.term,
+    formData.utmParams.content,
+    events,
+    promotions,
+  ])
 
   // Update promotion code when promotion is selected
   useEffect(() => {
-    const selectedPromotion = promotions.find(p => p.id.toString() === formData.affiliatePromotion)
+    const selectedPromotion = promotions.find(
+      (p) => p.id.toString() === formData.affiliatePromotion,
+    )
     const newPromotionCode = selectedPromotion?.code || ''
 
     if (newPromotionCode !== formData.promotionCode) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        promotionCode: newPromotionCode
+        promotionCode: newPromotionCode,
       }))
     }
   }, [formData.affiliatePromotion, formData.promotionCode, promotions])
@@ -160,7 +239,7 @@ const AffiliateLinkForm: React.FC<Props> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMessage('')
-    
+
     // Validate required fields
     if (!formData.event.trim()) {
       setErrorMessage('Event selection is required')
@@ -189,22 +268,22 @@ const AffiliateLinkForm: React.FC<Props> = ({
   }
 
   const updateFormData = (path: string, value: any) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const keys = path.split('.')
       const newData = { ...prev }
       let current: any = newData
-      
+
       for (let i = 0; i < keys.length - 1; i++) {
         const key = keys[i]
         if (!key) continue
-        
+
         if (!current[key]) current[key] = {}
         current = current[key]
       }
-      
+
       const lastKey = keys[keys.length - 1]
       if (!lastKey) return newData
-      
+
       current[lastKey] = value
       return newData
     })
@@ -237,41 +316,38 @@ const AffiliateLinkForm: React.FC<Props> = ({
     }
   }
 
-  // Filter promotions by selected event
-  const filteredPromotions = promotions.filter(promo =>
-    typeof promo.event === 'object' && promo.event
-      ? promo.event.id.toString() === formData.event
-      : promo.event?.toString() === formData.event
-  )
+  // Promotions are already filtered by event from the API
 
   return (
     <form onSubmit={handleSubmit}>
       {errorMessage && (
-        <div style={{
-          padding: 'calc(var(--base) / 2)',
-          marginBottom: 'var(--base)',
-          backgroundColor: 'var(--theme-error-50)',
-          border: '1px solid var(--theme-error-500)',
-          borderRadius: 'var(--border-radius-s)',
-          color: 'var(--theme-error-500)',
-          fontSize: 'var(--font-size-small)'
-        }}>
+        <div
+          style={{
+            padding: 'calc(var(--base) / 2)',
+            marginBottom: 'var(--base)',
+            backgroundColor: 'var(--theme-error-50)',
+            border: '1px solid var(--theme-error-500)',
+            borderRadius: 'var(--border-radius-s)',
+            color: 'var(--theme-error-500)',
+            fontSize: 'var(--font-size-small)',
+          }}
+        >
           {errorMessage}
         </div>
       )}
 
       <PayloadFormGroup>
-        <PayloadLabel htmlFor="event" required>Event</PayloadLabel>
-        <PayloadDescription>
-          Select the event this affiliate link applies to
-        </PayloadDescription>
+        <PayloadLabel htmlFor="event" required>
+          Event
+        </PayloadLabel>
+        <PayloadDescription>Select the event this affiliate link applies to</PayloadDescription>
         <PayloadSelect
           id="event"
           value={formData.event}
           onChange={(e) => updateFormData('event', e.target.value)}
         >
           <option value="">Select an event</option>
-          {events.map(event => (
+          {events.map((event) => (
             <option key={event.id} value={event.id.toString()}>
               {event.title}
             </option>
@@ -280,17 +356,17 @@ const AffiliateLinkForm: React.FC<Props> = ({
       </PayloadFormGroup>
 
       <PayloadFormGroup>
-        <PayloadLabel htmlFor="affiliatePromotion" required>Promotion</PayloadLabel>
-        <PayloadDescription>
-          Select a promotion to associate with this link
-        </PayloadDescription>
+        <PayloadLabel htmlFor="affiliatePromotion" required>
+          Promotion
+        </PayloadLabel>
+        <PayloadDescription>Select a promotion to associate with this link</PayloadDescription>
         <PayloadSelect
           id="affiliatePromotion"
           value={formData.affiliatePromotion}
           onChange={(e) => updateFormData('affiliatePromotion', e.target.value)}
         >
           <option value="">Select a promotion</option>
-          {filteredPromotions.map(promotion => (
+          {promotions.map((promotion: Promotion) => (
             <option key={promotion.id} value={promotion.id.toString()}>
               {promotion.code}
             </option>
@@ -313,9 +389,7 @@ const AffiliateLinkForm: React.FC<Props> = ({
 
       <PayloadFormGroup>
         <PayloadLabel htmlFor="status">Status</PayloadLabel>
-        <PayloadDescription>
-          Set the status of this affiliate link
-        </PayloadDescription>
+        <PayloadDescription>Set the status of this affiliate link</PayloadDescription>
         <PayloadSelect
           id="status"
           value={formData.status}
@@ -328,11 +402,13 @@ const AffiliateLinkForm: React.FC<Props> = ({
 
       {/* UTM Parameters Section */}
       <div style={{ marginTop: 'var(--base)', marginBottom: 'var(--base)' }}>
-        <h4 style={{
-          fontSize: 'var(--font-size-h5)',
-          fontWeight: 'var(--font-weight-medium)',
-          margin: '0 0 calc(var(--base) / 2) 0'
-        }}>
+        <h4
+          style={{
+            fontSize: 'var(--font-size-h5)',
+            fontWeight: 'var(--font-weight-medium)',
+            margin: '0 0 calc(var(--base) / 2) 0',
+          }}
+        >
           UTM Parameters (Optional)
         </h4>
         <PayloadDescription>
@@ -356,9 +432,7 @@ const AffiliateLinkForm: React.FC<Props> = ({
 
         <PayloadFormGroup>
           <PayloadLabel htmlFor="utm-medium">UTM Medium</PayloadLabel>
-          <PayloadDescription>
-            Marketing medium (e.g., cpc, email, social)
-          </PayloadDescription>
+          <PayloadDescription>Marketing medium (e.g., cpc, email, social)</PayloadDescription>
           <PayloadInput
             id="utm-medium"
             value={formData.utmParams.medium}
@@ -369,9 +443,7 @@ const AffiliateLinkForm: React.FC<Props> = ({
 
         <PayloadFormGroup>
           <PayloadLabel htmlFor="utm-campaign">UTM Campaign</PayloadLabel>
-          <PayloadDescription>
-            Campaign name (e.g., summer-promo, holiday-sale)
-          </PayloadDescription>
+          <PayloadDescription>Campaign name (e.g., summer-promo, holiday-sale)</PayloadDescription>
           <PayloadInput
             id="utm-campaign"
             value={formData.utmParams.campaign}
@@ -382,9 +454,7 @@ const AffiliateLinkForm: React.FC<Props> = ({
 
         <PayloadFormGroup>
           <PayloadLabel htmlFor="utm-term">UTM Term</PayloadLabel>
-          <PayloadDescription>
-            Keywords (e.g., classical music, orchestra)
-          </PayloadDescription>
+          <PayloadDescription>Keywords (e.g., classical music, orchestra)</PayloadDescription>
           <PayloadInput
             id="utm-term"
             value={formData.utmParams.term}
@@ -411,7 +481,8 @@ const AffiliateLinkForm: React.FC<Props> = ({
       <PayloadFormGroup>
         <PayloadLabel htmlFor="targetLink">Target Link (Auto-generated)</PayloadLabel>
         <PayloadDescription>
-          This URL is automatically generated based on the selected event, promotion, and UTM parameters
+          This URL is automatically generated based on the selected event, promotion, and UTM
+          parameters
         </PayloadDescription>
         <PayloadTextarea
           id="targetLink"
@@ -445,20 +516,14 @@ const AffiliateLinkForm: React.FC<Props> = ({
         </div>
       </PayloadFormGroup>
 
-      <div className="payload-flex payload-flex--gap" style={{ justifyContent: 'flex-end', marginTop: 'var(--base)' }}>
-        <Button
-          type="button"
-          buttonStyle="secondary"
-          onClick={onCancel}
-          disabled={isLoading}
-        >
+      <div
+        className="payload-flex payload-flex--gap"
+        style={{ justifyContent: 'flex-end', marginTop: 'var(--base)' }}
+      >
+        <Button type="button" buttonStyle="secondary" onClick={onCancel} disabled={isLoading}>
           Cancel
         </Button>
-        <Button
-          type="submit"
-          buttonStyle="primary"
-          disabled={isLoading}
-        >
+        <Button type="submit" buttonStyle="primary" disabled={isLoading}>
           {isLoading ? 'Saving...' : link ? 'Update Link' : 'Create Link'}
         </Button>
       </div>

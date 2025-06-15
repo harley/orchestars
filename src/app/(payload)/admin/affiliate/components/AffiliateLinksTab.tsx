@@ -18,6 +18,7 @@ import {
   PayloadModalBody,
 } from './PayloadUIComponents'
 import AffiliateLinkForm from './AffiliateLinkForm'
+import qs from 'qs'
 
 interface Props {
   selectedUser: User
@@ -33,10 +34,7 @@ interface PaginationInfo {
   hasPrevPage: boolean
 }
 
-const AffiliateLinksTab: React.FC<Props> = ({
-  selectedUser,
-  onCountUpdate,
-}) => {
+const AffiliateLinksTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) => {
   const [expandedLink, setExpandedLink] = useState<number | null>(null)
   const [copiedLink, setCopiedLink] = useState<number | null>(null)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -63,15 +61,20 @@ const AffiliateLinksTab: React.FC<Props> = ({
     setError(null)
 
     try {
-      const whereQuery = JSON.stringify({
-        affiliateUser: {
-          equals: selectedUser.id,
+      const queryStr = qs.stringify({
+        where: {
+          affiliateUser: {
+            equals: selectedUser.id,
+          },
         },
+
+        depth: 2,
+        page,
+        limit: 10,
+        sort: '-createdAt',
       })
 
-      const response = await fetch(
-        `/api/affiliate-links?where=${encodeURIComponent(whereQuery)}&page=${page}&limit=10&depth=2&sort=-createdAt`
-      )
+      const response = await fetch(`/api/affiliate-links?${queryStr}`)
       const result = await response.json()
 
       if (response.ok) {
@@ -137,8 +140,6 @@ const AffiliateLinksTab: React.FC<Props> = ({
     return 'General Link'
   }
 
-
-
   const getLinkStatus = (link: AffiliateLink) => {
     return link.status || 'active'
   }
@@ -150,8 +151,8 @@ const AffiliateLinksTab: React.FC<Props> = ({
       const formattedData = {
         ...data,
         event: data.event ? parseInt(data.event) : undefined,
-        // Remove affiliatePromotion from the data since API expects promotionCode
-        affiliatePromotion: undefined,
+        affiliatePromotion: data.affiliatePromotion ? parseInt(data.affiliatePromotion) : undefined,
+        affiliateUser: selectedUser.id
       }
 
       // Validate that event and promotion are integers
@@ -160,7 +161,7 @@ const AffiliateLinksTab: React.FC<Props> = ({
         return
       }
 
-      const response = await fetch('/api/affiliate/link', {
+      const response = await fetch('/api/affiliate-links', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -170,16 +171,17 @@ const AffiliateLinksTab: React.FC<Props> = ({
 
       const result = await response.json()
 
-      if (response.ok && result.success) {
+      if (response.ok) {
         setIsCreateModalOpen(false)
         // Refetch data to show the new link
         await fetchAffiliateLinks(pagination.page)
+        alert('Created successfully!')
       } else {
         // Handle API validation errors
         if (result.details && Array.isArray(result.details)) {
-          const errorMessages = result.details.map((detail: any) =>
-            `${detail.field}: ${detail.message}`
-          ).join('\n')
+          const errorMessages = result.details
+            .map((detail: any) => `${detail.field}: ${detail.message}`)
+            .join('\n')
 
           alert(`Validation Error:\n${errorMessages}`)
         } else {
@@ -204,8 +206,7 @@ const AffiliateLinksTab: React.FC<Props> = ({
       const formattedData = {
         ...data,
         event: data.event ? parseInt(data.event) : undefined,
-        // Remove affiliatePromotion from the data since API expects promotionCode
-        affiliatePromotion: undefined,
+        affiliatePromotion: data.affiliatePromotion ? parseInt(data.affiliatePromotion) : undefined,
       }
 
       // Validate that event and promotion are integers
@@ -214,8 +215,8 @@ const AffiliateLinksTab: React.FC<Props> = ({
         return
       }
 
-      const response = await fetch(`/api/affiliate/link/${editingLink.id}`, {
-        method: 'PUT',
+      const response = await fetch(`/api/affiliate-links/${editingLink.id}`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -224,17 +225,18 @@ const AffiliateLinksTab: React.FC<Props> = ({
 
       const result = await response.json()
 
-      if (response.ok && result.success) {
+      if (response.ok) {
         setIsEditModalOpen(false)
         setEditingLink(null)
+        alert('Updated successfully!')
         // Refetch data to show the updated link
         await fetchAffiliateLinks(pagination.page)
       } else {
         // Handle API validation errors
         if (result.details && Array.isArray(result.details)) {
-          const errorMessages = result.details.map((detail: any) =>
-            `${detail.field}: ${detail.message}`
-          ).join('\n')
+          const errorMessages = result.details
+            .map((detail: any) => `${detail.field}: ${detail.message}`)
+            .join('\n')
 
           alert(`Validation Error:\n${errorMessages}`)
         } else {
@@ -270,26 +272,26 @@ const AffiliateLinksTab: React.FC<Props> = ({
       {/* Header */}
       <div className="payload-flex payload-flex--between payload-mb">
         <div>
-          <h3 style={{
-            fontSize: 'var(--font-size-h4)',
-            fontWeight: 'var(--font-weight-medium)',
-            margin: '0 0 calc(var(--base) / 4) 0'
-          }}>
+          <h3
+            style={{
+              fontSize: 'var(--font-size-h4)',
+              fontWeight: 'var(--font-weight-medium)',
+              margin: '0 0 calc(var(--base) / 4) 0',
+            }}
+          >
             Affiliate Links
           </h3>
-          <p style={{
-            fontSize: 'var(--font-size-small)',
-            color: 'var(--theme-elevation-600)',
-            margin: 0
-          }}>
+          <p
+            style={{
+              fontSize: 'var(--font-size-small)',
+              color: 'var(--theme-elevation-600)',
+              margin: 0,
+            }}
+          >
             Manage affiliate links for {selectedUser.email}
           </p>
         </div>
-        <Button
-          buttonStyle="primary"
-          size="small"
-          onClick={() => setIsCreateModalOpen(true)}
-        >
+        <Button buttonStyle="primary" size="small" onClick={() => setIsCreateModalOpen(true)}>
           <div className="payload-flex payload-flex--gap">
             <Plus style={{ width: '16px', height: '16px' }} />
             Create New Link
@@ -338,18 +340,20 @@ const AffiliateLinksTab: React.FC<Props> = ({
               <PayloadCardHeader>
                 <div className="payload-flex payload-flex--between">
                   <div className="payload-flex payload-flex--gap">
-                    <Link style={{ width: '20px', height: '20px', color: 'var(--theme-elevation-600)' }} />
+                    <Link
+                      style={{ width: '20px', height: '20px', color: 'var(--theme-elevation-600)' }}
+                    />
                     <div>
-                      <PayloadCardTitle>
-                        {getEventTitle(link)}
-                      </PayloadCardTitle>
+                      <PayloadCardTitle>{getEventTitle(link)}</PayloadCardTitle>
                       <PayloadCardDescription>
                         Code: {link.affiliateCode} • Created: {formatDate(link.createdAt)}
                       </PayloadCardDescription>
                     </div>
                   </div>
                   <div className="payload-flex payload-flex--gap">
-                    <PayloadBadge variant={getLinkStatus(link) === 'active' ? "success" : "secondary"}>
+                    <PayloadBadge
+                      variant={getLinkStatus(link) === 'active' ? 'success' : 'secondary'}
+                    >
                       {getLinkStatus(link)}
                     </PayloadBadge>
                     {link.targetLink && (
@@ -386,37 +390,43 @@ const AffiliateLinksTab: React.FC<Props> = ({
               {expandedLink === link.id && (
                 <PayloadCardContent>
                   <div>
-                    <p style={{
-                      fontSize: 'var(--font-size-small)',
-                      color: 'var(--theme-elevation-600)',
-                      margin: 'var(--base) 0'
-                    }}>
+                    <p
+                      style={{
+                        fontSize: 'var(--font-size-small)',
+                        color: 'var(--theme-elevation-600)',
+                        margin: 'var(--base) 0',
+                      }}
+                    >
                       Status: {getLinkStatus(link)} | Event: {getEventTitle(link)}
                     </p>
 
                     {link.targetLink && (
-                      <div style={{
-                        padding: 'var(--base)',
-                        backgroundColor: 'var(--theme-elevation-50)',
-                        borderRadius: 'var(--border-radius-s)',
-                        marginBottom: 'var(--base)',
-                        fontFamily: 'monospace',
-                        fontSize: 'var(--font-size-small)',
-                        wordBreak: 'break-all'
-                      }}>
+                      <div
+                        style={{
+                          padding: 'var(--base)',
+                          backgroundColor: 'var(--theme-elevation-50)',
+                          borderRadius: 'var(--border-radius-s)',
+                          marginBottom: 'var(--base)',
+                          fontFamily: 'monospace',
+                          fontSize: 'var(--font-size-small)',
+                          wordBreak: 'break-all',
+                        }}
+                      >
                         <strong>Target Link:</strong> {link.targetLink}
                       </div>
                     )}
 
-                    <div style={{
-                      fontSize: 'var(--font-size-small)',
-                      color: 'var(--theme-elevation-600)',
-                      borderTop: '1px solid var(--theme-elevation-200)',
-                      paddingTop: 'calc(var(--base) / 2)',
-                      marginTop: 'var(--base)'
-                    }}>
-                      Created: {new Date(link.createdAt).toLocaleString()} |
-                      Updated: {new Date(link.updatedAt).toLocaleString()}
+                    <div
+                      style={{
+                        fontSize: 'var(--font-size-small)',
+                        color: 'var(--theme-elevation-600)',
+                        borderTop: '1px solid var(--theme-elevation-200)',
+                        paddingTop: 'calc(var(--base) / 2)',
+                        marginTop: 'var(--base)',
+                      }}
+                    >
+                      Created: {new Date(link.createdAt).toLocaleString()} | Updated:{' '}
+                      {new Date(link.updatedAt).toLocaleString()}
                     </div>
                   </div>
                 </PayloadCardContent>
@@ -427,8 +437,12 @@ const AffiliateLinksTab: React.FC<Props> = ({
           {/* Pagination */}
           {pagination.totalPages > 1 && (
             <div className="payload-flex payload-flex--between payload-mt">
-              <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--theme-elevation-600)' }}>
-                Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.totalDocs)} of {pagination.totalDocs} links
+              <div
+                style={{ fontSize: 'var(--font-size-small)', color: 'var(--theme-elevation-600)' }}
+              >
+                Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
+                {Math.min(pagination.page * pagination.limit, pagination.totalDocs)} of{' '}
+                {pagination.totalDocs} links
               </div>
               <div className="payload-flex payload-flex--gap">
                 <Button
@@ -440,12 +454,14 @@ const AffiliateLinksTab: React.FC<Props> = ({
                   <ChevronLeft style={{ width: '16px', height: '16px' }} />
                   Previous
                 </Button>
-                <span style={{
-                  padding: '0 var(--base)',
-                  fontSize: 'var(--font-size-small)',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
+                <span
+                  style={{
+                    padding: '0 var(--base)',
+                    fontSize: 'var(--font-size-small)',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
                   Page {pagination.page} of {pagination.totalPages}
                 </span>
                 <Button
@@ -471,14 +487,10 @@ const AffiliateLinksTab: React.FC<Props> = ({
               <Link />
               <h3>No Links Found</h3>
               <p>
-                This affiliate user does not have any links created yet.
-                Create a new link to get started.
+                This affiliate user does not have any links created yet. Create a new link to get
+                started.
               </p>
-              <Button
-                buttonStyle="primary"
-                size="small"
-                onClick={() => setIsCreateModalOpen(true)}
-              >
+              <Button buttonStyle="primary" size="small" onClick={() => setIsCreateModalOpen(true)}>
                 <div className="payload-flex payload-flex--gap">
                   <Plus style={{ width: '16px', height: '16px' }} />
                   Create First Link
@@ -490,10 +502,7 @@ const AffiliateLinksTab: React.FC<Props> = ({
       )}
 
       {/* Create Modal */}
-      <PayloadModal
-        isOpen={isCreateModalOpen}
-        onClose={closeModals}
-      >
+      <PayloadModal isOpen={isCreateModalOpen} onClose={closeModals}>
         <PayloadModalHeader>
           <PayloadModalTitle>Create Affiliate Link</PayloadModalTitle>
         </PayloadModalHeader>
@@ -508,10 +517,7 @@ const AffiliateLinksTab: React.FC<Props> = ({
       </PayloadModal>
 
       {/* Edit Modal */}
-      <PayloadModal
-        isOpen={isEditModalOpen}
-        onClose={closeModals}
-      >
+      <PayloadModal isOpen={isEditModalOpen} onClose={closeModals}>
         <PayloadModalHeader>
           <PayloadModalTitle>Edit Affiliate Link</PayloadModalTitle>
         </PayloadModalHeader>
