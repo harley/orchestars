@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { SelectInput } from '@payloadcms/ui'
-import type { User, AffiliateLink, AffiliateSetting } from '@/payload-types'
+import type { User } from '@/payload-types'
 import { UserCheck, Settings, Link } from 'lucide-react'
 import {
   PayloadCard,
@@ -22,20 +22,18 @@ import AffiliateLinksTab from './AffiliateLinksTab'
 
 interface Props {
   affiliateUsers: User[]
-  affiliateSettings: AffiliateSetting[]
-  affiliateLinks: AffiliateLink[]
   selectedAffiliateUser: User | null
   onSelectAffiliateUser: (user: User | null) => void
 }
 
 const ManageAffiliateUserTab: React.FC<Props> = ({
   affiliateUsers,
-  affiliateSettings,
-  affiliateLinks,
   selectedAffiliateUser,
   onSelectAffiliateUser,
 }) => {
   const [activeNestedTab, setActiveNestedTab] = useState<'settings' | 'links'>('settings')
+  // const [settingsCount, setSettingsCount] = useState(0)
+  // const [linksCount, setLinksCount] = useState(0)
 
   // Prepare options for user selector
   const userOptions = [
@@ -57,22 +55,14 @@ const ManageAffiliateUserTab: React.FC<Props> = ({
     onSelectAffiliateUser(selectedUser || null)
   }
 
-  // Filter data for selected user
-  const userSettings = selectedAffiliateUser
-    ? affiliateSettings.filter((setting) =>
-        typeof setting.affiliateUser === 'object'
-          ? setting.affiliateUser.id === selectedAffiliateUser.id
-          : setting.affiliateUser === selectedAffiliateUser.id,
-      )
-    : []
+  // Callbacks to update counts from child components
+  const handleSettingsCountUpdate = useCallback((count: number) => {
+    // setSettingsCount(count)
+  }, [])
 
-  const userLinks = selectedAffiliateUser
-    ? affiliateLinks.filter((link) =>
-        typeof link.affiliateUser === 'object'
-          ? link.affiliateUser.id === selectedAffiliateUser.id
-          : link.affiliateUser === selectedAffiliateUser.id,
-      )
-    : []
+  const handleLinksCountUpdate = useCallback((count: number) => {
+    // setLinksCount(count)
+  }, [])
 
   return (
     <div>
@@ -175,13 +165,13 @@ const ManageAffiliateUserTab: React.FC<Props> = ({
                 <PayloadTabsTrigger value="settings">
                   <div className="payload-flex payload-flex--gap">
                     <Settings style={{ width: '16px', height: '16px' }} />
-                    Settings ({userSettings.length})
+                    Settings
                   </div>
                 </PayloadTabsTrigger>
                 <PayloadTabsTrigger value="links">
                   <div className="payload-flex payload-flex--gap">
                     <Link style={{ width: '16px', height: '16px' }} />
-                    Links ({userLinks.length})
+                    Links
                   </div>
                 </PayloadTabsTrigger>
               </PayloadTabsList>
@@ -189,12 +179,15 @@ const ManageAffiliateUserTab: React.FC<Props> = ({
               <PayloadTabsContent value="settings">
                 <AffiliateSettingsTab
                   selectedUser={selectedAffiliateUser}
-                  userSettings={userSettings}
+                  onCountUpdate={handleSettingsCountUpdate}
                 />
               </PayloadTabsContent>
 
               <PayloadTabsContent value="links">
-                <AffiliateLinksTab selectedUser={selectedAffiliateUser} userLinks={userLinks} />
+                <AffiliateLinksTab
+                  selectedUser={selectedAffiliateUser}
+                  onCountUpdate={handleLinksCountUpdate}
+                />
               </PayloadTabsContent>
             </PayloadTabs>
           </PayloadCardContent>

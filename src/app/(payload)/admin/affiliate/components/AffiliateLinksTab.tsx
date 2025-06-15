@@ -1,10 +1,10 @@
 'use client'
 
 // cSpell:words payloadcms
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from '@payloadcms/ui'
 import type { User, AffiliateLink } from '@/payload-types'
-import { Link, Plus, Edit, Copy, Eye } from 'lucide-react'
+import { Link, Plus, Edit, Copy, Eye, ChevronLeft, ChevronRight } from 'lucide-react'
 import {
   PayloadCard,
   PayloadCardContent,
@@ -21,12 +21,21 @@ import AffiliateLinkForm from './AffiliateLinkForm'
 
 interface Props {
   selectedUser: User
-  userLinks: AffiliateLink[]
+  onCountUpdate: (count: number) => void
+}
+
+interface PaginationInfo {
+  page: number
+  limit: number
+  totalPages: number
+  totalDocs: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
 }
 
 const AffiliateLinksTab: React.FC<Props> = ({
   selectedUser,
-  userLinks,
+  onCountUpdate,
 }) => {
   const [expandedLink, setExpandedLink] = useState<number | null>(null)
   const [copiedLink, setCopiedLink] = useState<number | null>(null)
@@ -34,6 +43,72 @@ const AffiliateLinksTab: React.FC<Props> = ({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editingLink, setEditingLink] = useState<AffiliateLink | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [userLinks, setUserLinks] = useState<AffiliateLink[]>([])
+  const [isLoadingData, setIsLoadingData] = useState(false)
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    page: 1,
+    limit: 10,
+    totalPages: 0,
+    totalDocs: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+  })
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch affiliate links for the selected user using PayloadCMS REST API
+  const fetchAffiliateLinks = async (page: number = 1) => {
+    if (!selectedUser) return
+
+    setIsLoadingData(true)
+    setError(null)
+
+    try {
+      const whereQuery = JSON.stringify({
+        affiliateUser: {
+          equals: selectedUser.id,
+        },
+      })
+
+      const response = await fetch(
+        `/api/affiliate-links?where=${encodeURIComponent(whereQuery)}&page=${page}&limit=10&depth=2&sort=-createdAt`
+      )
+      const result = await response.json()
+
+      if (response.ok) {
+        setUserLinks(result.docs || [])
+        setPagination({
+          page: result.page || 1,
+          limit: result.limit || 10,
+          totalPages: result.totalPages || 0,
+          totalDocs: result.totalDocs || 0,
+          hasNextPage: result.hasNextPage || false,
+          hasPrevPage: result.hasPrevPage || false,
+        })
+        onCountUpdate(result.totalDocs || 0)
+      } else {
+        setError(result.message || 'Failed to fetch affiliate links')
+        setUserLinks([])
+        onCountUpdate(0)
+      }
+    } catch (error) {
+      console.error('Error fetching affiliate links:', error)
+      setError('Network error. Please try again.')
+      setUserLinks([])
+      onCountUpdate(0)
+    } finally {
+      setIsLoadingData(false)
+    }
+  }
+
+  // Fetch data when user changes or component mounts
+  useEffect(() => {
+    if (selectedUser) {
+      fetchAffiliateLinks(1)
+    } else {
+      setUserLinks([])
+      onCountUpdate(0)
+    }
+  }, [selectedUser]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleExpanded = (linkId: number) => {
     setExpandedLink(expandedLink === linkId ? null : linkId)
@@ -97,8 +172,8 @@ const AffiliateLinksTab: React.FC<Props> = ({
 
       if (response.ok && result.success) {
         setIsCreateModalOpen(false)
-        // Refresh the page to show the new link
-        window.location.reload()
+        // Refetch data to show the new link
+        await fetchAffiliateLinks(pagination.page)
       } else {
         // Handle API validation errors
         if (result.details && Array.isArray(result.details)) {
@@ -152,8 +227,8 @@ const AffiliateLinksTab: React.FC<Props> = ({
       if (response.ok && result.success) {
         setIsEditModalOpen(false)
         setEditingLink(null)
-        // Refresh the page to show the updated link
-        window.location.reload()
+        // Refetch data to show the updated link
+        await fetchAffiliateLinks(pagination.page)
       } else {
         // Handle API validation errors
         if (result.details && Array.isArray(result.details)) {
@@ -184,6 +259,10 @@ const AffiliateLinksTab: React.FC<Props> = ({
     setIsCreateModalOpen(false)
     setIsEditModalOpen(false)
     setEditingLink(null)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    fetchAffiliateLinks(newPage)
   }
 
   return (
@@ -218,8 +297,41 @@ const AffiliateLinksTab: React.FC<Props> = ({
         </Button>
       </div>
 
+      {/* Loading State */}
+      {isLoadingData && (
+        <PayloadCard>
+          <PayloadCardContent>
+            <div className="payload-empty-state">
+              <Link />
+              <h3>Loading Links...</h3>
+              <p>Please wait while we fetch the affiliate links.</p>
+            </div>
+          </PayloadCardContent>
+        </PayloadCard>
+      )}
+
+      {/* Error State */}
+      {error && !isLoadingData && (
+        <PayloadCard>
+          <PayloadCardContent>
+            <div className="payload-empty-state">
+              <Link />
+              <h3>Error Loading Links</h3>
+              <p style={{ color: 'var(--theme-error-500)' }}>{error}</p>
+              <Button
+                buttonStyle="secondary"
+                size="small"
+                onClick={() => fetchAffiliateLinks(pagination.page)}
+              >
+                Try Again
+              </Button>
+            </div>
+          </PayloadCardContent>
+        </PayloadCard>
+      )}
+
       {/* Links List */}
-      {userLinks.length > 0 ? (
+      {!isLoadingData && !error && userLinks.length > 0 && (
         <div>
           {userLinks.map((link) => (
             <PayloadCard key={link.id} className="payload-mb">
@@ -311,8 +423,48 @@ const AffiliateLinksTab: React.FC<Props> = ({
               )}
             </PayloadCard>
           ))}
+
+          {/* Pagination */}
+          {pagination.totalPages > 1 && (
+            <div className="payload-flex payload-flex--between payload-mt">
+              <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--theme-elevation-600)' }}>
+                Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.totalDocs)} of {pagination.totalDocs} links
+              </div>
+              <div className="payload-flex payload-flex--gap">
+                <Button
+                  buttonStyle="secondary"
+                  size="small"
+                  disabled={!pagination.hasPrevPage}
+                  onClick={() => handlePageChange(pagination.page - 1)}
+                >
+                  <ChevronLeft style={{ width: '16px', height: '16px' }} />
+                  Previous
+                </Button>
+                <span style={{
+                  padding: '0 var(--base)',
+                  fontSize: 'var(--font-size-small)',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  Page {pagination.page} of {pagination.totalPages}
+                </span>
+                <Button
+                  buttonStyle="secondary"
+                  size="small"
+                  disabled={!pagination.hasNextPage}
+                  onClick={() => handlePageChange(pagination.page + 1)}
+                >
+                  Next
+                  <ChevronRight style={{ width: '16px', height: '16px' }} />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
-      ) : (
+      )}
+
+      {/* Empty State */}
+      {!isLoadingData && !error && userLinks.length === 0 && (
         <PayloadCard>
           <PayloadCardContent>
             <div className="payload-empty-state">

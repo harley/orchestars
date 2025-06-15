@@ -1,10 +1,10 @@
 'use client'
 
 // cSpell:words payloadcms
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from '@payloadcms/ui'
 import type { User, AffiliateSetting } from '@/payload-types'
-import { Settings, Plus, Edit } from 'lucide-react'
+import { Settings, Plus, Edit, ChevronLeft, ChevronRight } from 'lucide-react'
 import {
   PayloadCard,
   PayloadCardContent,
@@ -21,17 +21,92 @@ import AffiliateSettingsForm from './AffiliateSettingsForm'
 
 interface Props {
   selectedUser: User
-  userSettings: AffiliateSetting[]
+  onCountUpdate: (count: number) => void
+}
+
+interface PaginationInfo {
+  page: number
+  limit: number
+  totalPages: number
+  totalDocs: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
 }
 
 const AffiliateSettingsTab: React.FC<Props> = ({
   selectedUser,
-  userSettings,
+  onCountUpdate,
 }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editingSetting, setEditingSetting] = useState<AffiliateSetting | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [userSettings, setUserSettings] = useState<AffiliateSetting[]>([])
+  const [isLoadingData, setIsLoadingData] = useState(false)
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    page: 1,
+    limit: 10,
+    totalPages: 0,
+    totalDocs: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+  })
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch affiliate settings for the selected user using PayloadCMS REST API
+  const fetchAffiliateSettings = async (page: number = 1) => {
+    if (!selectedUser) return
+
+    setIsLoadingData(true)
+    setError(null)
+
+    try {
+      const whereQuery = JSON.stringify({
+        affiliateUser: {
+          equals: selectedUser.id,
+        },
+      })
+
+      const response = await fetch(
+        `/api/affiliate-settings?where=${encodeURIComponent(whereQuery)}&page=${page}&limit=10&depth=2&sort=-createdAt`
+      )
+      const result = await response.json()
+
+      if (response.ok) {
+        setUserSettings(result.docs || [])
+        setPagination({
+          page: result.page || 1,
+          limit: result.limit || 10,
+          totalPages: result.totalPages || 0,
+          totalDocs: result.totalDocs || 0,
+          hasNextPage: result.hasNextPage || false,
+          hasPrevPage: result.hasPrevPage || false,
+        })
+        onCountUpdate(result.totalDocs || 0)
+      } else {
+        setError(result.message || 'Failed to fetch affiliate settings')
+        setUserSettings([])
+        onCountUpdate(0)
+      }
+    } catch (error) {
+      console.error('Error fetching affiliate settings:', error)
+      setError('Network error. Please try again.')
+      setUserSettings([])
+      onCountUpdate(0)
+    } finally {
+      setIsLoadingData(false)
+    }
+  }
+
+  // Fetch data when user changes or component mounts
+  useEffect(() => {
+    if (selectedUser) {
+      fetchAffiliateSettings(1)
+    } else {
+      setUserSettings([])
+      onCountUpdate(0)
+    }
+  }, [selectedUser]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString()
@@ -70,9 +145,9 @@ const AffiliateSettingsTab: React.FC<Props> = ({
 
       if (response.ok) {
         setIsCreateModalOpen(false)
-        // Refresh the page to show the new setting
+        // Refetch data to show the new setting
+        await fetchAffiliateSettings(pagination.page)
         alert('Create successfully!')
-        window.location.reload()
       } else {
         // Handle PayloadCMS validation errors
         if (result.errors && Array.isArray(result.errors)) {
@@ -134,9 +209,9 @@ const AffiliateSettingsTab: React.FC<Props> = ({
       if (response.ok) {
         setIsEditModalOpen(false)
         setEditingSetting(null)
-        // Refresh the page to show the updated setting
+        // Refetch data to show the updated setting
+        await fetchAffiliateSettings(pagination.page)
         alert('Updated successfully!')
-        window.location.reload()
       } else {
         // Handle PayloadCMS validation errors
         if (result.errors && Array.isArray(result.errors)) {
@@ -174,7 +249,9 @@ const AffiliateSettingsTab: React.FC<Props> = ({
     setEditingSetting(null)
   }
 
-
+  const handlePageChange = (newPage: number) => {
+    fetchAffiliateSettings(newPage)
+  }
 
   return (
     <div>
@@ -208,8 +285,41 @@ const AffiliateSettingsTab: React.FC<Props> = ({
         </Button>
       </div>
 
+      {/* Loading State */}
+      {isLoadingData && (
+        <PayloadCard>
+          <PayloadCardContent>
+            <div className="payload-empty-state">
+              <Settings />
+              <h3>Loading Settings...</h3>
+              <p>Please wait while we fetch the affiliate settings.</p>
+            </div>
+          </PayloadCardContent>
+        </PayloadCard>
+      )}
+
+      {/* Error State */}
+      {error && !isLoadingData && (
+        <PayloadCard>
+          <PayloadCardContent>
+            <div className="payload-empty-state">
+              <Settings />
+              <h3>Error Loading Settings</h3>
+              <p style={{ color: 'var(--theme-error-500)' }}>{error}</p>
+              <Button
+                buttonStyle="secondary"
+                size="small"
+                onClick={() => fetchAffiliateSettings(pagination.page)}
+              >
+                Try Again
+              </Button>
+            </div>
+          </PayloadCardContent>
+        </PayloadCard>
+      )}
+
       {/* Settings List */}
-      {userSettings.length > 0 ? (
+      {!isLoadingData && !error && userSettings.length > 0 && (
         <div>
           {userSettings.map((setting) => (
             <PayloadCard key={setting.id} className="payload-mb">
@@ -240,8 +350,48 @@ const AffiliateSettingsTab: React.FC<Props> = ({
               </PayloadCardHeader>
             </PayloadCard>
           ))}
+
+          {/* Pagination */}
+          {pagination.totalPages > 1 && (
+            <div className="payload-flex payload-flex--between payload-mt">
+              <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--theme-elevation-600)' }}>
+                Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.totalDocs)} of {pagination.totalDocs} settings
+              </div>
+              <div className="payload-flex payload-flex--gap">
+                <Button
+                  buttonStyle="secondary"
+                  size="small"
+                  disabled={!pagination.hasPrevPage}
+                  onClick={() => handlePageChange(pagination.page - 1)}
+                >
+                  <ChevronLeft style={{ width: '16px', height: '16px' }} />
+                  Previous
+                </Button>
+                <span style={{
+                  padding: '0 var(--base)',
+                  fontSize: 'var(--font-size-small)',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  Page {pagination.page} of {pagination.totalPages}
+                </span>
+                <Button
+                  buttonStyle="secondary"
+                  size="small"
+                  disabled={!pagination.hasNextPage}
+                  onClick={() => handlePageChange(pagination.page + 1)}
+                >
+                  Next
+                  <ChevronRight style={{ width: '16px', height: '16px' }} />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
-      ) : (
+      )}
+
+      {/* Empty State */}
+      {!isLoadingData && !error && userSettings.length === 0 && (
         <PayloadCard>
           <PayloadCardContent>
             <div className="payload-empty-state">

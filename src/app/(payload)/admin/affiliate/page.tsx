@@ -39,7 +39,8 @@ const AffiliateManagementPage = async () => {
       depth: 2,
     })
 
-    // Fetch affiliate settings
+    // Fetch affiliate settings and links for dashboard metrics only
+    // Individual user data is now fetched via API calls in the client components
     const affiliateSettings = await payload.find({
       collection: 'affiliate-settings',
       limit: 100,
@@ -47,7 +48,6 @@ const AffiliateManagementPage = async () => {
       depth: 2,
     })
 
-    // Fetch affiliate links
     const affiliateLinks = await payload.find({
       collection: 'affiliate-links',
       limit: 100,

@@ -72,8 +72,6 @@ const AffiliateManagementClient: React.FC<Props> = ({
           <PayloadTabsContent value="manage-users">
             <ManageAffiliateUserTab
               affiliateUsers={affiliateUsers}
-              affiliateSettings={affiliateSettings}
-              affiliateLinks={affiliateLinks}
               selectedAffiliateUser={selectedAffiliateUser}
               onSelectAffiliateUser={setSelectedAffiliateUser}
             />
