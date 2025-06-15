@@ -1,0 +1,469 @@
+'use client'
+
+// cSpell:words payloadcms textlink
+import React, { useState, useEffect } from 'react'
+import { Button } from '@payloadcms/ui'
+import type { User, AffiliateLink, Event, Promotion } from '@/payload-types'
+import { Copy, Check } from 'lucide-react'
+import {
+  PayloadFormGroup,
+  PayloadLabel,
+  PayloadInput,
+  PayloadSelect,
+  PayloadDescription,
+  PayloadTextarea,
+} from './PayloadUIComponents'
+
+interface Props {
+  selectedUser: User
+  link?: AffiliateLink
+  onSubmit: (data: AffiliateLinkFormData) => Promise<void>
+  onCancel: () => void
+  isLoading?: boolean
+}
+
+interface AffiliateLinkFormData {
+  event: string
+  affiliatePromotion: string
+  promotionCode: string
+  utmParams: {
+    source: string
+    medium: string
+    campaign: string
+    term: string
+    content: string
+  }
+  targetLink: string
+  status: string
+}
+
+const AffiliateLinkForm: React.FC<Props> = ({
+  selectedUser: _selectedUser,
+  link,
+  onSubmit,
+  onCancel,
+  isLoading = false,
+}) => {
+  const [events, setEvents] = useState<Event[]>([])
+  const [promotions, setPromotions] = useState<Promotion[]>([])
+  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [isCopied, setIsCopied] = useState(false)
+  const [formData, setFormData] = useState<AffiliateLinkFormData>({
+    event: typeof link?.event === 'object' && link.event ? link.event.id.toString() : link?.event?.toString() || '',
+    affiliatePromotion: typeof link?.affiliatePromotion === 'object' && link.affiliatePromotion ? link.affiliatePromotion.id.toString() : link?.affiliatePromotion?.toString() || '',
+    promotionCode: link?.promotionCode || '',
+    utmParams: {
+      source: link?.utmParams?.source || '',
+      medium: link?.utmParams?.medium || '',
+      campaign: link?.utmParams?.campaign || '',
+      term: link?.utmParams?.term || '',
+      content: link?.utmParams?.content || '',
+    },
+    targetLink: link?.targetLink || '',
+    status: link?.status || 'active',
+  })
+
+  // Fetch events and promotions
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [eventsRes, promotionsRes] = await Promise.all([
+          fetch('/api/events'),
+          fetch('/api/promotions')
+        ])
+
+        if (eventsRes.ok) {
+          const eventsData = await eventsRes.json()
+          setEvents(eventsData.docs || [])
+        }
+
+        if (promotionsRes.ok) {
+          const promotionsData = await promotionsRes.json()
+          setPromotions(promotionsData.docs || [])
+        }
+      } catch (error) {
+        console.error('Failed to fetch data:', error)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // Generate target link automatically
+  useEffect(() => {
+    const generateTargetLink = () => {
+      let url = ''
+
+      if (typeof window !== 'undefined') {
+        url = `${window.location.origin}`
+      }
+
+      url += '/events'
+
+      // Find selected event
+      const selectedEvent = events.find(e => e.id.toString() === formData.event)
+      if (selectedEvent) {
+        url += `/${selectedEvent.slug}`
+      }
+
+      const params = new URLSearchParams()
+
+      // Find selected promotion
+      const selectedPromotion = promotions.find(p => p.id.toString() === formData.affiliatePromotion)
+      if (selectedPromotion) {
+        params.append('apc', selectedPromotion.code)
+      }
+
+      if (formData.utmParams.source) {
+        params.append('utm_source', formData.utmParams.source)
+      }
+      if (formData.utmParams.medium) {
+        params.append('utm_medium', formData.utmParams.medium)
+      }
+      if (formData.utmParams.campaign) {
+        params.append('utm_campaign', formData.utmParams.campaign)
+      }
+      if (formData.utmParams.term) {
+        params.append('utm_term', formData.utmParams.term)
+      }
+      if (formData.utmParams.content) {
+        params.append('utm_content', formData.utmParams.content)
+      }
+
+      if (params.toString()) {
+        url = `${url}?${params.toString()}`
+      }
+
+      return url
+    }
+
+    const newTargetLink = generateTargetLink()
+    setFormData(prev => ({
+      ...prev,
+      targetLink: newTargetLink
+    }))
+  }, [formData.event, formData.affiliatePromotion, formData.utmParams.source, formData.utmParams.medium, formData.utmParams.campaign, formData.utmParams.term, formData.utmParams.content, events, promotions])
+
+  // Update promotion code when promotion is selected
+  useEffect(() => {
+    const selectedPromotion = promotions.find(p => p.id.toString() === formData.affiliatePromotion)
+    const newPromotionCode = selectedPromotion?.code || ''
+
+    if (newPromotionCode !== formData.promotionCode) {
+      setFormData(prev => ({
+        ...prev,
+        promotionCode: newPromotionCode
+      }))
+    }
+  }, [formData.affiliatePromotion, formData.promotionCode, promotions])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setErrorMessage('')
+    
+    // Validate required fields
+    if (!formData.event.trim()) {
+      setErrorMessage('Event selection is required')
+      return
+    }
+
+    if (!formData.affiliatePromotion.trim()) {
+      setErrorMessage('Promotion selection is required')
+      return
+    }
+
+    if (!formData.targetLink.trim()) {
+      setErrorMessage('Target link could not be generated. Please select an event and promotion.')
+      return
+    }
+
+    // Validate URL format
+    try {
+      new URL(formData.targetLink)
+    } catch {
+      setErrorMessage('Generated target link is invalid')
+      return
+    }
+
+    await onSubmit(formData)
+  }
+
+  const updateFormData = (path: string, value: any) => {
+    setFormData(prev => {
+      const keys = path.split('.')
+      const newData = { ...prev }
+      let current: any = newData
+      
+      for (let i = 0; i < keys.length - 1; i++) {
+        const key = keys[i]
+        if (!key) continue
+        
+        if (!current[key]) current[key] = {}
+        current = current[key]
+      }
+      
+      const lastKey = keys[keys.length - 1]
+      if (!lastKey) return newData
+      
+      current[lastKey] = value
+      return newData
+    })
+  }
+
+  const handleCopyTargetLink = async () => {
+    if (!formData.targetLink.trim()) {
+      return // Don't copy if there's no target link
+    }
+
+    try {
+      await navigator.clipboard.writeText(formData.targetLink)
+      setIsCopied(true)
+      setTimeout(() => setIsCopied(false), 2000) // Reset after 2 seconds
+    } catch (error) {
+      console.error('Failed to copy target link:', error)
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea')
+      textArea.value = formData.targetLink
+      document.body.appendChild(textArea)
+      textArea.select()
+      try {
+        document.execCommand('copy')
+        setIsCopied(true)
+        setTimeout(() => setIsCopied(false), 2000)
+      } catch (fallbackError) {
+        console.error('Fallback copy failed:', fallbackError)
+      }
+      document.body.removeChild(textArea)
+    }
+  }
+
+  // Filter promotions by selected event
+  const filteredPromotions = promotions.filter(promo =>
+    typeof promo.event === 'object' && promo.event
+      ? promo.event.id.toString() === formData.event
+      : promo.event?.toString() === formData.event
+  )
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {errorMessage && (
+        <div style={{
+          padding: 'calc(var(--base) / 2)',
+          marginBottom: 'var(--base)',
+          backgroundColor: 'var(--theme-error-50)',
+          border: '1px solid var(--theme-error-500)',
+          borderRadius: 'var(--border-radius-s)',
+          color: 'var(--theme-error-500)',
+          fontSize: 'var(--font-size-small)'
+        }}>
+          {errorMessage}
+        </div>
+      )}
+
+      <PayloadFormGroup>
+        <PayloadLabel htmlFor="event" required>Event</PayloadLabel>
+        <PayloadDescription>
+          Select the event this affiliate link applies to
+        </PayloadDescription>
+        <PayloadSelect
+          id="event"
+          value={formData.event}
+          onChange={(e) => updateFormData('event', e.target.value)}
+        >
+          <option value="">Select an event</option>
+          {events.map(event => (
+            <option key={event.id} value={event.id.toString()}>
+              {event.title}
+            </option>
+          ))}
+        </PayloadSelect>
+      </PayloadFormGroup>
+
+      <PayloadFormGroup>
+        <PayloadLabel htmlFor="affiliatePromotion" required>Promotion</PayloadLabel>
+        <PayloadDescription>
+          Select a promotion to associate with this link
+        </PayloadDescription>
+        <PayloadSelect
+          id="affiliatePromotion"
+          value={formData.affiliatePromotion}
+          onChange={(e) => updateFormData('affiliatePromotion', e.target.value)}
+        >
+          <option value="">Select a promotion</option>
+          {filteredPromotions.map(promotion => (
+            <option key={promotion.id} value={promotion.id.toString()}>
+              {promotion.code}
+            </option>
+          ))}
+        </PayloadSelect>
+      </PayloadFormGroup>
+
+      <PayloadFormGroup>
+        <PayloadLabel htmlFor="promotionCode">Promotion Code (Auto-generated)</PayloadLabel>
+        <PayloadDescription>
+          This field is automatically populated based on the selected promotion
+        </PayloadDescription>
+        <PayloadInput
+          id="promotionCode"
+          value={formData.promotionCode}
+          placeholder="Will be auto-generated"
+          disabled
+        />
+      </PayloadFormGroup>
+
+      <PayloadFormGroup>
+        <PayloadLabel htmlFor="status">Status</PayloadLabel>
+        <PayloadDescription>
+          Set the status of this affiliate link
+        </PayloadDescription>
+        <PayloadSelect
+          id="status"
+          value={formData.status}
+          onChange={(e) => updateFormData('status', e.target.value)}
+        >
+          <option value="active">Active</option>
+          <option value="disabled">Disabled</option>
+        </PayloadSelect>
+      </PayloadFormGroup>
+
+      {/* UTM Parameters Section */}
+      <div style={{ marginTop: 'var(--base)', marginBottom: 'var(--base)' }}>
+        <h4 style={{
+          fontSize: 'var(--font-size-h5)',
+          fontWeight: 'var(--font-weight-medium)',
+          margin: '0 0 calc(var(--base) / 2) 0'
+        }}>
+          UTM Parameters (Optional)
+        </h4>
+        <PayloadDescription>
+          Add UTM parameters for tracking campaign performance
+        </PayloadDescription>
+      </div>
+
+      <div className="payload-grid payload-grid--cols-2 payload-grid--gap-md">
+        <PayloadFormGroup>
+          <PayloadLabel htmlFor="utm-source">UTM Source</PayloadLabel>
+          <PayloadDescription>
+            Traffic source (e.g., facebook, google, newsletter)
+          </PayloadDescription>
+          <PayloadInput
+            id="utm-source"
+            value={formData.utmParams.source}
+            onChange={(e) => updateFormData('utmParams.source', e.target.value)}
+            placeholder="facebook"
+          />
+        </PayloadFormGroup>
+
+        <PayloadFormGroup>
+          <PayloadLabel htmlFor="utm-medium">UTM Medium</PayloadLabel>
+          <PayloadDescription>
+            Marketing medium (e.g., cpc, email, social)
+          </PayloadDescription>
+          <PayloadInput
+            id="utm-medium"
+            value={formData.utmParams.medium}
+            onChange={(e) => updateFormData('utmParams.medium', e.target.value)}
+            placeholder="social"
+          />
+        </PayloadFormGroup>
+
+        <PayloadFormGroup>
+          <PayloadLabel htmlFor="utm-campaign">UTM Campaign</PayloadLabel>
+          <PayloadDescription>
+            Campaign name (e.g., summer-promo, holiday-sale)
+          </PayloadDescription>
+          <PayloadInput
+            id="utm-campaign"
+            value={formData.utmParams.campaign}
+            onChange={(e) => updateFormData('utmParams.campaign', e.target.value)}
+            placeholder="summer-promo"
+          />
+        </PayloadFormGroup>
+
+        <PayloadFormGroup>
+          <PayloadLabel htmlFor="utm-term">UTM Term</PayloadLabel>
+          <PayloadDescription>
+            Keywords (e.g., classical music, orchestra)
+          </PayloadDescription>
+          <PayloadInput
+            id="utm-term"
+            value={formData.utmParams.term}
+            onChange={(e) => updateFormData('utmParams.term', e.target.value)}
+            placeholder="classical music"
+          />
+        </PayloadFormGroup>
+      </div>
+
+      <PayloadFormGroup>
+        <PayloadLabel htmlFor="utm-content">UTM Content</PayloadLabel>
+        <PayloadDescription>
+          Ad content or link identifier (e.g., banner1, textlink2)
+        </PayloadDescription>
+        <PayloadInput
+          id="utm-content"
+          value={formData.utmParams.content}
+          onChange={(e) => updateFormData('utmParams.content', e.target.value)}
+          placeholder="banner1"
+        />
+      </PayloadFormGroup>
+
+      {/* Target Link at the bottom */}
+      <PayloadFormGroup>
+        <PayloadLabel htmlFor="targetLink">Target Link (Auto-generated)</PayloadLabel>
+        <PayloadDescription>
+          This URL is automatically generated based on the selected event, promotion, and UTM parameters
+        </PayloadDescription>
+        <PayloadTextarea
+          id="targetLink"
+          value={formData.targetLink}
+          placeholder="Will be auto-generated"
+          disabled
+          rows={3}
+        />
+        <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'flex-end' }}>
+          <Button
+            type="button"
+            buttonStyle="secondary"
+            size="small"
+            onClick={handleCopyTargetLink}
+            disabled={!formData.targetLink.trim()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {isCopied ? (
+                <>
+                  <Check style={{ width: '16px', height: '16px' }} />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy style={{ width: '16px', height: '16px' }} />
+                  Copy Link
+                </>
+              )}
+            </div>
+          </Button>
+        </div>
+      </PayloadFormGroup>
+
+      <div className="payload-flex payload-flex--gap" style={{ justifyContent: 'flex-end', marginTop: 'var(--base)' }}>
+        <Button
+          type="button"
+          buttonStyle="secondary"
+          onClick={onCancel}
+          disabled={isLoading}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          buttonStyle="primary"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Saving...' : link ? 'Update Link' : 'Create Link'}
+        </Button>
+      </div>
+    </form>
+  )
+}
+
+export default AffiliateLinkForm

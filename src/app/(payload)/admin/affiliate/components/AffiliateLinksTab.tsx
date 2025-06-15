@@ -1,5 +1,6 @@
 'use client'
 
+// cSpell:words payloadcms
 import React, { useState } from 'react'
 import { Button } from '@payloadcms/ui'
 import type { User, AffiliateLink } from '@/payload-types'
@@ -10,8 +11,13 @@ import {
   PayloadCardDescription,
   PayloadCardHeader,
   PayloadCardTitle,
-  PayloadBadge
+  PayloadBadge,
+  PayloadModal,
+  PayloadModalHeader,
+  PayloadModalTitle,
+  PayloadModalBody,
 } from './PayloadUIComponents'
+import AffiliateLinkForm from './AffiliateLinkForm'
 
 interface Props {
   selectedUser: User
@@ -24,6 +30,10 @@ const AffiliateLinksTab: React.FC<Props> = ({
 }) => {
   const [expandedLink, setExpandedLink] = useState<number | null>(null)
   const [copiedLink, setCopiedLink] = useState<number | null>(null)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingLink, setEditingLink] = useState<AffiliateLink | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const toggleExpanded = (linkId: number) => {
     setExpandedLink(expandedLink === linkId ? null : linkId)
@@ -58,6 +68,124 @@ const AffiliateLinksTab: React.FC<Props> = ({
     return link.status || 'active'
   }
 
+  const handleCreateLink = async (data: any) => {
+    setIsLoading(true)
+    try {
+      // Format data for the affiliate API
+      const formattedData = {
+        ...data,
+        event: data.event ? parseInt(data.event) : undefined,
+        // Remove affiliatePromotion from the data since API expects promotionCode
+        affiliatePromotion: undefined,
+      }
+
+      // Validate that event and promotion are integers
+      if (formattedData.event && isNaN(formattedData.event)) {
+        alert('Invalid event selection')
+        return
+      }
+
+      const response = await fetch('/api/affiliate/link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formattedData),
+      })
+
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        setIsCreateModalOpen(false)
+        // Refresh the page to show the new link
+        window.location.reload()
+      } else {
+        // Handle API validation errors
+        if (result.details && Array.isArray(result.details)) {
+          const errorMessages = result.details.map((detail: any) =>
+            `${detail.field}: ${detail.message}`
+          ).join('\n')
+
+          alert(`Validation Error:\n${errorMessages}`)
+        } else {
+          alert(`Error: ${result.error || 'Failed to create link'}`)
+        }
+        console.error('Failed to create link:', result)
+      }
+    } catch (error) {
+      console.error('Error creating link:', error)
+      alert('Network error. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleEditLink = async (data: any) => {
+    if (!editingLink) return
+
+    setIsLoading(true)
+    try {
+      // Format data for the affiliate API
+      const formattedData = {
+        ...data,
+        event: data.event ? parseInt(data.event) : undefined,
+        // Remove affiliatePromotion from the data since API expects promotionCode
+        affiliatePromotion: undefined,
+      }
+
+      // Validate that event and promotion are integers
+      if (formattedData.event && isNaN(formattedData.event)) {
+        alert('Invalid event selection')
+        return
+      }
+
+      const response = await fetch(`/api/affiliate/link/${editingLink.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formattedData),
+      })
+
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        setIsEditModalOpen(false)
+        setEditingLink(null)
+        // Refresh the page to show the updated link
+        window.location.reload()
+      } else {
+        // Handle API validation errors
+        if (result.details && Array.isArray(result.details)) {
+          const errorMessages = result.details.map((detail: any) =>
+            `${detail.field}: ${detail.message}`
+          ).join('\n')
+
+          alert(`Validation Error:\n${errorMessages}`)
+        } else {
+          alert(`Error: ${result.error || 'Failed to update link'}`)
+        }
+        console.error('Failed to update link:', result)
+      }
+    } catch (error) {
+      console.error('Error updating link:', error)
+      alert('Network error. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const openEditModal = (link: AffiliateLink) => {
+    setEditingLink(link)
+    setIsEditModalOpen(true)
+  }
+
+  const closeModals = () => {
+    setIsCreateModalOpen(false)
+    setIsEditModalOpen(false)
+    setEditingLink(null)
+  }
+
   return (
     <div>
       {/* Header */}
@@ -78,7 +206,11 @@ const AffiliateLinksTab: React.FC<Props> = ({
             Manage affiliate links for {selectedUser.email}
           </p>
         </div>
-        <Button buttonStyle="primary" size="small">
+        <Button
+          buttonStyle="primary"
+          size="small"
+          onClick={() => setIsCreateModalOpen(true)}
+        >
           <div className="payload-flex payload-flex--gap">
             <Plus style={{ width: '16px', height: '16px' }} />
             Create New Link
@@ -128,7 +260,11 @@ const AffiliateLinksTab: React.FC<Props> = ({
                     >
                       <Eye style={{ width: '16px', height: '16px' }} />
                     </Button>
-                    <Button buttonStyle="secondary" size="small">
+                    <Button
+                      buttonStyle="secondary"
+                      size="small"
+                      onClick={() => openEditModal(link)}
+                    >
                       <Edit style={{ width: '16px', height: '16px' }} />
                     </Button>
                   </div>
@@ -186,7 +322,11 @@ const AffiliateLinksTab: React.FC<Props> = ({
                 This affiliate user does not have any links created yet.
                 Create a new link to get started.
               </p>
-              <Button buttonStyle="primary" size="small">
+              <Button
+                buttonStyle="primary"
+                size="small"
+                onClick={() => setIsCreateModalOpen(true)}
+              >
                 <div className="payload-flex payload-flex--gap">
                   <Plus style={{ width: '16px', height: '16px' }} />
                   Create First Link
@@ -196,6 +336,45 @@ const AffiliateLinksTab: React.FC<Props> = ({
           </PayloadCardContent>
         </PayloadCard>
       )}
+
+      {/* Create Modal */}
+      <PayloadModal
+        isOpen={isCreateModalOpen}
+        onClose={closeModals}
+      >
+        <PayloadModalHeader>
+          <PayloadModalTitle>Create Affiliate Link</PayloadModalTitle>
+        </PayloadModalHeader>
+        <PayloadModalBody>
+          <AffiliateLinkForm
+            selectedUser={selectedUser}
+            onSubmit={handleCreateLink}
+            onCancel={closeModals}
+            isLoading={isLoading}
+          />
+        </PayloadModalBody>
+      </PayloadModal>
+
+      {/* Edit Modal */}
+      <PayloadModal
+        isOpen={isEditModalOpen}
+        onClose={closeModals}
+      >
+        <PayloadModalHeader>
+          <PayloadModalTitle>Edit Affiliate Link</PayloadModalTitle>
+        </PayloadModalHeader>
+        <PayloadModalBody>
+          {editingLink && (
+            <AffiliateLinkForm
+              selectedUser={selectedUser}
+              link={editingLink}
+              onSubmit={handleEditLink}
+              onCancel={closeModals}
+              isLoading={isLoading}
+            />
+          )}
+        </PayloadModalBody>
+      </PayloadModal>
     </div>
   )
 }
