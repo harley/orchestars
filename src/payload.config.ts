@@ -68,6 +68,14 @@ export default buildConfig({
         Logo: '/components/Logo/Logo#Logo',
       },
       views: {
+        // custom page should be put before the default payloadcms pages
+        managementAffiliate: {
+          Component: '@/components/AdminViews/ManagementAffiliate/Page',
+          path: '/affiliate',
+          exact: true,
+          strict: true,
+          sensitive: true,
+        },
         createOrder: {
           Component: '@/components/AdminViews/Order/CreateOrder',
           path: '/create-order',
@@ -77,13 +85,6 @@ export default buildConfig({
         },
         dashboard: {
           Component: '@/components/AdminViews/Dashboard/Component',
-        },
-        affiliateManagement: {
-          Component: '@/app/(payload)/admin/affiliate/page',
-          path: '/affiliate',
-          exact: true,
-          strict: true,
-          sensitive: true,
         },
       },
     },

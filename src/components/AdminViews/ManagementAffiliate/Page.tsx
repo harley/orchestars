@@ -1,17 +1,25 @@
 import React from 'react'
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { getPayload } from 'payload'
+import { AdminViewProps, getPayload } from 'payload'
 import config from '@/payload.config'
-import AffiliateManagementClient from './page.client'
-import type { User, AffiliateLink, AffiliateClickLog, AffiliateSetting, Order } from '@/payload-types'
+import AffiliateManagementClient from './Page.client'
+import type {
+  User,
+  AffiliateLink,
+  AffiliateClickLog,
+  AffiliateSetting,
+  Order,
+} from '@/payload-types'
+import { DefaultTemplate } from '@payloadcms/next/templates'
 
-const AffiliateManagementPage = async () => {
-  const cookieStore = await cookies()
-  const token = cookieStore.get('payload-token')
 
-  if (!token?.value) {
-    redirect('/admin/login')
+const AffiliateManagementPage = async ({
+  initPageResult,
+  params,
+  searchParams,
+}: AdminViewProps) => {
+  if (!initPageResult?.req?.user) {
+    return redirect('/admin/login')
   }
 
   const payload = await getPayload({ config })
@@ -28,8 +36,6 @@ const AffiliateManagementPage = async () => {
       limit: 100,
       sort: 'email',
     })
-
-    console.log('affiliateUsers.docs', affiliateUsers.docs)
 
     // Fetch recent affiliate click logs for dashboard
     const recentClickLogs = await payload.find({
@@ -72,13 +78,25 @@ const AffiliateManagementPage = async () => {
     })
 
     return (
-      <AffiliateManagementClient
-        affiliateUsers={affiliateUsers.docs as User[]}
-        recentClickLogs={recentClickLogs.docs as AffiliateClickLog[]}
-        affiliateSettings={affiliateSettings.docs as AffiliateSetting[]}
-        affiliateLinks={affiliateLinks.docs as AffiliateLink[]}
-        affiliateOrders={affiliateOrders.docs as Order[]}
-      />
+      <DefaultTemplate
+        params={params}
+        searchParams={searchParams}
+        i18n={initPageResult.req.i18n}
+        payload={initPageResult.req.payload}
+        permissions={initPageResult.permissions}
+        user={initPageResult.req.user || undefined}
+        locale={initPageResult.locale}
+        visibleEntities={initPageResult.visibleEntities}
+      >
+        
+        <AffiliateManagementClient
+          affiliateUsers={affiliateUsers.docs as User[]}
+          recentClickLogs={recentClickLogs.docs as AffiliateClickLog[]}
+          affiliateSettings={affiliateSettings.docs as AffiliateSetting[]}
+          affiliateLinks={affiliateLinks.docs as AffiliateLink[]}
+          affiliateOrders={affiliateOrders.docs as Order[]}
+        />
+      </DefaultTemplate>
     )
   } catch (error) {
     console.error('Error fetching affiliate data:', error)
