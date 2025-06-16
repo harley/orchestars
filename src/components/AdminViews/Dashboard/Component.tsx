@@ -27,9 +27,25 @@ const Component = async ({
     entities: eventTicketEntities,
   }
 
+  const collections = navGroups.map((item) => {
+    if (item.label === 'Collections') {
+      const indexOfAffLinks = item.entities.findIndex((item) => item.slug === 'affiliate-links')
+      if (indexOfAffLinks !== -1) {
+        // Insert new item after index 1 (i.e., after a: '4')
+        item.entities.splice(indexOfAffLinks, 0, {
+          slug: 'affiliate',
+          type: '',
+          label: 'Management Affiliate',
+        })
+      }
+    }
+
+    return item
+  })
+
   return (
     <div>
-      <AdminCollections collections={[currentEventOnGoing, ...navGroups]} />
+      <AdminCollections collections={[currentEventOnGoing, ...collections]} />
     </div>
   )
 }
