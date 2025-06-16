@@ -2,7 +2,7 @@
 
 // cSpell:words payloadcms
 import React, { useState, useEffect } from 'react'
-import { Button } from '@payloadcms/ui'
+import { Button, toast } from '@payloadcms/ui'
 import type { User, AffiliateLink } from '@/payload-types'
 import { Link, Plus, Edit, Copy, Eye, ChevronLeft, ChevronRight } from 'lucide-react'
 import {
@@ -129,10 +129,6 @@ const AffiliateLinksTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) => 
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString()
-  }
-
   const getEventTitle = (link: AffiliateLink) => {
     if (typeof link.event === 'object' && link.event?.title) {
       return link.event.title
@@ -152,12 +148,12 @@ const AffiliateLinksTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) => 
         ...data,
         event: data.event ? parseInt(data.event) : undefined,
         affiliatePromotion: data.affiliatePromotion ? parseInt(data.affiliatePromotion) : undefined,
-        affiliateUser: selectedUser.id
+        affiliateUser: selectedUser.id,
       }
 
       // Validate that event and promotion are integers
       if (formattedData.event && isNaN(formattedData.event)) {
-        alert('Invalid event selection')
+        toast.error('Invalid event selection')
         return
       }
 
@@ -175,7 +171,7 @@ const AffiliateLinksTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) => 
         setIsCreateModalOpen(false)
         // Refetch data to show the new link
         await fetchAffiliateLinks(pagination.page)
-        alert('Created successfully!')
+        toast.success('Created successfully!')
       } else {
         // Handle API validation errors
         if (result.details && Array.isArray(result.details)) {
@@ -183,15 +179,15 @@ const AffiliateLinksTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) => 
             .map((detail: any) => `${detail.field}: ${detail.message}`)
             .join('\n')
 
-          alert(`Validation Error:\n${errorMessages}`)
+          toast.error(`Validation Error:\n${errorMessages}`)
         } else {
-          alert(`Error: ${result.error || 'Failed to create link'}`)
+          toast.error(`Error: ${result.error || 'Failed to create link'}`)
         }
         console.error('Failed to create link:', result)
       }
     } catch (error) {
       console.error('Error creating link:', error)
-      alert('Network error. Please try again.')
+      toast.error('Network error. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -211,7 +207,7 @@ const AffiliateLinksTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) => 
 
       // Validate that event and promotion are integers
       if (formattedData.event && isNaN(formattedData.event)) {
-        alert('Invalid event selection')
+        toast.error('Invalid event selection')
         return
       }
 
@@ -228,7 +224,7 @@ const AffiliateLinksTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) => 
       if (response.ok) {
         setIsEditModalOpen(false)
         setEditingLink(null)
-        alert('Updated successfully!')
+        toast.success('Updated successfully!')
         // Refetch data to show the updated link
         await fetchAffiliateLinks(pagination.page)
       } else {
@@ -238,15 +234,15 @@ const AffiliateLinksTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) => 
             .map((detail: any) => `${detail.field}: ${detail.message}`)
             .join('\n')
 
-          alert(`Validation Error:\n${errorMessages}`)
+          toast.error(`Validation Error:\n${errorMessages}`)
         } else {
-          alert(`Error: ${result.error || 'Failed to update link'}`)
+          toast.error(`Error: ${result.error || 'Failed to update link'}`)
         }
         console.error('Failed to update link:', result)
       }
     } catch (error) {
       console.error('Error updating link:', error)
-      alert('Network error. Please try again.')
+      toast.error('Network error. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -291,11 +287,14 @@ const AffiliateLinksTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) => 
             Manage affiliate links for {selectedUser.email}
           </p>
         </div>
-        <Button buttonStyle="primary" size="small" onClick={() => setIsCreateModalOpen(true)}>
-          <div className="payload-flex payload-flex--gap">
-            <Plus style={{ width: '16px', height: '16px' }} />
-            Create New Link
-          </div>
+        <Button
+          buttonStyle="primary"
+          size="small"
+          className="m-0"
+          onClick={() => setIsCreateModalOpen(true)}
+        >
+          <Plus style={{ width: '16px', height: '16px' }} />
+          Create New Link
         </Button>
       </div>
 
@@ -346,7 +345,9 @@ const AffiliateLinksTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) => 
                     <div>
                       <PayloadCardTitle>{getEventTitle(link)}</PayloadCardTitle>
                       <PayloadCardDescription>
-                        Code: {link.affiliateCode} • Created: {formatDate(link.createdAt)}
+                        Affiliate Promotion Code: <b>{link.promotionCode}</b> • Created:{' '}
+                        {new Date(link.createdAt).toLocaleString()} | Updated:{' '}
+                        {new Date(link.updatedAt).toLocaleString()}
                       </PayloadCardDescription>
                     </div>
                   </div>
@@ -358,9 +359,10 @@ const AffiliateLinksTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) => 
                     </PayloadBadge>
                     {link.targetLink && (
                       <Button
-                        buttonStyle="secondary"
+                        buttonStyle="icon-label"
                         size="small"
                         onClick={() => handleCopyLink(link)}
+                        className="m-0"
                       >
                         {copiedLink === link.id ? (
                           <span style={{ color: 'var(--theme-success-600)' }}>Copied!</span>
@@ -370,15 +372,17 @@ const AffiliateLinksTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) => 
                       </Button>
                     )}
                     <Button
-                      buttonStyle="secondary"
+                      buttonStyle="icon-label"
                       size="small"
+                      className="m-0"
                       onClick={() => toggleExpanded(link.id)}
                     >
                       <Eye style={{ width: '16px', height: '16px' }} />
                     </Button>
                     <Button
-                      buttonStyle="secondary"
+                      buttonStyle="icon-label"
                       size="small"
+                      className="m-0"
                       onClick={() => openEditModal(link)}
                     >
                       <Edit style={{ width: '16px', height: '16px' }} />

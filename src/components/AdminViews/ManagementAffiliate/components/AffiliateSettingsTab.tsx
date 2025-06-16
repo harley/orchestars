@@ -2,7 +2,7 @@
 
 // cSpell:words payloadcms
 import React, { useState, useEffect } from 'react'
-import { Button } from '@payloadcms/ui'
+import { Button, toast } from '@payloadcms/ui'
 import type { User, AffiliateSetting } from '@/payload-types'
 import { Settings, Plus, Edit, ChevronLeft, ChevronRight } from 'lucide-react'
 import {
@@ -59,8 +59,6 @@ const AffiliateSettingsTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) 
     setError(null)
 
     try {
-      console.log('selectedUser', selectedUser)
-
       const queryStr = qs.stringify({
         where: {
           affiliateUser: {
@@ -113,10 +111,6 @@ const AffiliateSettingsTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) 
     }
   }, [selectedUser]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString()
-  }
-
   const getEventTitle = (setting: AffiliateSetting) => {
     if (typeof setting.event === 'object' && setting.event?.title) {
       return setting.event.title
@@ -153,7 +147,7 @@ const AffiliateSettingsTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) 
         setIsCreateModalOpen(false)
         // Refetch data to show the new setting
         await fetchAffiliateSettings(pagination.page)
-        alert('Created successfully!')
+        toast.success('Created successfully')
       } else {
         // Handle PayloadCMS validation errors
         if (result.errors && Array.isArray(result.errors)) {
@@ -168,15 +162,15 @@ const AffiliateSettingsTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) 
             })
             .join('\n')
 
-          alert(`Validation Error:\n${errorMessages}`)
+          toast.error(`Validation Error:\n${errorMessages}`)
         } else {
-          alert(`Error: ${result.message || 'Failed to create setting'}`)
+          toast.error(`Error: ${result.message || 'Failed to create setting'}`)
         }
         console.error('Failed to create setting:', result)
       }
     } catch (error) {
       console.error('Error creating setting:', error)
-      alert('Network error. Please try again.')
+      toast.error('Network error. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -218,7 +212,7 @@ const AffiliateSettingsTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) 
         setEditingSetting(null)
         // Refetch data to show the updated setting
         await fetchAffiliateSettings(pagination.page)
-        alert('Updated successfully!')
+        toast.success('Updated successfully!')
       } else {
         // Handle PayloadCMS validation errors
         if (result.errors && Array.isArray(result.errors)) {
@@ -233,15 +227,15 @@ const AffiliateSettingsTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) 
             })
             .join('\n')
 
-          alert(`Validation Error:\n${errorMessages}`)
+          toast.error(`Validation Error:\n${errorMessages}`)
         } else {
-          alert(`Error: ${result.message || 'Failed to update setting'}`)
+          toast.error(`Error: ${result.message || 'Failed to update setting'}`)
         }
         console.error('Failed to update setting:', result)
       }
     } catch (error) {
       console.error('Error updating setting:', error)
-      alert('Network error. Please try again.')
+      toast.error('Network error. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -286,11 +280,14 @@ const AffiliateSettingsTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) 
             Manage affiliate program configurations for {selectedUser.email}
           </p>
         </div>
-        <Button buttonStyle="primary" size="small" onClick={() => setIsCreateModalOpen(true)}>
-          <div className="payload-flex payload-flex--gap">
-            <Plus style={{ width: '16px', height: '16px' }} />
-            Add New Setting
-          </div>
+        <Button
+          buttonStyle="primary"
+          size="small"
+          className="m-0"
+          onClick={() => setIsCreateModalOpen(true)}
+        >
+          <Plus style={{ width: '16px', height: '16px' }} />
+          Add New Setting
         </Button>
       </div>
 
@@ -341,7 +338,9 @@ const AffiliateSettingsTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) 
                     <div>
                       <PayloadCardTitle>{setting.name}</PayloadCardTitle>
                       <PayloadCardDescription>
-                        Event: {getEventTitle(setting)} • Created: {formatDate(setting.createdAt)}
+                        Event: {getEventTitle(setting)} • Created:{' '}
+                        {new Date(setting.createdAt).toLocaleString()} | Updated:{' '}
+                        {new Date(setting.updatedAt).toLocaleString()}
                       </PayloadCardDescription>
                     </div>
                   </div>
@@ -350,8 +349,9 @@ const AffiliateSettingsTab: React.FC<Props> = ({ selectedUser, onCountUpdate }) 
                       {setting.isActive ? 'Active' : 'Inactive'}
                     </PayloadBadge>
                     <Button
-                      buttonStyle="secondary"
+                      buttonStyle="icon-label"
                       size="small"
+                      className="m-0"
                       onClick={() => openEditModal(setting)}
                     >
                       <Edit style={{ width: '16px', height: '16px' }} />

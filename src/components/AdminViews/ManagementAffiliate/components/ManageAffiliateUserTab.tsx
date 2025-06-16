@@ -56,11 +56,11 @@ const ManageAffiliateUserTab: React.FC<Props> = ({
   }
 
   // Callbacks to update counts from child components
-  const handleSettingsCountUpdate = useCallback((count: number) => {
+  const handleSettingsCountUpdate = useCallback((_count: number) => {
     // setSettingsCount(count)
   }, [])
 
-  const handleLinksCountUpdate = useCallback((count: number) => {
+  const handleLinksCountUpdate = useCallback((_count: number) => {
     // setLinksCount(count)
   }, [])
 

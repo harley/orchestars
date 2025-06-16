@@ -2,7 +2,7 @@
 
 // cSpell:words eligTicketTypes payloadcms
 import React, { useState, useEffect } from 'react'
-import { Button } from '@payloadcms/ui'
+import { Button, SelectInput, toast } from '@payloadcms/ui'
 import type { User, AffiliateSetting, Event, Promotion } from '@/payload-types'
 import { Plus, Trash2 } from 'lucide-react'
 import {
@@ -10,7 +10,6 @@ import {
   PayloadLabel,
   PayloadInput,
   PayloadTextarea,
-  PayloadSelect,
   PayloadCheckbox,
   PayloadDescription,
   PayloadMultiSelect,
@@ -212,16 +211,23 @@ const AffiliateSettingsForm: React.FC<Props> = ({
     // Validate required fields
     if (!formData.name.trim()) {
       setErrorMessage('Setting name is required')
+      const msg = 'Setting name is required'
+      setErrorMessage(msg)
+      toast.error(msg)
       return
     }
 
     if (!formData.event) {
-      setErrorMessage('Event selection is required')
+      const msg = 'Event selection is required'
+      setErrorMessage(msg)
+      toast.error(msg)
       return
     }
 
     if (formData.tiers.length === 0) {
-      setErrorMessage('At least one tier is required')
+      const msg = 'At least one tier is required'
+      setErrorMessage(msg)
+      toast.error(msg)
       return
     }
 
@@ -229,15 +235,21 @@ const AffiliateSettingsForm: React.FC<Props> = ({
     for (let i = 0; i < formData.tiers.length; i++) {
       const tier = formData.tiers[i]
       if (!tier || !tier.tierName.trim()) {
-        setErrorMessage(`Tier ${i + 1}: Tier name is required`)
+        const msg = `Tier ${i + 1}: Tier name is required`
+        setErrorMessage(msg)
+        toast.error(msg)
         return
       }
       if (tier.tierLevel < 1) {
-        setErrorMessage(`Tier ${i + 1}: Tier level must be at least 1`)
+        const msg = `Tier ${i + 1}: Tier level must be at least 1`
+        setErrorMessage(msg)
+        toast.error(msg)
         return
       }
       if (!tier.quaCriteria || tier.quaCriteria.minTicketsSold < 1) {
-        setErrorMessage(`Tier ${i + 1}: Minimum tickets sold must be at least 1`)
+        const msg = `Tier ${i + 1}: Minimum tickets sold must be at least 1`
+        setErrorMessage(msg)
+        toast.error(msg)
         return
       }
       if (
@@ -245,9 +257,16 @@ const AffiliateSettingsForm: React.FC<Props> = ({
         tier.rewards.commissionPercentage < 0 ||
         tier.rewards.commissionPercentage > 100
       ) {
-        setErrorMessage(`Tier ${i + 1}: Commission percentage must be between 0 and 100`)
+        const msg = `Tier ${i + 1}: Commission percentage must be between 0 and 100`
+        setErrorMessage(msg)
+        toast.error(msg)
+
         return
       }
+    }
+
+    if (formData.promotions?.length) {
+      formData.promotions = formData.promotions.filter((promo) => !!promo.promotion)
     }
 
     await onSubmit(formData)
@@ -401,7 +420,6 @@ const AffiliateSettingsForm: React.FC<Props> = ({
           value={formData.name}
           onChange={(e) => updateFormData('name', e.target.value)}
           placeholder="e.g., Concert XYZ Affiliate Program"
-          required
         />
       </PayloadFormGroup>
 
@@ -410,19 +428,19 @@ const AffiliateSettingsForm: React.FC<Props> = ({
           Event
         </PayloadLabel>
         <PayloadDescription>The event this affiliate setting applies to</PayloadDescription>
-        <PayloadSelect
-          id="event"
+        <SelectInput
+          path="event"
+          name="event"
+          options={[
+            { label: 'Select an event', value: '' },
+            ...events.map((event) => ({
+              label: event.title || 'Untitled Event',
+              value: event.id.toString(),
+            })),
+          ]}
           value={formData.event}
-          onChange={(e) => updateFormData('event', e.target.value)}
-          required
-        >
-          <option value="">Select an event</option>
-          {events.map((event) => (
-            <option key={event.id} value={event.id.toString()}>
-              {event.title}
-            </option>
-          ))}
-        </PayloadSelect>
+          onChange={(option) => updateFormData('event', (option as any)?.value || '')}
+        />
       </PayloadFormGroup>
 
       <PayloadFormGroup>
@@ -450,62 +468,64 @@ const AffiliateSettingsForm: React.FC<Props> = ({
 
       {/* Promotions Section */}
       <PayloadFormGroup>
-        <div className="payload-flex payload-flex--between payload-mb">
+        <div className="payload-flex payload-flex--between">
           <PayloadLabel>Applied Promotions</PayloadLabel>
-          <Button type="button" buttonStyle="secondary" size="small" onClick={addPromotion}>
-            <Plus style={{ width: '16px', height: '16px' }} />
-          </Button>
         </div>
         <PayloadDescription>Promotions that are valid for this affiliate user</PayloadDescription>
         {formData.promotions.map((promo, index) => (
           <div key={index} className="payload-flex payload-flex--gap payload-mb">
-            <PayloadSelect
-              value={promo.promotion}
-              onChange={(e) => updateFormData(`promotions[${index}].promotion`, e.target.value)}
-              style={{ flex: 1 }}
-            >
-              <option value="">Select a promotion</option>
-              {promotions.map((promotion: Promotion) => (
-                <option key={promotion.id} value={promotion.id.toString()}>
-                  {promotion.code}
-                </option>
-              ))}
-            </PayloadSelect>
+            <div style={{ flex: 1 }}>
+              <SelectInput
+                path={`promotions[${index}].promotion`}
+                name={`promotions[${index}].promotion`}
+                options={[
+                  { label: 'Select a promotion', value: '' },
+                  ...promotions.map((promotion: Promotion) => ({
+                    label: promotion.code,
+                    value: promotion.id.toString(),
+                  })),
+                ]}
+                value={promo.promotion}
+                onChange={(option) =>
+                  updateFormData(`promotions[${index}].promotion`, (option as any)?.value || '')
+                }
+              />
+            </div>
             <Button
               type="button"
               buttonStyle="secondary"
               size="small"
+              className="m-0"
               onClick={() => removePromotion(index)}
             >
               <Trash2 style={{ width: '16px', height: '16px' }} />
             </Button>
           </div>
         ))}
+        <button type="button" className="m-0 cursor-pointer" onClick={addPromotion}>
+          <Plus style={{ width: '16px', height: '16px' }} /> Add Promotion
+        </button>
       </PayloadFormGroup>
 
       {/* Tiers Section */}
       <PayloadFormGroup>
         <div className="payload-flex payload-flex--between payload-mb">
           <PayloadLabel required>Affiliate Tiers</PayloadLabel>
-          <Button type="button" buttonStyle="secondary" size="small" onClick={addTier}>
-            <Plus style={{ width: '16px', height: '16px' }} />
-          </Button>
         </div>
 
         {formData.tiers.map((tier, tierIndex) => (
           <div key={tierIndex} className="payload-card payload-mb">
             <div className="payload-card__header">
-              <div className="payload-flex payload-flex--between">
+              <div className="payload-flex payload-flex--between" style={{ alignItems: 'center' }}>
                 <h4>Tier {tierIndex + 1}</h4>
                 {formData.tiers.length > 1 && (
-                  <Button
+                  <button
                     type="button"
-                    buttonStyle="secondary"
-                    size="small"
+                    className="m-0 cursor-pointer"
                     onClick={() => removeTier(tierIndex)}
                   >
                     <Trash2 style={{ width: '16px', height: '16px' }} />
-                  </Button>
+                  </button>
                 )}
               </div>
             </div>
@@ -521,7 +541,6 @@ const AffiliateSettingsForm: React.FC<Props> = ({
                     value={tier.tierName}
                     onChange={(e) => updateFormData(`tiers[${tierIndex}].tierName`, e.target.value)}
                     placeholder="e.g., Beginner, Professional"
-                    required
                   />
                 </PayloadFormGroup>
 
@@ -537,7 +556,6 @@ const AffiliateSettingsForm: React.FC<Props> = ({
                       updateFormData(`tiers[${tierIndex}].tierLevel`, parseInt(e.target.value))
                     }
                     min={1}
-                    required
                   />
                 </PayloadFormGroup>
               </div>
@@ -662,16 +680,15 @@ const AffiliateSettingsForm: React.FC<Props> = ({
               </PayloadFormGroup>
 
               {/* Free Tickets */}
-              <div className="payload-flex payload-flex--between payload-mb">
+              <div className="payload-flex payload-flex--between">
                 <PayloadLabel>Free Ticket Rewards</PayloadLabel>
-                <Button
+                <button
                   type="button"
-                  buttonStyle="secondary"
-                  size="small"
                   onClick={() => addFreeTicket(tierIndex)}
+                  className="m-0 cursor-pointer"
                 >
                   <Plus style={{ width: '16px', height: '16px' }} />
-                </Button>
+                </button>
               </div>
               <PayloadDescription>Free tickets awarded when reaching this tier</PayloadDescription>
 
@@ -684,14 +701,13 @@ const AffiliateSettingsForm: React.FC<Props> = ({
                   <div className="payload-card__content">
                     <div className="payload-flex payload-flex--between payload-mb">
                       <span>Free Ticket {ticketIndex + 1}</span>
-                      <Button
+                      <button
                         type="button"
-                        buttonStyle="secondary"
-                        size="small"
+                        className="m-0 cursor-pointer"
                         onClick={() => removeFreeTicket(tierIndex, ticketIndex)}
                       >
                         <Trash2 style={{ width: '16px', height: '16px' }} />
-                      </Button>
+                      </button>
                     </div>
                     <div className="payload-grid payload-grid--cols-3 payload-grid--gap-md">
                       <PayloadFormGroup>
@@ -700,22 +716,21 @@ const AffiliateSettingsForm: React.FC<Props> = ({
                           Class of free ticket to award. The value decreases by zone, with Zone 1
                           being the most expensive ticket.
                         </PayloadDescription>
-                        <PayloadSelect
+                        <SelectInput
+                          path={`tiers[${tierIndex}].rewards.freeTickets[${ticketIndex}].ticketClass`}
+                          name={`tiers[${tierIndex}].rewards.freeTickets[${ticketIndex}].ticketClass`}
+                          options={TICKET_ZONES.map((zone) => ({
+                            label: zone.label,
+                            value: zone.value,
+                          }))}
                           value={freeTicket.ticketClass}
-                          onChange={(e) =>
+                          onChange={(option) =>
                             updateFormData(
                               `tiers[${tierIndex}].rewards.freeTickets[${ticketIndex}].ticketClass`,
-                              e.target.value,
+                              (option as any)?.value || '',
                             )
                           }
-                          required
-                        >
-                          {TICKET_ZONES.map((zone) => (
-                            <option key={zone.value} value={zone.value}>
-                              {zone.label}
-                            </option>
-                          ))}
-                        </PayloadSelect>
+                        />
                       </PayloadFormGroup>
 
                       <PayloadFormGroup>
@@ -760,6 +775,10 @@ const AffiliateSettingsForm: React.FC<Props> = ({
             </div>
           </div>
         ))}
+
+        <button type="button" className="m-0 cursor-pointer" onClick={addTier}>
+          <Plus style={{ width: '16px', height: '16px' }} /> Add Affiliate Tier
+        </button>
       </PayloadFormGroup>
 
       <div
