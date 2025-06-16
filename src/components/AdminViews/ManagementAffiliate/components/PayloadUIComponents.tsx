@@ -7,46 +7,34 @@ import './PayloadUIComponents.scss'
 export const PayloadCard: React.FC<{
   children: React.ReactNode
   className?: string
-}> = ({ children, className = '' }) => (
-  <div className={`payload-card ${className}`}>
-    {children}
-  </div>
-)
+}> = ({ children, className = '' }) => <div className={`payload-card ${className}`}>{children}</div>
 
 export const PayloadCardHeader: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className = '' }) => (
-  <div className={`payload-card__header ${className}`}>
-    {children}
-  </div>
+  <div className={`payload-card__header ${className}`}>{children}</div>
 )
 
 export const PayloadCardContent: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className = '' }) => (
-  <div className={`payload-card__content ${className}`}>
-    {children}
-  </div>
+  <div className={`payload-card__content ${className}`}>{children}</div>
 )
 
 export const PayloadCardTitle: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className = '' }) => (
-  <h3 className={`payload-card__title ${className}`}>
-    {children}
-  </h3>
+  <h3 className={`payload-card__title ${className}`}>{children}</h3>
 )
 
 export const PayloadCardDescription: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className = '' }) => (
-  <p className={`payload-card__description ${className}`}>
-    {children}
-  </p>
+  <p className={`payload-card__description ${className}`}>{children}</p>
 )
 
 // PayloadCMS-compatible Badge component
@@ -55,7 +43,10 @@ export const PayloadBadge: React.FC<{
   variant?: 'default' | 'secondary' | 'success' | 'warning' | 'danger'
   className?: string
 }> = ({ children, variant = 'default', className = '' }) => (
-  <span className={`payload-badge payload-badge--${variant} ${className}`}>
+  <span
+    className={`payload-badge payload-badge--${variant} ${className}`}
+    style={{ borderRadius: '4px' }}
+  >
     {children}
   </span>
 )
@@ -77,10 +68,10 @@ export const PayloadTabs: React.FC<{
 
   return (
     <div className={`payload-tabs ${className}`} data-active-tab={activeTab}>
-      {React.Children.map(children, child => 
-        React.isValidElement(child) 
+      {React.Children.map(children, (child) =>
+        React.isValidElement(child)
           ? React.cloneElement(child, { activeTab, onTabChange: handleTabChange } as any)
-          : child
+          : child,
       )}
     </div>
   )
@@ -93,10 +84,10 @@ export const PayloadTabsList: React.FC<{
   onTabChange?: (value: string) => void
 }> = ({ children, className = '', activeTab, onTabChange }) => (
   <div className={`payload-tabs__list ${className}`}>
-    {React.Children.map(children, child => 
-      React.isValidElement(child) 
+    {React.Children.map(children, (child) =>
+      React.isValidElement(child)
         ? React.cloneElement(child, { activeTab, onTabChange } as any)
-        : child
+        : child,
     )}
   </div>
 )
@@ -125,11 +116,7 @@ export const PayloadTabsContent: React.FC<{
 }> = ({ children, value, className = '', activeTab }) => {
   if (activeTab !== value) return null
 
-  return (
-    <div className={`payload-tabs__content ${className}`}>
-      {children}
-    </div>
-  )
+  return <div className={`payload-tabs__content ${className}`}>{children}</div>
 }
 
 // PayloadCMS-compatible Modal components
@@ -172,36 +159,28 @@ export const PayloadModalHeader: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className = '' }) => (
-  <div className={`payload-modal-header ${className}`}>
-    {children}
-  </div>
+  <div className={`payload-modal-header ${className}`}>{children}</div>
 )
 
 export const PayloadModalTitle: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className = '' }) => (
-  <h2 className={`payload-modal-title ${className}`}>
-    {children}
-  </h2>
+  <h2 className={`payload-modal-title ${className}`}>{children}</h2>
 )
 
 export const PayloadModalBody: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className = '' }) => (
-  <div className={`payload-modal-body ${className}`}>
-    {children}
-  </div>
+  <div className={`payload-modal-body ${className}`}>{children}</div>
 )
 
 export const PayloadModalFooter: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className = '' }) => (
-  <div className={`payload-modal-footer ${className}`}>
-    {children}
-  </div>
+  <div className={`payload-modal-footer ${className}`}>{children}</div>
 )
 
 // PayloadCMS-compatible Form components
@@ -209,9 +188,7 @@ export const PayloadFormGroup: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className = '' }) => (
-  <div className={`payload-form-group ${className}`}>
-    {children}
-  </div>
+  <div className={`payload-form-group ${className}`}>{children}</div>
 )
 
 export const PayloadLabel: React.FC<{
@@ -230,9 +207,7 @@ export const PayloadDescription: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className = '' }) => (
-  <p className={`payload-description ${className}`}>
-    {children}
-  </p>
+  <p className={`payload-description ${className}`}>{children}</p>
 )
 
 export const PayloadInput: React.FC<{
@@ -260,7 +235,7 @@ export const PayloadInput: React.FC<{
   name,
   min,
   max,
-  step
+  step,
 }) => (
   <input
     type={type}
@@ -288,17 +263,7 @@ export const PayloadTextarea: React.FC<{
   id?: string
   name?: string
   rows?: number
-}> = ({
-  value,
-  onChange,
-  placeholder,
-  required,
-  disabled,
-  className = '',
-  id,
-  name,
-  rows = 3
-}) => (
+}> = ({ value, onChange, placeholder, required, disabled, className = '', id, name, rows = 3 }) => (
   <textarea
     value={value}
     onChange={onChange}
@@ -322,17 +287,7 @@ export const PayloadSelect: React.FC<{
   name?: string
   style?: React.CSSProperties
   children: React.ReactNode
-}> = ({
-  value,
-  onChange,
-  required,
-  disabled,
-  className = '',
-  id,
-  name,
-  style,
-  children
-}) => (
+}> = ({ value, onChange, required, disabled, className = '', id, name, style, children }) => (
   <select
     value={value}
     onChange={onChange}
@@ -354,14 +309,7 @@ export const PayloadCheckbox: React.FC<{
   className?: string
   id?: string
   name?: string
-}> = ({
-  checked,
-  onChange,
-  disabled,
-  className = '',
-  id,
-  name
-}) => (
+}> = ({ checked, onChange, disabled, className = '', id, name }) => (
   <input
     type="checkbox"
     checked={checked}
@@ -384,13 +332,13 @@ export const PayloadMultiSelect: React.FC<{
     if (checked) {
       onChange([...value, optionValue])
     } else {
-      onChange(value.filter(v => v !== optionValue))
+      onChange(value.filter((v) => v !== optionValue))
     }
   }
 
   return (
     <div className={`payload-multi-select ${className}`}>
-      {options.map(option => (
+      {options.map((option) => (
         <label key={option.value} className="payload-multi-select-option">
           <PayloadCheckbox
             checked={value.includes(option.value)}
@@ -404,61 +352,43 @@ export const PayloadMultiSelect: React.FC<{
   )
 }
 
-
-
 // PayloadCMS-compatible Table components
 export const PayloadTable: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className = '' }) => (
   <div className={`payload-table-wrapper ${className}`}>
-    <table className="payload-table">
-      {children}
-    </table>
+    <table className="payload-table">{children}</table>
   </div>
 )
 
 export const PayloadTableHeader: React.FC<{
   children: React.ReactNode
-}> = ({ children }) => (
-  <thead className="payload-table__header">
-    {children}
-  </thead>
-)
+}> = ({ children }) => <thead className="payload-table__header">{children}</thead>
 
 export const PayloadTableBody: React.FC<{
   children: React.ReactNode
-}> = ({ children }) => (
-  <tbody className="payload-table__body">
-    {children}
-  </tbody>
-)
+}> = ({ children }) => <tbody className="payload-table__body">{children}</tbody>
 
 export const PayloadTableRow: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className = '' }) => (
-  <tr className={`payload-table__row ${className}`}>
-    {children}
-  </tr>
+  <tr className={`payload-table__row ${className}`}>{children}</tr>
 )
 
 export const PayloadTableHead: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className = '' }) => (
-  <th className={`payload-table__head ${className}`}>
-    {children}
-  </th>
+  <th className={`payload-table__head ${className}`}>{children}</th>
 )
 
 export const PayloadTableCell: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className = '' }) => (
-  <td className={`payload-table__cell ${className}`}>
-    {children}
-  </td>
+  <td className={`payload-table__cell ${className}`}>{children}</td>
 )
 
 // PayloadCMS-compatible Grid components

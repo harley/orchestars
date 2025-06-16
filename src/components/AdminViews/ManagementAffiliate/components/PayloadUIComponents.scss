@@ -254,51 +254,51 @@
 }
 
 // SelectInput z-index fix and overflow handling
-.field-type {
-  position: relative;
-  z-index: 10;
+// .field-type {
+//   position: relative;
+//   z-index: 10;
 
-  .rs__control {
-    z-index: 10;
-    position: relative;
-  }
+//   .rs__control {
+//     z-index: 10;
+//     position: relative;
+//   }
 
-  .rs__menu {
-    z-index: 1000 !important;
-    position: absolute !important;
-    top: 100% !important;
-    left: 0 !important;
-    right: 0 !important;
-    background: var(--theme-bg) !important;
-    border: 1px solid var(--theme-elevation-200) !important;
-    border-radius: var(--border-radius-s) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  }
+//   .rs__menu {
+//     z-index: 1000 !important;
+//     position: absolute !important;
+//     top: 100% !important;
+//     left: 0 !important;
+//     right: 0 !important;
+//     // background: var(--theme-bg) !important;
+//     border: 1px solid var(--theme-elevation-200) !important;
+//     border-radius: var(--border-radius-s) !important;
+//     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+//   }
 
-  .rs__menu-list {
-    z-index: 1001 !important;
-    max-height: 200px !important;
-    overflow-y: auto !important;
-  }
+//   .rs__menu-list {
+//     z-index: 1001 !important;
+//     max-height: 200px !important;
+//     overflow-y: auto !important;
+//   }
 
-  .rs__option {
-    padding: calc(var(--base) / 2) !important;
-    color: var(--theme-text) !important;
+//   .rs__option {
+//     padding: calc(var(--base) / 2) !important;
+//     color: var(--theme-text) !important;
 
-    &:hover {
-      background: var(--theme-elevation-50) !important;
-    }
+//     &:hover {
+//       background: var(--theme-elevation-50) !important;
+//     }
 
-    &--is-selected {
-      background: var(--theme-success-100) !important;
-      color: var(--theme-success-600) !important;
-    }
+//     &--is-selected {
+//       background: var(--theme-success-100) !important;
+//       color: var(--theme-success-600) !important;
+//     }
 
-    &--is-focused {
-      background: var(--theme-elevation-100) !important;
-    }
-  }
-}
+//     &--is-focused {
+//       background: var(--theme-elevation-100) !important;
+//     }
+//   }
+// }
 
 // Special handling for cards containing dropdowns
 .payload-card--dropdown {
@@ -592,4 +592,12 @@
   .payload-grid--cols-4 {
     grid-template-columns: 1fr;
   }
+}
+
+.m-0 {
+  margin: 0;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }

@@ -2,14 +2,13 @@
 
 // cSpell:words payloadcms textlink
 import React, { useState, useEffect } from 'react'
-import { Button } from '@payloadcms/ui'
+import { Button, SelectInput, toast } from '@payloadcms/ui'
 import type { User, AffiliateLink, Event, Promotion } from '@/payload-types'
 import { Copy, Check } from 'lucide-react'
 import {
   PayloadFormGroup,
   PayloadLabel,
   PayloadInput,
-  PayloadSelect,
   PayloadDescription,
   PayloadTextarea,
 } from './PayloadUIComponents'
@@ -81,6 +80,7 @@ const AffiliateLinkForm: React.FC<Props> = ({
         }
       } catch (error) {
         console.error('Failed to fetch events:', error)
+        toast.error('Failed to fetch events')
       }
     }
 
@@ -142,6 +142,7 @@ const AffiliateLinkForm: React.FC<Props> = ({
         }
       } catch (error) {
         console.error('Failed to fetch promotions:', error)
+        toast.error('Failed to fetch promotions')
         setPromotions([])
         setFormData((prev) => ({
           ...prev,
@@ -242,17 +243,23 @@ const AffiliateLinkForm: React.FC<Props> = ({
 
     // Validate required fields
     if (!formData.event.trim()) {
-      setErrorMessage('Event selection is required')
+      const errorMsg = 'Event selection is required'
+      setErrorMessage(errorMsg)
+      toast.error(errorMsg)
       return
     }
 
     if (!formData.affiliatePromotion.trim()) {
-      setErrorMessage('Promotion selection is required')
+      const errorMsg = 'Promotion selection is required'
+      setErrorMessage(errorMsg)
+      toast.error(errorMsg)
       return
     }
 
     if (!formData.targetLink.trim()) {
-      setErrorMessage('Target link could not be generated. Please select an event and promotion.')
+      const errorMsg = 'Target link could not be generated. Please select an event and promotion.'
+      setErrorMessage(errorMsg)
+      toast.error(errorMsg)
       return
     }
 
@@ -260,7 +267,9 @@ const AffiliateLinkForm: React.FC<Props> = ({
     try {
       new URL(formData.targetLink)
     } catch {
-      setErrorMessage('Generated target link is invalid')
+      const errorMsg = 'Generated target link is invalid'
+      setErrorMessage(errorMsg)
+      toast.error(errorMsg)
       return
     }
 
@@ -341,18 +350,19 @@ const AffiliateLinkForm: React.FC<Props> = ({
           Event
         </PayloadLabel>
         <PayloadDescription>Select the event this affiliate link applies to</PayloadDescription>
-        <PayloadSelect
-          id="event"
+        <SelectInput
+          path="event"
+          name="event"
+          options={[
+            { label: 'Select an event', value: '' },
+            ...events.map((event) => ({
+              label: event.title || 'Untitled Event',
+              value: event.id.toString(),
+            })),
+          ]}
           value={formData.event}
-          onChange={(e) => updateFormData('event', e.target.value)}
-        >
-          <option value="">Select an event</option>
-          {events.map((event) => (
-            <option key={event.id} value={event.id.toString()}>
-              {event.title}
-            </option>
-          ))}
-        </PayloadSelect>
+          onChange={(option) => updateFormData('event', (option as any)?.value || '')}
+        />
       </PayloadFormGroup>
 
       <PayloadFormGroup>
@@ -360,18 +370,19 @@ const AffiliateLinkForm: React.FC<Props> = ({
           Promotion
         </PayloadLabel>
         <PayloadDescription>Select a promotion to associate with this link</PayloadDescription>
-        <PayloadSelect
-          id="affiliatePromotion"
+        <SelectInput
+          path="affiliatePromotion"
+          name="affiliatePromotion"
+          options={[
+            { label: 'Select a promotion', value: '' },
+            ...promotions.map((promotion: Promotion) => ({
+              label: promotion.code,
+              value: promotion.id.toString(),
+            })),
+          ]}
           value={formData.affiliatePromotion}
-          onChange={(e) => updateFormData('affiliatePromotion', e.target.value)}
-        >
-          <option value="">Select a promotion</option>
-          {promotions.map((promotion: Promotion) => (
-            <option key={promotion.id} value={promotion.id.toString()}>
-              {promotion.code}
-            </option>
-          ))}
-        </PayloadSelect>
+          onChange={(option) => updateFormData('affiliatePromotion', (option as any)?.value || '')}
+        />
       </PayloadFormGroup>
 
       <PayloadFormGroup>
@@ -390,14 +401,16 @@ const AffiliateLinkForm: React.FC<Props> = ({
       <PayloadFormGroup>
         <PayloadLabel htmlFor="status">Status</PayloadLabel>
         <PayloadDescription>Set the status of this affiliate link</PayloadDescription>
-        <PayloadSelect
-          id="status"
+        <SelectInput
+          path="status"
+          name="status"
+          options={[
+            { label: 'Active', value: 'active' },
+            { label: 'Disabled', value: 'disabled' },
+          ]}
           value={formData.status}
-          onChange={(e) => updateFormData('status', e.target.value)}
-        >
-          <option value="active">Active</option>
-          <option value="disabled">Disabled</option>
-        </PayloadSelect>
+          onChange={(option) => updateFormData('status', (option as any)?.value || '')}
+        />
       </PayloadFormGroup>
 
       {/* UTM Parameters Section */}
@@ -491,11 +504,12 @@ const AffiliateLinkForm: React.FC<Props> = ({
           disabled
           rows={3}
         />
-        <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ marginTop: '8px', display: 'flex' }}>
           <Button
             type="button"
             buttonStyle="secondary"
             size="small"
+            className='m-0'
             onClick={handleCopyTargetLink}
             disabled={!formData.targetLink.trim()}
           >
