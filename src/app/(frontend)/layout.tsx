@@ -21,6 +21,8 @@ import { getLocale } from '@/providers/I18n/server'
 
 import { Analytics } from '@vercel/analytics/next'
 import PixelTracker from '@/components/PixelTracker'
+import { GOOGLE_TAG_MANAGER_KEY } from '@/config/ads'
+import { GTM, GTM_NO_SCRIPT } from '@/components/GTM'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // const { isEnabled } = await draftMode()
@@ -36,8 +38,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         {/* <InitTheme /> */}
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
+        <GTM gtmKey={GOOGLE_TAG_MANAGER_KEY} />
       </head>
       <body>
+        <GTM_NO_SCRIPT gtmKey={GOOGLE_TAG_MANAGER_KEY} />
         <Providers>
           {/* <AdminBar
             adminBarProps={{

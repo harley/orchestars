@@ -20,6 +20,9 @@ import { Analytics } from '@vercel/analytics/next'
 import PixelTracker from '@/components/PixelTracker'
 import { checkUserAuthenticated } from './actions/authenticated'
 
+import { GOOGLE_TAG_MANAGER_KEY } from '@/config/ads'
+import { GTM, GTM_NO_SCRIPT } from '@/components/GTM'
+
 export default async function AffiliateLayout({ children }: { children: React.ReactNode }) {
   const lang = await getLocale()
 
@@ -35,8 +38,10 @@ export default async function AffiliateLayout({ children }: { children: React.Re
     >
       <head>
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
+        <GTM gtmKey={GOOGLE_TAG_MANAGER_KEY} />
       </head>
       <body>
+        <GTM_NO_SCRIPT gtmKey={GOOGLE_TAG_MANAGER_KEY} />
         <Providers>
           <AffiliateProviders initialEvents={eventsData} authUser={authUser} locale={lang}>
             <Suspense fallback={null}>
@@ -60,7 +65,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     creator: '@coderpush',
   },
-  description:
-    'Affiliate Dashboard - Orchestars Partner Portal',
+  description: 'Affiliate Dashboard - Orchestars Partner Portal',
   title: 'Affiliate Dashboard | Orchestars',
 }
