@@ -15854,9 +15854,9 @@
   "texts": [
     {
       "id": "san-khau-nang-cao",
-      "x": 455,
+      "x": 180,
       "y": -5.1,
-      "label": "SÂN KHẤU NÂNG CAO",
+      "label": "SÂN KHẤU NÂNG CAO / ELEVATED STAGE",
       "fontSize": 35,
       "fontWeight": 600,
       "letterSpacing": 5,
@@ -15866,9 +15866,9 @@
     },
     {
       "id": "ghe-ngoi-khu-vuc-duoi-san",
-      "x": 420,
+      "x": 145,
       "y": 110,
-      "label": "GHẾ NGỒI KHU VỰC DƯỚI SÂN",
+      "label": "GHẾ NGỒI KHU VỰC DƯỚI SÂN/SEATING AREA IN FRONT OF STAGE",
       "fontSize": 26,
       "fontWeight": 600,
       "letterSpacing": 5,
@@ -15878,9 +15878,9 @@
     },
     {
       "id": "ghe-ngoi-khu-vuc-khan-dai",
-      "x": 420,
+      "x": 148,
       "y": 680,
-      "label": "GHẾ NGỒI KHU VỰC KHÁN ĐÀI",
+      "label": "GHẾ NGỒI KHU VỰC KHÁN ĐÀI/SEATING AREA IN THE STANDS",
       "fontSize": 26,
       "fontWeight": 600,
       "letterSpacing": 5,
