@@ -3,9 +3,11 @@
 import PageClient from "./page.client"
 import React, { useState, useEffect } from "react"
 import { FormBlock } from "@/blocks/Form/Component"
+import type { Form as FormType } from "@payloadcms/plugin-form-builder/types"
 
 const ContactForm = () => {
-  const [formData, setFormData] = useState<any>(null)
+  const [formData, setFormData] = useState<FormType | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const formTitle = "Contact"
 
   useEffect(() => {
@@ -16,21 +18,28 @@ const ContactForm = () => {
           throw new Error('Failed to fetch form data')
         }
         const data = await response.json()
-        console.log('Fetched form data:', data)
         if (data.docs && data.docs.length > 0) {
           setFormData(data.docs[0])
         } else {
-          console.log('No forms found with title: ', formTitle)
           setFormData(null)
         }
       } catch (err: any) {
         console.error('Error fetching form data:', err)
+        setError('An error occurred while fetching form data. Please try again later.')
       }
     }
 
-    console.log('Fetching form data for formId:', formTitle)
     fetchFormData()
   }, [formTitle])
+
+  if (error) {
+    return (
+      <div>
+        <PageClient />
+        <div>{error}</div>
+      </div>
+    )
+  }
 
   if (!formData) {
     return (
@@ -45,7 +54,6 @@ const ContactForm = () => {
     <div className="pt-16 pb-8">
       <PageClient />
       <FormBlock 
-        id="1"
         enableIntro={false}
         form={formData}
         introContent={undefined}
