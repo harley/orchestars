@@ -8,21 +8,17 @@ import type { Form as FormType } from "@payloadcms/plugin-form-builder/types"
 const ContactForm = () => {
   const [formData, setFormData] = useState<FormType | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const formTitle = "Contact"
 
   useEffect(() => {
     const fetchFormData = async () => {
       try {
-        const response = await fetch(`/api/forms?where[title][equals]=${encodeURIComponent(formTitle)}`)
+        const response = await fetch(`/api/forms?where[title][equals]=${encodeURIComponent("Contact")}`)
         if (!response.ok) {
           throw new Error('Failed to fetch form data')
         }
         const data = await response.json()
-        if (data.docs && data.docs.length > 0) {
-          setFormData(data.docs[0])
-        } else {
-          setFormData(null)
-        }
+        const doc = (data?.docs || []).length > 0 ? data.docs[0] : null;
+        setFormData(doc);
       } catch (err: any) {
         console.error('Error fetching form data:', err)
         setError('An error occurred while fetching form data. Please try again later.')
@@ -30,7 +26,7 @@ const ContactForm = () => {
     }
 
     fetchFormData()
-  }, [formTitle])
+  }, [])
 
   if (error) {
     return (
