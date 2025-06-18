@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
@@ -82,9 +82,117 @@ const mockAnalyticsData = {
   },
 }
 
+type MetricsData = {
+  clicks: string
+  orders: string
+  overallConversionRate: number
+  ticketsIssued: string
+  averageTicketsPerOrder: number
+  grossRevenue: string
+  commission: string
+}
+
+type PerformanceLinkData = {
+  id: string
+  name?: string
+  utmSource?: string
+  utmCampaign?: string
+  clicks: string
+  orders: string
+  ticketsIssued: string
+  conversionRate: number
+  grossRevenue: string
+  netRevenue: string
+  commission: string
+}
+
+type PerformanceBreakdownData = PerformanceLinkData[]
+
+type RevenueBreakdownData = {
+  bySource: { source: string; revenue: string; percentage: number }[]
+  byCampaign: { campaign: string; revenue: string; percentage: number }[]
+}
+
 export function PerformanceAnalytics() {
   const [timeRange, setTimeRange] = useState('30d')
   const [sortBy, setSortBy] = useState('revenue')
+  const [metricsData, setMetricsData] = useState<MetricsData | null>(null)
+  const [performanceBreakdownData, setPerformanceBreakdownData] = useState<PerformanceBreakdownData | null>(null)
+  const [revenueBreakdownData, setRevenueBreakdownData] = useState<RevenueBreakdownData | null>(null)
+
+  useEffect(() => {
+    const fetchPerformanceData = async () => {
+      try {
+        const response = await fetch(`/api/affiliate/analytics/performance?timeRange=${timeRange}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch analytics data')
+        }
+
+        const data = await response.json()
+        console.log('Fetched analytics data:', data)
+        setMetricsData(data.data)
+      } catch (err) {
+        console.error('Error fetching analytics data:', err)
+      }
+    }
+    fetchPerformanceData()
+  }, [timeRange])
+
+  useEffect(() => {
+    const fetchPerformanceBreakdown = async () => {
+      try {
+        const response = await fetch(`/api/affiliate/analytics/performance-breakdown?timeRange=${timeRange}&sortBy=${sortBy}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch performance breakdown')
+        }
+
+        const data = await response.json()
+        setPerformanceBreakdownData(data.data)
+        console.log('Fetched performance breakdown:', data)
+      } catch (err) {
+        console.error('Error fetching performance breakdown:', err)
+      }
+    }
+
+    fetchPerformanceBreakdown()
+  }, [timeRange, sortBy])
+
+  useEffect(() => {
+    const fetchRevenueBreakdown = async () => {
+      try {
+        const response = await fetch(`/api/affiliate/analytics/revenue?timeRange=${timeRange}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch revenue breakdown')
+        }
+
+        const data = await response.json()
+        console.log('Fetched revenue breakdown:', data)
+        setRevenueBreakdownData(data.data)
+      } catch (err) {
+        console.error('Error fetching revenue breakdown:', err)
+      }
+    }
+
+    fetchRevenueBreakdown()
+  }, [timeRange])
 
   const sortedData = [...mockAnalyticsData.linkPerformance].sort((a, b) => {
     switch (sortBy) {
@@ -169,7 +277,7 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Total Clicks</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalMetrics.clicks.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{metricsData?.clicks}</div>
             <p className="text-xs text-muted-foreground">Across all links</p>
           </CardContent>
         </Card>
@@ -178,8 +286,8 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalMetrics.orders.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Conversion rate: {overallConversionRate.toFixed(2)}%</p>
+            <div className="text-2xl font-bold">{metricsData?.orders}</div>
+            <p className="text-xs text-muted-foreground">Conversion rate: {metricsData?.overallConversionRate}%</p>
           </CardContent>
         </Card>
         <Card className="shadow-md">
@@ -187,8 +295,8 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Tickets Issued</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalMetrics.ticketsIssued.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Avg {(totalMetrics.ticketsIssued / totalMetrics.orders).toFixed(1)} per order</p>
+            <div className="text-2xl font-bold">{metricsData?.ticketsIssued}</div>
+            <p className="text-xs text-muted-foreground">Avg {metricsData?.averageTicketsPerOrder} per order</p>
           </CardContent>
         </Card>
         <Card className="shadow-md">
@@ -196,7 +304,7 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Gross Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalMetrics.grossRevenue.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{metricsData?.grossRevenue} VND</div>
             <p className="text-xs text-muted-foreground">Before discounts</p>
           </CardContent>
         </Card>
@@ -205,8 +313,8 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Your Commission</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">${totalMetrics.commission.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">10% commission rate</p>
+            <div className="text-2xl font-bold text-green-600">{metricsData?.commission} VND</div>
+            <p className="text-xs text-muted-foreground">0% commission rate</p>
           </CardContent>
         </Card>
       </div>
@@ -234,7 +342,7 @@ export function PerformanceAnalytics() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedData.map((link) => (
+                {performanceBreakdownData?.map((link) => (
                   <TableRow key={link.id}>
                     <TableCell className="font-medium">{link.name}</TableCell>
                     <TableCell>
@@ -245,12 +353,12 @@ export function PerformanceAnalytics() {
                         <div className="text-xs text-muted-foreground">{link.utmCampaign}</div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right">{link.clicks.toLocaleString()}</TableCell>
+                    <TableCell className="text-right">{link.clicks}</TableCell>
                     <TableCell className="text-right">{link.orders}</TableCell>
-                    <TableCell className="text-right">{link.ticketsIssued.toLocaleString()}</TableCell>
+                    <TableCell className="text-right">{link.ticketsIssued}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <span>{link.conversionRate.toFixed(2)}%</span>
+                        <span>{link.conversionRate}%</span>
                         {link.conversionRate >= 6 ? (
                           <TrendingUp className="h-3 w-3 text-green-500" />
                         ) : (
@@ -258,10 +366,10 @@ export function PerformanceAnalytics() {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="text-right">${link.grossRevenue.toLocaleString()}</TableCell>
-                    <TableCell className="text-right">${link.netRevenue.toLocaleString()}</TableCell>
+                    <TableCell className="text-right">{link.grossRevenue} VND</TableCell>
+                    <TableCell className="text-right">{link.netRevenue} VND</TableCell>
                     <TableCell className="text-right font-medium text-green-600">
-                      ${link.commission.toLocaleString()}
+                      {link.commission} VND
                     </TableCell>
                   </TableRow>
                 ))}
@@ -279,12 +387,12 @@ export function PerformanceAnalytics() {
             <CardDescription>Performance breakdown by traffic source</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {mockAnalyticsData.revenueBreakdown.bySource.map((item) => (
+            {revenueBreakdownData?.bySource.map((item) => (
               <div key={item.source} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium capitalize">{item.source}</span>
                   <span className="text-sm text-muted-foreground">
-                    ${item.revenue.toLocaleString()} ({item.percentage}%)
+                    ${item.revenue} ({item.percentage}%)
                   </span>
                 </div>
                 <Progress value={item.percentage} className="h-2" />
@@ -299,12 +407,12 @@ export function PerformanceAnalytics() {
             <CardDescription>Performance breakdown by campaign</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {mockAnalyticsData.revenueBreakdown.byCampaign.map((item) => (
+            {revenueBreakdownData?.byCampaign.map((item) => (
               <div key={item.campaign} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">{item.campaign}</span>
                   <span className="text-sm text-muted-foreground">
-                    ${item.revenue.toLocaleString()} ({item.percentage}%)
+                    ${item.revenue} ({item.percentage}%)
                   </span>
                 </div>
                 <Progress value={item.percentage} className="h-2" />
