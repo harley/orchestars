@@ -10,6 +10,7 @@ import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical
 
 import { fields } from './fields'
 import { getClientSideURL } from '@/utilities/getURL'
+import { useToast } from '@/components/ui/use-toast'
 
 export type FormBlockType = {
   blockName?: string
@@ -19,9 +20,26 @@ export type FormBlockType = {
   introContent?: SerializedEditorState
 }
 
+function lexicalToPlainText(lexicalState: any): string {
+  if (!lexicalState?.root?.children) return ''
+
+  return lexicalState.root.children
+    .map((node: any) => {
+      if (node.type === 'paragraph' && node.children) {
+        return node.children
+          .filter((child: any) => child.type === 'text')
+          .map((child: any) => child.text || '')
+          .join('')
+      }
+      return ''
+    })
+    .filter(Boolean)
+    .join('\n') // Join paragraphs with newlines
+}
+
 export const FormBlock: React.FC<
   {
-    id?: number
+    id?: string
   } & FormBlockType
 > = (props) => {
   const {
@@ -39,12 +57,15 @@ export const FormBlock: React.FC<
     formState: { errors },
     handleSubmit,
     register,
+    reset,
   } = formMethods
 
   const [isLoading, setIsLoading] = useState(false)
   const [hasSubmitted, setHasSubmitted] = useState<boolean>()
   const [error, setError] = useState<{ message: string; status?: string } | undefined>()
   const router = useRouter()
+
+  const { toast } = useToast()
 
   const onSubmit = useCallback(
     (data: FormFieldBlock[]) => {
@@ -91,6 +112,11 @@ export const FormBlock: React.FC<
 
           setIsLoading(false)
           setHasSubmitted(true)
+          reset()
+          toast({
+            title: 'Success',
+            description: lexicalToPlainText(confirmationMessage) || 'Thank you for your submission.',
+          })
 
           if (confirmationType === 'redirect' && redirect) {
             const { url } = redirect
@@ -120,12 +146,9 @@ export const FormBlock: React.FC<
       )}
       <div className="p-4 lg:p-6 border border-border rounded-[0.8rem]">
         <FormProvider {...formMethods}>
-          {!isLoading && hasSubmitted && confirmationType === 'message' && (
-            <RichText data={confirmationMessage} />
-          )}
-          {isLoading && !hasSubmitted && <p>Loading, please wait...</p>}
+          {/* {isLoading && !hasSubmitted && <p>Loading, please wait...</p>} */}
           {error && <div>{`${error.status || '500'}: ${error.message || ''}`}</div>}
-          {!hasSubmitted && (
+          
             <form id={formID} onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-4 last:mb-0">
                 {formFromProps &&
@@ -154,7 +177,7 @@ export const FormBlock: React.FC<
                 {submitButtonLabel || 'Submit'}
               </Button>
             </form>
-          )}
+          
         </FormProvider>
       </div>
     </div>

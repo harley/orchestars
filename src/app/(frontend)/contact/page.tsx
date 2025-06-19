@@ -21,7 +21,6 @@ async function ContactForm() {
     })
 
     const form = formData.docs.length > 0 ? formData.docs[0] : null
-    console.log('Form data:', form)
 
     if (!form) {
       return (
@@ -36,7 +35,6 @@ async function ContactForm() {
       <div className="pt-16 pb-8">
         <PageClient />
         <FormBlock
-          id={form.id}
           enableIntro={false}
           form={form as unknown as Form}
           introContent={undefined}

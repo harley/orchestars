@@ -43,7 +43,7 @@ export const Select: React.FC<
               <SelectTrigger className="w-full" id={name}>
                 <SelectValue placeholder={label} />
               </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-zinc-900 select-content">
+              <SelectContent className="bg-white select-content">
                 {options.map(({ label, value }) => {
                   return (
                     <SelectItem key={value} value={value}>
