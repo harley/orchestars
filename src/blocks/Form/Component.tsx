@@ -21,7 +21,7 @@ export type FormBlockType = {
 
 export const FormBlock: React.FC<
   {
-    id?: string
+    id?: number
   } & FormBlockType
 > = (props) => {
   const {
@@ -151,7 +151,7 @@ export const FormBlock: React.FC<
               </div>
 
               <Button form={formID} type="submit" variant="default" className="border px-8">
-                {submitButtonLabel}
+                {submitButtonLabel || 'Submit'}
               </Button>
             </form>
           )}

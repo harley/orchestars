@@ -626,6 +626,10 @@ export interface FormBlock {
  */
 export interface Form {
   id: number;
+  /**
+   * Enter a custom type for this form
+   */
+  type: string;
   title: string;
   fields?:
     | (
@@ -791,6 +795,7 @@ export interface Form {
         id?: string | null;
       }[]
     | null;
+  status: 'active' | 'inactive';
   updatedAt: string;
   createdAt: string;
 }
@@ -2903,6 +2908,7 @@ export interface RedirectsSelect<T extends boolean = true> {
  * via the `definition` "forms_select".
  */
 export interface FormsSelect<T extends boolean = true> {
+  type?: T;
   title?: T;
   fields?:
     | T
@@ -3028,6 +3034,7 @@ export interface FormsSelect<T extends boolean = true> {
         message?: T;
         id?: T;
       };
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }
