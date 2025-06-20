@@ -11,6 +11,8 @@ import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical
 import { fields } from './fields'
 import { getClientSideURL } from '@/utilities/getURL'
 import { useToast } from '@/components/ui/use-toast'
+import { Loader2 } from 'lucide-react'
+import { useTranslate } from '@/providers/I18n/client'
 
 export type FormBlockType = {
   blockName?: string
@@ -54,68 +56,46 @@ export const FormBlock: React.FC<
   })
   const {
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     handleSubmit,
     register,
     reset,
   } = formMethods
 
-  const [isLoading, setIsLoading] = useState(false)
   const [hasSubmitted, setHasSubmitted] = useState<boolean>()
-  const [error, setError] = useState<{ message: string; status?: string } | undefined>()
   const router = useRouter()
+  const { t } = useTranslate()
 
   const { toast } = useToast()
 
   const onSubmit = useCallback(
-    (data: FormFieldBlock[]) => {
-      let loadingTimerID: ReturnType<typeof setTimeout>
-      const submitForm = async () => {
-        setError(undefined)
+    async (data: FormFieldBlock[]) => {
+      const submissionData = Object.entries(data).map(([name, value]) => ({
+        field: name,
+        value,
+      }))
 
-        const dataToSend = Object.entries(data).map(([name, value]) => ({
-          field: name,
-          value,
-        }))
+      try {
+        const res = await fetch(`${getClientSideURL()}/api/form-submissions`, {
+          body: JSON.stringify({
+            form: formID,
+            submissionData,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
+        })
 
-        // delay loading indicator by 1s
-        loadingTimerID = setTimeout(() => {
-          setIsLoading(true)
-        }, 1000)
+        const resData = await res.json()
 
-        try {
-          const req = await fetch(`${getClientSideURL()}/api/form-submissions`, {
-            body: JSON.stringify({
-              form: formID,
-              submissionData: dataToSend,
-            }),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            method: 'POST',
-          })
-
-          const res = await req.json()
-
-          clearTimeout(loadingTimerID)
-
-          if (req.status >= 400) {
-            setIsLoading(false)
-
-            setError({
-              message: res.errors?.[0]?.message || 'Internal Server Error',
-              status: res.status,
-            })
-
-            return
-          }
-
-          setIsLoading(false)
+        if (res.ok) {
           setHasSubmitted(true)
           reset()
           toast({
-            title: 'Success',
-            description: lexicalToPlainText(confirmationMessage) || 'Thank you for your submission.',
+            title: t('message.success'),
+            description:
+              lexicalToPlainText(confirmationMessage) || t('message.thankYouForYourSubmission'),
           })
 
           if (confirmationType === 'redirect' && redirect) {
@@ -125,18 +105,26 @@ export const FormBlock: React.FC<
 
             if (redirectUrl) router.push(redirectUrl)
           }
-        } catch (err) {
-          console.warn(err)
-          setIsLoading(false)
-          setError({
-            message: 'Something went wrong.',
-          })
-        }
-      }
 
-      void submitForm()
+          return
+        }
+
+        toast({
+          title: t('message.failed'),
+          description: resData.errors?.[0]?.message || t('message.failedMessage'),
+          variant: 'destructive',
+        })
+      } catch (err) {
+        console.error(err)
+
+        toast({
+          title: t('message.failed'),
+          description: t('message.failedMessage'),
+          variant: 'destructive',
+        })
+      }
     },
-    [router, formID, redirect, confirmationType],
+    [router, formID, redirect, confirmationType, t, toast, confirmationMessage, reset],
   )
 
   return (
@@ -146,38 +134,45 @@ export const FormBlock: React.FC<
       )}
       <div className="p-4 lg:p-6 border border-border rounded-[0.8rem]">
         <FormProvider {...formMethods}>
-          {/* {isLoading && !hasSubmitted && <p>Loading, please wait...</p>} */}
-          {error && <div>{`${error.status || '500'}: ${error.message || ''}`}</div>}
-          
-            <form id={formID} onSubmit={handleSubmit(onSubmit)}>
-              <div className="mb-4 last:mb-0">
-                {formFromProps &&
-                  formFromProps.fields &&
-                  formFromProps.fields?.map((field, index) => {
-                    const Field: React.FC<any> = fields?.[field.blockType as keyof typeof fields]
-                    if (Field) {
-                      return (
-                        <div className="mb-6 last:mb-0" key={index}>
-                          <Field
-                            form={formFromProps}
-                            {...field}
-                            {...formMethods}
-                            control={control}
-                            errors={errors}
-                            register={register}
-                          />
-                        </div>
-                      )
-                    }
-                    return null
-                  })}
-              </div>
+          <form id={formID} onSubmit={handleSubmit(onSubmit)}>
+            {/* display title */}
+            {formFromProps.title && (
+              <h2 className="text-2xl font-bold mb-8 text-center">{formFromProps.title}</h2>
+            )}
+            <div className="mb-4 last:mb-0">
+              {formFromProps &&
+                formFromProps.fields &&
+                formFromProps.fields?.map((field, index) => {
+                  const Field: React.FC<any> = fields?.[field.blockType as keyof typeof fields]
+                  if (Field) {
+                    return (
+                      <div className="mb-6 last:mb-0" key={index}>
+                        <Field
+                          form={formFromProps}
+                          {...field}
+                          {...formMethods}
+                          control={control}
+                          errors={errors}
+                          register={register}
+                        />
+                      </div>
+                    )
+                  }
+                  return null
+                })}
+            </div>
 
-              <Button form={formID} type="submit" variant="default" className="border px-8">
-                {submitButtonLabel || 'Submit'}
-              </Button>
-            </form>
-          
+            <Button form={formID} type="submit" variant="default" className="border px-8" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <span className="flex items-center">
+                  <Loader2 className="w-4 h-4 mr-2" />
+                  {t('message.submitting')}
+                </span>
+              ) : (
+                submitButtonLabel || t('message.submit')
+              )}
+            </Button>
+          </form>
         </FormProvider>
       </div>
     </div>
