@@ -63,7 +63,7 @@ const HomeClient = ({
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow pt-2 md:pt-6">
-        <ConcertBanner events={[...bannerDocs, ...(!bannerDocs?.length ? pastEvents : [])]} />
+        <ConcertBanner events={[...bannerDocs, ...pastEvents]} />
         {visibleSections.map((section, index) => (
           <section.Component key={index} {...section.props} />
         ))}
