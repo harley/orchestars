@@ -154,7 +154,13 @@
     "promotionSuccess": "Success",
     "promotionApplied": "Promo code applied",
     "invalidPromoCode": "Invalid promo code",
-    "errorHoldingSeat": "An error occurred while holding the seat and processing the payment"
+    "errorHoldingSeat": "An error occurred while holding the seat and processing the payment",
+    "success": "Success",
+    "failed": "Failed",
+    "submitting": "Submitting...",
+    "submit": "Submit",
+    "thankYouForYourSubmission": "Thank you! Your information has been submitted successfully. We will contact you soon.",
+    "failedMessage": "An error occurred! Please try again"
   },
   "errorCode": {
     "SYS001": "An error occurred! Please try again",
