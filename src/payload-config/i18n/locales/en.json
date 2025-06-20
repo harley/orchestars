@@ -455,12 +455,5 @@
     "firstTimeLoginEmailPlaceholder": "Enter the email you used to book tickets",
     "pleaseEnterEmailAndPassword": "Please enter both email and password",
     "signingIn": "Signing in..."
-  },
-  "navbar": {
-    "profile": "Profile",
-    "logout": "Logout",
-    "signInSignUp": "Sign In",
-    "buyTicketNow": "Buy Ticket Now",
-    "buyNow": "Buy Now"
   }
 }

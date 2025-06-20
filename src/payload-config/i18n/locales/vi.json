@@ -455,12 +455,5 @@
     "firstTimeLoginEmailPlaceholder": "Nhập email bạn đã dùng để đặt vé",
     "pleaseEnterEmailAndPassword": "Vui lòng nhập cả email và mật khẩu",
     "signingIn": "Đang đăng nhập..."
-  },
-  "navbar": {
-    "profile": "Thông tin tài khoản",
-    "logout": "Đăng xuất",
-    "signInSignUp": "Đăng nhập",
-    "buyTicketNow": "Mua vé ngay",
-    "buyNow": "Mua ngay"
   }
 }
