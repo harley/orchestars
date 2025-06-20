@@ -20,7 +20,7 @@ import { getServerSideURL } from '@/utilities/getURL'
 import { getLocale } from '@/providers/I18n/server'
 
 import { Analytics } from '@vercel/analytics/next'
-import PixelTracker from '@/components/PixelTracker'
+// import PixelTracker from '@/components/PixelTracker'
 import { GOOGLE_TAG_MANAGER_KEY } from '@/config/ads'
 import { GTM, GTM_NO_SCRIPT } from '@/components/GTM'
 
@@ -48,9 +48,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               preview: isEnabled,
             }}
           /> */}
-          <Suspense fallback={null}>
+          {/* <Suspense fallback={null}>
             <PixelTracker />
-          </Suspense>
+          </Suspense> */}
           <Header />
           <EnvironmentIndicator />
           <div className="pt-[72px]">{children}</div>

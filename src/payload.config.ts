@@ -43,6 +43,10 @@ import { PromotionConfigs } from './collections/Promotion/PromotionConfigs'
 import { AffiliateLinks } from './collections/Affiliate/AffiliateLinks'
 import { AffiliateClickLogs } from './collections/Affiliate/AffiliateClickLogs'
 import { AffiliateSettings } from './collections/Affiliate/AffiliateSettings'
+// import { AffiliateRanks } from './collections/Affiliate/AffiliateRanks'
+// import { EventAffiliateRanks } from './collections/Affiliate/EventAffiliateRanks'
+// import { AffiliateRankLogs } from './collections/Affiliate/AffiliateRankLogs'
+// import { AffiliateUserProfiles } from './collections/Affiliate/AffiliateUserProfile'
 // import { sendMailJob } from './collections/Emails/jobs/sendMail'
 
 const filename = fileURLToPath(import.meta.url)
@@ -145,6 +149,10 @@ export default buildConfig({
     FAQs,
     Admins,
     Emails,
+    // AffiliateRanks,
+    // EventAffiliateRanks,
+    // AffiliateUserProfiles,
+    // AffiliateRankLogs,
     AffiliateLinks,
     AffiliateSettings,
     AffiliateClickLogs,
