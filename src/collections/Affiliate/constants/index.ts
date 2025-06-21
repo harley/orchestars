@@ -1,4 +1,6 @@
-export const AFFILIATE_RANK = {
+export type AffiliateRank = 'seller' | 'fan' | 'ambassador' | 'patron'
+
+export const AFFILIATE_RANK: Record<AffiliateRank, { label: string; value: AffiliateRank }> = {
   seller: { label: 'Seller', value: 'seller' },
   fan: { label: 'Fan', value: 'fan' },
   ambassador: { label: 'Ambassador', value: 'ambassador' },

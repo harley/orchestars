@@ -8,6 +8,9 @@ export const EventAffiliateRanks: CollectionConfig = {
   admin: {
     useAsTitle: 'event',
     description: 'Quản lý hạng của Affiliate Seller trong từng event cụ thể',
+    components: {
+      beforeList: ['@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate'],
+    }
   },
 
   fields: [

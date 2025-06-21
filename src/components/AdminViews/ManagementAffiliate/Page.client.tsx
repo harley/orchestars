@@ -18,6 +18,7 @@ import {
 import DashboardTab from './components/DashboardTab'
 import ManageAffiliateUserTab from './components/ManageAffiliateUserTab'
 import AffiliateClickLogsTab from './components/AffiliateClickLogsTab'
+import { AffiliateCollectionList } from './AffiliateCollectionList'
 
 interface Props {
   affiliateUsers: User[]
@@ -52,6 +53,11 @@ const AffiliateManagementClient: React.FC<Props> = ({
           >
             Manage affiliate users, track performance, and configure affiliate settings
           </p>
+        </div>
+
+        <div style={{ marginBottom: 'calc(var(--base))' }}>
+          <h2 style={{ marginBottom: 'calc(var(--base))' }}>Affiliate Ranks</h2>
+          <AffiliateCollectionList />
         </div>
 
         <PayloadTabs defaultValue="dashboard">
