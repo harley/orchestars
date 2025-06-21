@@ -135,7 +135,6 @@ export function PerformanceAnalytics() {
         }
 
         const data = await response.json()
-        console.log('Fetched analytics data:', data)
         setMetricsData(data.data)
       } catch (err) {
         console.error('Error fetching analytics data:', err)
@@ -160,7 +159,6 @@ export function PerformanceAnalytics() {
 
         const data = await response.json()
         setPerformanceBreakdownData(data.data)
-        console.log('Fetched performance breakdown:', data)
       } catch (err) {
         console.error('Error fetching performance breakdown:', err)
       }
@@ -184,7 +182,6 @@ export function PerformanceAnalytics() {
         }
 
         const data = await response.json()
-        console.log('Fetched revenue breakdown:', data)
         setRevenueBreakdownData(data.data)
       } catch (err) {
         console.error('Error fetching revenue breakdown:', err)
