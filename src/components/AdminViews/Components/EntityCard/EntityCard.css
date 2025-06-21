@@ -1,0 +1,72 @@
+
+.admin-entity-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  
+  @media (max-width: 1200px) {
+    .admin-entity-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (max-width: 900px) {
+    .admin-entity-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .admin-entity-grid {
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }
+  
+  .admin-entity-card {
+    position: relative;
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    animation: fadeIn 0.4s ease-out forwards;
+    height: 80px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .admin-entity-card:hover {
+    background-color: #2a2a2a;
+  }
+  
+  .admin-entity-title {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #fff;
+  }
+  
+  .admin-entity-type {
+    display: none;
+  }
+  
+  .admin-entity-add {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 16px;
+  }
+  
+  .admin-entity-add:hover {
+    background-color: #444;
+  }
+  
