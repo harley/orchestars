@@ -465,7 +465,7 @@ const ConfirmOrderModal = ({
             </div>
             <div className="flex justify-between items-center mb-6">
               <span className="text-base font-bold">{t('event.totalAfterDiscount')}:</span>
-              <span className="text-lg font-bold text-primary">
+              <span className="text-lg font-bold text-primary total-value">
                 {formatMoney(calculateTotal.amount)}
               </span>
             </div>
@@ -475,7 +475,7 @@ const ConfirmOrderModal = ({
                 <div className="grid xl:grid-cols-2 grid-cols-1 gap-2">
                   <Button
                     type="submit"
-                    className="bg-green-600 hover:bg-green-700 cursor-pointer text-white"
+                    className="bg-green-600 hover:bg-green-700 cursor-pointer text-white purchased"
                     disabled={isSubmitting || isSubmittingPromotionForm}
                   >
                     {isSubmitting ? (

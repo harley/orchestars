@@ -278,7 +278,7 @@ const SelectTicket = ({
                 </div>
                 <div className="border-t border-gray-300 mt-4 pt-2 flex justify-between font-bold text-base">
                   <span>{t('event.total')}</span>
-                  <span>{formatMoney(calculateTotal())}</span>
+                  <span className='total-value'>{formatMoney(calculateTotal())}</span>
                 </div>
                 <Button
                   onClick={handleBuyTickets}
