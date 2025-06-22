@@ -68,7 +68,7 @@ export const AffiliateUserRanks: CollectionConfig = {
       required: true,
       defaultValue: 0,
       admin: {
-        description: 'Tổng doanh thu từ các đơn hàng của Affiliate User',
+        description: 'Tổng doanh thu trước giảm giá từ các đơn hàng của Affiliate User',
       },
     },
     {

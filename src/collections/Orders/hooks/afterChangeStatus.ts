@@ -107,8 +107,8 @@ const getAffiliateAggregates = async (
   `
 
   const [resultCountTotal, resultCountTotalTicketSold] = await Promise.all([
-    db.drizzle.execute(valueQuery).then((res: any) => res.rows?.[0]),
-    db.drizzle.execute(ticketsQuery).then((res: any) => res.rows?.[0]),
+    db.drizzle.execute(valueQuery).then((res: {rows: Array<{ total_net_value?: string; total_gross_value?: string }>}) => res.rows?.[0]),
+    db.drizzle.execute(ticketsQuery).then((res: { rows?: Array<{ total_ticket_sold?: string }> }) => res.rows?.[0]),
   ])
 
   const totalNetValue = Number(resultCountTotal?.total_net_value) || 0
@@ -262,7 +262,7 @@ const updateAffiliateStats = async (
     req.payload.db,
   )
 
-  const exchangedToPoints = Math.ceil(totalNetValue / POINT_PER_VND)
+  const exchangedToPoints = Math.ceil(totalGrossValue / POINT_PER_VND)
   const sortedRanks = affiliateRanks.sort((a, b) => b.minPoints - a.minPoints)
   const newRank = sortedRanks.find((rank) => exchangedToPoints >= rank.minPoints)
 
