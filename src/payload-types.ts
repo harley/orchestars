@@ -1542,7 +1542,7 @@ export interface AffiliateUserRank {
    */
   totalRevenue: number;
   /**
-   * Tổng doanh thu từ các đơn hàng của Affiliate User
+   * Tổng doanh thu trước giảm giá từ các đơn hàng của Affiliate User
    */
   totalRevenueBeforeDiscount: number;
   /**
