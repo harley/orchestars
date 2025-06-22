@@ -47,6 +47,7 @@ import { AffiliateRanks } from './collections/Affiliate/AffiliateRanks'
 import { EventAffiliateRanks } from './collections/Affiliate/EventAffiliateRanks'
 import { AffiliateRankLogs } from './collections/Affiliate/AffiliateRankLogs'
 import { AffiliateUserRanks } from './collections/Affiliate/AffiliateUserRank'
+import { HIDE_AFFILIATE_RANK_CONFIG } from './collections/Affiliate/helper'
 // import { sendMailJob } from './collections/Emails/jobs/sendMail'
 
 const filename = fileURLToPath(import.meta.url)
@@ -149,10 +150,9 @@ export default buildConfig({
     FAQs,
     Admins,
     Emails,
-    AffiliateRanks,
-    EventAffiliateRanks,
-    AffiliateUserRanks,
-    AffiliateRankLogs,
+    ...(HIDE_AFFILIATE_RANK_CONFIG
+      ? []
+      : [AffiliateRanks, EventAffiliateRanks, AffiliateUserRanks, AffiliateRankLogs]),
     AffiliateLinks,
     AffiliateSettings,
     AffiliateClickLogs,
