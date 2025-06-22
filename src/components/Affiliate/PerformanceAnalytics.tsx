@@ -7,82 +7,9 @@ import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Progress } from '@/components/ui/progress'
 import { BarChart3, TrendingUp, TrendingDown } from 'lucide-react'
+import { useToast } from '@/components/ui/use-toast'
 
-// Mock data - in real implementation, this would come from API
-const mockAnalyticsData = {
-  linkPerformance: [
-    {
-      id: '1',
-      name: 'Summer Concert Series',
-      utmSource: 'facebook',
-      utmCampaign: 'summer-2024',
-      clicks: 1247,
-      orders: 89,
-      ticketsIssued: 890,
-      grossRevenue: 4450,
-      netRevenue: 4005,
-      conversionRate: 7.14,
-      commission: 445,
-    },
-    {
-      id: '2',
-      name: 'Classical Nights',
-      utmSource: 'instagram',
-      utmCampaign: 'classical-nights',
-      clicks: 892,
-      orders: 56,
-      ticketsIssued: 560,
-      grossRevenue: 2800,
-      netRevenue: 2520,
-      conversionRate: 6.28,
-      commission: 280,
-    },
-    {
-      id: '3',
-      name: 'Holiday Special',
-      utmSource: 'newsletter',
-      utmCampaign: 'holiday-2024',
-      clicks: 634,
-      orders: 41,
-      ticketsIssued: 410,
-      grossRevenue: 2050,
-      netRevenue: 1845,
-      conversionRate: 6.47,
-      commission: 205,
-    },
-    {
-      id: '4',
-      name: 'Orchestra Gala',
-      utmSource: 'google',
-      utmCampaign: 'gala-2024',
-      clicks: 456,
-      orders: 23,
-      ticketsIssued: 230,
-      grossRevenue: 1150,
-      netRevenue: 1035,
-      conversionRate: 5.04,
-      commission: 115,
-    },
-  ],
-  revenueBreakdown: {
-    bySource: [
-      { source: 'facebook', revenue: 4450, percentage: 42.1 },
-      { source: 'instagram', revenue: 2800, percentage: 26.5 },
-      { source: 'newsletter', revenue: 2050, percentage: 19.4 },
-      { source: 'google', revenue: 1150, percentage: 10.9 },
-      { source: 'twitter', revenue: 120, percentage: 1.1 },
-    ],
-    byCampaign: [
-      { campaign: 'summer-2024', revenue: 4450, percentage: 42.1 },
-      { campaign: 'classical-nights', revenue: 2800, percentage: 26.5 },
-      { campaign: 'holiday-2024', revenue: 2050, percentage: 19.4 },
-      { campaign: 'gala-2024', revenue: 1150, percentage: 10.9 },
-      { campaign: 'spring-promo', revenue: 120, percentage: 1.1 },
-    ],
-  },
-}
-
-type MetricsData = {
+type PerformanceData = {
   clicks: string
   orders: string
   overallConversionRate: number
@@ -92,7 +19,7 @@ type MetricsData = {
   commission: string
 }
 
-type PerformanceLinkData = {
+type LinkBreakdownData = {
   id: string
   name?: string
   utmSource?: string
@@ -104,121 +31,89 @@ type PerformanceLinkData = {
   grossRevenue: string
   netRevenue: string
   commission: string
-}
+}[]
 
-type PerformanceBreakdownData = PerformanceLinkData[]
-
-type RevenueBreakdownData = {
+type SourceCampaignBreakdownData = {
   bySource: { source: string; revenue: string; percentage: number }[]
   byCampaign: { campaign: string; revenue: string; percentage: number }[]
 }
 
+type PaginationInfo = {
+  page: number
+  limit: number
+  totalPages: number
+  totalDocs: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
+}
+
+interface ApiResponse {
+  success: boolean
+  data: PerformanceData | LinkBreakdownData | SourceCampaignBreakdownData
+  pagination?: PaginationInfo
+  error?: string
+}
+
 export function PerformanceAnalytics() {
+  const { toast } = useToast()
+  const [loading, setLoading] = useState(true)
+
+  // Data
+  const [performanceData, setPerformanceData] = useState<PerformanceData | null>(null)
+  const [linkBreakdownData, setLinkBreakdownData] = useState<LinkBreakdownData | null>(null)
+  const [sourceCampaignBreakdownData, setSourceCampaignBreakdownData] = useState<SourceCampaignBreakdownData | null>(null)
+
+  // Filters
   const [timeRange, setTimeRange] = useState('30d')
   const [sortBy, setSortBy] = useState('revenue')
-  const [metricsData, setMetricsData] = useState<MetricsData | null>(null)
-  const [performanceBreakdownData, setPerformanceBreakdownData] = useState<PerformanceBreakdownData | null>(null)
-  const [revenueBreakdownData, setRevenueBreakdownData] = useState<RevenueBreakdownData | null>(null)
+
+  const fetchAnalyticsData = async () => {
+    try {
+      setLoading(true)
+
+      const [performanceResponse, linkBreakdownResponse, sourceCampaignBreakdownResponse] = await Promise.all([
+        fetch(`/api/affiliate/analytics/performance?timeRange=${timeRange}`),
+        fetch(`/api/affiliate/analytics/performance-breakdown?timeRange=${timeRange}&sortBy=${sortBy}`),
+        fetch(`/api/affiliate/analytics/revenue?timeRange=${timeRange}`)
+      ])
+
+      if (!performanceResponse.ok || !linkBreakdownResponse.ok || !sourceCampaignBreakdownResponse.ok) {
+        throw new Error('Failed to fetch analytics data')
+      }
+
+      const [performanceResult, linkBreakdownResult, sourceCampaignBreakdownResult]: [ApiResponse, ApiResponse, ApiResponse] = await Promise.all([
+        performanceResponse.json(),
+        linkBreakdownResponse.json(),
+        sourceCampaignBreakdownResponse.json()
+      ])
+
+      if (performanceResult.success && linkBreakdownResult.success && sourceCampaignBreakdownResult.success) {
+        setPerformanceData(performanceResult.data as PerformanceData)
+        setLinkBreakdownData(linkBreakdownResult.data as LinkBreakdownData)
+        setSourceCampaignBreakdownData(sourceCampaignBreakdownResult.data as SourceCampaignBreakdownData)
+      } else {
+        const errorMessage = performanceResult.error || linkBreakdownResult.error || sourceCampaignBreakdownResult.error || 'Failed to fetch analytics data'
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching analytics data:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch analytics data',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchPerformanceData = async () => {
-      try {
-        const response = await fetch(`/api/affiliate/analytics/performance?timeRange=${timeRange}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch analytics data')
-        }
-
-        const data = await response.json()
-        setMetricsData(data.data)
-      } catch (err) {
-        console.error('Error fetching analytics data:', err)
-      }
-    }
-    fetchPerformanceData()
-  }, [timeRange])
-
-  useEffect(() => {
-    const fetchPerformanceBreakdown = async () => {
-      try {
-        const response = await fetch(`/api/affiliate/analytics/performance-breakdown?timeRange=${timeRange}&sortBy=${sortBy}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch performance breakdown')
-        }
-
-        const data = await response.json()
-        setPerformanceBreakdownData(data.data)
-      } catch (err) {
-        console.error('Error fetching performance breakdown:', err)
-      }
-    }
-
-    fetchPerformanceBreakdown()
+    fetchAnalyticsData()
   }, [timeRange, sortBy])
-
-  useEffect(() => {
-    const fetchRevenueBreakdown = async () => {
-      try {
-        const response = await fetch(`/api/affiliate/analytics/revenue?timeRange=${timeRange}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch revenue breakdown')
-        }
-
-        const data = await response.json()
-        setRevenueBreakdownData(data.data)
-      } catch (err) {
-        console.error('Error fetching revenue breakdown:', err)
-      }
-    }
-
-    fetchRevenueBreakdown()
-  }, [timeRange])
-
-  const sortedData = [...mockAnalyticsData.linkPerformance].sort((a, b) => {
-    switch (sortBy) {
-      case 'revenue':
-        return b.grossRevenue - a.grossRevenue
-      case 'clicks':
-        return b.clicks - a.clicks
-      case 'orders':
-        return b.orders - a.orders
-      case 'conversion':
-        return b.conversionRate - a.conversionRate
-      default:
-        return 0
-    }
-  })
-
-  const totalMetrics = mockAnalyticsData.linkPerformance.reduce(
-    (acc, link) => ({
-      clicks: acc.clicks + link.clicks,
-      orders: acc.orders + link.orders,
-      ticketsIssued: acc.ticketsIssued + link.ticketsIssued,
-      grossRevenue: acc.grossRevenue + link.grossRevenue,
-      netRevenue: acc.netRevenue + link.netRevenue,
-      commission: acc.commission + link.commission,
-    }),
-    { clicks: 0, orders: 0, ticketsIssued: 0, grossRevenue: 0, netRevenue: 0, commission: 0 }
-  )
-
-  const overallConversionRate = totalMetrics.clicks > 0 ? (totalMetrics.orders / totalMetrics.clicks) * 100 : 0
 
   return (
     <div className="space-y-6">
@@ -274,7 +169,7 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Total Clicks</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metricsData?.clicks}</div>
+            <div className="text-2xl font-bold">{performanceData?.clicks}</div>
             <p className="text-xs text-muted-foreground">Across all links</p>
           </CardContent>
         </Card>
@@ -283,8 +178,8 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metricsData?.orders}</div>
-            <p className="text-xs text-muted-foreground">Conversion rate: {metricsData?.overallConversionRate}%</p>
+            <div className="text-2xl font-bold">{performanceData?.orders}</div>
+            <p className="text-xs text-muted-foreground">Conversion rate: {performanceData?.overallConversionRate}%</p>
           </CardContent>
         </Card>
         <Card className="shadow-md">
@@ -292,8 +187,8 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Tickets Issued</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metricsData?.ticketsIssued}</div>
-            <p className="text-xs text-muted-foreground">Avg {metricsData?.averageTicketsPerOrder} per order</p>
+            <div className="text-2xl font-bold">{performanceData?.ticketsIssued}</div>
+            <p className="text-xs text-muted-foreground">Avg {performanceData?.averageTicketsPerOrder} per order</p>
           </CardContent>
         </Card>
         <Card className="shadow-md">
@@ -301,7 +196,7 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Gross Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metricsData?.grossRevenue} VND</div>
+            <div className="text-2xl font-bold">{performanceData?.grossRevenue} VND</div>
             <p className="text-xs text-muted-foreground">Before discounts</p>
           </CardContent>
         </Card>
@@ -310,7 +205,7 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Your Commission</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{metricsData?.commission} VND</div>
+            <div className="text-2xl font-bold text-green-600">{performanceData?.commission} VND</div>
             <p className="text-xs text-muted-foreground">0% commission rate</p>
           </CardContent>
         </Card>
@@ -339,7 +234,7 @@ export function PerformanceAnalytics() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {performanceBreakdownData?.map((link) => (
+                {linkBreakdownData?.map((link) => (
                   <TableRow key={link.id}>
                     <TableCell className="font-medium">{link.name}</TableCell>
                     <TableCell>
@@ -384,7 +279,7 @@ export function PerformanceAnalytics() {
             <CardDescription>Performance breakdown by traffic source</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {revenueBreakdownData?.bySource.map((item) => (
+            {sourceCampaignBreakdownData?.bySource.map((item) => (
               <div key={item.source} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium capitalize">{item.source}</span>
@@ -404,7 +299,7 @@ export function PerformanceAnalytics() {
             <CardDescription>Performance breakdown by campaign</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {revenueBreakdownData?.byCampaign.map((item) => (
+            {sourceCampaignBreakdownData?.byCampaign.map((item) => (
               <div key={item.campaign} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">{item.campaign}</span>
