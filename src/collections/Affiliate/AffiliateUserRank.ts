@@ -1,11 +1,14 @@
 import type { CollectionConfig } from 'payload'
 import { AFFILIATE_RANKS } from './constants'
 
-export const AffiliateUserProfiles: CollectionConfig = {
-  slug: 'affiliate-user-profiles',
+export const AffiliateUserRanks: CollectionConfig = {
+  slug: 'affiliate-user-ranks',
   admin: {
     useAsTitle: 'affiliateUser',
     description: 'Lưu trữ thông tin hạng tổng của Affiliate User',
+    components: {
+      beforeList: ['@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate'],
+    }
   },
   access: {},
   fields: [
@@ -59,6 +62,16 @@ export const AffiliateUserProfiles: CollectionConfig = {
       },
     },
     {
+      name: 'totalRevenueBeforeDiscount',
+      type: 'number',
+      label: 'Tổng Doanh Thu Trước Giảm Giá (VND)',
+      required: true,
+      defaultValue: 0,
+      admin: {
+        description: 'Tổng doanh thu trước giảm giá từ các đơn hàng của Affiliate User',
+      },
+    },
+    {
       name: 'totalTicketsSold',
       type: 'number',
       label: 'Tổng Số Vé Bán Được',
@@ -103,6 +116,15 @@ export const AffiliateUserProfiles: CollectionConfig = {
       admin: {
         description:
           'Thời điểm Affiliate User thực hiện hành động gần nhất (bán vé, tích điểm, nâng hạng, v.v.)',
+      },
+    },
+    {
+      name: 'pendingRankUpgrade',
+      type: 'select',
+      label: 'Hạng Chờ Xác Nhận',
+      options: AFFILIATE_RANKS,
+      admin: {
+        description: 'Hạng mà Affiliate User đủ điều kiện nâng cấp nhưng chưa xác nhận',
       },
     },
   ],

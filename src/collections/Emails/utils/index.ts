@@ -176,6 +176,7 @@ export const addQueueEmail = async ({
   resendMailData,
   emailData,
   payload,
+  transactionID
 }: {
   resendMailData: {
     to: string
@@ -185,6 +186,7 @@ export const addQueueEmail = async ({
   }
   emailData: Partial<Email>
   payload: BasePayload
+  transactionID?: TransactionID
 }) => {
   return createEmailRecord({
     data: {
@@ -194,5 +196,6 @@ export const addQueueEmail = async ({
       status: 'pending',
     },
     payload,
+    transactionID
   })
 }

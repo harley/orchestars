@@ -29,11 +29,11 @@ const Component = async ({
 
   const collections = navGroups.map((item) => {
     if (item.label === 'Collections') {
-      const indexOfAffLinks = item.entities.findIndex((item) => item.slug === 'affiliate-links')
+      const indexOfAffLinks = item.entities.findIndex((item) => item.slug === 'affiliate-ranks')
       if (indexOfAffLinks !== -1) {
         // Insert new item after index 1 (i.e., after a: '4')
         item.entities.splice(indexOfAffLinks, 0, {
-          slug: 'affiliate',
+          slug: 'management-affiliate',
           type: '',
           label: 'Management Affiliate',
         })

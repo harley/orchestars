@@ -1,0 +1,1 @@
+export const POINT_PER_VND = 1000

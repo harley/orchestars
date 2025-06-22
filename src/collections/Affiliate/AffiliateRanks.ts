@@ -6,6 +6,9 @@ export const AffiliateRanks: CollectionConfig = {
   admin: {
     useAsTitle: 'rankName',
     description: 'Cấu hình các hạng của Affiliate Seller',
+    components: {
+      beforeList: ['@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate'],
+    }
   },
 
   fields: [

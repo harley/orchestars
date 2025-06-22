@@ -1,11 +1,15 @@
 import type { CollectionConfig } from 'payload'
 import { AFFILIATE_RANKS } from './constants'
+import { AFFILIATE_ACTION_TYPE_LOGS } from './constants/actionTypeLog'
 
 export const AffiliateRankLogs: CollectionConfig = {
   slug: 'affiliate-rank-logs',
   admin: {
     useAsTitle: 'affiliateUser',
     description: 'Lưu trữ lịch sử các thay đổi điểm và hạng của Affiliate User',
+    components: {
+      beforeList: ['@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate'],
+    }
   },
 
   fields: [
@@ -31,13 +35,7 @@ export const AffiliateRankLogs: CollectionConfig = {
       type: 'select',
       label: 'Loại Hành Động',
       required: true,
-      options: [
-        { label: 'Thêm Điểm', value: 'add_points' },
-        { label: 'Trừ Điểm', value: 'subtract_points' },
-        { label: 'Nâng Hạng', value: 'rank_upgrade' },
-        { label: 'Hạ Hạng', value: 'rank_downgrade' },
-        { label: 'Xác Nhận Nâng Hạng', value: 'confirm_rank_upgrade' },
-      ],
+      options:AFFILIATE_ACTION_TYPE_LOGS,
       admin: {
         description: 'Loại hành động liên quan đến điểm hoặc hạng',
       },
