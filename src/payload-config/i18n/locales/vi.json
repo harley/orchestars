@@ -160,7 +160,9 @@
     "submitting": "Đang gửi...",
     "submit": "Gửi",
     "thankYouForYourSubmission": "Cảm ơn bạn! Thông tin của bạn đã được gửi thành công. Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.",
-    "failedMessage": "Có lỗi xảy ra! Vui lòng thử lại"
+    "failedMessage": "Có lỗi xảy ra! Vui lòng thử lại",
+    "requiredField": "Trường này là bắt buộc",
+    "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ"
   },
   "errorCode": {
     "SYS001": "Có lỗi xảy ra! Vui lòng thử lại",

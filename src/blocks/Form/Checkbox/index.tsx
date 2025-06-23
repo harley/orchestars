@@ -10,13 +10,16 @@ import React from 'react'
 import { Error } from '../Error'
 import { Width } from '../Width'
 
+import { useTranslate } from '@/providers/I18n/client'
+
 export const Checkbox: React.FC<
   CheckboxField & {
     errors: Partial<FieldErrorsImpl>
     register: UseFormRegister<FieldValues>
   }
 > = ({ name, defaultValue, errors, label, register, required, width }) => {
-  const props = register(name, { required: required })
+  const { t } = useTranslate()
+  const props = register(name, { required: required ? t('message.requiredField') : false })
   const { setValue } = useFormContext()
 
   return (

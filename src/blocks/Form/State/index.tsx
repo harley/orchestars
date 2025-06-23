@@ -16,12 +16,16 @@ import { Error } from '../Error'
 import { Width } from '../Width'
 import { stateOptions } from './options'
 
+import { useTranslate } from '@/providers/I18n/client'
+
 export const State: React.FC<
   StateField & {
     control: Control
     errors: Partial<FieldErrorsImpl>
   }
 > = ({ name, control, errors, label, required, width }) => {
+  const { t } = useTranslate()
+
   return (
     <Width width={width}>
       <Label htmlFor={name}>
@@ -56,7 +60,7 @@ export const State: React.FC<
             </Select>
           )
         }}
-        rules={{ required }}
+        rules={{ required: required ? t('message.requiredField') : false }}
       />
       {errors[name] && <Error name={name} />}
     </Width>
