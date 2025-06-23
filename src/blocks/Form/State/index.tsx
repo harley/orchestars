@@ -44,7 +44,7 @@ export const State: React.FC<
               <SelectTrigger className="w-full" id={name}>
                 <SelectValue placeholder={label} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white select-content">
                 {stateOptions.map(({ label, value }) => {
                   return (
                     <SelectItem key={value} value={value}>

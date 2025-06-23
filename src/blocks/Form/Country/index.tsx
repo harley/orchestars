@@ -45,7 +45,7 @@ export const Country: React.FC<
               <SelectTrigger className="w-full" id={name}>
                 <SelectValue placeholder={label} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white select-content">
                 {countryOptions.map(({ label, value }) => {
                   return (
                     <SelectItem key={value} value={value}>
