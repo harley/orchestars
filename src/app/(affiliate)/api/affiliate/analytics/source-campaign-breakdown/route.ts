@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from '@/payload-config/getPayloadConfig';
 import { authorizeApiRequest } from '@/app/(affiliate)/utils/authorizeApiRequest';
 import { getDateRangeFromTimeRange } from '@/app/(affiliate)/utils/getDateRangeFromTimeRange';
+import { getLinkId } from '@/app/(affiliate)/utils/getLinkId';
 
 export async function GET(request: NextRequest) {
   try {
@@ -49,12 +50,14 @@ export async function GET(request: NextRequest) {
     orders.docs.forEach(order => {
       const revenue = order.totalBeforeDiscount || 0;
       const affiliateLink = order.affiliate?.affiliateLink;
-      const affiliateLinkId = typeof affiliateLink === 'object' && affiliateLink !== null
-        ? affiliateLink.id
-        : affiliateLink;
+      const affiliateLinkId = getLinkId(affiliateLink);
 
       if (affiliateLinkId) {
         const utmParams = linkUtmMap.get(affiliateLinkId);
+        if (!utmParams) {
+          console.error(`No UTM parameters found for affiliate link ID: ${affiliateLinkId}`);
+          return;
+        }
         
         // Add revenue by source
         const currentSourceRevenue = revenueBySource.get(utmParams.source) || 0;
@@ -69,33 +72,43 @@ export async function GET(request: NextRequest) {
     const totalRevenue = Array.from(revenueBySource.values()).reduce((sum, value) => sum + value, 0);
 
     const topSourcesByRevenue = Array.from(revenueBySource.entries())
-      .map(([source, revenue]) => ({
+      .map(([source, numericRevenue]) => ({
         source,
-        revenue: revenue.toLocaleString(),
-        percentage: totalRevenue > 0 ? parseFloat(((revenue / totalRevenue) * 100).toFixed(2)) : 0
+        _numericRevenue: numericRevenue,
+        percentage: totalRevenue > 0 ? parseFloat(((numericRevenue / totalRevenue) * 100).toFixed(2)) : 0
       }))
-      .sort((a, b) => parseFloat(b.revenue) - parseFloat(a.revenue))
-      .slice(0, 5);
+      .sort((a, b) => b._numericRevenue - a._numericRevenue)
+      .slice(0, 5)
+      .map(item => ({
+        source: item.source,
+        revenue: item._numericRevenue.toLocaleString(),
+        percentage: item.percentage
+      }));
 
     const topCampaignsByRevenue = Array.from(revenueByCampaign.entries())
-      .map(([campaign, revenue]) => ({
+      .map(([campaign, numericRevenue]) => ({
         campaign,
-        revenue: revenue.toLocaleString(),
-        percentage: totalRevenue > 0 ? parseFloat(((revenue / totalRevenue) * 100).toFixed(2)) : 0
+        _numericRevenue: numericRevenue,
+        percentage: totalRevenue > 0 ? parseFloat(((numericRevenue / totalRevenue) * 100).toFixed(2)) : 0
       }))
-      .sort((a, b) => parseFloat(b.revenue) - parseFloat(a.revenue))
-      .slice(0, 5);
+      .sort((a, b) => b._numericRevenue - a._numericRevenue)
+      .slice(0, 5)
+      .map(item => ({
+        campaign: item.campaign,
+        revenue: item._numericRevenue.toLocaleString(),
+        percentage: item.percentage
+      }));
 
     return NextResponse.json({
       success: true,
       data: {
         bySource: topSourcesByRevenue,
         byCampaign: topCampaignsByRevenue
-      }
+      },
     })
 
   } catch (error) {
-
+    console.error('Error fetching affiliate revenue analytics:', error);
     return NextResponse.json(
       {
         success: false,
