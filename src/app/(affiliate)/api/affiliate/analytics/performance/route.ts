@@ -24,7 +24,6 @@ export async function GET(request: NextRequest) {
           equals: userRequest.email,
         }
       },
-      limit: 0,
     })
 
     const orders = await payload.find({
@@ -38,7 +37,6 @@ export async function GET(request: NextRequest) {
           equals: userRequest.id,
         }
       },
-      limit: 0,
     })
 
     const orderIds = orders.docs.map(order => order.id)
@@ -53,23 +51,23 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    //    todo
     return NextResponse.json({
       success: true,
       data: 
         {
           clicks: clicks.totalDocs.toLocaleString(),
           orders: orders.totalDocs.toLocaleString(),
-          overallConversionRate: (clicks.totalDocs > 0 ? (orders.totalDocs / clicks.totalDocs) * 100 : 0).toFixed(2),
+          overallConversionRate: Number((clicks.totalDocs > 0 ? (orders.totalDocs / clicks.totalDocs) * 100 : 0).toFixed(2)),
           ticketsIssued: tickets.totalDocs.toLocaleString(),
-          averageTicketsPerOrder: (tickets.totalDocs > 0 ? (tickets.totalDocs / orders.totalDocs) : 0).toFixed(1),
+          averageTicketsPerOrder: Number((orders.totalDocs > 0 ? (tickets.totalDocs / orders.totalDocs) : 0).toFixed(1)),
           grossRevenue: grossRevenue.toLocaleString(),
           commission: "0".toLocaleString(),
+          commissionRate: "0".toLocaleString(),
         }
       ,
     })
   } catch (error) {
-
+    console.error('Error fetching affiliate performance data:', error)
     return NextResponse.json(
       {
         success: false,

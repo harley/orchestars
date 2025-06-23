@@ -3,12 +3,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from '@/payload-config/getPayloadConfig';
 import { authorizeApiRequest } from '@/app/(affiliate)/utils/authorizeApiRequest';
 import { getDateRangeFromTimeRange } from '@/app/(affiliate)/utils/getDateRangeFromTimeRange';
+import { getLinkId } from '@/app/(affiliate)/utils/getLinkId';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const timeRange = searchParams.get('timeRange') || '30d';
     const sortBy = searchParams.get('sortBy') || 'revenue';
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '5');
     const userRequest = await authorizeApiRequest();
     const payload = await getPayload();
 
@@ -60,38 +63,29 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    const logs = links.docs.map(link => {
-      clicks.docs.map(click => {
-        console.log(click.affiliateLink)
-        console.log(link.id)
-      })
-    })
-
     const performanceData = links.docs.map(link => {
       const linkName = 'Unnamed Link';
       const linkSource = link.utmParams?.source || 'Unknown';
       const linkCampaign = link.utmParams?.campaign || 'Unknown';
       
       const linkClicks = clicks.docs.filter(click => {
-        const affiliateLinkId = typeof click.affiliateLink === 'object' && click.affiliateLink !== null
-          ? click.affiliateLink.id
-          : click.affiliateLink;
+        const affiliateLinkId = getLinkId(click.affiliateLink);
         return affiliateLinkId === link.id;
       }).length;
 
       const linkOrders = orders.docs.filter(order => {
         const affiliateLink = order.affiliate?.affiliateLink;
-        const affiliateLinkId = typeof affiliateLink === 'object' && affiliateLink !== null
-          ? affiliateLink.id
-          : affiliateLink;
+        const affiliateLinkId = getLinkId(affiliateLink);
         return affiliateLinkId === link.id;
       }).length;
-      
+
       const linkTickets = tickets.docs.filter(ticket => {
-        const orderId = typeof ticket.order === 'object' && ticket.order !== null
-          ? ticket.order.id
-          : ticket.order;
-        return typeof orderId === 'number' && orderIds.includes(orderId);
+        const ticketOrderId = typeof ticket.order === 'object' && ticket.order !== null ? ticket.order.id : ticket.order;
+        const order = orders.docs.find(o => o.id === ticketOrderId);
+
+        const affiliateLink = order?.affiliate?.affiliateLink;
+        const affiliateLinkId = getLinkId(affiliateLink);
+        return affiliateLinkId === link.id;
       }).length;
       
       const linkConversion = linkClicks > 0 ? (linkOrders / linkClicks) * 100 : 0;
@@ -99,9 +93,7 @@ export async function GET(request: NextRequest) {
       const linkGrossRevenue = orders.docs
         .filter(order => {
           const affiliateLink = order.affiliate?.affiliateLink;
-          const affiliateLinkId = typeof affiliateLink === 'object' && affiliateLink !== null
-            ? affiliateLink.id
-            : affiliateLink;
+          const affiliateLinkId = getLinkId(affiliateLink);
           return affiliateLinkId === link.id;
         })
         .reduce((sum, order) => sum + (order.total || 0), 0);
@@ -115,40 +107,60 @@ export async function GET(request: NextRequest) {
         name: linkName,
         utmSource: linkSource,
         utmCampaign: linkCampaign,
-        clicks: linkClicks.toLocaleString(),
-        orders: linkOrders.toLocaleString(),
-        ticketsIssued: linkTickets.toLocaleString(),
-        conversionRate: parseFloat(linkConversion.toFixed(2)),
-        grossRevenue: linkGrossRevenue.toLocaleString(),
-        netRevenue: linkNetRevenue.toLocaleString(),
-        commission: linkCommission.toLocaleString(),
+        clicks: linkClicks,
+        orders: linkOrders,
+        ticketsIssued: linkTickets,
+        conversionRate: linkConversion,
+        grossRevenue: linkGrossRevenue,
+        netRevenue: linkNetRevenue,
+        commission: linkCommission,
       }
     })
 
     switch (sortBy) {
       case 'revenue':
-        performanceData.sort((a, b) => parseFloat(b.netRevenue) - parseFloat(a.netRevenue));
+        performanceData.sort((a, b) => b.netRevenue - a.netRevenue);
         break;
       case 'clicks':
-        performanceData.sort((a, b) => parseInt(String(b.clicks), 10) - parseInt(String(a.clicks), 10));
+        performanceData.sort((a, b) => b.clicks - a.clicks);
         break;
       case 'orders':
-        performanceData.sort((a, b) => parseInt(String(b.orders), 10) - parseInt(String(a.orders), 10));
+        performanceData.sort((a, b) => b.orders - a.orders);
         break;
       case 'conversion':
         performanceData.sort((a, b) => b.conversionRate - a.conversionRate);
         break;
       default:
-        return 0
+        throw new Error('Invalid sort parameter: ' + sortBy);
     }
 
     return NextResponse.json({
       success: true,
-      data: performanceData.slice(0, 4),
+      data: performanceData.slice((page - 1) * limit, page * limit).map(item => ({
+        id: item.id,
+        name: item.name,
+        utmSource: item.utmSource,
+        utmCampaign: item.utmCampaign,
+        clicks: item.clicks.toLocaleString(),
+        orders: item.orders.toLocaleString(),
+        ticketsIssued: item.ticketsIssued.toLocaleString(),
+        conversionRate: Number(item.conversionRate.toFixed(2)),
+        grossRevenue: item.grossRevenue.toLocaleString(),
+        netRevenue: item.netRevenue.toLocaleString(),
+        commission: item.commission.toLocaleString(),
+      })),
+      pagination: {
+        page: page,
+        limit: limit,
+        totalPages: Math.ceil(performanceData.length / limit),
+        totalDocs: performanceData.length,
+        hasNextPage: page < Math.ceil(performanceData.length / limit),
+        hasPrevPage: page > 1,
+      }
     })
 
   } catch (error) {
-
+    console.error('Error fetching affiliate performance breakdown data:', error)
     return NextResponse.json(
       {
         success: false,
