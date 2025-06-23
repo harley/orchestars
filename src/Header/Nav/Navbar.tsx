@@ -179,7 +179,7 @@ const Navbar = ({
             </div>
           </div>
 
-          {/* Language select - right aligned */}
+          {/* Right aligned items */}
           <div className="flex items-center gap-6">
             {/* Buy Ticket Now (Primary Action) */}
             {shouldShowBuyTicketButton && (
@@ -191,11 +191,6 @@ const Navbar = ({
                 {t('navbar.buyTicketNow')}
               </Link>
             )}
-
-            {/* Language Switcher (Modern style) */}
-            <div className="">
-              <LanguageSwitcher className="flex items-center space-x-2 h-10 px-2 rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-colors duration-200" />
-            </div>
 
             {/* Authenticated: show profile menu */}
             {authData ? (
@@ -246,7 +241,13 @@ const Navbar = ({
                 </Sheet>
               </>
             )}
-            {/* Mobile menu button */}
+            
+            {/* Language Switcher (Modern style) - now rightmost on desktop */}
+            <div className="hidden md:block">
+              <LanguageSwitcher className="flex items-center space-x-2 h-10 px-2 rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-colors duration-200" />
+            </div>
+            
+            {/* Mobile menu button - visible only on mobile */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <button className="md:hidden">
@@ -361,6 +362,11 @@ const Navbar = ({
                       <User size={24} /> {t('navbar.signInSignUp')}
                     </button>
                   )}
+                  <hr className="my-2 border-gray-200" />
+                  {/* Language Switcher for mobile */}
+                  <div className="flex items-center justify-center py-2">
+                    <LanguageSwitcher className="flex items-center space-x-2 h-10 px-4 py-2 rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-colors duration-200" />
+                  </div>
                   <hr className="my-2 border-gray-200" />
                   {/* Buy Ticket Now button for mobile */}
                   {shouldShowBuyTicketButton && (
