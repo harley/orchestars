@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+// import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 // import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Check, Info, X, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
@@ -89,16 +89,16 @@ const ConfirmOrderModal = ({
     )
   }, [selectedSeats])
 
-  const paymentMethods: PaymentMethod[] = [
-    { id: PAYMENT_METHODS.ZALOPAY, name: '', icon: <ZalopayIcon /> },
-    // {
-    //   id: PAYMENT_METHODS.BANK_TRANSFER,
-    //   name: 'Chuyển khoản ngân hàng (quét mã QR)',
-    //   icon: <CreditCard className="h-5 w-5" />,
-    // },
-  ]
+  // const paymentMethods: PaymentMethod[] = [
+  //   { id: PAYMENT_METHODS.ZALOPAY, name: '', icon: <ZalopayIcon /> },
+  //   // {
+  //   //   id: PAYMENT_METHODS.BANK_TRANSFER,
+  //   //   name: 'Chuyển khoản ngân hàng (quét mã QR)',
+  //   //   icon: <CreditCard className="h-5 w-5" />,
+  //   // },
+  // ]
 
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>(
+  const [selectedPaymentMethod, _setSelectedPaymentMethod] = useState<string>(
     PAYMENT_METHODS.ZALOPAY,
   )
 
@@ -165,6 +165,12 @@ const ConfirmOrderModal = ({
   }
 
   const [promotionCode, setPromotionCode] = useState<string>('')
+  
+  const listPromotionsRef = useRef<Promotion[]>([])
+
+  useEffect(() => {
+    listPromotionsRef.current = promotions
+  }, [promotions])
 
   useEffect(() => {
     let cancelled = false
@@ -180,6 +186,15 @@ const ConfirmOrderModal = ({
             .then((res) => res.data)
 
           if (!cancelled && isAppliedPromotion(affiliatePromotionInfo, ticketSelected, event)) {
+            if(!listPromotionsRef.current) {
+              listPromotionsRef.current = []
+            }
+
+            // check exist fist
+            if(!listPromotionsRef.current.find((promo) => promo.code === affiliatePromotionInfo.code)) {
+              listPromotionsRef.current.push(affiliatePromotionInfo)
+            }
+
             setSelectedPromotions((oldSltPromos) => {
               const newArrPromos = [...oldSltPromos]
               if (!newArrPromos.find((promo) => promo.code === affiliatePromotionInfo.code)) {
@@ -263,7 +278,7 @@ const ConfirmOrderModal = ({
 
   return (
     <form onSubmit={handleSubmit(handleConfirm)}>
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 my-8">
         <div className="grid md:grid-cols-2 gap-8">
           {/* Left Column - User Info & Payment Methods */}
           <div className="bg-white p-6 rounded-lg shadow-md">
@@ -320,9 +335,9 @@ const ConfirmOrderModal = ({
               </div>
             </div>
 
-            <Separator className="my-6" />
+            {/* <Separator className="my-6" /> */}
 
-            <h2 className="text-xl font-semibold mb-4">{t('event.selectPaymentMethod')}</h2>
+            {/* <h2 className="text-xl font-semibold mb-4">{t('event.selectPaymentMethod')}</h2>
 
             <RadioGroup value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
               <div className="space-y-2">
@@ -342,7 +357,7 @@ const ConfirmOrderModal = ({
                   </div>
                 ))}
               </div>
-            </RadioGroup>
+            </RadioGroup> */}
           </div>
 
           {/* Right Column - Order Summary */}
@@ -364,7 +379,7 @@ const ConfirmOrderModal = ({
             </div>
 
             <PromotionListCheckbox
-              promotions={promotions}
+              promotions={listPromotionsRef.current || []}
               selectedPromotions={selectedPromotions}
               onSelectPromotions={setSelectedPromotions}
               isAllowApplyMultiplePromotions={!!isAllowApplyMultiplePromotions}

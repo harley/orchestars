@@ -176,6 +176,10 @@ const Navbar = ({
                   )}
                 </div>
               ))}
+              {/* Language Switcher (Modern style) */}
+            <div className="">
+              <LanguageSwitcher className="flex items-center space-x-2 h-10 px-2 rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-colors duration-200" />
+            </div>
             </div>
           </div>
 
@@ -192,10 +196,7 @@ const Navbar = ({
               </Link>
             )}
 
-            {/* Language Switcher (Modern style) */}
-            <div className="">
-              <LanguageSwitcher className="flex items-center space-x-2 h-10 px-2 rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-colors duration-200" />
-            </div>
+            
 
             {/* Authenticated: show profile menu */}
             {authData ? (
@@ -231,7 +232,7 @@ const Navbar = ({
                   aria-label={t('navbar.signInSignUp')}
                   title={t('navbar.signInSignUp')}
                 >
-                  <User size={28} />
+                  <User size={24} />
                 </button>
                 {/* Login Modal */}
                 <Sheet open={loginOpen} onOpenChange={setLoginOpen}>
