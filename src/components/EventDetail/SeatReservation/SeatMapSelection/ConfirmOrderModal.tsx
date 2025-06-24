@@ -166,7 +166,7 @@ const ConfirmOrderModal = ({
 
   const [promotionCode, setPromotionCode] = useState<string>('')
   
-  const listPromotionsRef = useRef<Promotion[]>([])
+  const listPromotionsRef = useRef<Promotion[]>(promotions)
 
   useEffect(() => {
     listPromotionsRef.current = promotions
@@ -186,9 +186,6 @@ const ConfirmOrderModal = ({
             .then((res) => res.data)
 
           if (!cancelled && isAppliedPromotion(affiliatePromotionInfo, ticketSelected, event)) {
-            if(!listPromotionsRef.current) {
-              listPromotionsRef.current = []
-            }
 
             // check exist fist
             if(!listPromotionsRef.current.find((promo) => promo.code === affiliatePromotionInfo.code)) {
