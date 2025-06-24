@@ -32,23 +32,20 @@ export async function GET(req: NextRequest){
         // Initialize Payload
         const payload = await getPayload()
     
-         // SQL query to get average order value and number of orders
+         // SQL query to get total clicks
          const result = await payload.db.drizzle.execute(sql`
           SELECT 
-            AVG("total") AS average_order_value,
-            COUNT(*) AS num_order
-          FROM "orders"
-          WHERE "status" = 'completed'
-            AND "affiliate_affiliate_user_id" = ${userRequest.id}
+            COUNT(*) AS total_click
+          FROM "affiliate_click_logs"
+          WHERE "affiliate_user_id" = ${userRequest.id}
             ${dateFrom ? sql`AND "created_at" >= ${dateFrom.toISOString()}` : sql``}
         `)
-        const avgOrderValue = result.rows[0]?.average_order_value ?? 0
-        const numOrder = result.rows[0]?.num_order ?? 0
-
-        //Return response
-        return NextResponse.json({ avgOrderValue, numOrder })
+        const totalClick = result.rows[0]?.total_click ?? 0
+        
+        // Return response
+        return NextResponse.json({ totalClick })
       } catch (err) {
-        console.error('Error fetching average order value and/or number of orders:', err);
+        console.error(err)
         return NextResponse.json({ error: 'Server error' }, { status: 500 })
       }
 }

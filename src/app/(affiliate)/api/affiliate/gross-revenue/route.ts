@@ -2,35 +2,51 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { authorizeApiRequest } from '@/app/(affiliate)/utils/authorizeApiRequest'
 
+import { sql } from '@payloadcms/db-postgres';
+
+
 export async function GET(req: NextRequest) {
   try {
-    // Step 1: Authenticate user
+    //Get time range param
+    const { searchParams } = new URL(req.url);
+    const timeRange = searchParams.get('timeRange');
+
+    //Set dateFrom based on timeRange
+    let dateFrom: Date | undefined
+    if (timeRange === '6m') {
+      dateFrom = new Date()
+      dateFrom.setMonth(dateFrom.getMonth() - 6)
+    } else if (timeRange === '3m') {
+      dateFrom = new Date()
+      dateFrom.setMonth(dateFrom.getMonth() - 3)
+    } else if (timeRange === '1m') {
+      dateFrom = new Date()
+      dateFrom.setDate(dateFrom.getDate() - 30)
+    } else if (timeRange === '1y') {
+      dateFrom = new Date()
+      dateFrom.setMonth(dateFrom.getMonth() - 12)
+    }
+
+    //Authenticate user
     const userRequest = await authorizeApiRequest() // returns { id, email }
 
-    // Step 2: Initialize Payload
+    //Initialize Payload
     const payload = await getPayload()
 
-    // Step 3: Query Payload for completed orders made via this affiliate
-    const orderQueryResult = await payload.find({
-      collection: 'orders',
-      where: {
-        'status': { equals: 'completed' },
-        'affiliate.affiliateUser': { equals: userRequest.id },
-      },
-      limit: 1000, 
-      depth: 0,
-    }) 
-
-    // Step 4: Sum up total revenue
-    const totalRevenue = orderQueryResult.docs.reduce((sum, order) => {
-      return sum + (order.totalBeforeDiscount || 0) 
-    }, 0) 
-
-    // Step 5: Return the response
-    return NextResponse.json({ totalRevenue })
-
+     //SQL query for sum of gross revenue
+     const result = await payload.db.drizzle.execute(sql`
+      SELECT SUM("total_before_discount") AS gross_revenue
+      FROM "orders"
+      WHERE "status" = 'completed'
+        AND "affiliate_affiliate_user_id" = ${userRequest.id}
+        ${dateFrom ? sql`AND "created_at" >= ${dateFrom.toISOString()}` : sql``}
+    `)
+    const grossRevenue = result.rows[0]?.gross_revenue ?? 0
+    
+    //Return the response
+    return NextResponse.json({ grossRevenue })
   } catch (err) {
-    console.error('Error calculating affiliate revenue:', err)
+    console.error(err)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }
