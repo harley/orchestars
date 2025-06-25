@@ -46,7 +46,7 @@ export const AffiliateRanks: CollectionConfig = {
           type: 'array',
           label: 'Thưởng Vé (Dành cho Fan)',
           admin: {
-            condition: (data) => data.rankName === 'fan',
+            condition: (data) => [AFFILIATE_RANK.Tier2.value].includes(data.rankName),
           },
           fields: [
             {
@@ -106,7 +106,7 @@ export const AffiliateRanks: CollectionConfig = {
           label: 'Thưởng Hoa Hồng dành cho hạng đã chọn',
           admin: {
             condition: (data) =>
-              [AFFILIATE_RANK.ambassador.value, AFFILIATE_RANK.patron.value].includes(data.rankName),
+              [AFFILIATE_RANK.Tier3.value, AFFILIATE_RANK.Tier4.value].includes(data.rankName),
           },
           fields: [
             {

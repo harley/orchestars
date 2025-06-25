@@ -1,5 +1,5 @@
 {
-  "id": "e7a1245d-b645-469d-b9e1-a75689d57763",
+  "id": "427572e1-dd18-4e0d-8be7-fdc033f57dd0",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -13322,12 +13322,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "affiliate_user_id": {
-          "name": "affiliate_user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
         "rank_name": {
           "name": "rank_name",
           "type": "enum_event_affiliate_ranks_rank_name",
@@ -13342,13 +13336,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'draft'"
-        },
-        "is_locked": {
-          "name": "is_locked",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": true
         },
         "updated_at": {
           "name": "updated_at",
@@ -13371,21 +13358,6 @@
           "columns": [
             {
               "expression": "event_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "event_affiliate_ranks_affiliate_user_idx": {
-          "name": "event_affiliate_ranks_affiliate_user_idx",
-          "columns": [
-            {
-              "expression": "affiliate_user_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -13440,19 +13412,6 @@
           ],
           "onDelete": "set null",
           "onUpdate": "no action"
-        },
-        "event_affiliate_ranks_affiliate_user_id_users_id_fk": {
-          "name": "event_affiliate_ranks_affiliate_user_id_users_id_fk",
-          "tableFrom": "event_affiliate_ranks",
-          "tableTo": "users",
-          "columnsFrom": [
-            "affiliate_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -13483,7 +13442,7 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
-          "default": "'seller'"
+          "default": "'Tier1'"
         },
         "total_points": {
           "name": "total_points",
@@ -13612,6 +13571,175 @@
         "affiliate_user_ranks_affiliate_user_id_users_id_fk": {
           "name": "affiliate_user_ranks_affiliate_user_id_users_id_fk",
           "tableFrom": "affiliate_user_ranks",
+          "tableTo": "users",
+          "columnsFrom": [
+            "affiliate_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.event_affiliate_user_ranks": {
+      "name": "event_affiliate_user_ranks",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "event_affiliate_rank_id": {
+          "name": "event_affiliate_rank_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "affiliate_user_id": {
+          "name": "affiliate_user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "enum_event_affiliate_user_ranks_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'draft'"
+        },
+        "is_locked": {
+          "name": "is_locked",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "event_affiliate_user_ranks_event_affiliate_rank_idx": {
+          "name": "event_affiliate_user_ranks_event_affiliate_rank_idx",
+          "columns": [
+            {
+              "expression": "event_affiliate_rank_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "event_affiliate_user_ranks_affiliate_user_idx": {
+          "name": "event_affiliate_user_ranks_affiliate_user_idx",
+          "columns": [
+            {
+              "expression": "affiliate_user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "event_affiliate_user_ranks_updated_at_idx": {
+          "name": "event_affiliate_user_ranks_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "event_affiliate_user_ranks_created_at_idx": {
+          "name": "event_affiliate_user_ranks_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "eventAffiliateRank_affiliateUser_idx": {
+          "name": "eventAffiliateRank_affiliateUser_idx",
+          "columns": [
+            {
+              "expression": "event_affiliate_rank_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "affiliate_user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "event_affiliate_user_ranks_event_affiliate_rank_id_event_affiliate_ranks_id_fk": {
+          "name": "event_affiliate_user_ranks_event_affiliate_rank_id_event_affiliate_ranks_id_fk",
+          "tableFrom": "event_affiliate_user_ranks",
+          "tableTo": "event_affiliate_ranks",
+          "columnsFrom": [
+            "event_affiliate_rank_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "event_affiliate_user_ranks_affiliate_user_id_users_id_fk": {
+          "name": "event_affiliate_user_ranks_affiliate_user_id_users_id_fk",
+          "tableFrom": "event_affiliate_user_ranks",
           "tableTo": "users",
           "columnsFrom": [
             "affiliate_user_id"
@@ -19361,6 +19489,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "event_affiliate_user_ranks_id": {
+          "name": "event_affiliate_user_ranks_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "affiliate_rank_logs_id": {
           "name": "affiliate_rank_logs_id",
           "type": "integer",
@@ -19845,6 +19979,21 @@
           "columns": [
             {
               "expression": "affiliate_user_ranks_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "payload_locked_documents_rels_event_affiliate_user_ranks_id_idx": {
+          "name": "payload_locked_documents_rels_event_affiliate_user_ranks_id_idx",
+          "columns": [
+            {
+              "expression": "event_affiliate_user_ranks_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -20368,6 +20517,19 @@
           "tableTo": "affiliate_user_ranks",
           "columnsFrom": [
             "affiliate_user_ranks_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payload_locked_documents_rels_event_affiliate_user_ranks_fk": {
+          "name": "payload_locked_documents_rels_event_affiliate_user_ranks_fk",
+          "tableFrom": "payload_locked_documents_rels",
+          "tableTo": "event_affiliate_user_ranks",
+          "columnsFrom": [
+            "event_affiliate_user_ranks_id"
           ],
           "columnsTo": [
             "id"
@@ -22549,20 +22711,20 @@
       "name": "enum_affiliate_ranks_rank_name",
       "schema": "public",
       "values": [
-        "seller",
-        "fan",
-        "ambassador",
-        "patron"
+        "Tier1",
+        "Tier2",
+        "Tier3",
+        "Tier4"
       ]
     },
     "public.enum_event_affiliate_ranks_rank_name": {
       "name": "enum_event_affiliate_ranks_rank_name",
       "schema": "public",
       "values": [
-        "seller",
-        "fan",
-        "ambassador",
-        "patron"
+        "Tier1",
+        "Tier2",
+        "Tier3",
+        "Tier4"
       ]
     },
     "public.enum_event_affiliate_ranks_status": {
@@ -22578,20 +22740,29 @@
       "name": "enum_affiliate_user_ranks_current_rank",
       "schema": "public",
       "values": [
-        "seller",
-        "fan",
-        "ambassador",
-        "patron"
+        "Tier1",
+        "Tier2",
+        "Tier3",
+        "Tier4"
       ]
     },
     "public.enum_affiliate_user_ranks_pending_rank_upgrade": {
       "name": "enum_affiliate_user_ranks_pending_rank_upgrade",
       "schema": "public",
       "values": [
-        "seller",
-        "fan",
-        "ambassador",
-        "patron"
+        "Tier1",
+        "Tier2",
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "public.enum_event_affiliate_user_ranks_status": {
+      "name": "enum_event_affiliate_user_ranks_status",
+      "schema": "public",
+      "values": [
+        "draft",
+        "active",
+        "disabled"
       ]
     },
     "public.enum_affiliate_rank_logs_action_type": {
@@ -22609,20 +22780,20 @@
       "name": "enum_affiliate_rank_logs_rank_before",
       "schema": "public",
       "values": [
-        "seller",
-        "fan",
-        "ambassador",
-        "patron"
+        "Tier1",
+        "Tier2",
+        "Tier3",
+        "Tier4"
       ]
     },
     "public.enum_affiliate_rank_logs_rank_after": {
       "name": "enum_affiliate_rank_logs_rank_after",
       "schema": "public",
       "values": [
-        "seller",
-        "fan",
-        "ambassador",
-        "patron"
+        "Tier1",
+        "Tier2",
+        "Tier3",
+        "Tier4"
       ]
     },
     "public.enum_affiliate_links_status": {

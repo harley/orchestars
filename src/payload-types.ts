@@ -92,6 +92,7 @@ export interface Config {
     'affiliate-ranks': AffiliateRank;
     'event-affiliate-ranks': EventAffiliateRank;
     'affiliate-user-ranks': AffiliateUserRank;
+    'event-affiliate-user-ranks': EventAffiliateUserRank;
     'affiliate-rank-logs': AffiliateRankLog;
     'affiliate-links': AffiliateLink;
     'affiliate-settings': AffiliateSetting;
@@ -135,6 +136,7 @@ export interface Config {
     'affiliate-ranks': AffiliateRanksSelect<false> | AffiliateRanksSelect<true>;
     'event-affiliate-ranks': EventAffiliateRanksSelect<false> | EventAffiliateRanksSelect<true>;
     'affiliate-user-ranks': AffiliateUserRanksSelect<false> | AffiliateUserRanksSelect<true>;
+    'event-affiliate-user-ranks': EventAffiliateUserRanksSelect<false> | EventAffiliateUserRanksSelect<true>;
     'affiliate-rank-logs': AffiliateRankLogsSelect<false> | AffiliateRankLogsSelect<true>;
     'affiliate-links': AffiliateLinksSelect<false> | AffiliateLinksSelect<true>;
     'affiliate-settings': AffiliateSettingsSelect<false> | AffiliateSettingsSelect<true>;
@@ -1433,7 +1435,7 @@ export interface Email {
  */
 export interface AffiliateRank {
   id: number;
-  rankName: 'seller' | 'fan' | 'ambassador' | 'patron';
+  rankName: 'Tier1' | 'Tier2' | 'Tier3' | 'Tier4';
   description?: string | null;
   /**
    * Số điểm tối thiểu để đạt hạng này (1 điểm = 1000 VND doanh thu)
@@ -1465,7 +1467,7 @@ export interface AffiliateRank {
   createdAt: string;
 }
 /**
- * Quản lý hạng của Affiliate Seller trong từng event cụ thể
+ * Cấu hình hạng của Affiliate Seller trong từng event cụ thể
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "event-affiliate-ranks".
@@ -1477,25 +1479,17 @@ export interface EventAffiliateRank {
    */
   event: number | Event;
   /**
-   * Chọn Affiliate User (chỉ hiển thị users có role là affiliate)
-   */
-  affiliateUser: number | User;
-  /**
    * Hạng được gán cho Affiliate User trong event
    */
-  rankName: 'seller' | 'fan' | 'ambassador' | 'patron';
+  rankName: 'Tier1' | 'Tier2' | 'Tier3' | 'Tier4';
   /**
    * Trạng thái của hạng trong event: Draft (bản nháp), Active (hoạt động), Disabled (vô hiệu hóa)
    */
   status: 'draft' | 'active' | 'disabled';
-  /**
-   * Khi khóa, hạng này sẽ không thay đổi trong suốt event
-   */
-  isLocked?: boolean | null;
   eventRewards?: {
     ticketRewards?:
       | {
-          minTickets: number;
+          minTickets?: number | null;
           maxTickets?: number | null;
           minRevenue: number;
           maxRevenue?: number | null;
@@ -1505,7 +1499,7 @@ export interface EventAffiliateRank {
       | null;
     commissionRewards?:
       | {
-          minTickets: number;
+          minTickets?: number | null;
           maxTickets?: number | null;
           minRevenue: number;
           maxRevenue?: number | null;
@@ -1532,7 +1526,7 @@ export interface AffiliateUserRank {
   /**
    * Hạng hiện tại của Affiliate User
    */
-  currentRank: 'seller' | 'fan' | 'ambassador' | 'patron';
+  currentRank: 'Tier1' | 'Tier2' | 'Tier3' | 'Tier4';
   /**
    * Tổng số điểm tích lũy (1 điểm = 1000 VND doanh thu)
    */
@@ -1568,7 +1562,34 @@ export interface AffiliateUserRank {
   /**
    * Hạng mà Affiliate User đủ điều kiện nâng cấp nhưng chưa xác nhận
    */
-  pendingRankUpgrade?: ('seller' | 'fan' | 'ambassador' | 'patron') | null;
+  pendingRankUpgrade?: ('Tier1' | 'Tier2' | 'Tier3' | 'Tier4') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Quản lý hạng của Affiliate Seller trong từng event cụ thể
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-affiliate-user-ranks".
+ */
+export interface EventAffiliateUserRank {
+  id: number;
+  /**
+   * Hạng được gán cho Affiliate Seller trong sự kiện này (ví dụ: Fan, Ambassador)
+   */
+  eventAffiliateRank: number | EventAffiliateRank;
+  /**
+   * Affiliate User
+   */
+  affiliateUser: number | User;
+  /**
+   * Trạng thái của hạng trong event: Draft (bản nháp), Active (hoạt động), Disabled (vô hiệu hóa)
+   */
+  status: 'draft' | 'active' | 'disabled';
+  /**
+   * Khi khóa, hạng này sẽ không thay đổi trong suốt event
+   */
+  isLocked?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1603,11 +1624,11 @@ export interface AffiliateRankLog {
   /**
    * Hạng trước khi sự kiện xảy ra (nếu có)
    */
-  rankBefore?: ('seller' | 'fan' | 'ambassador' | 'patron') | null;
+  rankBefore?: ('Tier1' | 'Tier2' | 'Tier3' | 'Tier4') | null;
   /**
    * Hạng sau khi sự kiện xảy ra (nếu có)
    */
-  rankAfter?: ('seller' | 'fan' | 'ambassador' | 'patron') | null;
+  rankAfter?: ('Tier1' | 'Tier2' | 'Tier3' | 'Tier4') | null;
   /**
    * Mô tả chi tiết về sự kiện (ví dụ: lý do thay đổi điểm hoặc hạng)
    */
@@ -2149,6 +2170,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'affiliate-user-ranks';
         value: number | AffiliateUserRank;
+      } | null)
+    | ({
+        relationTo: 'event-affiliate-user-ranks';
+        value: number | EventAffiliateUserRank;
       } | null)
     | ({
         relationTo: 'affiliate-rank-logs';
@@ -3037,10 +3062,8 @@ export interface AffiliateRanksSelect<T extends boolean = true> {
  */
 export interface EventAffiliateRanksSelect<T extends boolean = true> {
   event?: T;
-  affiliateUser?: T;
   rankName?: T;
   status?: T;
-  isLocked?: T;
   eventRewards?:
     | T
     | {
@@ -3084,6 +3107,18 @@ export interface AffiliateUserRanksSelect<T extends boolean = true> {
   rankAchievedDate?: T;
   lastActivityDate?: T;
   pendingRankUpgrade?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-affiliate-user-ranks_select".
+ */
+export interface EventAffiliateUserRanksSelect<T extends boolean = true> {
+  eventAffiliateRank?: T;
+  affiliateUser?: T;
+  status?: T;
+  isLocked?: T;
   updatedAt?: T;
   createdAt?: T;
 }
