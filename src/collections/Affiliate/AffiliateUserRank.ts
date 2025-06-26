@@ -7,8 +7,10 @@ export const AffiliateUserRanks: CollectionConfig = {
     useAsTitle: 'affiliateUser',
     description: 'Lưu trữ thông tin hạng tổng của Affiliate User',
     components: {
-      beforeList: ['@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate'],
-    }
+      beforeList: [
+        '@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate',
+      ],
+    },
   },
   access: {},
   fields: [
@@ -39,6 +41,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       options: AFFILIATE_RANKS,
       admin: {
         description: 'Hạng hiện tại của Affiliate User',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -49,6 +53,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng số điểm tích lũy (1 điểm = 1000 VND doanh thu)',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -59,6 +65,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng doanh thu từ các đơn hàng của Affiliate User',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -69,6 +77,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng doanh thu trước giảm giá từ các đơn hàng của Affiliate User',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -79,6 +89,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng số vé đã bán được trong tất cả các sự kiện',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -89,6 +101,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng số tiền hoa hồng đã nhận được từ các sự kiện',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -99,6 +113,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng số vé thưởng đã nhận được từ các sự kiện',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -107,6 +123,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       label: 'Ngày Đạt Hạng Hiện Tại',
       admin: {
         description: 'Ngày Affiliate User đạt được hạng hiện tại',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -116,6 +134,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       admin: {
         description:
           'Thời điểm Affiliate User thực hiện hành động gần nhất (bán vé, tích điểm, nâng hạng, v.v.)',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -125,6 +145,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       options: AFFILIATE_RANKS,
       admin: {
         description: 'Hạng mà Affiliate User đủ điều kiện nâng cấp nhưng chưa xác nhận',
+        readOnly: true,
+        // disabled: true,
       },
     },
   ],

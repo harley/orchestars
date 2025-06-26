@@ -53,13 +53,15 @@ export const AffiliateRanks: CollectionConfig = {
               name: 'minTickets',
               type: 'number',
               label: 'Số Vé Bán Tối Thiểu',
-              required: true,
+              required: false,
+              hidden: true
             },
             {
               name: 'maxTickets',
               type: 'number',
               label: 'Số Vé Bán Tối Đa',
               required: false,
+              hidden: true
             },
             {
               name: 'minRevenue',
@@ -113,13 +115,15 @@ export const AffiliateRanks: CollectionConfig = {
               name: 'minTickets',
               type: 'number',
               label: 'Số Vé Bán Tối Thiểu',
-              required: true,
+              required: false,
+              hidden: true
             },
             {
               name: 'maxTickets',
               type: 'number',
               label: 'Số Vé Bán Tối Đa',
               required: false,
+              hidden: true
             },
             {
               name: 'minRevenue',

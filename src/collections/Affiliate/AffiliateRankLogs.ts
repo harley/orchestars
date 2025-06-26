@@ -11,6 +11,10 @@ export const AffiliateRankLogs: CollectionConfig = {
       beforeList: ['@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate'],
     },
   },
+  access: {
+    update: () => false,
+    delete: () => false,
+  },
   fields: [
     {
       name: 'affiliateUser',
@@ -27,6 +31,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       },
       admin: {
         description: 'Affiliate User liên quan đến log này',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -41,6 +47,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       ],
       admin: {
         description: 'Xác định log này liên quan đến hạng tổng hay hạng theo sự kiện',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -51,6 +59,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       options: AFFILIATE_ACTION_TYPE_LOGS,
       admin: {
         description: 'Loại hành động liên quan đến điểm hoặc hạng',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -60,6 +70,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Số điểm thay đổi (dương hoặc âm, 0 nếu không thay đổi điểm)',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -68,6 +80,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       label: 'Điểm Trước Khi Thay Đổi',
       admin: {
         description: 'Số điểm của Affiliate User trước khi sự kiện xảy ra',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -76,6 +90,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       label: 'Điểm Sau Khi Thay Đổi',
       admin: {
         description: 'Số điểm của Affiliate User sau khi sự kiện xảy ra',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -85,6 +101,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       options: AFFILIATE_RANKS,
       admin: {
         description: 'Hạng trước khi sự kiện xảy ra (nếu có, áp dụng cho rank tổng)',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -94,6 +112,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       options: AFFILIATE_RANKS,
       admin: {
         description: 'Hạng sau khi sự kiện xảy ra (nếu có, áp dụng cho rank tổng)',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -104,6 +124,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       admin: {
         description: 'Hạng trong event nếu log liên quan đến EventAffiliateUserRanks',
         condition: (data) => data.rankContext === 'event',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -112,6 +134,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       label: 'Mô Tả',
       admin: {
         description: 'Mô tả chi tiết về sự kiện (ví dụ: lý do thay đổi điểm hoặc hạng)',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -125,6 +149,8 @@ export const AffiliateRankLogs: CollectionConfig = {
           pickerAppearance: 'dayAndTime',
           timeFormat: 'HH:mm a',
         },
+        readOnly: true,
+        // disabled: true,
       },
       defaultValue: () => new Date().toISOString(),
     },
@@ -135,6 +161,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       relationTo: 'events',
       admin: {
         description: 'Sự kiện liên quan đến thay đổi này (nếu có)',
+        readOnly: true,
+        disabled: true,
       },
     },
     {
@@ -144,6 +172,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       relationTo: 'orders',
       admin: {
         description: 'Đơn hàng liên quan đến thay đổi này (nếu có)',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -161,6 +191,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       },
       admin: {
         description: 'Admin thực hiện hành động này (nếu có)',
+        readOnly: true,
+        // disabled: true,
       },
     },
   ],
