@@ -1,10 +1,11 @@
 import type { CollectionConfig } from 'payload'
 import { AFFILIATE_RANK, AFFILIATE_RANKS } from './constants'
+import { rankNameLabel } from './fields/rankNameLabel'
 
 export const AffiliateRanks: CollectionConfig = {
   slug: 'affiliate-ranks',
   admin: {
-    useAsTitle: 'rankName',
+    useAsTitle: 'rankNameLabel',
     description: 'Cấu hình các hạng của Affiliate Seller',
     components: {
       beforeList: ['@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate'],
@@ -20,6 +21,7 @@ export const AffiliateRanks: CollectionConfig = {
       options: AFFILIATE_RANKS,
       unique: true,
     },
+    rankNameLabel,
     {
       name: 'description',
       type: 'text',

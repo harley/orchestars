@@ -1436,6 +1436,7 @@ export interface Email {
 export interface AffiliateRank {
   id: number;
   rankName: 'Tier1' | 'Tier2' | 'Tier3' | 'Tier4';
+  rankNameLabel?: string | null;
   description?: string | null;
   /**
    * Số điểm tối thiểu để đạt hạng này (1 điểm = 1000 VND doanh thu)
@@ -1482,6 +1483,7 @@ export interface EventAffiliateRank {
    * Hạng được gán cho Affiliate User trong event
    */
   rankName: 'Tier1' | 'Tier2' | 'Tier3' | 'Tier4';
+  rankNameLabel?: string | null;
   /**
    * Trạng thái của hạng trong event: Draft (bản nháp), Active (hoạt động), Disabled (vô hiệu hóa)
    */
@@ -3077,6 +3079,7 @@ export interface EmailsSelect<T extends boolean = true> {
  */
 export interface AffiliateRanksSelect<T extends boolean = true> {
   rankName?: T;
+  rankNameLabel?: T;
   description?: T;
   minPoints?: T;
   rewards?:
@@ -3113,6 +3116,7 @@ export interface AffiliateRanksSelect<T extends boolean = true> {
 export interface EventAffiliateRanksSelect<T extends boolean = true> {
   event?: T;
   rankName?: T;
+  rankNameLabel?: T;
   status?: T;
   eventRewards?:
     | T
