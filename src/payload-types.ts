@@ -1579,6 +1579,10 @@ export interface EventAffiliateUserRank {
    */
   eventAffiliateRank: number | EventAffiliateRank;
   /**
+   * Sự kiện mà hạng này được áp dụng
+   */
+  event: number | Event;
+  /**
    * Affiliate User
    */
   affiliateUser: number | User;
@@ -1590,6 +1594,38 @@ export interface EventAffiliateUserRank {
    * Khi khóa, hạng này sẽ không thay đổi trong suốt event
    */
   isLocked?: boolean | null;
+  /**
+   * Tổng số điểm tích lũy (1 điểm = 1000 VND doanh thu) của Affiliate User trong event này
+   */
+  totalPoints: number;
+  /**
+   * Tổng doanh thu từ các đơn hàng của Affiliate User
+   */
+  totalRevenue: number;
+  /**
+   * Tổng doanh thu trước giảm giá từ các đơn hàng của Affiliate User
+   */
+  totalRevenueBeforeDiscount: number;
+  /**
+   * Tổng số vé đã bán được trong tất cả sự kiện
+   */
+  totalTicketsSold: number;
+  /**
+   * Tổng số tiền hoa hồng có thể nhận được từ sự kiện
+   */
+  totalCommissionEarned: number;
+  /**
+   * Tổng số vé thưởng có thể nhận được từ sự kiện
+   */
+  totalTicketsRewarded: number;
+  /**
+   * Thời điểm Affiliate User thực hiện hành động gần nhất (bán vé, tích điểm, v.v.) trong event này
+   */
+  lastActivityDate?: string | null;
+  /**
+   * Khi đã hoàn thành, những giá trị sẽ được tính toán và lưu vào các thông số hạng tổng của Affiliate User. Chỉ thực hiện hành động này sau khi event đã kết thúc
+   */
+  isCompleted?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1606,9 +1642,19 @@ export interface AffiliateRankLog {
    */
   affiliateUser: number | User;
   /**
+   * Xác định log này liên quan đến hạng tổng hay hạng theo sự kiện
+   */
+  rankContext: 'user' | 'event';
+  /**
    * Loại hành động liên quan đến điểm hoặc hạng
    */
-  actionType: 'add_points' | 'subtract_points' | 'rank_upgrade' | 'rank_downgrade' | 'confirm_rank_upgrade';
+  actionType:
+    | 'add_points'
+    | 'subtract_points'
+    | 'rank_upgrade'
+    | 'rank_downgrade'
+    | 'confirm_rank_upgrade'
+    | 'event_completed';
   /**
    * Số điểm thay đổi (dương hoặc âm, 0 nếu không thay đổi điểm)
    */
@@ -1622,13 +1668,17 @@ export interface AffiliateRankLog {
    */
   pointsAfter?: number | null;
   /**
-   * Hạng trước khi sự kiện xảy ra (nếu có)
+   * Hạng trước khi sự kiện xảy ra (nếu có, áp dụng cho rank tổng)
    */
   rankBefore?: ('Tier1' | 'Tier2' | 'Tier3' | 'Tier4') | null;
   /**
-   * Hạng sau khi sự kiện xảy ra (nếu có)
+   * Hạng sau khi sự kiện xảy ra (nếu có, áp dụng cho rank tổng)
    */
   rankAfter?: ('Tier1' | 'Tier2' | 'Tier3' | 'Tier4') | null;
+  /**
+   * Hạng trong event nếu log liên quan đến EventAffiliateUserRanks
+   */
+  eventAffiliateRank?: (number | null) | EventAffiliateRank;
   /**
    * Mô tả chi tiết về sự kiện (ví dụ: lý do thay đổi điểm hoặc hạng)
    */
@@ -3116,9 +3166,18 @@ export interface AffiliateUserRanksSelect<T extends boolean = true> {
  */
 export interface EventAffiliateUserRanksSelect<T extends boolean = true> {
   eventAffiliateRank?: T;
+  event?: T;
   affiliateUser?: T;
   status?: T;
   isLocked?: T;
+  totalPoints?: T;
+  totalRevenue?: T;
+  totalRevenueBeforeDiscount?: T;
+  totalTicketsSold?: T;
+  totalCommissionEarned?: T;
+  totalTicketsRewarded?: T;
+  lastActivityDate?: T;
+  isCompleted?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3128,12 +3187,14 @@ export interface EventAffiliateUserRanksSelect<T extends boolean = true> {
  */
 export interface AffiliateRankLogsSelect<T extends boolean = true> {
   affiliateUser?: T;
+  rankContext?: T;
   actionType?: T;
   pointsChange?: T;
   pointsBefore?: T;
   pointsAfter?: T;
   rankBefore?: T;
   rankAfter?: T;
+  eventAffiliateRank?: T;
   description?: T;
   occurredAt?: T;
   event?: T;

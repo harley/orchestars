@@ -2,9 +2,16 @@ import { FieldHookArgs } from 'payload'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 import { sql } from '@payloadcms/db-postgres/drizzle'
 
-import { Event, User, Order, AffiliateUserRank as AffiliateUserRankType } from '@/payload-types'
+import {
+  Event,
+  User,
+  Order,
+  AffiliateUserRank as AffiliateUserRankType,
+  EventAffiliateUserRank,
+  EventAffiliateRank,
+} from '@/payload-types'
 import { sendTicketMail } from '../helper/sendTicketMail'
-import { AFFILIATE_RANKS, AffiliateRank } from '@/collections/Affiliate/constants'
+import { AFFILIATE_RANKS, AffiliateRank, AFFILIATE_RANK } from '@/collections/Affiliate/constants'
 import { POINT_PER_VND } from '@/config/affiliate'
 import { AFFILIATE_ACTION_TYPE_LOG } from '@/collections/Affiliate/constants/actionTypeLog'
 
@@ -36,7 +43,7 @@ const updateTicketsAndSendEmail = async (originalDoc: Order, req: FieldHookArgs[
         status: 'booked',
       },
       req: {
-        transactionID: req.transactionID
+        transactionID: req.transactionID,
       },
     })
     .then((res) => res.docs || [])
@@ -69,7 +76,7 @@ const updateTicketsAndSendEmail = async (originalDoc: Order, req: FieldHookArgs[
       user,
       ticketData,
       payload: req.payload,
-      transactionID: req?.transactionID
+      transactionID: req?.transactionID,
     })
   }
 
@@ -86,6 +93,7 @@ const getAffiliateOrderWhereClause = (affiliateUserId: number, orderId: string |
 const getAffiliateAggregates = async (
   affiliateUserId: number,
   orderId: string | number,
+  eventId: number,
   db: FieldHookArgs['req']['payload']['db'],
 ) => {
   const whereClause = getAffiliateOrderWhereClause(affiliateUserId, orderId)
@@ -95,7 +103,15 @@ const getAffiliateAggregates = async (
         SUM(ord.total) AS total_net_value, 
         SUM(ord.total_before_discount) AS total_gross_value
       FROM orders ord
-      ${whereClause}
+      WHERE ord.id IN (
+        SELECT DISTINCT oi.order_id
+        FROM order_items oi
+        WHERE oi.event_id = ${eventId}
+      )
+      AND (
+        (ord.affiliate_affiliate_user_id = ${affiliateUserId} AND ord.status = 'completed') OR 
+        (ord.affiliate_affiliate_user_id = ${affiliateUserId} AND ord.id = ${orderId})
+      )
   `
 
   const ticketsQuery = sql`
@@ -103,12 +119,19 @@ const getAffiliateAggregates = async (
         COUNT(ticket.id) AS total_ticket_sold
       FROM tickets ticket
       LEFT JOIN orders ord ON ord.id = ticket.order_id
-      ${whereClause}
+      ${whereClause} AND ticket.event_id = ${eventId}
   `
 
   const [resultCountTotal, resultCountTotalTicketSold] = await Promise.all([
-    db.drizzle.execute(valueQuery).then((res: {rows: Array<{ total_net_value?: string; total_gross_value?: string }>}) => res.rows?.[0]),
-    db.drizzle.execute(ticketsQuery).then((res: { rows?: Array<{ total_ticket_sold?: string }> }) => res.rows?.[0]),
+    db.drizzle
+      .execute(valueQuery)
+      .then(
+        (res: { rows: Array<{ total_net_value?: string; total_gross_value?: string }> }) =>
+          res.rows?.[0],
+      ),
+    db.drizzle
+      .execute(ticketsQuery)
+      .then((res: { rows?: Array<{ total_ticket_sold?: string }> }) => res.rows?.[0]),
   ])
 
   const totalNetValue = Number(resultCountTotal?.total_net_value) || 0
@@ -118,23 +141,23 @@ const getAffiliateAggregates = async (
   return { totalNetValue, totalGrossValue, totalTicketSold }
 }
 
-const upsertAffiliateUserRank = async (
+const upsertEventAffiliateUserRank = async (
   {
-    affiliateUserRank,
+    eventAffiliateUserRank,
     affiliateUserId,
-    newRank,
     exchangedToPoints,
     totalNetValue,
     totalGrossValue,
     totalTicketSold,
+    eventAffiliateRank,
   }: {
-    affiliateUserRank: AffiliateUserRankType | undefined
+    eventAffiliateUserRank?: EventAffiliateUserRank
     affiliateUserId: string
-    newRank: any
     exchangedToPoints: number
     totalNetValue: number
     totalGrossValue: number
     totalTicketSold: number
+    eventAffiliateRank: EventAffiliateRank
   },
   req: FieldHookArgs['req'],
 ) => {
@@ -148,32 +171,54 @@ const upsertAffiliateUserRank = async (
     lastActivityDate: new Date().toISOString(),
   }
 
-  if (!affiliateUserRank) {
+  // get total totalTicketsRewarded based on the current eventAffiliateRank
+  if (eventAffiliateRank.eventRewards?.ticketRewards) {
+    // now check by totalRevenueBeforeDiscount first in eventAffiliateRank.eventRewards?.ticketRewards array
+    // sort by minRevenue desc first
+    const ticketRewards = eventAffiliateRank.eventRewards?.ticketRewards?.sort(
+      (a, b) => b.minRevenue - a.minRevenue,
+    )
+    const ticketReward = ticketRewards?.find((reward) => reward.minRevenue <= totalGrossValue)
+    if (ticketReward) {
+      commonData.totalTicketsRewarded = ticketReward.rewardTickets || 0
+    }
+  }
+
+  if (eventAffiliateRank.eventRewards?.commissionRewards) {
+    // sort by minRevenue desc first
+    const commissionRewards = eventAffiliateRank.eventRewards?.commissionRewards?.sort(
+      (a, b) => b.minRevenue - a.minRevenue,
+    )
+    const commissionReward = commissionRewards?.find(
+      (reward) => reward.minRevenue <= totalGrossValue,
+    )
+    if (commissionReward) {
+      const commissionRate = commissionReward.commissionRate || 0
+
+      commonData.totalCommissionEarned = totalGrossValue - (totalGrossValue * commissionRate) / 100
+    }
+  }
+
+  if (!eventAffiliateUserRank) {
     // create affiliate user rank
     return req.payload.create({
-      collection: 'affiliate-user-ranks',
+      collection: 'event-affiliate-user-ranks',
       data: {
         ...commonData,
         affiliateUser: Number(affiliateUserId),
-        currentRank: newRank?.rankName as AffiliateRank,
-        rankAchievedDate: new Date().toISOString(),
+        eventAffiliateRank: eventAffiliateRank.id,
+        event: eventAffiliateRank.event,
+        status: 'active',
       },
       req,
     })
   }
 
-  // update affiliate user rank
-  let pendingRankUpgrade: AffiliateRank | null = null
-  if (newRank && newRank.rankName !== affiliateUserRank.currentRank) {
-    pendingRankUpgrade = newRank.rankName as AffiliateRank
-  }
-
   return req.payload.update({
-    collection: 'affiliate-user-ranks',
-    id: affiliateUserRank.id,
+    collection: 'event-affiliate-user-ranks',
+    id: eventAffiliateUserRank.id,
     data: {
       ...commonData,
-      pendingRankUpgrade,
     },
     req,
   })
@@ -187,6 +232,7 @@ const createAffiliateRankLog = (
     newRank,
     originalDoc,
     event,
+    eventAffiliateRank,
   }: {
     affiliateUserId: string
     exchangedToPoints: number
@@ -194,6 +240,7 @@ const createAffiliateRankLog = (
     newRank: any
     originalDoc: Order
     event: Event | null
+    eventAffiliateRank: EventAffiliateRank | null
   },
   req: FieldHookArgs['req'],
 ) => {
@@ -203,8 +250,10 @@ const createAffiliateRankLog = (
   return req.payload.create({
     collection: 'affiliate-rank-logs',
     data: {
+      rankContext: 'event',
       affiliateUser: Number(affiliateUserId),
       actionType: AFFILIATE_ACTION_TYPE_LOG.add_points.value,
+      eventAffiliateRank: eventAffiliateRank?.id,
       occurredAt: new Date().toISOString(),
       pointsChange: pointsChange,
       pointsBefore: pointsBefore,
@@ -233,15 +282,16 @@ const updateAffiliateStats = async (
 
   const affiliateUserId = String(affiliateUserIdValue)
 
-  const [affiliateUserRank, affiliateRanks] = await Promise.all([
+  const [eventAffiliateUserRank, affiliateRanks] = await Promise.all([
     req.payload
       .find({
-        collection: 'affiliate-user-ranks',
+        collection: 'event-affiliate-user-ranks',
         where: {
           affiliateUser: { equals: Number(affiliateUserId) },
+          event: { equals: event?.id },
         },
         limit: 1,
-        depth: 0,
+        depth: 1,
       })
       .then((res) => res.docs?.[0]),
     req.payload
@@ -259,6 +309,7 @@ const updateAffiliateStats = async (
   const { totalNetValue, totalGrossValue, totalTicketSold } = await getAffiliateAggregates(
     Number(affiliateUserId),
     originalDoc.id,
+    event?.id as number,
     req.payload.db,
   )
 
@@ -266,15 +317,60 @@ const updateAffiliateStats = async (
   const sortedRanks = affiliateRanks.sort((a, b) => b.minPoints - a.minPoints)
   const newRank = sortedRanks.find((rank) => exchangedToPoints >= rank.minPoints)
 
-  await upsertAffiliateUserRank(
+  // if eventAffiliateUserRank is not set, get default rank of user
+  let eventAffiliateRank: EventAffiliateRank | null = eventAffiliateUserRank?.eventAffiliateRank as EventAffiliateRank | null
+  let affiliateUserRank: AffiliateUserRankType | undefined = undefined
+  if (!eventAffiliateRank) {
+    // 1. Fetch the user's currentRank from affiliate-user-ranks
+    affiliateUserRank = await req.payload
+      .find({
+        collection: 'affiliate-user-ranks',
+        where: {
+          affiliateUser: { equals: Number(affiliateUserId) },
+        },
+        limit: 1,
+        depth: 0,
+      })
+      .then((res) => res.docs?.[0])
+
+    // 2. Use currentRank to get the EventAffiliateRank for this event
+    const userCurrentRank = affiliateUserRank?.currentRank || AFFILIATE_RANK.Tier1.value
+    eventAffiliateRank = await req.payload
+      .find({
+        collection: 'event-affiliate-ranks',
+        where: {
+          event: { equals: event?.id },
+          rankName: { equals: userCurrentRank },
+          status: { equals: 'active' },
+        },
+        limit: 1,
+        depth: 0,
+      })
+      .then((res) => res.docs?.[0] || null)
+
+    if (!eventAffiliateRank) {
+      // create event affiliate rank based on the affiliate user rank
+      eventAffiliateRank = await req.payload.create({
+        collection: 'event-affiliate-ranks',
+        data: {
+          event: event?.id as number,
+          rankName: userCurrentRank,
+          status: 'active',
+          eventRewards: sortedRanks.find((rank) => rank.rankName === userCurrentRank)?.rewards,
+        },
+      })
+    }
+  }
+
+  await upsertEventAffiliateUserRank(
     {
-      affiliateUserRank,
+      eventAffiliateUserRank,
       affiliateUserId,
-      newRank,
       exchangedToPoints,
       totalNetValue,
       totalGrossValue,
       totalTicketSold,
+      eventAffiliateRank,
     },
     req,
   )
@@ -287,6 +383,7 @@ const updateAffiliateStats = async (
       newRank,
       originalDoc,
       event,
+      eventAffiliateRank,
     },
     req,
   )
@@ -298,6 +395,7 @@ const handleCompletedOrder = async (originalDoc: Order, req: FieldHookArgs['req'
 
     await updateAffiliateStats(originalDoc, event, req)
   } catch (error: unknown) {
+    console.log('error', error)
     req.payload.logger.error({
       msg: `Error handling completed order ${originalDoc.id}`,
       error,
