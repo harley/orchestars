@@ -1,12 +1,13 @@
 import type { CollectionConfig } from 'payload'
 import { AFFILIATE_RANK, AFFILIATE_RANK_STATUSES, AFFILIATE_RANKS } from './constants'
+import { rankNameLabel } from './fields/rankNameLabel'
 /**
  * Collection configuration for Event Affiliate Ranks in PayloadCMS
  */
 export const EventAffiliateRanks: CollectionConfig = {
   slug: 'event-affiliate-ranks',
   admin: {
-    useAsTitle: 'rankName',
+    useAsTitle: 'rankNameLabel',
     defaultColumns: ['event', 'rankName', 'eventRewards', 'status'],
     description: 'Cấu hình hạng của Affiliate Seller trong từng event cụ thể',
     components: {
@@ -37,6 +38,7 @@ export const EventAffiliateRanks: CollectionConfig = {
         description: 'Hạng được gán cho Affiliate User trong event',
       },
     },
+    rankNameLabel,
     {
       name: 'status',
       type: 'select',
