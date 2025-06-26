@@ -62,7 +62,8 @@ import * as migration_20250611_080103_add_affiliate_to_order_collection from './
 import * as migration_20250612_060257_add_promotions_to_affiliate_setting from './20250612_060257_add_promotions_to_affiliate_setting';
 import * as migration_20250612_102521_update_affiliate_link from './20250612_102521_update_affiliate_link';
 import * as migration_20250619_091356 from './20250619_091356';
-// import * as migration_20250621_175024_create_affiliate_ranks from './20250621_175024_create_affiliate_ranks';
+import * as migration_20250624_164118_create_affiliate_ranks from './20250624_164118_create_affiliate_ranks';
+import * as migration_20250626_015908_add_fields_affiliate_ranks from './20250626_015908_add_fields_affiliate_ranks';
 
 export const migrations = [
   {
@@ -386,10 +387,13 @@ export const migrations = [
     name: '20250619_091356',
   },
   {
-
-    // temp, will remove after affiliate ranks applied on prod
-    // up: migration_20250621_175024_create_affiliate_ranks.up,
-    // down: migration_20250621_175024_create_affiliate_ranks.down,
-    // name: '20250621_175024_create_affiliate_ranks'
+    up: migration_20250624_164118_create_affiliate_ranks.up,
+    down: migration_20250624_164118_create_affiliate_ranks.down,
+    name: '20250624_164118_create_affiliate_ranks',
+  },
+  {
+    up: migration_20250626_015908_add_fields_affiliate_ranks.up,
+    down: migration_20250626_015908_add_fields_affiliate_ranks.down,
+    name: '20250626_015908_add_fields_affiliate_ranks'
   },
 ];

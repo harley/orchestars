@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { AFFILIATE_RANKS } from './constants'
+import { AFFILIATE_RANK, AFFILIATE_RANKS } from './constants'
 
 export const AffiliateUserRanks: CollectionConfig = {
   slug: 'affiliate-user-ranks',
@@ -35,7 +35,7 @@ export const AffiliateUserRanks: CollectionConfig = {
       type: 'select',
       label: 'Hạng Hiện Tại',
       required: true,
-      defaultValue: 'seller',
+      defaultValue: AFFILIATE_RANK.Tier1.value,
       options: AFFILIATE_RANKS,
       admin: {
         description: 'Hạng hiện tại của Affiliate User',
