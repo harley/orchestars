@@ -23,24 +23,6 @@ export const EventAffiliateUserRanks: CollectionConfig = {
 
   fields: [
     {
-      name: 'eventAffiliateRank',
-      type: 'relationship',
-      label: 'Event Affiliate Rank',
-      relationTo: 'event-affiliate-ranks',
-      required: true,
-      admin: {
-        description:
-          'Hạng được gán cho Affiliate Seller trong sự kiện này (ví dụ: Fan, Ambassador)',
-      },
-      filterOptions: () => {
-        return {
-          status: {
-            equals: AFFILIATE_RANK_STATUS.active.value,
-          },
-        }
-      },
-    },
-    {
       name: 'event',
       type: 'relationship',
       label: 'Sự Kiện',
@@ -50,6 +32,30 @@ export const EventAffiliateUserRanks: CollectionConfig = {
         description: 'Sự kiện mà hạng này được áp dụng',
       },
     },
+    {
+      name: 'eventAffiliateRank',
+      type: 'relationship',
+      label: 'Event Affiliate Rank',
+      relationTo: 'event-affiliate-ranks',
+      required: true,
+      admin: {
+        description:
+          'Hạng được gán cho Affiliate Seller trong sự kiện này (ví dụ: Fan, Ambassador)',
+      },
+      filterOptions: ({ data }) => {
+        const eventId = data.event || -1
+
+        return {
+          status: {
+            equals: AFFILIATE_RANK_STATUS.active.value,
+          },
+          event: {
+            equals: eventId,
+          },
+        }
+      },
+    },
+
     {
       name: 'affiliateUser',
       type: 'relationship',
@@ -86,6 +92,8 @@ export const EventAffiliateUserRanks: CollectionConfig = {
       defaultValue: true,
       admin: {
         description: 'Khi khóa, hạng này sẽ không thay đổi trong suốt event',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -97,6 +105,8 @@ export const EventAffiliateUserRanks: CollectionConfig = {
       admin: {
         description:
           'Tổng số điểm tích lũy (1 điểm = 1000 VND doanh thu) của Affiliate User trong event này',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -107,6 +117,8 @@ export const EventAffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng doanh thu từ các đơn hàng của Affiliate User',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -117,6 +129,8 @@ export const EventAffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng doanh thu trước giảm giá từ các đơn hàng của Affiliate User',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -127,6 +141,8 @@ export const EventAffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng số vé đã bán được trong tất cả sự kiện',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -137,6 +153,8 @@ export const EventAffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng số tiền hoa hồng có thể nhận được từ sự kiện',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -147,18 +165,23 @@ export const EventAffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng số vé thưởng có thể nhận được từ sự kiện',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
       name: 'lastActivityDate',
       type: 'date',
       label: 'Ngày Hoạt Động Gần Nhất',
+
       admin: {
         description:
           'Thời điểm Affiliate User thực hiện hành động gần nhất (bán vé, tích điểm, v.v.) trong event này',
         date: {
           pickerAppearance: 'dayAndTime',
         },
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -287,10 +310,15 @@ export const EventAffiliateUserRanks: CollectionConfig = {
                 lastActivityDate: new Date().toISOString(),
                 totalPoints: (affiliateUserRank.totalPoints || 0) + (doc.totalPoints || 0),
                 totalRevenue: (affiliateUserRank.totalRevenue || 0) + (doc.totalRevenue || 0),
-                totalRevenueBeforeDiscount: (affiliateUserRank.totalRevenueBeforeDiscount || 0) + (doc.totalRevenueBeforeDiscount || 0),
-                totalTicketsSold: (affiliateUserRank.totalTicketsSold || 0) + (doc.totalTicketsSold || 0),
-                totalCommissionEarned: (affiliateUserRank.totalCommissionEarned || 0) + (doc.totalCommissionEarned || 0),
-                totalTicketsRewarded: (affiliateUserRank.totalTicketsRewarded || 0) + (doc.totalTicketsRewarded || 0),
+                totalRevenueBeforeDiscount:
+                  (affiliateUserRank.totalRevenueBeforeDiscount || 0) +
+                  (doc.totalRevenueBeforeDiscount || 0),
+                totalTicketsSold:
+                  (affiliateUserRank.totalTicketsSold || 0) + (doc.totalTicketsSold || 0),
+                totalCommissionEarned:
+                  (affiliateUserRank.totalCommissionEarned || 0) + (doc.totalCommissionEarned || 0),
+                totalTicketsRewarded:
+                  (affiliateUserRank.totalTicketsRewarded || 0) + (doc.totalTicketsRewarded || 0),
               },
             })
           }

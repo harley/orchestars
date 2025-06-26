@@ -1444,7 +1444,7 @@ export interface AffiliateRank {
   rewards?: {
     ticketRewards?:
       | {
-          minTickets: number;
+          minTickets?: number | null;
           maxTickets?: number | null;
           minRevenue: number;
           maxRevenue?: number | null;
@@ -1454,7 +1454,7 @@ export interface AffiliateRank {
       | null;
     commissionRewards?:
       | {
-          minTickets: number;
+          minTickets?: number | null;
           maxTickets?: number | null;
           minRevenue: number;
           maxRevenue?: number | null;
@@ -1575,13 +1575,13 @@ export interface AffiliateUserRank {
 export interface EventAffiliateUserRank {
   id: number;
   /**
-   * Hạng được gán cho Affiliate Seller trong sự kiện này (ví dụ: Fan, Ambassador)
-   */
-  eventAffiliateRank: number | EventAffiliateRank;
-  /**
    * Sự kiện mà hạng này được áp dụng
    */
   event: number | Event;
+  /**
+   * Hạng được gán cho Affiliate Seller trong sự kiện này (ví dụ: Fan, Ambassador)
+   */
+  eventAffiliateRank: number | EventAffiliateRank;
   /**
    * Affiliate User
    */
@@ -3165,8 +3165,8 @@ export interface AffiliateUserRanksSelect<T extends boolean = true> {
  * via the `definition` "event-affiliate-user-ranks_select".
  */
 export interface EventAffiliateUserRanksSelect<T extends boolean = true> {
-  eventAffiliateRank?: T;
   event?: T;
+  eventAffiliateRank?: T;
   affiliateUser?: T;
   status?: T;
   isLocked?: T;

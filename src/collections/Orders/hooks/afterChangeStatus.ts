@@ -11,7 +11,7 @@ import {
   EventAffiliateRank,
 } from '@/payload-types'
 import { sendTicketMail } from '../helper/sendTicketMail'
-import { AFFILIATE_RANKS, AffiliateRank, AFFILIATE_RANK } from '@/collections/Affiliate/constants'
+import { AFFILIATE_RANKS, AFFILIATE_RANK } from '@/collections/Affiliate/constants'
 import { POINT_PER_VND } from '@/config/affiliate'
 import { AFFILIATE_ACTION_TYPE_LOG } from '@/collections/Affiliate/constants/actionTypeLog'
 
@@ -178,7 +178,7 @@ const upsertEventAffiliateUserRank = async (
     const ticketRewards = eventAffiliateRank.eventRewards?.ticketRewards?.sort(
       (a, b) => b.minRevenue - a.minRevenue,
     )
-    const ticketReward = ticketRewards?.find((reward) => reward.minRevenue <= totalGrossValue)
+    const ticketReward = ticketRewards?.find((reward) => reward.minRevenue <= totalNetValue)
     if (ticketReward) {
       commonData.totalTicketsRewarded = ticketReward.rewardTickets || 0
     }
@@ -190,12 +190,14 @@ const upsertEventAffiliateUserRank = async (
       (a, b) => b.minRevenue - a.minRevenue,
     )
     const commissionReward = commissionRewards?.find(
-      (reward) => reward.minRevenue <= totalGrossValue,
+      (reward) => reward.minRevenue <= totalNetValue,
     )
     if (commissionReward) {
       const commissionRate = commissionReward.commissionRate || 0
 
-      commonData.totalCommissionEarned = totalGrossValue - (totalGrossValue * commissionRate) / 100
+      commonData.totalCommissionEarned = Number(
+        ((totalNetValue * commissionRate) / 100).toFixed(2),
+      )
     }
   }
 
@@ -228,23 +230,21 @@ const createAffiliateRankLog = (
   {
     affiliateUserId,
     exchangedToPoints,
-    affiliateUserRank,
-    newRank,
+    eventAffiliateUserRank,
     originalDoc,
     event,
     eventAffiliateRank,
   }: {
     affiliateUserId: string
     exchangedToPoints: number
-    affiliateUserRank: AffiliateUserRankType | undefined
-    newRank: any
+    eventAffiliateUserRank: EventAffiliateUserRank | undefined
     originalDoc: Order
     event: Event | null
     eventAffiliateRank: EventAffiliateRank | null
   },
   req: FieldHookArgs['req'],
 ) => {
-  const pointsBefore = affiliateUserRank?.totalPoints || 0
+  const pointsBefore = eventAffiliateUserRank?.totalPoints || 0
   const pointsChange = exchangedToPoints - pointsBefore
 
   return req.payload.create({
@@ -258,8 +258,8 @@ const createAffiliateRankLog = (
       pointsChange: pointsChange,
       pointsBefore: pointsBefore,
       pointsAfter: exchangedToPoints,
-      rankBefore: affiliateUserRank?.currentRank || null,
-      rankAfter: newRank?.rankName as AffiliateRank,
+      rankBefore:
+        (eventAffiliateUserRank?.eventAffiliateRank as EventAffiliateRank)?.rankName || null,
       order: originalDoc.id,
       event: event?.id,
       description: `Cập nhật điểm tích lũy cho người dùng affiliate sau khi Đơn hàng #${originalDoc.orderCode} được hoàn thành`,
@@ -313,12 +313,12 @@ const updateAffiliateStats = async (
     req.payload.db,
   )
 
-  const exchangedToPoints = Math.ceil(totalGrossValue / POINT_PER_VND)
+  const exchangedToPoints = Math.ceil(totalNetValue / POINT_PER_VND)
   const sortedRanks = affiliateRanks.sort((a, b) => b.minPoints - a.minPoints)
-  const newRank = sortedRanks.find((rank) => exchangedToPoints >= rank.minPoints)
 
   // if eventAffiliateUserRank is not set, get default rank of user
-  let eventAffiliateRank: EventAffiliateRank | null = eventAffiliateUserRank?.eventAffiliateRank as EventAffiliateRank | null
+  let eventAffiliateRank: EventAffiliateRank | null =
+    eventAffiliateUserRank?.eventAffiliateRank as EventAffiliateRank | null
   let affiliateUserRank: AffiliateUserRankType | undefined = undefined
   if (!eventAffiliateRank) {
     // 1. Fetch the user's currentRank from affiliate-user-ranks
@@ -379,8 +379,7 @@ const updateAffiliateStats = async (
     {
       affiliateUserId,
       exchangedToPoints,
-      affiliateUserRank,
-      newRank,
+      eventAffiliateUserRank,
       originalDoc,
       event,
       eventAffiliateRank,
