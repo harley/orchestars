@@ -1539,11 +1539,15 @@ export interface AffiliateUserRank {
    */
   totalPoints: number;
   /**
-   * Tổng doanh thu từ các đơn hàng của Affiliate User
+   * Tổng doanh thu từ các đơn hàng của Affiliate User.
    */
   totalRevenue: number;
   /**
-   * Tổng doanh thu trước giảm giá từ các đơn hàng của Affiliate User
+   * Tổng Tiền trước khi trừ thuế VAT của Affiliate User
+   */
+  totalRevenueBeforeTax: number;
+  /**
+   * Tổng Tiền trước giảm giá từ các đơn hàng của Affiliate User
    */
   totalRevenueBeforeDiscount: number;
   /**
@@ -1610,7 +1614,7 @@ export interface EventAffiliateUserRank {
    */
   totalRevenue: number;
   /**
-   * Tổng tiền trước khi trừ thuế VAT của Affiliate User
+   * Tổng Tiền trước khi trừ thuế VAT của Affiliate User
    */
   totalRevenueBeforeTax: number;
   /**
@@ -3170,6 +3174,7 @@ export interface AffiliateUserRanksSelect<T extends boolean = true> {
   currentRank?: T;
   totalPoints?: T;
   totalRevenue?: T;
+  totalRevenueBeforeTax?: T;
   totalRevenueBeforeDiscount?: T;
   totalTicketsSold?: T;
   totalCommissionEarned?: T;
