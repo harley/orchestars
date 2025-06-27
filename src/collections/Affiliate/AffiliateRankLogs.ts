@@ -130,7 +130,7 @@ export const AffiliateRankLogs: CollectionConfig = {
     },
     {
       name: 'description',
-      type: 'text',
+      type: 'textarea',
       label: 'Mô Tả',
       admin: {
         description: 'Mô tả chi tiết về sự kiện (ví dụ: lý do thay đổi điểm hoặc hạng)',

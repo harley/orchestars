@@ -959,6 +959,11 @@ export interface Event {
         id?: string | null;
       }[]
     | null;
+  vat?: {
+    enabled?: boolean | null;
+    percentage?: number | null;
+    note?: string | null;
+  };
   eventLogo?: (number | null) | Media;
   eventBanner?: (number | null) | Media;
   mobileEventBanner?: (number | null) | Media;
@@ -1534,11 +1539,15 @@ export interface AffiliateUserRank {
    */
   totalPoints: number;
   /**
-   * Tổng doanh thu từ các đơn hàng của Affiliate User
+   * Tổng doanh thu từ các đơn hàng của Affiliate User.
    */
   totalRevenue: number;
   /**
-   * Tổng doanh thu trước giảm giá từ các đơn hàng của Affiliate User
+   * Tổng Tiền trước khi trừ thuế VAT của Affiliate User
+   */
+  totalRevenueBeforeTax: number;
+  /**
+   * Tổng Tiền trước giảm giá từ các đơn hàng của Affiliate User
    */
   totalRevenueBeforeDiscount: number;
   /**
@@ -1601,11 +1610,15 @@ export interface EventAffiliateUserRank {
    */
   totalPoints: number;
   /**
-   * Tổng doanh thu từ các đơn hàng của Affiliate User
+   * Tổng doanh thu từ các đơn hàng của Affiliate User. Sẽ tính phần thưởng dựa trên giá trị này
    */
   totalRevenue: number;
   /**
-   * Tổng doanh thu trước giảm giá từ các đơn hàng của Affiliate User
+   * Tổng Tiền trước khi trừ thuế VAT của Affiliate User
+   */
+  totalRevenueBeforeTax: number;
+  /**
+   * Tổng Tiền trước giảm giá từ các đơn hàng của Affiliate User
    */
   totalRevenueBeforeDiscount: number;
   /**
@@ -2753,6 +2766,13 @@ export interface EventsSelect<T extends boolean = true> {
         quantity?: T;
         id?: T;
       };
+  vat?:
+    | T
+    | {
+        enabled?: T;
+        percentage?: T;
+        note?: T;
+      };
   eventLogo?: T;
   eventBanner?: T;
   mobileEventBanner?: T;
@@ -3154,6 +3174,7 @@ export interface AffiliateUserRanksSelect<T extends boolean = true> {
   currentRank?: T;
   totalPoints?: T;
   totalRevenue?: T;
+  totalRevenueBeforeTax?: T;
   totalRevenueBeforeDiscount?: T;
   totalTicketsSold?: T;
   totalCommissionEarned?: T;
@@ -3176,6 +3197,7 @@ export interface EventAffiliateUserRanksSelect<T extends boolean = true> {
   isLocked?: T;
   totalPoints?: T;
   totalRevenue?: T;
+  totalRevenueBeforeTax?: T;
   totalRevenueBeforeDiscount?: T;
   totalTicketsSold?: T;
   totalCommissionEarned?: T;
