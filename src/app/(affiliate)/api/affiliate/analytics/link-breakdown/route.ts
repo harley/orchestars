@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getPayload } from '@/payload-config/getPayloadConfig';
+import { sql } from '@payloadcms/db-postgres/drizzle';
 import { authorizeApiRequest } from '@/app/(affiliate)/utils/authorizeApiRequest';
 import { getDateRangeFromTimeRange } from '@/app/(affiliate)/utils/getDateRangeFromTimeRange';
 import { getLinkId } from '@/app/(affiliate)/utils/getLinkId';
@@ -10,151 +11,131 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const timeRange = searchParams.get('timeRange') || '30d';
     const sortBy = searchParams.get('sortBy') || 'revenue';
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '5');
+    const page = parseInt(searchParams.get('page') || '1') || 1;
+    const limit = parseInt(searchParams.get('limit') || '5') || 5;
     const userRequest = await authorizeApiRequest();
     const payload = await getPayload();
 
     const { startDate, endDate } = getDateRangeFromTimeRange(timeRange);
 
-    const links = await payload.find({
-      collection: 'affiliate-links',
-      where: {
-        affiliateUser: {
-          equals: userRequest.id,
-        },
-      }
-    })
+    const results = await payload.db.drizzle.execute(sql`
+      WITH link_performance AS (
+        SELECT
+          affiliate_links.id,
+          COALESCE(affiliate_links.name, 'Unamed Link') AS name,
+          COALESCE(affiliate_links.utm_params_source, 'Unknown') AS utm_source,
+          COALESCE(affiliate_links.utm_params_campaign, 'Unknown') AS utm_campaign,
 
-    const clicks = await payload.find({
-      collection: 'affiliate-click-logs',
-      where: {
-        'affiliateUser.email': {
-          equals: userRequest.email,
-        },
-        createdAt: {
-          greater_than_equal: startDate,
-          less_than_equal: endDate,
-        }
-      }
-    })
+          -- Count clicks for this link
+          (SELECT COUNT(*)
+            FROM affiliate_click_logs
+            WHERE affiliate_click_logs.affiliate_link_id = affiliate_links.id
+              AND affiliate_click_logs.created_at >= ${startDate}
+              AND affiliate_click_logs.created_at <= ${endDate}
+          ) AS clicks,
+          
+          -- Count orders for this link
+          (SELECT COUNT(*)
+            FROM orders
+            WHERE orders.affiliate_affiliate_link_id = affiliate_links.id
+              AND orders.created_at >= ${startDate}
+              AND orders.created_at <= ${endDate}
+          ) AS orders,
 
-    const orders = await payload.find({
-      collection: 'orders',
-      where: {
-        createdAt: {
-          greater_than_equal: startDate,
-          less_than_equal: endDate,
-        },
-        'affiliate.affiliateUser': {
-          equals: userRequest.id,
-        }
-      },
-    });
+          -- Calculate gross revenue for this link
+          (SELECT SUM(orders.total)
+            FROM orders
+            WHERE orders.affiliate_affiliate_link_id = affiliate_links.id
+              AND orders.created_at >= ${startDate}
+              AND orders.created_at <= ${endDate}
+          ) AS gross_revenue,
 
-    const orderIds = orders.docs.map(order => order.id);
+          -- Calculate tickets for this link
+          (SELECT COUNT(*)
+            FROM tickets t
+            INNER JOIN orders o ON t.order_id = o.id
+            WHERE o.affiliate_affiliate_link_id = affiliate_links.id
+              AND o.created_at >= ${startDate}
+              AND o.created_at <= ${endDate}
+          ) AS tickets_issued
 
-    const tickets = await payload.find({
-      collection: 'tickets',
-      where: {
-        order: {
-          in: orderIds,
-        },
-      },
-    })
+        FROM affiliate_links
+        WHERE affiliate_links.affiliate_user_id = ${userRequest.id}
+      ),
 
-    const performanceData = links.docs.map(link => {
-      const linkName = 'Unnamed Link';
-      const linkSource = link.utmParams?.source || 'Unknown';
-      const linkCampaign = link.utmParams?.campaign || 'Unknown';
-      
-      const linkClicks = clicks.docs.filter(click => {
-        const affiliateLinkId = getLinkId(click.affiliateLink);
-        return affiliateLinkId === link.id;
-      }).length;
+      calculated_metrics AS (
+        SELECT
+          *,
 
-      const linkOrders = orders.docs.filter(order => {
-        const affiliateLink = order.affiliate?.affiliateLink;
-        const affiliateLinkId = getLinkId(affiliateLink);
-        return affiliateLinkId === link.id;
-      }).length;
+          -- Calculate conversion rate
+          CASE
+            WHEN clicks > 0 THEN ROUND((orders::numeric / clicks) * 100, 2)
+            ELSE 0
+          END AS conversion_rate,
 
-      const linkTickets = tickets.docs.filter(ticket => {
-        const ticketOrderId = typeof ticket.order === 'object' && ticket.order !== null ? ticket.order.id : ticket.order;
-        const order = orders.docs.find(o => o.id === ticketOrderId);
+          -- Calculate net revenue
+          gross_revenue as net_revenue,
 
-        const affiliateLink = order?.affiliate?.affiliateLink;
-        const affiliateLinkId = getLinkId(affiliateLink);
-        return affiliateLinkId === link.id;
-      }).length;
-      
-      const linkConversion = linkClicks > 0 ? (linkOrders / linkClicks) * 100 : 0;
-      
-      const linkGrossRevenue = orders.docs
-        .filter(order => {
-          const affiliateLink = order.affiliate?.affiliateLink;
-          const affiliateLinkId = getLinkId(affiliateLink);
-          return affiliateLinkId === link.id;
-        })
-        .reduce((sum, order) => sum + (order.total || 0), 0);
+          -- Calculate commission
+          '0' as commission
+        
+        FROM link_performance
+      ),
 
-      const linkNetRevenue = linkGrossRevenue;
-      
-      const linkCommission = 0;
+      sorted_results AS(
+        SELECT
+          *,
+          ROW_NUMBER() OVER(
+            ORDER BY
+              CASE WHEN ${sortBy} = 'revenue' THEN net_revenue END DESC,
+              CASE WHEN ${sortBy} = 'clicks' THEN clicks END DESC,
+              CASE WHEN ${sortBy} = 'orders' THEN orders END DESC,
+              CASE WHEN ${sortBy} = 'conversion' THEN conversion_rate END DESC,
+              id -- stable sort
+          ) AS row_num,
+          COUNT(*) OVER() AS total_count
+        FROM calculated_metrics
+      )
 
-      return {
-        id: link.id,
-        name: linkName,
-        utmSource: linkSource,
-        utmCampaign: linkCampaign,
-        clicks: linkClicks,
-        orders: linkOrders,
-        ticketsIssued: linkTickets,
-        conversionRate: linkConversion,
-        grossRevenue: linkGrossRevenue,
-        netRevenue: linkNetRevenue,
-        commission: linkCommission,
-      }
-    })
-
-    switch (sortBy) {
-      case 'revenue':
-        performanceData.sort((a, b) => b.netRevenue - a.netRevenue);
-        break;
-      case 'clicks':
-        performanceData.sort((a, b) => b.clicks - a.clicks);
-        break;
-      case 'orders':
-        performanceData.sort((a, b) => b.orders - a.orders);
-        break;
-      case 'conversion':
-        performanceData.sort((a, b) => b.conversionRate - a.conversionRate);
-        break;
-      default:
-        throw new Error('Invalid sort parameter: ' + sortBy);
-    }
+      SELECT
+        id,
+        name,
+        utm_source,
+        utm_campaign,
+        clicks,
+        orders,
+        tickets_issued,
+        conversion_rate,
+        gross_revenue,
+        net_revenue,
+        commission,
+        total_count
+      FROM sorted_results
+      WHERE row_num BETWEEN ${(page - 1) * limit + 1} AND ${page * limit}
+      ORDER BY row_num
+    `)
 
     return NextResponse.json({
       success: true,
-      data: performanceData.slice((page - 1) * limit, page * limit).map(item => ({
-        id: item.id,
-        name: item.name,
-        utmSource: item.utmSource,
-        utmCampaign: item.utmCampaign,
-        clicks: item.clicks.toLocaleString(),
-        orders: item.orders.toLocaleString(),
-        ticketsIssued: item.ticketsIssued.toLocaleString(),
-        conversionRate: Number(item.conversionRate.toFixed(2)),
-        grossRevenue: item.grossRevenue.toLocaleString(),
-        netRevenue: item.netRevenue.toLocaleString(),
-        commission: item.commission.toLocaleString(),
+      data: results.rows.map(row => ({
+        name: row.name,
+        utmSource: row.utm_source,
+        utmCampaign: row.utm_campaign,
+        clicks: row.clicks?.toLocaleString()  || '0',
+        orders: row.orders?.toLocaleString()  || '0',
+        ticketsIssued: row.tickets_issued?.toLocaleString()  || '0',
+        conversionRate: row.conversion_rate?.toLocaleString()  || '0',
+        grossRevenue: row.gross_revenue?.toLocaleString()  || '0',
+        netRevenue: row.net_revenue?.toLocaleString()  || '0',
+        commission: row.commission?.toLocaleString()  || '0',
+        totalCount: row.total_count?.toLocaleString()  || '0',
       })),
       pagination: {
         page: page,
         limit: limit,
-        totalPages: Math.ceil(performanceData.length / limit),
-        totalDocs: performanceData.length,
-        hasNextPage: page < Math.ceil(performanceData.length / limit),
+        totalPages: Math.ceil(results.rowCount / limit),
+        totalDocs: results.rowCount,
+        hasNextPage: page < Math.ceil(results.rowCount / limit),
         hasPrevPage: page > 1,
       }
     })

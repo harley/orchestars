@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { getPayload } from '@/payload-config/getPayloadConfig'
+import { sql } from '@payloadcms/db-postgres/drizzle'
 import { authorizeApiRequest } from '@/app/(affiliate)/utils/authorizeApiRequest'
 import { getDateRangeFromTimeRange } from '@/app/(affiliate)/utils/getDateRangeFromTimeRange'
 
@@ -13,54 +14,45 @@ export async function GET(request: NextRequest) {
 
     const { startDate, endDate } = getDateRangeFromTimeRange(timeRange)
 
-    const clicks = await payload.find({
-      collection: 'affiliate-click-logs',
-      where: {
-        createdAt: {
-          greater_than_equal: startDate,
-          less_than_equal: endDate,
-        },
-        'affiliateUser.email': {
-          equals: userRequest.email,
-        }
-      },
-    })
+    const results = await payload.db.drizzle.execute(sql`
+      SELECT
+        COUNT(DISTINCT affiliate_click_logs.id) AS clicks,
+        COUNT(DISTINCT orders.id) AS orders,
+        SUM(orders.total) AS total_revenue,
+        COUNT(DISTINCT tickets.id) AS total_tickets,
 
-    const orders = await payload.find({
-      collection: 'orders',
-      where: {
-        createdAt: {
-          greater_than_equal: startDate,
-          less_than_equal: endDate,
-        },
-        'affiliate.affiliateUser': {
-          equals: userRequest.id,
-        }
-      },
-    })
-
-    const orderIds = orders.docs.map(order => order.id)
-    const grossRevenue = orders.docs.reduce((sum, order) => sum + (order.total || 0), 0)
-
-    const tickets = await payload.find({
-      collection: 'tickets',
-      where: {
-        order: {
-          in: orderIds
-        }
-      }
-    })
+        -- Calculate metrics
+        CASE
+          WHEN COUNT(DISTINCT affiliate_click_logs.id) > 0 THEN
+            ROUND((COUNT(DISTINCT orders.id)::decimal / COUNT(DISTINCT affiliate_click_logs.id)) * 100, 2)
+          ELSE 0
+        END as conversion_rate,
+        
+        CASE
+          WHEN COUNT(DISTINCT orders.id) > 0 THEN
+            ROUND(COUNT(DISTINCT tickets.id)::decimal / COUNT(DISTINCT orders.id), 1)
+          ELSE 0 
+        END as average_tickets_per_order
+      
+      FROM affiliate_links
+      LEFT JOIN affiliate_click_logs ON affiliate_click_logs.affiliate_link_id = affiliate_links.id
+        AND affiliate_click_logs.created_at >= ${startDate} AND affiliate_click_logs.created_at <= ${endDate}
+      LEFT JOIN orders ON orders.affiliate_affiliate_link_id = affiliate_links.id
+        AND orders.created_at >= ${startDate} AND orders.created_at <= ${endDate}
+      LEFT JOIN tickets ON tickets.order_id = orders.id
+      WHERE affiliate_links.affiliate_user_id = ${userRequest.id}
+    `)
 
     return NextResponse.json({
       success: true,
       data: 
         {
-          clicks: clicks.totalDocs.toLocaleString(),
-          orders: orders.totalDocs.toLocaleString(),
-          overallConversionRate: Number((clicks.totalDocs > 0 ? (orders.totalDocs / clicks.totalDocs) * 100 : 0).toFixed(2)),
-          ticketsIssued: tickets.totalDocs.toLocaleString(),
-          averageTicketsPerOrder: Number((orders.totalDocs > 0 ? (tickets.totalDocs / orders.totalDocs) : 0).toFixed(1)),
-          grossRevenue: grossRevenue.toLocaleString(),
+          clicks: results?.rows[0]?.clicks?.toLocaleString() ?? 0,
+          orders: results?.rows[0]?.orders?.toLocaleString() ?? 0,
+          overallConversionRate: Number(results?.rows[0]?.conversion_rate) ?? 0,
+          ticketsIssued: results?.rows[0]?.total_tickets?.toLocaleString() ?? 0,
+          averageTicketsPerOrder: Number(results?.rows[0]?.average_tickets_per_order) ?? 0,
+          grossRevenue: results?.rows[0]?.total_revenue?.toLocaleString() ?? 0,
           commission: "0".toLocaleString(),
           commissionRate: "0".toLocaleString(),
         }
