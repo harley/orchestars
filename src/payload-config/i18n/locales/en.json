@@ -454,7 +454,8 @@
     "firstTimeLoginHeader": "Access Your Tickets",
     "firstTimeLoginEmailPlaceholder": "Enter the email you used to book tickets",
     "pleaseEnterEmailAndPassword": "Please enter both email and password",
-    "signingIn": "Signing in..."
+    "signingIn": "Signing in...",
+    "affiliateLoginLink": "Become our ambassador"
   },
   "navbar": {
     "profile": "Profile",

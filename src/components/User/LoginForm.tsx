@@ -113,20 +113,33 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
               {isLoading ? t('auth.signingIn') : t('auth.signIn')}
             </button>
             <div className="text-center text-sm">
-              <button
-                type="button"
-                onClick={() => setFormMode('forgotPassword')}
-                className="font-medium text-gray-900 hover:underline focus:outline-none mr-4"
-              >
-                {t('auth.forgotPassword')}
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormMode('firstTimeLogin')}
-                className="font-medium text-gray-900 hover:underline focus:outline-none mt-2"
-              >
-                {t('auth.firstTimeLoginLink')}
-              </button>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setFormMode('forgotPassword')}
+                  className="font-medium text-gray-900 hover:underline focus:outline-none mr-4"
+                >
+                  {t('auth.forgotPassword')}
+                </button>
+              </div>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => router.push('/affiliate')}
+                  className="font-medium text-gray-900 hover:underline focus:outline-none mt-2"
+                >
+                  {t('auth.affiliateLoginLink')}
+                </button>
+              </div>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setFormMode('firstTimeLogin')}
+                  className="font-medium text-gray-900 hover:underline focus:outline-none mt-2"
+                >
+                  {t('auth.firstTimeLoginLink')}
+                </button>
+              </div>
             </div>
           </div>
           <div className="flex items-start gap-3 p-4 mt-6 border-l-4 border-blue-500 bg-blue-50 rounded-md shadow-sm">
