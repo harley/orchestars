@@ -1,10 +1,10 @@
 'use client'
-
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { AffiliateSidebar } from '@/components/Affiliate/AffiliateSidebar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AffiliateMetricsCard } from '@/components/Affiliate/AffiliateMetricsCard'
+import { formatMoney } from '@/utilities/formatMoney'
 import {
   Select,
   SelectContent,
@@ -72,6 +72,35 @@ export default function RevenuePage() {
   const [timeRange, setTimeRange] = useState('6m')
   const [viewType, setViewType] = useState('gross')
 
+  const [grossRevenue, setGrossRevenue] = useState(0)
+  const [netRevenue, setNetRevenue] = useState(0)
+  const [avgOrderValue, setAvgOrderValue] = useState(0)
+
+  useEffect(() => {
+    const fetchRevenueMetrics = async () => {
+      try {
+        //Gross revenue
+        const resGrossRev = await fetch('/api/affiliate/gross-revenue')
+        const dataGrossRev = await resGrossRev.json()
+        setGrossRevenue(dataGrossRev.totalRevenue)
+
+        //Net revenue
+        const resNetRev = await fetch('/api/affiliate/net-revenue')
+        const dataNetRev = await resNetRev.json()
+        setNetRevenue(dataNetRev.netRevenue)
+
+        //Average Order Value
+        const resAvgVal = await fetch('/api/affiliate/avg-order-value')
+        const dataAvgVal = await resAvgVal.json()
+        setAvgOrderValue(dataAvgVal.avgOrderValue)
+      } catch (err) {
+        console.error('Failed to fetch revenue:', err)
+      }
+    }
+
+    fetchRevenueMetrics()
+  }, [])
+
   return (
     <ProtectedRoute>
       <SidebarProvider>
@@ -96,7 +125,7 @@ export default function RevenuePage() {
                         <SelectTrigger className="w-[180px]">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white">
                           <SelectItem value="1m">Last Month</SelectItem>
                           <SelectItem value="3m">Last 3 Months</SelectItem>
                           <SelectItem value="6m">Last 6 Months</SelectItem>
@@ -110,7 +139,7 @@ export default function RevenuePage() {
                         <SelectTrigger className="w-[180px]">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white">
                           <SelectItem value="gross">Gross Revenue</SelectItem>
                           <SelectItem value="net">Net Revenue</SelectItem>
                           <SelectItem value="commission">Commission</SelectItem>
@@ -123,7 +152,7 @@ export default function RevenuePage() {
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 mb-8">
                     <AffiliateMetricsCard
                       title="Gross Revenue"
-                      value={`$${mockRevenueData.summary.totalGrossRevenue.toLocaleString()}`}
+                      value={formatMoney(grossRevenue)}
                       change={mockRevenueData.summary.monthlyGrowth}
                       period="vs last period"
                       icon={DollarSign}
@@ -131,7 +160,7 @@ export default function RevenuePage() {
                     />
                     <AffiliateMetricsCard
                       title="Net Revenue"
-                      value={`$${mockRevenueData.summary.totalNetRevenue.toLocaleString()}`}
+                      value={formatMoney(netRevenue)}
                       change={15.2}
                       period="vs last period"
                       icon={TrendingUp}
@@ -139,7 +168,7 @@ export default function RevenuePage() {
                     />
                     <AffiliateMetricsCard
                       title="Your Commission"
-                      value={`$${mockRevenueData.summary.totalCommission.toLocaleString()}`}
+                      value={formatMoney(netRevenue * 0.1)}
                       change={18.7}
                       period="vs last period"
                       icon={PieChart}
@@ -147,7 +176,7 @@ export default function RevenuePage() {
                     />
                     <AffiliateMetricsCard
                       title="Avg Order Value"
-                      value={`$${mockRevenueData.summary.averageOrderValue}`}
+                      value={formatMoney(avgOrderValue)}
                       change={5.3}
                       period="vs last period"
                       icon={BarChart3}
@@ -195,6 +224,7 @@ export default function RevenuePage() {
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
+                                {/* For each month in mock revenue data */}
                                 {mockRevenueData.monthlyRevenue.map((month) => (
                                   <TableRow key={month.month}>
                                     <TableCell className="font-medium">{month.month}</TableCell>
