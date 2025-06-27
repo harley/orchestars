@@ -14,6 +14,7 @@ import { sendTicketMail } from '../helper/sendTicketMail'
 import { AFFILIATE_RANKS, AFFILIATE_RANK } from '@/collections/Affiliate/constants'
 import { POINT_PER_VND } from '@/config/affiliate'
 import { AFFILIATE_ACTION_TYPE_LOG } from '@/collections/Affiliate/constants/actionTypeLog'
+import { TAX_PERCENTAGE_DEFAULT } from '@/collections/Events/constants/tax'
 
 const updateTicketsAndSendEmail = async (originalDoc: Order, req: FieldHookArgs['req']) => {
   const orderItems = await req.payload
@@ -93,15 +94,15 @@ const getAffiliateOrderWhereClause = (affiliateUserId: number, orderId: string |
 const getAffiliateAggregates = async (
   affiliateUserId: number,
   orderId: string | number,
-  eventId: number,
+  event: Event,
   db: FieldHookArgs['req']['payload']['db'],
 ) => {
   const whereClause = getAffiliateOrderWhereClause(affiliateUserId, orderId)
-
+  const eventId = event?.id as number
   const valueQuery = sql`
       SELECT 
-        SUM(ord.total) AS total_net_value, 
-        SUM(ord.total_before_discount) AS total_gross_value
+        SUM(ord.total) AS total_after_discount_value, 
+        SUM(ord.total_before_discount) AS total_before_discount_value
       FROM orders ord
       WHERE ord.id IN (
         SELECT DISTINCT oi.order_id
@@ -126,19 +127,32 @@ const getAffiliateAggregates = async (
     db.drizzle
       .execute(valueQuery)
       .then(
-        (res: { rows: Array<{ total_net_value?: string; total_gross_value?: string }> }) =>
-          res.rows?.[0],
+        (res: {
+          rows: Array<{ total_after_discount_value?: string; total_before_discount_value?: string }>
+        }) => res.rows?.[0],
       ),
     db.drizzle
       .execute(ticketsQuery)
       .then((res: { rows?: Array<{ total_ticket_sold?: string }> }) => res.rows?.[0]),
   ])
 
-  const totalNetValue = Number(resultCountTotal?.total_net_value) || 0
-  const totalGrossValue = Number(resultCountTotal?.total_gross_value) || 0
+  const totalAfterDiscountValue = Number(resultCountTotal?.total_after_discount_value) || 0
+  const totalBeforeDiscountValue = Number(resultCountTotal?.total_before_discount_value) || 0
+
+  const taxPercentage = event?.vat?.enabled ? event.vat?.percentage || TAX_PERCENTAGE_DEFAULT : 0
+
+  const totalValueAfterTax =
+    totalAfterDiscountValue - (totalAfterDiscountValue * taxPercentage) / 100
+  const totalValueBeforeTax = totalAfterDiscountValue
   const totalTicketSold = Number(resultCountTotalTicketSold?.total_ticket_sold) || 0
 
-  return { totalNetValue, totalGrossValue, totalTicketSold }
+  return {
+    totalValueAfterTax,
+    totalValueBeforeTax,
+    totalAfterDiscountValue,
+    totalBeforeDiscountValue,
+    totalTicketSold,
+  }
 }
 
 const upsertEventAffiliateUserRank = async (
@@ -146,16 +160,18 @@ const upsertEventAffiliateUserRank = async (
     eventAffiliateUserRank,
     affiliateUserId,
     exchangedToPoints,
-    totalNetValue,
-    totalGrossValue,
+    totalBeforeDiscountValue,
+    totalValueAfterTax,
+    totalValueBeforeTax,
     totalTicketSold,
     eventAffiliateRank,
   }: {
     eventAffiliateUserRank?: EventAffiliateUserRank
     affiliateUserId: string
     exchangedToPoints: number
-    totalNetValue: number
-    totalGrossValue: number
+    totalBeforeDiscountValue: number,
+    totalValueAfterTax: number,
+    totalValueBeforeTax: number,
     totalTicketSold: number
     eventAffiliateRank: EventAffiliateRank
   },
@@ -163,8 +179,9 @@ const upsertEventAffiliateUserRank = async (
 ) => {
   const commonData = {
     totalPoints: exchangedToPoints,
-    totalRevenue: totalNetValue,
-    totalRevenueBeforeDiscount: totalGrossValue,
+    totalRevenue: totalValueAfterTax,
+    totalRevenueBeforeDiscount: totalBeforeDiscountValue,
+    totalRevenueBeforeTax: totalValueBeforeTax,
     totalTicketsSold: totalTicketSold,
     totalCommissionEarned: 0, // todo
     totalTicketsRewarded: 0, // todo
@@ -178,7 +195,7 @@ const upsertEventAffiliateUserRank = async (
     const ticketRewards = eventAffiliateRank.eventRewards?.ticketRewards?.sort(
       (a, b) => b.minRevenue - a.minRevenue,
     )
-    const ticketReward = ticketRewards?.find((reward) => reward.minRevenue <= totalNetValue)
+    const ticketReward = ticketRewards?.find((reward) => reward.minRevenue <= totalValueAfterTax)
     if (ticketReward) {
       commonData.totalTicketsRewarded = ticketReward.rewardTickets || 0
     }
@@ -189,15 +206,11 @@ const upsertEventAffiliateUserRank = async (
     const commissionRewards = eventAffiliateRank.eventRewards?.commissionRewards?.sort(
       (a, b) => b.minRevenue - a.minRevenue,
     )
-    const commissionReward = commissionRewards?.find(
-      (reward) => reward.minRevenue <= totalNetValue,
-    )
+    const commissionReward = commissionRewards?.find((reward) => reward.minRevenue <= totalValueAfterTax)
     if (commissionReward) {
       const commissionRate = commissionReward.commissionRate || 0
 
-      commonData.totalCommissionEarned = Number(
-        ((totalNetValue * commissionRate) / 100).toFixed(2),
-      )
+      commonData.totalCommissionEarned = Number(((totalValueAfterTax * commissionRate) / 100).toFixed(2))
     }
   }
 
@@ -306,14 +319,19 @@ const updateAffiliateStats = async (
       .then((res) => res.docs),
   ])
 
-  const { totalNetValue, totalGrossValue, totalTicketSold } = await getAffiliateAggregates(
+  const {
+    totalBeforeDiscountValue,
+    totalValueAfterTax,
+    totalValueBeforeTax,
+    totalTicketSold,
+  } = await getAffiliateAggregates(
     Number(affiliateUserId),
     originalDoc.id,
-    event?.id as number,
+    event as Event,
     req.payload.db,
   )
 
-  const exchangedToPoints = Math.ceil(totalNetValue / POINT_PER_VND)
+  const exchangedToPoints = Math.ceil(totalValueAfterTax / POINT_PER_VND)
   const sortedRanks = affiliateRanks.sort((a, b) => b.minPoints - a.minPoints)
 
   // if eventAffiliateUserRank is not set, get default rank of user
@@ -367,8 +385,9 @@ const updateAffiliateStats = async (
       eventAffiliateUserRank,
       affiliateUserId,
       exchangedToPoints,
-      totalNetValue,
-      totalGrossValue,
+      totalBeforeDiscountValue,
+      totalValueAfterTax,
+      totalValueBeforeTax,
       totalTicketSold,
       eventAffiliateRank,
     },

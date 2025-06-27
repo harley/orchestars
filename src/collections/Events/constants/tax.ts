@@ -1,0 +1,1 @@
+export const TAX_PERCENTAGE_DEFAULT = 8
