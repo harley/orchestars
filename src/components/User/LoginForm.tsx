@@ -4,6 +4,7 @@ import { useTranslate } from '@/providers/I18n/client'
 import { useToast } from '@/hooks/use-toast'
 import ForgotPasswordForm from './ForgotPasswordForm'
 import { Info } from 'lucide-react'
+import Link from 'next/link'
 
 interface LoginFormProps {
   onSuccess?: () => void
@@ -112,34 +113,29 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
             >
               {isLoading ? t('auth.signingIn') : t('auth.signIn')}
             </button>
-            <div className="text-center text-sm">
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setFormMode('forgotPassword')}
-                  className="font-medium text-gray-900 hover:underline focus:outline-none mr-4"
-                >
-                  {t('auth.forgotPassword')}
-                </button>
-              </div>
-              <div>
-                <button
-                  type="button"
-                  onClick={() => router.push('/affiliate')}
-                  className="font-medium text-gray-900 hover:underline focus:outline-none mt-2"
-                >
-                  {t('auth.affiliateLoginLink')}
-                </button>
-              </div>
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setFormMode('firstTimeLogin')}
-                  className="font-medium text-gray-900 hover:underline focus:outline-none mt-2"
-                >
-                  {t('auth.firstTimeLoginLink')}
-                </button>
-              </div>
+            <div className="text-center text-sm flex flex-col items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setFormMode('forgotPassword')}
+                className="font-medium text-gray-900 hover:underline focus:outline-none mr-4"
+              >
+                {t('auth.forgotPassword')}
+              </button>
+              <Link
+                href="/affiliate"
+                className="font-medium text-gray-900 hover:underline focus:outline-none"
+                aria-label={t('auth.affiliateLoginLink')}
+              >
+                {t('auth.affiliateLoginLink')}
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => setFormMode('firstTimeLogin')}
+                className="font-medium text-gray-900 hover:underline focus:outline-none"
+              >
+                {t('auth.firstTimeLoginLink')}
+              </button>
             </div>
           </div>
           <div className="flex items-start gap-3 p-4 mt-6 border-l-4 border-blue-500 bg-blue-50 rounded-md shadow-sm">
