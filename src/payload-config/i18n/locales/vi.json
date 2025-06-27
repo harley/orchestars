@@ -154,7 +154,13 @@
     "promotionSuccess": "Thành công",
     "promotionApplied": "Đã áp dụng mã giảm giá",
     "invalidPromoCode": "Mã giảm giá không hợp lệ",
-    "errorHoldingSeat": "Có lỗi xảy ra khi tiến hành giữ chỗ và thanh toán"
+    "errorHoldingSeat": "Có lỗi xảy ra khi tiến hành giữ chỗ và thanh toán",
+    "success": "Thành công",
+    "failed": "Thất bại",
+    "submitting": "Đang gửi...",
+    "submit": "Gửi",
+    "thankYouForYourSubmission": "Cảm ơn bạn! Thông tin của bạn đã được gửi thành công. Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.",
+    "failedMessage": "Có lỗi xảy ra! Vui lòng thử lại"
   },
   "errorCode": {
     "SYS001": "Có lỗi xảy ra! Vui lòng thử lại",
@@ -449,5 +455,12 @@
     "firstTimeLoginEmailPlaceholder": "Nhập email bạn đã dùng để đặt vé",
     "pleaseEnterEmailAndPassword": "Vui lòng nhập cả email và mật khẩu",
     "signingIn": "Đang đăng nhập..."
+  },
+  "navbar": {
+    "profile": "Thông tin tài khoản",
+    "logout": "Đăng xuất",
+    "signInSignUp": "Đăng nhập",
+    "buyTicketNow": "Mua vé ngay",
+    "buyNow": "Mua ngay"
   }
 }

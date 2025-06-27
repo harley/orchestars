@@ -1,0 +1,603 @@
+@import '~@payloadcms/ui/scss';
+
+// PayloadCMS Card Components
+.payload-card {
+  background: var(--theme-bg);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--border-radius-s);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: var(--base);
+  overflow: visible; // Allow dropdowns to overflow
+}
+
+.payload-card__header {
+  padding: var(--base);
+  border-bottom: 1px solid var(--theme-elevation-200);
+  background: var(--theme-elevation-50);
+}
+
+.payload-card__content {
+  padding: var(--base);
+}
+
+.payload-card__title {
+  margin: 0 0 calc(var(--base) / 4) 0;
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-bold);
+  color: var(--theme-text);
+}
+
+.payload-card__description {
+  margin: 0;
+  font-size: var(--font-size-small);
+  color: var(--theme-elevation-600);
+  line-height: var(--line-height-body);
+}
+
+// PayloadCMS Badge Components
+.payload-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: calc(var(--base) / 8) calc(var(--base) / 4);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--border-radius-s);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.payload-badge--default {
+  background: var(--theme-success-100);
+  color: var(--theme-success-600);
+  border: 1px solid var(--theme-success-200);
+}
+
+.payload-badge--secondary {
+  background: var(--theme-elevation-100);
+  color: var(--theme-elevation-600);
+  border: 1px solid var(--theme-elevation-200);
+}
+
+.payload-badge--success {
+  background: var(--theme-success-100);
+  color: var(--theme-success-600);
+  border: 1px solid var(--theme-success-200);
+}
+
+.payload-badge--warning {
+  background: var(--theme-warning-100);
+  color: var(--theme-warning-600);
+  border: 1px solid var(--theme-warning-200);
+}
+
+.payload-badge--danger {
+  background: var(--theme-error-100);
+  color: var(--theme-error-600);
+  border: 1px solid var(--theme-error-200);
+}
+
+// PayloadCMS Tabs Components
+.payload-tabs {
+  width: 100%;
+}
+
+.payload-tabs__list {
+  display: flex;
+  border-bottom: 1px solid var(--theme-elevation-200);
+  margin-bottom: var(--base);
+}
+
+.payload-tabs__trigger {
+  background: none;
+  border: none;
+  padding: calc(var(--base) / 2) var(--base);
+  font-size: var(--font-size-base);
+  color: var(--theme-elevation-600);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--base) / 4);
+
+  &:hover {
+    color: var(--theme-text);
+    background: var(--theme-elevation-50);
+  }
+
+  &--active {
+    color: var(--theme-text);
+    border-bottom-color: var(--theme-success-500);
+    font-weight: var(--font-weight-medium);
+  }
+}
+
+.payload-tabs__content {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// PayloadCMS Input Components
+.payload-input {
+  width: 100%;
+  padding: calc(var(--base) / 2);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--border-radius-s);
+  font-size: var(--font-size-base);
+  background: var(--theme-bg);
+  color: var(--theme-text);
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--theme-success-500);
+    box-shadow: 0 0 0 2px var(--theme-success-100);
+  }
+
+  &::placeholder {
+    color: var(--theme-elevation-500);
+  }
+}
+
+// PayloadCMS Table Components
+.payload-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--border-radius-s);
+  background: var(--theme-bg);
+}
+
+.payload-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-small);
+}
+
+.payload-table__header {
+  background: var(--theme-elevation-50);
+}
+
+.payload-table__head {
+  padding: calc(var(--base) / 2);
+  text-align: left;
+  font-weight: var(--font-weight-medium);
+  color: var(--theme-text);
+  border-bottom: 1px solid var(--theme-elevation-200);
+}
+
+.payload-table__row {
+  &:hover {
+    background: var(--theme-elevation-25);
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--theme-elevation-100);
+  }
+}
+
+.payload-table__cell {
+  padding: calc(var(--base) / 2);
+  color: var(--theme-text);
+  vertical-align: top;
+}
+
+// PayloadCMS Grid Components
+.payload-grid {
+  display: grid;
+  width: 100%;
+
+  // Ensure grid items don't clip dropdowns
+  .payload-grid__item {
+    overflow: visible;
+  }
+}
+
+.payload-grid--cols-1 {
+  grid-template-columns: 1fr;
+}
+
+.payload-grid--cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.payload-grid--cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.payload-grid--cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.payload-grid--gap-sm {
+  gap: calc(var(--base) / 2);
+}
+
+.payload-grid--gap-md {
+  gap: var(--base);
+}
+
+.payload-grid--gap-lg {
+  gap: calc(var(--base) * 1.5);
+}
+
+// Responsive adjustments
+@include small-break {
+  .payload-grid--cols-2,
+  .payload-grid--cols-3,
+  .payload-grid--cols-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .payload-tabs__list {
+    flex-direction: column;
+  }
+
+  .payload-tabs__trigger {
+    border-bottom: none;
+    border-left: 2px solid transparent;
+
+    &--active {
+      border-left-color: var(--theme-success-500);
+      border-bottom-color: transparent;
+    }
+  }
+}
+
+// SelectInput z-index fix and overflow handling
+// .field-type {
+//   position: relative;
+//   z-index: 10;
+
+//   .rs__control {
+//     z-index: 10;
+//     position: relative;
+//   }
+
+//   .rs__menu {
+//     z-index: 1000 !important;
+//     position: absolute !important;
+//     top: 100% !important;
+//     left: 0 !important;
+//     right: 0 !important;
+//     // background: var(--theme-bg) !important;
+//     border: 1px solid var(--theme-elevation-200) !important;
+//     border-radius: var(--border-radius-s) !important;
+//     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+//   }
+
+//   .rs__menu-list {
+//     z-index: 1001 !important;
+//     max-height: 200px !important;
+//     overflow-y: auto !important;
+//   }
+
+//   .rs__option {
+//     padding: calc(var(--base) / 2) !important;
+//     color: var(--theme-text) !important;
+
+//     &:hover {
+//       background: var(--theme-elevation-50) !important;
+//     }
+
+//     &--is-selected {
+//       background: var(--theme-success-100) !important;
+//       color: var(--theme-success-600) !important;
+//     }
+
+//     &--is-focused {
+//       background: var(--theme-elevation-100) !important;
+//     }
+//   }
+// }
+
+// Special handling for cards containing dropdowns
+.payload-card--dropdown {
+  overflow: visible !important;
+  position: relative;
+  z-index: 1;
+}
+
+.payload-card__content--dropdown {
+  overflow: visible !important;
+  position: relative;
+  z-index: 1;
+}
+
+// Utility classes
+.payload-flex {
+  display: flex;
+}
+
+.payload-flex--center {
+  align-items: center;
+  justify-content: center;
+}
+
+.payload-flex--between {
+  justify-content: space-between;
+}
+
+.payload-flex--gap {
+  gap: calc(var(--base) / 2);
+}
+
+.payload-text--center {
+  text-align: center;
+}
+
+.payload-text--muted {
+  color: var(--theme-elevation-600);
+}
+
+.payload-text--small {
+  font-size: var(--font-size-small);
+}
+
+.payload-text--bold {
+  font-weight: var(--font-weight-bold);
+}
+
+.payload-mb {
+  margin-bottom: var(--base);
+}
+
+.payload-mt {
+  margin-top: var(--base);
+}
+
+.payload-p {
+  padding: var(--base);
+}
+
+.payload-empty-state {
+  text-align: center;
+  padding: calc(var(--base) * 2);
+  color: var(--theme-elevation-600);
+
+  svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: var(--base);
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0 0 calc(var(--base) / 2) 0;
+    font-size: var(--font-size-h5);
+    color: var(--theme-text);
+  }
+
+  p {
+    margin: 0 0 var(--base) 0;
+    font-size: var(--font-size-small);
+    line-height: var(--line-height-body);
+  }
+}
+
+// PayloadCMS Modal Components
+.payload-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--base);
+}
+
+.payload-modal-content {
+  background: var(--theme-bg);
+  border-radius: var(--border-radius-s);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 500px;
+}
+
+.payload-modal-header {
+  padding: var(--base);
+  border-bottom: 1px solid var(--theme-elevation-200);
+  background: var(--theme-elevation-50);
+}
+
+.payload-modal-title {
+  margin: 0;
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-bold);
+  color: var(--theme-text);
+}
+
+.payload-modal-body {
+  padding: var(--base);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.payload-modal-footer {
+  padding: var(--base);
+  border-top: 1px solid var(--theme-elevation-200);
+  background: var(--theme-elevation-50);
+  display: flex;
+  justify-content: flex-end;
+  gap: calc(var(--base) / 2);
+}
+
+// PayloadCMS Form Components
+.payload-form-group {
+  margin-bottom: var(--base);
+}
+
+.payload-label {
+  display: block;
+  margin-bottom: calc(var(--base) / 4);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--theme-text);
+}
+
+.payload-label-required {
+  color: var(--theme-error-500);
+  margin-left: 2px;
+}
+
+.payload-description {
+  font-size: var(--font-size-small);
+  color: var(--theme-elevation-600);
+  margin: calc(var(--base) / 4) 0 calc(var(--base) / 2) 0;
+  line-height: var(--line-height-body);
+}
+
+.payload-textarea {
+  width: 100%;
+  padding: calc(var(--base) / 2);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--border-radius-s);
+  font-size: var(--font-size-base);
+  background: var(--theme-bg);
+  color: var(--theme-text);
+  transition: border-color 0.2s ease;
+  resize: vertical;
+  min-height: 80px;
+
+  &:focus {
+    outline: none;
+    border-color: var(--theme-success-500);
+    box-shadow: 0 0 0 2px var(--theme-success-100);
+  }
+
+  &::placeholder {
+    color: var(--theme-elevation-500);
+  }
+}
+
+.payload-select {
+  width: 100%;
+  padding: calc(var(--base) / 2);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--border-radius-s);
+  font-size: var(--font-size-base);
+  background: var(--theme-bg);
+  color: var(--theme-text);
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--theme-success-500);
+    box-shadow: 0 0 0 2px var(--theme-success-100);
+  }
+}
+
+.payload-checkbox {
+  margin-right: calc(var(--base) / 4);
+  accent-color: var(--theme-success-500);
+}
+
+.payload-multi-select {
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--border-radius-s);
+  padding: calc(var(--base) / 2);
+  background: var(--theme-bg);
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.payload-multi-select-option {
+  display: flex;
+  align-items: center;
+  padding: calc(var(--base) / 4) 0;
+  font-size: var(--font-size-small);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--theme-elevation-50);
+    margin: 0 calc(var(--base) / -2);
+    padding-left: calc(var(--base) / 2);
+    padding-right: calc(var(--base) / 2);
+    border-radius: var(--border-radius-s);
+  }
+}
+
+// PayloadCMS Grid System
+.payload-grid {
+  display: grid;
+  width: 100%;
+}
+
+.payload-grid--cols-1 {
+  grid-template-columns: 1fr;
+}
+
+.payload-grid--cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.payload-grid--cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.payload-grid--cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.payload-grid--gap-sm {
+  gap: calc(var(--base) / 2);
+}
+
+.payload-grid--gap-md {
+  gap: var(--base);
+}
+
+.payload-grid--gap-lg {
+  gap: calc(var(--base) * 1.5);
+}
+
+.payload-grid__item {
+  min-width: 0; // Prevent grid items from overflowing
+}
+
+// Additional form styling
+.payload-form-group {
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Modal responsive design
+@media (max-width: 768px) {
+  .payload-modal-content {
+    min-width: auto;
+    width: 95vw;
+    max-height: 95vh;
+  }
+
+  .payload-grid--cols-2,
+  .payload-grid--cols-3,
+  .payload-grid--cols-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.m-0 {
+  margin: 0;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}

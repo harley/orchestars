@@ -9,6 +9,7 @@ import {
 import { revalidateTag } from 'next/cache'
 import type { CollectionConfig } from 'payload'
 import { EVENT_STATUSES } from './constants/status'
+import { TAX_PERCENTAGE_DEFAULT } from './constants/tax'
 
 export const Events: CollectionConfig = {
   slug: 'events',
@@ -192,6 +193,38 @@ export const Events: CollectionConfig = {
           min: 0,
           name: 'quantity',
           defaultValue: 0,
+        },
+      ],
+    },
+    {
+      name: 'vat',
+      type: 'group',
+      label: 'VAT Information',
+      fields: [
+        {
+          name: 'enabled',
+          type: 'checkbox',
+          label: 'Apply VAT',
+          defaultValue: true,
+        },
+        {
+          name: 'percentage',
+          type: 'number',
+          label: 'VAT Percentage',
+          min: 0,
+          defaultValue: TAX_PERCENTAGE_DEFAULT,
+          max: 100,
+          admin: {
+            condition: (_, siblingData) => siblingData?.enabled === true,
+          },
+        },
+        {
+          name: 'note',
+          type: 'textarea',
+          label: 'VAT Note / Registration Number',
+          admin: {
+            condition: (_, siblingData) => siblingData?.enabled === true,
+          },
         },
       ],
     },

@@ -43,6 +43,12 @@ import { PromotionConfigs } from './collections/Promotion/PromotionConfigs'
 import { AffiliateLinks } from './collections/Affiliate/AffiliateLinks'
 import { AffiliateClickLogs } from './collections/Affiliate/AffiliateClickLogs'
 import { AffiliateSettings } from './collections/Affiliate/AffiliateSettings'
+import { AffiliateRanks } from './collections/Affiliate/AffiliateRanks'
+import { EventAffiliateRanks } from './collections/Affiliate/EventAffiliateRanks'
+import { AffiliateRankLogs } from './collections/Affiliate/AffiliateRankLogs'
+import { AffiliateUserRanks } from './collections/Affiliate/AffiliateUserRank'
+import { EventAffiliateUserRanks } from './collections/Affiliate/EventAffiliateUserRanks'
+import { HIDE_AFFILIATE_RANK_CONFIG } from './collections/Affiliate/helper'
 // import { sendMailJob } from './collections/Emails/jobs/sendMail'
 
 const filename = fileURLToPath(import.meta.url)
@@ -68,6 +74,14 @@ export default buildConfig({
         Logo: '/components/Logo/Logo#Logo',
       },
       views: {
+        // custom page should be put before the default payloadcms pages
+        managementAffiliate: {
+          Component: '@/components/AdminViews/ManagementAffiliate/Page',
+          path: '/management-affiliate',
+          exact: true,
+          strict: true,
+          sensitive: true,
+        },
         createOrder: {
           Component: '@/components/AdminViews/Order/CreateOrder',
           path: '/create-order',
@@ -137,6 +151,9 @@ export default buildConfig({
     FAQs,
     Admins,
     Emails,
+    ...(HIDE_AFFILIATE_RANK_CONFIG
+      ? []
+      : [AffiliateRanks, EventAffiliateRanks, AffiliateUserRanks, EventAffiliateUserRanks, AffiliateRankLogs]),
     AffiliateLinks,
     AffiliateSettings,
     AffiliateClickLogs,

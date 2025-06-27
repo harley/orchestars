@@ -33,6 +33,7 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { SelectOrderCategory as SelectOrderCategory_049671e81ae6d06dcf2439baca2a6b79 } from '@/components/AdminViews/Order/SelectOrderCategory/SelectOrderCategoryPayloadComponent'
 import { ActionViews as ActionViews_c625c4a830674427dc2497d62b0046dd } from '@/components/AdminViews/Order/ActionViews'
 import { default as default_e6b30098bdd062bcc6e4cf9467eed8df } from '@/components/Tickets/Actions/SendMailButton'
+import { BackToManagementAffiliate as BackToManagementAffiliate_e4cfc8d47ceec056e42a7dd2643c7d64 } from '@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate'
 import { TargetLink as TargetLink_fee2cd5f2a9fe1a01c55a441ca6e0d70 } from '@/components/AdminViews/Affiliate/Links/TargetLink'
 import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
@@ -47,6 +48,7 @@ import { Logo as Logo_9bcae99938dc292be0063ce32055e14c } from '../../../componen
 import { ImportExportProvider as ImportExportProvider_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { VercelBlobClientUploadHandler as VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e } from '@payloadcms/storage-vercel-blob/client'
+import { default as default_3efec95bcc976db851def6c50766ac0b } from '@/components/AdminViews/ManagementAffiliate/Page'
 import { default as default_8e5de8afbbc6bbe41b4747de1145e709 } from '@/components/AdminViews/Order/CreateOrder'
 import { default as default_cedb957be856ec83a6d609901bda3c39 } from '@/components/AdminViews/Dashboard/Component'
 
@@ -86,6 +88,7 @@ export const importMap = {
   "@/components/AdminViews/Order/SelectOrderCategory/SelectOrderCategoryPayloadComponent#SelectOrderCategory": SelectOrderCategory_049671e81ae6d06dcf2439baca2a6b79,
   "@/components/AdminViews/Order/ActionViews#ActionViews": ActionViews_c625c4a830674427dc2497d62b0046dd,
   "@/components/Tickets/Actions/SendMailButton#default": default_e6b30098bdd062bcc6e4cf9467eed8df,
+  "@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate": BackToManagementAffiliate_e4cfc8d47ceec056e42a7dd2643c7d64,
   "@/components/AdminViews/Affiliate/Links/TargetLink#TargetLink": TargetLink_fee2cd5f2a9fe1a01c55a441ca6e0d70,
   "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,
@@ -100,6 +103,7 @@ export const importMap = {
   "@payloadcms/plugin-import-export/rsc#ImportExportProvider": ImportExportProvider_cdf7e044479f899a31f804427d568b36,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "@payloadcms/storage-vercel-blob/client#VercelBlobClientUploadHandler": VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e,
+  "@/components/AdminViews/ManagementAffiliate/Page#default": default_3efec95bcc976db851def6c50766ac0b,
   "@/components/AdminViews/Order/CreateOrder#default": default_8e5de8afbbc6bbe41b4747de1145e709,
   "@/components/AdminViews/Dashboard/Component#default": default_cedb957be856ec83a6d609901bda3c39
 }

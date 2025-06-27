@@ -89,6 +89,11 @@ export interface Config {
     faqs: Faq;
     admins: Admin;
     emails: Email;
+    'affiliate-ranks': AffiliateRank;
+    'event-affiliate-ranks': EventAffiliateRank;
+    'affiliate-user-ranks': AffiliateUserRank;
+    'event-affiliate-user-ranks': EventAffiliateUserRank;
+    'affiliate-rank-logs': AffiliateRankLog;
     'affiliate-links': AffiliateLink;
     'affiliate-settings': AffiliateSetting;
     'affiliate-click-logs': AffiliateClickLog;
@@ -128,6 +133,11 @@ export interface Config {
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     admins: AdminsSelect<false> | AdminsSelect<true>;
     emails: EmailsSelect<false> | EmailsSelect<true>;
+    'affiliate-ranks': AffiliateRanksSelect<false> | AffiliateRanksSelect<true>;
+    'event-affiliate-ranks': EventAffiliateRanksSelect<false> | EventAffiliateRanksSelect<true>;
+    'affiliate-user-ranks': AffiliateUserRanksSelect<false> | AffiliateUserRanksSelect<true>;
+    'event-affiliate-user-ranks': EventAffiliateUserRanksSelect<false> | EventAffiliateUserRanksSelect<true>;
+    'affiliate-rank-logs': AffiliateRankLogsSelect<false> | AffiliateRankLogsSelect<true>;
     'affiliate-links': AffiliateLinksSelect<false> | AffiliateLinksSelect<true>;
     'affiliate-settings': AffiliateSettingsSelect<false> | AffiliateSettingsSelect<true>;
     'affiliate-click-logs': AffiliateClickLogsSelect<false> | AffiliateClickLogsSelect<true>;
@@ -626,6 +636,10 @@ export interface FormBlock {
  */
 export interface Form {
   id: number;
+  /**
+   * Enter a custom type for this form
+   */
+  type: string;
   title: string;
   fields?:
     | (
@@ -791,6 +805,7 @@ export interface Form {
         id?: string | null;
       }[]
     | null;
+  status: 'active' | 'inactive';
   updatedAt: string;
   createdAt: string;
 }
@@ -944,6 +959,11 @@ export interface Event {
         id?: string | null;
       }[]
     | null;
+  vat?: {
+    enabled?: boolean | null;
+    percentage?: number | null;
+    note?: string | null;
+  };
   eventLogo?: (number | null) | Media;
   eventBanner?: (number | null) | Media;
   mobileEventBanner?: (number | null) | Media;
@@ -1409,6 +1429,291 @@ export interface Email {
     | null;
   status?: ('pending' | 'sent' | 'failed') | null;
   sentAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Cấu hình các hạng của Affiliate Seller
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-ranks".
+ */
+export interface AffiliateRank {
+  id: number;
+  rankName: 'Tier1' | 'Tier2' | 'Tier3' | 'Tier4';
+  rankNameLabel?: string | null;
+  description?: string | null;
+  /**
+   * Số điểm tối thiểu để đạt hạng này (1 điểm = 1000 VND doanh thu)
+   */
+  minPoints: number;
+  rewards?: {
+    ticketRewards?:
+      | {
+          minTickets?: number | null;
+          maxTickets?: number | null;
+          minRevenue: number;
+          maxRevenue?: number | null;
+          rewardTickets: number;
+          id?: string | null;
+        }[]
+      | null;
+    commissionRewards?:
+      | {
+          minTickets?: number | null;
+          maxTickets?: number | null;
+          minRevenue: number;
+          maxRevenue?: number | null;
+          commissionRate: number;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Cấu hình hạng của Affiliate Seller trong từng event cụ thể
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-affiliate-ranks".
+ */
+export interface EventAffiliateRank {
+  id: number;
+  /**
+   * Sự kiện mà hạng này được áp dụng
+   */
+  event: number | Event;
+  /**
+   * Hạng được gán cho Affiliate User trong event
+   */
+  rankName: 'Tier1' | 'Tier2' | 'Tier3' | 'Tier4';
+  rankNameLabel?: string | null;
+  /**
+   * Trạng thái của hạng trong event: Draft (bản nháp), Active (hoạt động), Disabled (vô hiệu hóa)
+   */
+  status: 'draft' | 'active' | 'disabled';
+  eventRewards?: {
+    ticketRewards?:
+      | {
+          minTickets?: number | null;
+          maxTickets?: number | null;
+          minRevenue: number;
+          maxRevenue?: number | null;
+          rewardTickets: number;
+          id?: string | null;
+        }[]
+      | null;
+    commissionRewards?:
+      | {
+          minTickets?: number | null;
+          maxTickets?: number | null;
+          minRevenue: number;
+          maxRevenue?: number | null;
+          commissionRate: number;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Lưu trữ thông tin hạng tổng của Affiliate User
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-user-ranks".
+ */
+export interface AffiliateUserRank {
+  id: number;
+  /**
+   * Chọn Affiliate User (chỉ hiển thị users có role là affiliate)
+   */
+  affiliateUser: number | User;
+  /**
+   * Hạng hiện tại của Affiliate User
+   */
+  currentRank: 'Tier1' | 'Tier2' | 'Tier3' | 'Tier4';
+  /**
+   * Tổng số điểm tích lũy (1 điểm = 1000 VND doanh thu)
+   */
+  totalPoints: number;
+  /**
+   * Tổng doanh thu từ các đơn hàng của Affiliate User.
+   */
+  totalRevenue: number;
+  /**
+   * Tổng Tiền trước khi trừ thuế VAT của Affiliate User
+   */
+  totalRevenueBeforeTax: number;
+  /**
+   * Tổng Tiền trước giảm giá từ các đơn hàng của Affiliate User
+   */
+  totalRevenueBeforeDiscount: number;
+  /**
+   * Tổng số vé đã bán được trong tất cả các sự kiện
+   */
+  totalTicketsSold: number;
+  /**
+   * Tổng số tiền hoa hồng đã nhận được từ các sự kiện
+   */
+  totalCommissionEarned: number;
+  /**
+   * Tổng số vé thưởng đã nhận được từ các sự kiện
+   */
+  totalTicketsRewarded: number;
+  /**
+   * Ngày Affiliate User đạt được hạng hiện tại
+   */
+  rankAchievedDate?: string | null;
+  /**
+   * Thời điểm Affiliate User thực hiện hành động gần nhất (bán vé, tích điểm, nâng hạng, v.v.)
+   */
+  lastActivityDate?: string | null;
+  /**
+   * Hạng mà Affiliate User đủ điều kiện nâng cấp nhưng chưa xác nhận
+   */
+  pendingRankUpgrade?: ('Tier1' | 'Tier2' | 'Tier3' | 'Tier4') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Quản lý hạng của Affiliate Seller trong từng event cụ thể
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-affiliate-user-ranks".
+ */
+export interface EventAffiliateUserRank {
+  id: number;
+  /**
+   * Sự kiện mà hạng này được áp dụng
+   */
+  event: number | Event;
+  /**
+   * Hạng được gán cho Affiliate Seller trong sự kiện này (ví dụ: Fan, Ambassador)
+   */
+  eventAffiliateRank: number | EventAffiliateRank;
+  /**
+   * Affiliate User
+   */
+  affiliateUser: number | User;
+  /**
+   * Trạng thái của hạng trong event: Draft (bản nháp), Active (hoạt động), Disabled (vô hiệu hóa)
+   */
+  status: 'draft' | 'active' | 'disabled';
+  /**
+   * Khi khóa, hạng này sẽ không thay đổi trong suốt event
+   */
+  isLocked?: boolean | null;
+  /**
+   * Tổng số điểm tích lũy (1 điểm = 1000 VND doanh thu) của Affiliate User trong event này
+   */
+  totalPoints: number;
+  /**
+   * Tổng doanh thu từ các đơn hàng của Affiliate User. Sẽ tính phần thưởng dựa trên giá trị này
+   */
+  totalRevenue: number;
+  /**
+   * Tổng Tiền trước khi trừ thuế VAT của Affiliate User
+   */
+  totalRevenueBeforeTax: number;
+  /**
+   * Tổng Tiền trước giảm giá từ các đơn hàng của Affiliate User
+   */
+  totalRevenueBeforeDiscount: number;
+  /**
+   * Tổng số vé đã bán được trong tất cả sự kiện
+   */
+  totalTicketsSold: number;
+  /**
+   * Tổng số tiền hoa hồng có thể nhận được từ sự kiện
+   */
+  totalCommissionEarned: number;
+  /**
+   * Tổng số vé thưởng có thể nhận được từ sự kiện
+   */
+  totalTicketsRewarded: number;
+  /**
+   * Thời điểm Affiliate User thực hiện hành động gần nhất (bán vé, tích điểm, v.v.) trong event này
+   */
+  lastActivityDate?: string | null;
+  /**
+   * Khi đã hoàn thành, những giá trị sẽ được tính toán và lưu vào các thông số hạng tổng của Affiliate User. Chỉ thực hiện hành động này sau khi event đã kết thúc
+   */
+  isCompleted?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Lưu trữ lịch sử các thay đổi điểm và hạng của Affiliate User
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-rank-logs".
+ */
+export interface AffiliateRankLog {
+  id: number;
+  /**
+   * Affiliate User liên quan đến log này
+   */
+  affiliateUser: number | User;
+  /**
+   * Xác định log này liên quan đến hạng tổng hay hạng theo sự kiện
+   */
+  rankContext: 'user' | 'event';
+  /**
+   * Loại hành động liên quan đến điểm hoặc hạng
+   */
+  actionType:
+    | 'add_points'
+    | 'subtract_points'
+    | 'rank_upgrade'
+    | 'rank_downgrade'
+    | 'confirm_rank_upgrade'
+    | 'event_completed';
+  /**
+   * Số điểm thay đổi (dương hoặc âm, 0 nếu không thay đổi điểm)
+   */
+  pointsChange?: number | null;
+  /**
+   * Số điểm của Affiliate User trước khi sự kiện xảy ra
+   */
+  pointsBefore?: number | null;
+  /**
+   * Số điểm của Affiliate User sau khi sự kiện xảy ra
+   */
+  pointsAfter?: number | null;
+  /**
+   * Hạng trước khi sự kiện xảy ra (nếu có, áp dụng cho rank tổng)
+   */
+  rankBefore?: ('Tier1' | 'Tier2' | 'Tier3' | 'Tier4') | null;
+  /**
+   * Hạng sau khi sự kiện xảy ra (nếu có, áp dụng cho rank tổng)
+   */
+  rankAfter?: ('Tier1' | 'Tier2' | 'Tier3' | 'Tier4') | null;
+  /**
+   * Hạng trong event nếu log liên quan đến EventAffiliateUserRanks
+   */
+  eventAffiliateRank?: (number | null) | EventAffiliateRank;
+  /**
+   * Mô tả chi tiết về sự kiện (ví dụ: lý do thay đổi điểm hoặc hạng)
+   */
+  description?: string | null;
+  /**
+   * Thời gian xảy ra hành động.
+   */
+  occurredAt: string;
+  /**
+   * Sự kiện liên quan đến thay đổi này (nếu có)
+   */
+  event?: (number | null) | Event;
+  /**
+   * Đơn hàng liên quan đến thay đổi này (nếu có)
+   */
+  order?: (number | null) | Order;
+  /**
+   * Admin thực hiện hành động này (nếu có)
+   */
+  adminUser?: (number | null) | Admin;
   updatedAt: string;
   createdAt: string;
 }
@@ -1918,6 +2223,26 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'emails';
         value: number | Email;
+      } | null)
+    | ({
+        relationTo: 'affiliate-ranks';
+        value: number | AffiliateRank;
+      } | null)
+    | ({
+        relationTo: 'event-affiliate-ranks';
+        value: number | EventAffiliateRank;
+      } | null)
+    | ({
+        relationTo: 'affiliate-user-ranks';
+        value: number | AffiliateUserRank;
+      } | null)
+    | ({
+        relationTo: 'event-affiliate-user-ranks';
+        value: number | EventAffiliateUserRank;
+      } | null)
+    | ({
+        relationTo: 'affiliate-rank-logs';
+        value: number | AffiliateRankLog;
       } | null)
     | ({
         relationTo: 'affiliate-links';
@@ -2441,6 +2766,13 @@ export interface EventsSelect<T extends boolean = true> {
         quantity?: T;
         id?: T;
       };
+  vat?:
+    | T
+    | {
+        enabled?: T;
+        percentage?: T;
+        note?: T;
+      };
   eventLogo?: T;
   eventBanner?: T;
   mobileEventBanner?: T;
@@ -2763,6 +3095,142 @@ export interface EmailsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-ranks_select".
+ */
+export interface AffiliateRanksSelect<T extends boolean = true> {
+  rankName?: T;
+  rankNameLabel?: T;
+  description?: T;
+  minPoints?: T;
+  rewards?:
+    | T
+    | {
+        ticketRewards?:
+          | T
+          | {
+              minTickets?: T;
+              maxTickets?: T;
+              minRevenue?: T;
+              maxRevenue?: T;
+              rewardTickets?: T;
+              id?: T;
+            };
+        commissionRewards?:
+          | T
+          | {
+              minTickets?: T;
+              maxTickets?: T;
+              minRevenue?: T;
+              maxRevenue?: T;
+              commissionRate?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-affiliate-ranks_select".
+ */
+export interface EventAffiliateRanksSelect<T extends boolean = true> {
+  event?: T;
+  rankName?: T;
+  rankNameLabel?: T;
+  status?: T;
+  eventRewards?:
+    | T
+    | {
+        ticketRewards?:
+          | T
+          | {
+              minTickets?: T;
+              maxTickets?: T;
+              minRevenue?: T;
+              maxRevenue?: T;
+              rewardTickets?: T;
+              id?: T;
+            };
+        commissionRewards?:
+          | T
+          | {
+              minTickets?: T;
+              maxTickets?: T;
+              minRevenue?: T;
+              maxRevenue?: T;
+              commissionRate?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-user-ranks_select".
+ */
+export interface AffiliateUserRanksSelect<T extends boolean = true> {
+  affiliateUser?: T;
+  currentRank?: T;
+  totalPoints?: T;
+  totalRevenue?: T;
+  totalRevenueBeforeTax?: T;
+  totalRevenueBeforeDiscount?: T;
+  totalTicketsSold?: T;
+  totalCommissionEarned?: T;
+  totalTicketsRewarded?: T;
+  rankAchievedDate?: T;
+  lastActivityDate?: T;
+  pendingRankUpgrade?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-affiliate-user-ranks_select".
+ */
+export interface EventAffiliateUserRanksSelect<T extends boolean = true> {
+  event?: T;
+  eventAffiliateRank?: T;
+  affiliateUser?: T;
+  status?: T;
+  isLocked?: T;
+  totalPoints?: T;
+  totalRevenue?: T;
+  totalRevenueBeforeTax?: T;
+  totalRevenueBeforeDiscount?: T;
+  totalTicketsSold?: T;
+  totalCommissionEarned?: T;
+  totalTicketsRewarded?: T;
+  lastActivityDate?: T;
+  isCompleted?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-rank-logs_select".
+ */
+export interface AffiliateRankLogsSelect<T extends boolean = true> {
+  affiliateUser?: T;
+  rankContext?: T;
+  actionType?: T;
+  pointsChange?: T;
+  pointsBefore?: T;
+  pointsAfter?: T;
+  rankBefore?: T;
+  rankAfter?: T;
+  eventAffiliateRank?: T;
+  description?: T;
+  occurredAt?: T;
+  event?: T;
+  order?: T;
+  adminUser?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "affiliate-links_select".
  */
 export interface AffiliateLinksSelect<T extends boolean = true> {
@@ -2903,6 +3371,7 @@ export interface RedirectsSelect<T extends boolean = true> {
  * via the `definition` "forms_select".
  */
 export interface FormsSelect<T extends boolean = true> {
+  type?: T;
   title?: T;
   fields?:
     | T
@@ -3028,6 +3497,7 @@ export interface FormsSelect<T extends boolean = true> {
         message?: T;
         id?: T;
       };
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }
