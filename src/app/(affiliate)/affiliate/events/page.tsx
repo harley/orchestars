@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { AffiliateSidebar } from '@/components/Affiliate/AffiliateSidebar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AffiliateMetricsCard } from '@/components/Affiliate/AffiliateMetricsCard'
+import { format as formatDate } from 'date-fns'
 import {
   Select,
   SelectContent,
@@ -36,175 +37,99 @@ import {
 } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 import { ProtectedRoute } from '@/components/Affiliate/ProtectedRoute'
+import { formatMoney } from '@/utilities/formatMoney'
+import { N } from 'vitest/dist/chunks/environment.d.Dmw5ulng.js'
 
-// Mock events data
-const mockEventsData = {
-  summary: {
-    totalEvents: 12,
-    activeEvents: 8,
-    upcomingEvents: 4,
-    totalTicketsSold: 1560,
-    totalRevenue: 45250,
-    averageTicketPrice: 89.5,
-  },
-  events: [
-    {
-      id: '1',
-      title: 'Summer Concert Series',
-      date: '2024-07-15',
-      time: '19:30',
-      venue: 'Symphony Hall',
-      status: 'active',
-      ticketsSold: 634,
-      revenue: 12450,
-      clicks: 8920,
-      conversionRate: 7.11,
-      commission: 1245,
-      category: 'Classical',
-      capacity: 800,
-      priceRange: '$45 - $120',
-      description: 'An enchanting evening of classical music featuring renowned orchestral pieces.',
-    },
-    {
-      id: '2',
-      title: 'Classical Nights',
-      date: '2024-08-22',
-      time: '20:00',
-      venue: 'Opera House',
-      status: 'active',
-      ticketsSold: 378,
-      revenue: 8900,
-      clicks: 6780,
-      conversionRate: 5.58,
-      commission: 890,
-      category: 'Classical',
-      capacity: 600,
-      priceRange: '$35 - $95',
-      description: 'Experience the beauty of classical music in an intimate setting.',
-    },
-    {
-      id: '3',
-      title: 'Holiday Special',
-      date: '2024-12-20',
-      time: '18:00',
-      venue: 'Grand Theater',
-      status: 'upcoming',
-      ticketsSold: 267,
-      revenue: 7200,
-      clicks: 5240,
-      conversionRate: 5.1,
-      commission: 720,
-      category: 'Holiday',
-      capacity: 1000,
-      priceRange: '$25 - $85',
-      description: 'Celebrate the holidays with festive orchestral performances.',
-    },
-    {
-      id: '4',
-      title: 'Orchestra Gala',
-      date: '2024-09-10',
-      time: '19:00',
-      venue: 'Concert Hall',
-      status: 'active',
-      ticketsSold: 156,
-      revenue: 6100,
-      clicks: 3890,
-      conversionRate: 4.01,
-      commission: 610,
-      category: 'Gala',
-      capacity: 500,
-      priceRange: '$75 - $200',
-      description: 'An elegant gala evening featuring world-class orchestral performances.',
-    },
-    {
-      id: '5',
-      title: 'Spring Festival',
-      date: '2024-05-18',
-      time: '17:30',
-      venue: 'Outdoor Pavilion',
-      status: 'completed',
-      ticketsSold: 89,
-      revenue: 4800,
-      clicks: 2340,
-      conversionRate: 3.8,
-      commission: 480,
-      category: 'Festival',
-      capacity: 1200,
-      priceRange: '$30 - $70',
-      description: 'Outdoor spring festival celebrating music and nature.',
-    },
-    {
-      id: '6',
-      title: 'Chamber Music Series',
-      date: '2024-06-25',
-      time: '19:30',
-      venue: 'Intimate Hall',
-      status: 'completed',
-      ticketsSold: 36,
-      revenue: 3200,
-      clicks: 1300,
-      conversionRate: 2.77,
-      commission: 320,
-      category: 'Chamber',
-      capacity: 150,
-      priceRange: '$55 - $110',
-      description: 'Intimate chamber music performances in a cozy setting.',
-    },
-  ],
-  categories: [
-    { name: 'Classical', events: 4, revenue: 21350, percentage: 47.2 },
-    { name: 'Holiday', events: 2, revenue: 7200, percentage: 15.9 },
-    { name: 'Gala', events: 2, revenue: 6100, percentage: 13.5 },
-    { name: 'Festival', events: 2, revenue: 4800, percentage: 10.6 },
-    { name: 'Chamber', events: 2, revenue: 3200, percentage: 7.1 },
-  ],
+type eventByStatusItem = {
+  upcoming: Number
+  active: Number
+  total: Number
 }
-
+type eventMetrics = {
+  ticketNumber: number
+  grossRevenue: number
+  netRevenue: number
+}
+type performanceSummaryItem = {
+  eventName: string
+  location: string
+  eventStatus: string
+  totalPoints: number
+  affLink: string
+  ticketNum: number
+  totalRevenue: number
+  clickNum: number
+  minPrice: number
+  maxPrice: number
+  schedules: Array<Date>
+}
 export default function EventsPage() {
   const { toast } = useToast()
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [categoryFilter, setCategoryFilter] = useState('all')
-
-  const filteredEvents = mockEventsData.events.filter((event) => {
-    const statusMatch = statusFilter === 'all' || event.status === statusFilter
-    const categoryMatch =
-      categoryFilter === 'all' || event.category.toLowerCase() === categoryFilter
-    return statusMatch && categoryMatch
+  // const [statusFilter, setStatusFilter] = useState('all')
+  // const [categoryFilter, setCategoryFilter] = useState('all')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [eventCountByStatus, setEventCountByStatus] = useState<eventByStatusItem>({
+    upcoming: 0,
+    active: 0,
+    total: 0,
   })
+  const [eventMetrics, setEventMetrics] = useState<eventMetrics>({
+    ticketNumber: 0,
+    grossRevenue: 0,
+    netRevenue: 0,
+  })
+  const [performanceSummary, setPerformanceSummary] = useState<performanceSummaryItem[]>([])
+
+  useEffect(() => {
+    //UseEffect structure and syntax
+    const fetchEventMetrics = async () => {
+      try {
+        //Event count by status
+        const resEventCountByStatus = await fetch(`/api/affiliate/event-by-status`)
+        const dataEventCountByStatus = await resEventCountByStatus.json()
+        setEventCountByStatus(dataEventCountByStatus)
+        //Event metrics
+        const resEventMetrics = await fetch(`/api/affiliate/event-metrics`)
+        const dataEventMetrics = await resEventMetrics.json()
+        console.log('Metrics:', dataEventMetrics)
+        setEventMetrics(dataEventMetrics)
+        //Performance summary
+        const resPerformanceSummary = await fetch(`/api/affiliate/performance-summary-by-events`)
+        const dataPerformanceSummary = await resPerformanceSummary.json()
+        setPerformanceSummary(dataPerformanceSummary)
+      } catch (err) {
+        console.error('Failed to fetch metrics:', err)
+        setError('Failed to load event metrics data')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchEventMetrics()
+  }, [])
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
+      case 'Active':
         return 'bg-green-100 text-green-800'
-      case 'upcoming':
+      case 'Upcoming':
         return 'bg-blue-100 text-blue-800'
-      case 'completed':
+      case 'Completed':
+        return 'bg-gray-100 text-gray-800'
+      case 'Unknown':
         return 'bg-gray-100 text-gray-800'
       default:
         return 'bg-gray-100 text-gray-800'
     }
   }
 
-  const generateAffiliateLink = (eventId: string, eventTitle: string) => {
-    const baseUrl = `${window.location.origin}/events/${eventId}`
-    const utmParams = new URLSearchParams({
-      utm_source: 'affiliate',
-      utm_medium: 'affiliate_link',
-      utm_campaign: eventTitle.toLowerCase().replace(/\s+/g, '-'),
-      utm_content: 'event_page',
-    })
-    return `${baseUrl}?${utmParams.toString()}`
-  }
-
-  const copyAffiliateLink = (eventId: string, eventTitle: string) => {
-    const link = generateAffiliateLink(eventId, eventTitle)
+  const copyAffiliateLink = (link: string) => {
     navigator.clipboard.writeText(link)
     toast({
       title: 'Link Copied',
       description: 'Affiliate link has been copied to your clipboard.',
     })
   }
-
   return (
     <ProtectedRoute>
       <SidebarProvider>
@@ -217,13 +142,12 @@ export default function EventsPage() {
                   <div className="mb-8">
                     <h1 className="text-3xl font-bold tracking-tight">Events Analytics</h1>
                     <p className="text-muted-foreground">
-                      Track performance across all events and generate affiliate links for specific
-                      events
+                      Track performance across all events and affiliate links
                     </p>
                   </div>
 
                   {/* Filters */}
-                  <div className="flex gap-4 mb-6">
+                  {/* <div className="flex gap-4 mb-6">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Status</label>
                       <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -254,160 +178,165 @@ export default function EventsPage() {
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Summary Cards */}
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6 mb-8">
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
                     <AffiliateMetricsCard
                       title="Total Events"
-                      value={mockEventsData.summary.totalEvents.toString()}
+                      value={String(eventCountByStatus.total)}
                       change={20.0}
                       period="vs last period"
                       icon={Calendar}
                       className="shadow-md"
                     />
-                    <AffiliateMetricsCard
+                    {/* <AffiliateMetricsCard
                       title="Active Events"
-                      value={mockEventsData.summary.activeEvents.toString()}
+                      value={String(eventCountByStatus.active)}
                       change={14.3}
                       period="vs last period"
                       icon={Star}
                       className="shadow-md"
-                    />
+                    /> */}
                     <AffiliateMetricsCard
                       title="Tickets Sold"
-                      value={mockEventsData.summary.totalTicketsSold.toLocaleString()}
+                      value={String(eventMetrics.ticketNumber)}
                       change={15.3}
                       period="vs last period"
                       icon={Users}
                       className="shadow-md"
                     />
                     <AffiliateMetricsCard
-                      title="Total Revenue"
-                      value={`$${mockEventsData.summary.totalRevenue.toLocaleString()}`}
+                      title="Gross Revenue"
+                      value={formatMoney(eventMetrics.grossRevenue)}
                       change={18.7}
                       period="vs last period"
                       icon={DollarSign}
                       className="shadow-md"
                     />
                     <AffiliateMetricsCard
-                      title="Avg Ticket Price"
-                      value={`$${mockEventsData.summary.averageTicketPrice}`}
+                      title="Net Revenue"
+                      value={formatMoney(eventMetrics.netRevenue)}
                       change={5.2}
                       period="vs last period"
                       icon={TrendingUp}
                       className="shadow-md"
                     />
-                    <AffiliateMetricsCard
+                    {/* <AffiliateMetricsCard
                       title="Upcoming Events"
-                      value={mockEventsData.summary.upcomingEvents.toString()}
+                      value={String(eventCountByStatus.upcoming)}
                       change={33.3}
                       period="vs last period"
                       icon={Clock}
                       className="shadow-md"
-                    />
+                    /> */}
+                  </div>
+
+                  <div className="mb-8">
+                    <h1 className="text-3xl font-bold tracking-tight">Performance Breakdown</h1>
+                    <p className="text-muted-foreground">Track performance of each event</p>
                   </div>
 
                   {/* Main Content Tabs */}
-                  <Tabs defaultValue="events" className="space-y-4">
+                  {/* <Tabs defaultValue="events" className="space-y-4">
                     <TabsList className="grid w-full grid-cols-3">
                       <TabsTrigger value="events">Events List</TabsTrigger>
                       <TabsTrigger value="performance">Performance</TabsTrigger>
                       <TabsTrigger value="categories">Categories</TabsTrigger>
-                    </TabsList>
+                    </TabsList> */}
 
-                    <TabsContent value="events" className="space-y-4">
-                      <div className="grid gap-4">
-                        {filteredEvents.map((event) => (
-                          <Card key={event.id} className="shadow-md">
-                            <CardHeader>
-                              <div className="flex items-start justify-between">
-                                <div className="space-y-2">
-                                  <div className="flex items-center gap-2">
-                                    <CardTitle className="text-lg">{event.title}</CardTitle>
-                                    <Badge className={getStatusColor(event.status)}>
-                                      {event.status}
-                                    </Badge>
-                                    <Badge variant="outline">{event.category}</Badge>
-                                  </div>
-                                  <CardDescription>{event.description}</CardDescription>
-                                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                    <div className="flex items-center gap-1">
-                                      <Calendar className="h-4 w-4" />
-                                      {new Date(event.date).toLocaleDateString()} at {event.time}
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                      <MapPin className="h-4 w-4" />
-                                      {event.venue}
-                                    </div>
-                                  </div>
+                  <div className="space-y-4">
+                    <div className="grid gap-4">
+                      {performanceSummary.map((event) => (
+                        <Card className="shadow-md">
+                          <CardHeader>
+                            <div className="flex items-start justify-between">
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <CardTitle className="text-lg">{event.eventName}</CardTitle>
+                                  <Badge className={getStatusColor(event.eventStatus)}>
+                                    {event.eventStatus}
+                                  </Badge>
                                 </div>
-                                <div className="flex gap-2">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => copyAffiliateLink(event.id, event.title)}
-                                  >
-                                    <Copy className="h-4 w-4 mr-2" />
-                                    Copy Link
-                                  </Button>
-                                  <Button variant="ghost" size="sm">
-                                    <ExternalLink className="h-4 w-4" />
-                                  </Button>
+                                {/* <CardDescription>{event.description}</CardDescription> */}
+                                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                  <div className="flex items-center gap-1">
+                                    <Calendar className="h-4 w-4" />
+                                    {event.schedules?.[0] &&
+                                      formatDate(event.schedules[0], 'dd-MM-yyyy')}
+                                    {', '}
+                                    {event.schedules?.[1] &&
+                                      formatDate(event.schedules[1], 'dd-MM-yyyy')}
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <MapPin className="h-4 w-4" />
+                                    {event.location}
+                                  </div>
                                 </div>
                               </div>
-                            </CardHeader>
-                            <CardContent>
-                              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
-                                <div className="space-y-1">
-                                  <p className="text-sm font-medium">Tickets Sold</p>
-                                  <p className="text-lg font-bold">{event.ticketsSold}</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    of {event.capacity} capacity
-                                  </p>
-                                </div>
-                                <div className="space-y-1">
-                                  <p className="text-sm font-medium">Revenue</p>
-                                  <p className="text-lg font-bold">
-                                    ${event.revenue.toLocaleString()}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    Commission: ${event.commission}
-                                  </p>
-                                </div>
-                                <div className="space-y-1">
-                                  <p className="text-sm font-medium">Clicks</p>
-                                  <p className="text-lg font-bold">
-                                    {event.clicks.toLocaleString()}
-                                  </p>
-                                </div>
-                                <div className="space-y-1">
-                                  <p className="text-sm font-medium">Conversion</p>
-                                  <p
-                                    className={`text-lg font-bold ${event.conversionRate >= 5 ? 'text-green-600' : event.conversionRate >= 3 ? 'text-yellow-600' : 'text-red-600'}`}
-                                  >
-                                    {event.conversionRate.toFixed(2)}%
-                                  </p>
-                                </div>
-                                <div className="space-y-1">
-                                  <p className="text-sm font-medium">Price Range</p>
-                                  <p className="text-lg font-bold">{event.priceRange}</p>
-                                </div>
-                                <div className="space-y-1">
-                                  <p className="text-sm font-medium">Capacity</p>
-                                  <p className="text-lg font-bold">
-                                    {((event.ticketsSold / event.capacity) * 100).toFixed(1)}%
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">filled</p>
-                                </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => copyAffiliateLink(event.affLink)}
+                                >
+                                  <Copy className="h-4 w-4 mr-2" />
+                                  Copy Link
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  <ExternalLink className="h-4 w-4" />
+                                </Button>
                               </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    </TabsContent>
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+                              <div className="space-y-1">
+                                <p className="text-sm font-medium">Tickets Sold</p>
+                                <p className="text-lg font-bold">{event.ticketNum}</p>
+                                {/* <p className="text-xs text-muted-foreground">
+                                  of {event.capacity} capacity */}
+                                {/* </p> */}
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-sm font-medium">Total Revenue</p>
+                                <p className="text-lg font-bold">
+                                  {formatMoney(event.totalRevenue)}
+                                </p>
+                                {/* <p className="text-xs text-muted-foreground">
+                                  Commission: {formatMoney(event.netRevenue * 0.1)}
+                                </p> */}
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-sm font-medium">Total Points</p>
+                                <p className="text-lg font-bold">{event.totalPoints}</p>
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-sm font-medium">Clicks</p>
+                                <p className="text-lg font-bold">{event.clickNum}</p>
+                              </div>
+                              {/* <div className="space-y-1">
+                                <p className="text-sm font-medium">Ticket conversion</p>
+                                <p
+                                  className={`text-lg font-bold ${event.conversionRate >= 5 ? 'text-green-600' : event.conversionRate >= 3 ? 'text-yellow-600' : 'text-red-600'}`}
+                                >
+                                  {event.conversionRate}%
+                                </p>
+                              </div> */}
+                              <div className="space-y-1">
+                                <p className="text-sm font-medium">Price Range</p>
+                                <p className="text-lg font-bold">
+                                  {formatMoney(event.minPrice)}-{formatMoney(event.maxPrice)}
+                                </p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
 
-                    <TabsContent value="performance" className="space-y-4">
+                  {/* <TabsContent value="performance" className="space-y-4">
                       <Card className="shadow-md">
                         <CardHeader>
                           <CardTitle>Event Performance Comparison</CardTitle>
@@ -510,7 +439,7 @@ export default function EventsPage() {
                         </CardContent>
                       </Card>
                     </TabsContent>
-                  </Tabs>
+                  </Tabs> */}
                 </div>
               </div>
             </div>

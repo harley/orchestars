@@ -40,11 +40,11 @@ const navigationItems = [
     url: '/affiliate/manage',
     icon: Link2,
   },
-  {
-    title: 'Performance',
-    url: '/affiliate/performance',
-    icon: TrendingUp,
-  },
+  // {
+  //   title: 'Performance',
+  //   url: '/affiliate/performance',
+  //   icon: TrendingUp,
+  // },
   {
     title: 'Analytics',
     url: '/affiliate/analytics',
@@ -58,11 +58,11 @@ const metricsItems = [
     url: '/affiliate/revenue',
     icon: DollarSign,
   },
-  {
-    title: 'Conversions',
-    url: '/affiliate/conversions',
-    icon: Users,
-  },
+  // {
+  //   title: 'Conversions',
+  //   url: '/affiliate/conversions',
+  //   icon: Users,
+  // },
   {
     title: 'Events',
     url: '/affiliate/events',
@@ -144,7 +144,7 @@ export function AffiliateSidebar() {
           </SidebarMenuItem> */}
           <SidebarMenuItem>
             <form action={logout}>
-              <SidebarMenuButton type="submit" >
+              <SidebarMenuButton type="submit">
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>
               </SidebarMenuButton>
