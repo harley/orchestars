@@ -4,14 +4,15 @@ import { authorizeApiRequest } from '@/app/(affiliate)/utils/authorizeApiRequest
 import { sql } from '@payloadcms/db-postgres/drizzle'
 
 type PerformanceSummary = {
+  event_id: number
   title: string
   event_location: string
-  status: string //fix
+  status: string
   total_points: number
   total_revenue: number
   total_tickets_sold: number
   target_link: string
-  schedule_dates: Array<Date> //check + find
+  schedule_dates: Array<Date>
   click_count: number
   min_price: number
   max_price: number
@@ -96,6 +97,7 @@ export async function GET(req: NextRequest) {
         status = 'Unknown'
       }
       return {
+        eventID: row.event_id,
         eventName: row.title,
         location: row.event_location,
         eventStatus: status,
@@ -113,7 +115,7 @@ export async function GET(req: NextRequest) {
     //Return the response
     return NextResponse.json(performanceSummaryArray)
   } catch (err) {
-    console.error('An error occured:' + err)
-    return NextResponse.json({ error: 'Server error' }, { status: 500 })
+    console.error('An error occurred while processing the request:', err)
+    return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 })
   }
 }

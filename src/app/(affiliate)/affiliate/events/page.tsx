@@ -38,12 +38,11 @@ import {
 import { useToast } from '@/components/ui/use-toast'
 import { ProtectedRoute } from '@/components/Affiliate/ProtectedRoute'
 import { formatMoney } from '@/utilities/formatMoney'
-import { N } from 'vitest/dist/chunks/environment.d.Dmw5ulng.js'
 
 type eventByStatusItem = {
-  upcoming: Number
-  active: Number
-  total: Number
+  upcoming: number
+  active: number
+  total: number
 }
 type eventMetrics = {
   ticketNumber: number
@@ -51,6 +50,7 @@ type eventMetrics = {
   netRevenue: number
 }
 type performanceSummaryItem = {
+  eventID: number
   eventName: string
   location: string
   eventStatus: string
@@ -248,7 +248,7 @@ export default function EventsPage() {
                   <div className="space-y-4">
                     <div className="grid gap-4">
                       {performanceSummary.map((event) => (
-                        <Card className="shadow-md">
+                        <Card key={event.eventID} className="shadow-md">
                           <CardHeader>
                             <div className="flex items-start justify-between">
                               <div className="space-y-2">
@@ -262,11 +262,13 @@ export default function EventsPage() {
                                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                   <div className="flex items-center gap-1">
                                     <Calendar className="h-4 w-4" />
-                                    {event.schedules?.[0] &&
-                                      formatDate(event.schedules[0], 'dd-MM-yyyy')}
-                                    {', '}
-                                    {event.schedules?.[1] &&
-                                      formatDate(event.schedules[1], 'dd-MM-yyyy')}
+                                    {event.schedules && event.schedules.length > 0 && (
+                                      <span>
+                                        {event.schedules
+                                          .map((date) => formatDate(date, 'dd-MM-yyyy'))
+                                          .join(', ')}
+                                      </span>
+                                    )}
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <MapPin className="h-4 w-4" />
