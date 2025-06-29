@@ -85,17 +85,21 @@ export default function EventsPage() {
     //UseEffect structure and syntax
     const fetchEventMetrics = async () => {
       try {
+        setLoading(true)
+        setError(null)
         //Event count by status
         const resEventCountByStatus = await fetch(`/api/affiliate/event-by-status`)
+        if (!resEventCountByStatus.ok) throw new Error('Failed to fetch event status')
         const dataEventCountByStatus = await resEventCountByStatus.json()
         setEventCountByStatus(dataEventCountByStatus)
         //Event metrics
         const resEventMetrics = await fetch(`/api/affiliate/event-metrics`)
+        if (!resEventMetrics.ok) throw new Error('Failed to fetch event metrics')
         const dataEventMetrics = await resEventMetrics.json()
-        console.log('Metrics:', dataEventMetrics)
         setEventMetrics(dataEventMetrics)
         //Performance summary
         const resPerformanceSummary = await fetch(`/api/affiliate/performance-summary-by-events`)
+        if (!resPerformanceSummary.ok) throw new Error('Failed to fetch performance summary')
         const dataPerformanceSummary = await resPerformanceSummary.json()
         setPerformanceSummary(dataPerformanceSummary)
       } catch (err) {
@@ -132,22 +136,29 @@ export default function EventsPage() {
   }
   return (
     <ProtectedRoute>
-      <SidebarProvider>
-        <div className="flex min-h-screen w-full">
-          <AffiliateSidebar />
-          <SidebarInset className="flex-1">
-            <div className="flex flex-col gap-4 p-4 pt-0">
-              <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
-                <div className="p-6">
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold tracking-tight">Events Analytics</h1>
-                    <p className="text-muted-foreground">
-                      Track performance across all events and affiliate links
-                    </p>
-                  </div>
+      {loading && (
+        <div className="flex items-center justify-center h-screen bg-gray-100">Loading...</div>
+      )}
+      {error && (
+        <div className="flex items-center justify-center h-screen bg-gray-100">Error: {error}</div>
+      )}
+      {!loading && !error && (
+        <SidebarProvider>
+          <div className="flex min-h-screen w-full">
+            <AffiliateSidebar />
+            <SidebarInset className="flex-1">
+              <div className="flex flex-col gap-4 p-4 pt-0">
+                <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
+                  <div className="p-6">
+                    <div className="mb-8">
+                      <h1 className="text-3xl font-bold tracking-tight">Events Analytics</h1>
+                      <p className="text-muted-foreground">
+                        Track performance across all events and affiliate links
+                      </p>
+                    </div>
 
-                  {/* Filters */}
-                  {/* <div className="flex gap-4 mb-6">
+                    {/* Filters */}
+                    {/* <div className="flex gap-4 mb-6">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Status</label>
                       <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -180,17 +191,17 @@ export default function EventsPage() {
                     </div>
                   </div> */}
 
-                  {/* Summary Cards */}
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-                    <AffiliateMetricsCard
-                      title="Total Events"
-                      value={String(eventCountByStatus.total)}
-                      change={20.0}
-                      period="vs last period"
-                      icon={Calendar}
-                      className="shadow-md"
-                    />
-                    {/* <AffiliateMetricsCard
+                    {/* Summary Cards */}
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+                      <AffiliateMetricsCard
+                        title="Total Events"
+                        value={String(eventCountByStatus.total)}
+                        change={20.0}
+                        period="vs last period"
+                        icon={Calendar}
+                        className="shadow-md"
+                      />
+                      {/* <AffiliateMetricsCard
                       title="Active Events"
                       value={String(eventCountByStatus.active)}
                       change={14.3}
@@ -198,31 +209,31 @@ export default function EventsPage() {
                       icon={Star}
                       className="shadow-md"
                     /> */}
-                    <AffiliateMetricsCard
-                      title="Tickets Sold"
-                      value={String(eventMetrics.ticketNumber)}
-                      change={15.3}
-                      period="vs last period"
-                      icon={Users}
-                      className="shadow-md"
-                    />
-                    <AffiliateMetricsCard
-                      title="Gross Revenue"
-                      value={formatMoney(eventMetrics.grossRevenue)}
-                      change={18.7}
-                      period="vs last period"
-                      icon={DollarSign}
-                      className="shadow-md"
-                    />
-                    <AffiliateMetricsCard
-                      title="Net Revenue"
-                      value={formatMoney(eventMetrics.netRevenue)}
-                      change={5.2}
-                      period="vs last period"
-                      icon={TrendingUp}
-                      className="shadow-md"
-                    />
-                    {/* <AffiliateMetricsCard
+                      <AffiliateMetricsCard
+                        title="Tickets Sold"
+                        value={String(eventMetrics.ticketNumber)}
+                        change={15.3}
+                        period="vs last period"
+                        icon={Users}
+                        className="shadow-md"
+                      />
+                      <AffiliateMetricsCard
+                        title="Gross Revenue"
+                        value={formatMoney(eventMetrics.grossRevenue)}
+                        change={18.7}
+                        period="vs last period"
+                        icon={DollarSign}
+                        className="shadow-md"
+                      />
+                      <AffiliateMetricsCard
+                        title="Net Revenue"
+                        value={formatMoney(eventMetrics.netRevenue)}
+                        change={5.2}
+                        period="vs last period"
+                        icon={TrendingUp}
+                        className="shadow-md"
+                      />
+                      {/* <AffiliateMetricsCard
                       title="Upcoming Events"
                       value={String(eventCountByStatus.upcoming)}
                       change={33.3}
@@ -230,94 +241,94 @@ export default function EventsPage() {
                       icon={Clock}
                       className="shadow-md"
                     /> */}
-                  </div>
+                    </div>
 
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold tracking-tight">Performance Breakdown</h1>
-                    <p className="text-muted-foreground">Track performance of each event</p>
-                  </div>
+                    <div className="mb-8">
+                      <h1 className="text-3xl font-bold tracking-tight">Performance Breakdown</h1>
+                      <p className="text-muted-foreground">Track performance of each event</p>
+                    </div>
 
-                  {/* Main Content Tabs */}
-                  {/* <Tabs defaultValue="events" className="space-y-4">
+                    {/* Main Content Tabs */}
+                    {/* <Tabs defaultValue="events" className="space-y-4">
                     <TabsList className="grid w-full grid-cols-3">
                       <TabsTrigger value="events">Events List</TabsTrigger>
                       <TabsTrigger value="performance">Performance</TabsTrigger>
                       <TabsTrigger value="categories">Categories</TabsTrigger>
                     </TabsList> */}
 
-                  <div className="space-y-4">
-                    <div className="grid gap-4">
-                      {performanceSummary.map((event) => (
-                        <Card key={event.eventID} className="shadow-md">
-                          <CardHeader>
-                            <div className="flex items-start justify-between">
-                              <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                  <CardTitle className="text-lg">{event.eventName}</CardTitle>
-                                  <Badge className={getStatusColor(event.eventStatus)}>
-                                    {event.eventStatus}
-                                  </Badge>
+                    <div className="space-y-4">
+                      <div className="grid gap-4">
+                        {performanceSummary.map((event) => (
+                          <Card key={event.eventID} className="shadow-md">
+                            <CardHeader>
+                              <div className="flex items-start justify-between">
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2">
+                                    <CardTitle className="text-lg">{event.eventName}</CardTitle>
+                                    <Badge className={getStatusColor(event.eventStatus)}>
+                                      {event.eventStatus}
+                                    </Badge>
+                                  </div>
+                                  {/* <CardDescription>{event.description}</CardDescription> */}
+                                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                    <div className="flex items-center gap-1">
+                                      <Calendar className="h-4 w-4" />
+                                      {event.schedules && event.schedules.length > 0 && (
+                                        <span>
+                                          {event.schedules
+                                            .map((date) => formatDate(date, 'dd-MM-yyyy'))
+                                            .join(', ')}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <MapPin className="h-4 w-4" />
+                                      {event.location}
+                                    </div>
+                                  </div>
                                 </div>
-                                {/* <CardDescription>{event.description}</CardDescription> */}
-                                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                  <div className="flex items-center gap-1">
-                                    <Calendar className="h-4 w-4" />
-                                    {event.schedules && event.schedules.length > 0 && (
-                                      <span>
-                                        {event.schedules
-                                          .map((date) => formatDate(date, 'dd-MM-yyyy'))
-                                          .join(', ')}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                    <MapPin className="h-4 w-4" />
-                                    {event.location}
-                                  </div>
+                                <div className="flex gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => copyAffiliateLink(event.affLink)}
+                                  >
+                                    <Copy className="h-4 w-4 mr-2" />
+                                    Copy Link
+                                  </Button>
+                                  <Button variant="ghost" size="sm">
+                                    <ExternalLink className="h-4 w-4" />
+                                  </Button>
                                 </div>
                               </div>
-                              <div className="flex gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => copyAffiliateLink(event.affLink)}
-                                >
-                                  <Copy className="h-4 w-4 mr-2" />
-                                  Copy Link
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  <ExternalLink className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
-                              <div className="space-y-1">
-                                <p className="text-sm font-medium">Tickets Sold</p>
-                                <p className="text-lg font-bold">{event.ticketNum}</p>
-                                {/* <p className="text-xs text-muted-foreground">
+                            </CardHeader>
+                            <CardContent>
+                              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+                                <div className="space-y-1">
+                                  <p className="text-sm font-medium">Tickets Sold</p>
+                                  <p className="text-lg font-bold">{event.ticketNum}</p>
+                                  {/* <p className="text-xs text-muted-foreground">
                                   of {event.capacity} capacity */}
-                                {/* </p> */}
-                              </div>
-                              <div className="space-y-1">
-                                <p className="text-sm font-medium">Total Revenue</p>
-                                <p className="text-lg font-bold">
-                                  {formatMoney(event.totalRevenue)}
-                                </p>
-                                {/* <p className="text-xs text-muted-foreground">
+                                  {/* </p> */}
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-sm font-medium">Total Revenue</p>
+                                  <p className="text-lg font-bold">
+                                    {formatMoney(event.totalRevenue)}
+                                  </p>
+                                  {/* <p className="text-xs text-muted-foreground">
                                   Commission: {formatMoney(event.netRevenue * 0.1)}
                                 </p> */}
-                              </div>
-                              <div className="space-y-1">
-                                <p className="text-sm font-medium">Total Points</p>
-                                <p className="text-lg font-bold">{event.totalPoints}</p>
-                              </div>
-                              <div className="space-y-1">
-                                <p className="text-sm font-medium">Clicks</p>
-                                <p className="text-lg font-bold">{event.clickNum}</p>
-                              </div>
-                              {/* <div className="space-y-1">
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-sm font-medium">Total Points</p>
+                                  <p className="text-lg font-bold">{event.totalPoints}</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-sm font-medium">Clicks</p>
+                                  <p className="text-lg font-bold">{event.clickNum}</p>
+                                </div>
+                                {/* <div className="space-y-1">
                                 <p className="text-sm font-medium">Ticket conversion</p>
                                 <p
                                   className={`text-lg font-bold ${event.conversionRate >= 5 ? 'text-green-600' : event.conversionRate >= 3 ? 'text-yellow-600' : 'text-red-600'}`}
@@ -325,20 +336,20 @@ export default function EventsPage() {
                                   {event.conversionRate}%
                                 </p>
                               </div> */}
-                              <div className="space-y-1">
-                                <p className="text-sm font-medium">Price Range</p>
-                                <p className="text-lg font-bold">
-                                  {formatMoney(event.minPrice)}-{formatMoney(event.maxPrice)}
-                                </p>
+                                <div className="space-y-1">
+                                  <p className="text-sm font-medium">Price Range</p>
+                                  <p className="text-lg font-bold">
+                                    {formatMoney(event.minPrice)}-{formatMoney(event.maxPrice)}
+                                  </p>
+                                </div>
                               </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* <TabsContent value="performance" className="space-y-4">
+                    {/* <TabsContent value="performance" className="space-y-4">
                       <Card className="shadow-md">
                         <CardHeader>
                           <CardTitle>Event Performance Comparison</CardTitle>
@@ -442,12 +453,13 @@ export default function EventsPage() {
                       </Card>
                     </TabsContent>
                   </Tabs> */}
+                  </div>
                 </div>
               </div>
-            </div>
-          </SidebarInset>
-        </div>
-      </SidebarProvider>
+            </SidebarInset>
+          </div>
+        </SidebarProvider>
+      )}
     </ProtectedRoute>
   )
 }
