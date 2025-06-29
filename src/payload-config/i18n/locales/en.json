@@ -455,7 +455,9 @@
     "firstTimeLoginEmailPlaceholder": "Enter the email you used to book tickets",
     "pleaseEnterEmailAndPassword": "Please enter both email and password",
     "signingIn": "Signing in...",
-    "affiliateLoginLink": "Become our ambassador"
+    "affiliateLoginLink": "Become our ambassador",
+    "joinAmbassadorProgram": "Join Our Ambassador Program",
+    "joinAmbassadorProgramDescription": "Earn rewards and exclusive benefits"
   },
   "navbar": {
     "profile": "Profile",

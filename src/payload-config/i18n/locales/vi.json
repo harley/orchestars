@@ -455,7 +455,9 @@
     "firstTimeLoginEmailPlaceholder": "Nhập email bạn đã dùng để đặt vé",
     "pleaseEnterEmailAndPassword": "Vui lòng nhập cả email và mật khẩu",
     "signingIn": "Đang đăng nhập...",
-    "affiliateLoginLink": "Trở thành đại sứ của chúng tôi"
+    "affiliateLoginLink": "Trở thành đại sứ của chúng tôi",
+    "joinAmbassadorProgram": "Tham gia Chương Trình Đại Sứ",
+    "joinAmbassadorProgramDescription": "Nhận những ưu đãi độc quyền"
   },
   "navbar": {
     "profile": "Thông tin tài khoản",
