@@ -18,7 +18,13 @@ export async function GET(request: NextRequest) {
       SELECT
         COUNT(DISTINCT affiliate_click_logs.id) AS clicks,
         COUNT(DISTINCT orders.id) AS orders,
-        SUM(orders.total) AS total_revenue,
+        (SELECT SUM(orders.total)
+          FROM orders
+          INNER JOIN affiliate_links ON orders.affiliate_affiliate_link_id = affiliate_links.id
+          WHERE affiliate_links.affiliate_user_id = ${userRequest.id}
+            AND orders.created_at >= ${startDate} 
+            AND orders.created_at <= ${endDate}
+        ) AS total_revenue,
         COUNT(DISTINCT tickets.id) AS total_tickets,
 
         -- Calculate metrics
@@ -47,14 +53,14 @@ export async function GET(request: NextRequest) {
       success: true,
       data: 
         {
-          clicks: results?.rows[0]?.clicks?.toLocaleString() ?? 0,
-          orders: results?.rows[0]?.orders?.toLocaleString() ?? 0,
+          clicks: Number(results?.rows[0]?.clicks) ?? 0,
+          orders: Number(results?.rows[0]?.orders) ?? 0,
           overallConversionRate: Number(results?.rows[0]?.conversion_rate) ?? 0,
-          ticketsIssued: results?.rows[0]?.total_tickets?.toLocaleString() ?? 0,
+          ticketsIssued: Number(results?.rows[0]?.total_tickets) ?? 0,
           averageTicketsPerOrder: Number(results?.rows[0]?.average_tickets_per_order) ?? 0,
-          grossRevenue: results?.rows[0]?.total_revenue?.toLocaleString() ?? 0,
-          commission: "0".toLocaleString(),
-          commissionRate: "0".toLocaleString(),
+          grossRevenue: Number(results?.rows[0]?.total_revenue) ?? 0,
+          commission: 0,
+          commissionRate: 0,
         }
       ,
     })
