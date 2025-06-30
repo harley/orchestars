@@ -13,22 +13,44 @@ export async function GET(req: NextRequest) {
 
     //SQL query to get gross revenue
     const result = await payload.db.drizzle.execute(sql`
-        WITH metrics_base AS (
+      WITH metrics_base AS (
+        SELECT DISTINCT
+          oi.order_id,
+          oi.event_id,
+          o.total,
+          e.vat_percentage
+        FROM order_items oi
+        JOIN orders o ON oi.order_id = o.id
+        JOIN events e ON oi.event_id = e.id
+        WHERE o.status = 'completed'
+          AND o.affiliate_affiliate_user_id = ${userRequest.id}
+      ),
+
+      ticket_counts AS (
         SELECT
-        o.id AS order_id,
-        COUNT(i.id) AS num_ticket,
-        o.total AS net_revenue,
-        o.total_before_discount AS gross_revenue
-        FROM orders o
-        LEFT JOIN order_items i ON o.id = i.order_id
-        WHERE o.affiliate_affiliate_user_id = ${userRequest.id}
-        GROUP BY o.id, o.total, o.total_before_discount
-    )
-    SELECT
-        SUM(num_ticket) AS num_ticket,
-        SUM(gross_revenue) AS gross_revenue,
-        SUM(net_revenue) AS net_revenue
-    FROM metrics_base;
+          order_id,
+          COUNT(*) AS ticket_count
+        FROM order_items
+        GROUP BY order_id
+      ),
+
+      metrics_1 AS (
+        SELECT
+          mb.event_id,
+          COUNT(DISTINCT mb.order_id) AS num_orders,
+          SUM(mb.total) AS gross_revenue_by_event,
+          ROUND(SUM(mb.total * (100 - mb.vat_percentage) / 100)) AS net_revenue,
+          COALESCE(SUM(tc.ticket_count), 0) AS ticket_number
+        FROM metrics_base mb
+        LEFT JOIN ticket_counts tc ON mb.order_id = tc.order_id
+        GROUP BY mb.event_id, mb.vat_percentage
+      )
+
+      SELECT
+        SUM(gross_revenue_by_event) AS gross_revenue,
+        SUM(net_revenue) AS net_revenue,
+        SUM(ticket_number) AS num_ticket
+      FROM metrics_1;
     `)
     const eventMetrics = {
       ticketNumber: 0,
