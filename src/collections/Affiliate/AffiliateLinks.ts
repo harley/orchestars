@@ -6,6 +6,10 @@ export const AffiliateLinks: CollectionConfig = {
   // admin: { useAsTitle: 'affiliateUser' },
   fields: [
     {
+      name: 'name',
+      type: 'text',
+    },
+    {
       name: 'affiliateUser',
       type: 'relationship',
       relationTo: 'users',
