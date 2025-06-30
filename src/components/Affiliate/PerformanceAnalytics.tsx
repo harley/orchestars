@@ -9,16 +9,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Progress } from '@/components/ui/progress'
 import { BarChart3, TrendingUp, TrendingDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
+import { Skeleton } from '@/components/ui/skeleton'
+import { formatMoney } from '@/utilities/formatMoney'
 
 type PerformanceData = {
-  clicks: string
-  orders: string
+  clicks: number
+  orders: number
   overallConversionRate: number
-  ticketsIssued: string
+  ticketsIssued: number
   averageTicketsPerOrder: number
-  grossRevenue: string
-  commission: string
-  commissionRate: string
+  grossRevenue: number
+  commission: number
+  commissionRate: number
 }
 
 type LinkBreakdownData = {
@@ -26,18 +28,18 @@ type LinkBreakdownData = {
   name?: string
   utmSource?: string
   utmCampaign?: string
-  clicks: string
-  orders: string
-  ticketsIssued: string
+  clicks: number
+  orders: number
+  ticketsIssued: number
   conversionRate: number
-  grossRevenue: string
-  netRevenue: string
-  commission: string
+  grossRevenue: number
+  netRevenue: number
+  commission: number
 }[]
 
 type SourceCampaignBreakdownData = {
-  bySource: { source: string; revenue: string; percentage: number }[]
-  byCampaign: { campaign: string; revenue: string; percentage: number }[]
+  bySource: { source: string; revenue: number; percentage: number }[]
+  byCampaign: { campaign: string; revenue: number; percentage: number }[]
 }
 
 type PaginationInfo = {
@@ -79,9 +81,9 @@ export function PerformanceAnalytics() {
   const [timeRange, setTimeRange] = useState('30d')
   const [sortBy, setSortBy] = useState('revenue')
 
-  const fetchPerformanceData = async (page = 1) => {
+  const fetchPerformanceData = async (timeRangeValue: string) => {
     const params = new URLSearchParams({
-      timeRange,
+      timeRange: timeRangeValue,
     })
 
     const response = await fetch(`/api/affiliate/analytics/performance?${params.toString()}`)
@@ -93,10 +95,11 @@ export function PerformanceAnalytics() {
     }
   }
 
-  const fetchLinkBreakdownData = async (page = 1) => {
+  const fetchLinkBreakdownData = async (page = 1, timeRangeValue: string, sortByValue: string) => {
+    console.log('Fetching link breakdown data:', { page, timeRangeValue, sortByValue })
     const params = new URLSearchParams({
-      timeRange,
-      sortBy,
+      timeRange: timeRangeValue,
+      sortBy: sortByValue,
       page: page.toString(),
       limit: linkBreakdownPagination.limit.toString(),
     })
@@ -111,9 +114,9 @@ export function PerformanceAnalytics() {
     }
   }
 
-  const fetchSourceCampaignBreakdownData = async (page = 1) => {
+  const fetchSourceCampaignBreakdownData = async (timeRangeValue: string) => {
     const params = new URLSearchParams({
-      timeRange,
+      timeRange: timeRangeValue,
     })
 
     const response = await fetch(`/api/affiliate/analytics/source-campaign-breakdown?${params.toString()}`)
@@ -129,9 +132,9 @@ export function PerformanceAnalytics() {
     try {
       setLoading(true)
       await Promise.all([
-        fetchPerformanceData(),
-        fetchLinkBreakdownData(),
-        fetchSourceCampaignBreakdownData(),
+        fetchPerformanceData(timeRange),
+        fetchLinkBreakdownData(1, timeRange, sortBy),
+        fetchSourceCampaignBreakdownData(timeRange),
       ])
     } catch (error) {
       console.error('Error fetching initial data:', error)
@@ -155,9 +158,9 @@ export function PerformanceAnalytics() {
       setTimeRange(value)
 
       await Promise.all([
-        fetchPerformanceData(),
-        fetchLinkBreakdownData(),
-        fetchSourceCampaignBreakdownData(),
+        fetchPerformanceData(value),
+        fetchLinkBreakdownData(linkBreakdownPagination.page, value, sortBy),
+        fetchSourceCampaignBreakdownData(value),
       ])
     } catch (error) {
       console.error('Error changing time range:', error)
@@ -175,7 +178,7 @@ export function PerformanceAnalytics() {
     try {
       setLoading(true)
       setSortBy(value)
-      await fetchLinkBreakdownData()
+      await fetchLinkBreakdownData(linkBreakdownPagination.page, timeRange, value)
     } catch (error) {
       console.error('Error changing sort by:', error)
       toast({
@@ -189,7 +192,19 @@ export function PerformanceAnalytics() {
   }
 
   const handlePageChange = (newPage: number) => {
-    fetchLinkBreakdownData(newPage)
+    try {
+      setLoading(true)
+      fetchLinkBreakdownData(newPage, timeRange, sortBy)
+    } catch (error) {
+      console.error('Error changing page:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to change page',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -206,52 +221,44 @@ export function PerformanceAnalytics() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Time Range</label>
-              <Select value={timeRange} onValueChange={toggleTimeRange}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className='bg-white'>
-                  <SelectItem value="7d">Last 7 days</SelectItem>
-                  <SelectItem value="30d">Last 30 days</SelectItem>
-                  <SelectItem value="90d">Last 90 days</SelectItem>
-                  <SelectItem value="1y">Last year</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Sort By</label>
-              <Select value={sortBy} onValueChange={toggleSortBy}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className='bg-white'>
-                  <SelectItem value="revenue">Revenue</SelectItem>
-                  <SelectItem value="clicks">Clicks</SelectItem>
-                  <SelectItem value="orders">Orders</SelectItem>
-                  <SelectItem value="conversion">Conversion Rate</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Time Range</label>
+            <Select value={timeRange} onValueChange={toggleTimeRange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className='bg-white'>
+                <SelectItem value="7d">Last 7 days</SelectItem>
+                <SelectItem value="30d">Last 30 days</SelectItem>
+                <SelectItem value="90d">Last 90 days</SelectItem>
+                <SelectItem value="1y">Last year</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
 
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="shadow-md">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Clicks</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {loading ? 'Loading...' : performanceData?.clicks}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {loading ? '' : `Across all links`}
-            </p>
+            {
+              loading ? (
+                <Skeleton className="h-4 w-6 rounded-xl"/>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">
+                    {performanceData?.clicks.toLocaleString()}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {`Across all links`}
+                  </p>
+                </>
+              )
+            }
           </CardContent>
         </Card>
         <Card className="shadow-md">
@@ -259,12 +266,20 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {loading ? 'Loading...' : performanceData?.orders}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {loading ? '' : `Conversion Rate: ${performanceData?.overallConversionRate}%`}
-            </p>
+            {
+              loading ? (
+                <Skeleton className="h-4 w-6 rounded-xl"/>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">
+                    {performanceData?.orders.toLocaleString()}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {`Conversion Rate: ${performanceData?.overallConversionRate.toLocaleString()}%`}
+                  </p>
+                </>
+              )
+            }
           </CardContent>
         </Card>
         <Card className="shadow-md">
@@ -272,12 +287,20 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Tickets Issued</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {loading ? 'Loading...' : performanceData?.ticketsIssued}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {loading ? '' : `Avg: ${performanceData?.averageTicketsPerOrder} per order`}
-            </p>
+            {
+              loading ? (
+                <Skeleton className="h-4 w-6 rounded-xl"/>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">
+                    {performanceData?.ticketsIssued.toLocaleString()}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {`Avg: ${performanceData?.averageTicketsPerOrder.toLocaleString()} per order`}
+                  </p> 
+                </>
+              )
+            }
           </CardContent>
         </Card>
         <Card className="shadow-md">
@@ -285,34 +308,58 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Gross Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {loading ? 'Loading...' : `${performanceData?.grossRevenue} VND`}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {loading ? '' : `Before discounts`}
-            </p>
+            {
+              loading ? (
+                <Skeleton className="h-4 w-6 rounded-xl"/>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">
+                    {loading ? <Skeleton/> : `${formatMoney(performanceData?.grossRevenue ?? 0)}`}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {loading ? <Skeleton/> : `Before discounts`}
+                  </p>
+                </>
+              )
+            }
           </CardContent>
         </Card>
-        <Card className="shadow-md">
+        {/* <Card className="shadow-md">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Your Commission</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {loading ? 'Loading...' : `${performanceData?.commission} VND`}
+              {loading ? 'Loading...' : `${formatMoney(performanceData?.commission ?? 0)}`}
             </div>
             <p className="text-xs text-muted-foreground">
-              {loading ? '' : `${performanceData?.commissionRate}% commission rate`}
+              {loading ? '' : `${performanceData?.commissionRate.toLocaleString()}% commission rate`}
             </p>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       {/* Link Performance Table */}
       <Card className="shadow-md">
-        <CardHeader>
-          <CardTitle>Link Performance Breakdown</CardTitle>
-          <CardDescription>Detailed metrics for each affiliate link</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div className="space-y-2">
+            <CardTitle>Link Performance Breakdown</CardTitle>
+            <CardDescription>Detailed metrics for each affiliate link</CardDescription>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Sort By</label>
+            <Select value={sortBy} onValueChange={toggleSortBy}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className='bg-white'>
+                <SelectItem value="revenue">Revenue</SelectItem>
+                <SelectItem value="clicks">Clicks</SelectItem>
+                <SelectItem value="orders">Orders</SelectItem>
+                <SelectItem value="conversion">Conversion Rate</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -324,10 +371,10 @@ export function PerformanceAnalytics() {
                   <TableHead className="text-right">Clicks</TableHead>
                   <TableHead className="text-right">Orders</TableHead>
                   <TableHead className="text-right">Tickets</TableHead>
-                  <TableHead className="text-right">Conversion</TableHead>
+                  {/* <TableHead className="text-right">Conversion</TableHead> */}
                   <TableHead className="text-right">Gross Revenue</TableHead>
-                  <TableHead className="text-right">Net Revenue</TableHead>
-                  <TableHead className="text-right">Commission</TableHead>
+                  {/* <TableHead className="text-right">Net Revenue</TableHead> */}
+                  {/* <TableHead className="text-right">Commission</TableHead> */}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -355,24 +402,24 @@ export function PerformanceAnalytics() {
                           <div className="text-xs text-muted-foreground">{link.utmCampaign}</div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-right">{link.clicks}</TableCell>
-                      <TableCell className="text-right">{link.orders}</TableCell>
-                      <TableCell className="text-right">{link.ticketsIssued}</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right">{link.clicks.toLocaleString()}</TableCell>
+                      <TableCell className="text-right">{link.orders.toLocaleString()}</TableCell>
+                      <TableCell className="text-right">{link.ticketsIssued.toLocaleString()}</TableCell>
+                      {/* <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <span>{link.conversionRate}%</span>
+                          <span>{link.conversionRate.toLocaleString()}%</span>
                           {link.conversionRate >= 6 ? (
                             <TrendingUp className="h-3 w-3 text-green-500" />
                           ) : (
                             <TrendingDown className="h-3 w-3 text-red-500" />
                           )}
                         </div>
-                      </TableCell>
-                      <TableCell className="text-right">{link.grossRevenue} VND</TableCell>
-                      <TableCell className="text-right">{link.netRevenue} VND</TableCell>
+                      </TableCell> */}
+                      <TableCell className="text-right">{formatMoney(link.grossRevenue)}</TableCell>
+                      {/* <TableCell className="text-right">{formatMoney(link.netRevenue)} VND</TableCell>
                       <TableCell className="text-right font-medium text-green-600">
-                        {link.commission} VND
-                      </TableCell>
+                        {link.commission.toLocaleString()} VND
+                      </TableCell> */}
                     </TableRow>
                   ))
                 )}
@@ -438,7 +485,7 @@ export function PerformanceAnalytics() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium capitalize">{item.source}</span>
                   <span className="text-sm text-muted-foreground">
-                    ${item.revenue} ({item.percentage}%)
+                    {formatMoney(item.revenue)} ({item.percentage.toLocaleString()}%)
                   </span>
                 </div>
                 <Progress value={item.percentage} className="h-2" />
@@ -468,7 +515,7 @@ export function PerformanceAnalytics() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">{item.campaign}</span>
                     <span className="text-sm text-muted-foreground">
-                      ${item.revenue} ({item.percentage}%)
+                      {formatMoney(item.revenue)} ({item.percentage.toLocaleString()}%)
                     </span>
                   </div>
                   <Progress value={item.percentage} className="h-2" />
