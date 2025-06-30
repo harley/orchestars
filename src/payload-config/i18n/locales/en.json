@@ -160,7 +160,9 @@
     "submitting": "Submitting...",
     "submit": "Submit",
     "thankYouForYourSubmission": "Thank you! Your information has been submitted successfully. We will contact you soon.",
-    "failedMessage": "An error occurred! Please try again"
+    "failedMessage": "An error occurred! Please try again",
+    "requiredField": "This field is required",
+    "invalidEmail": "Please enter a valid email address"
   },
   "errorCode": {
     "SYS001": "An error occurred! Please try again",
