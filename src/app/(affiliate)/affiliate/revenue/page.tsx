@@ -1,10 +1,10 @@
 'use client'
-
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { AffiliateSidebar } from '@/components/Affiliate/AffiliateSidebar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AffiliateMetricsCard } from '@/components/Affiliate/AffiliateMetricsCard'
+import { formatMoney } from '@/utilities/formatMoney'
 import {
   Select,
   SelectContent,
@@ -69,8 +69,64 @@ const mockRevenueData = {
 }
 
 export default function RevenuePage() {
+  type RevenueItem = {
+    month: string
+    gross: number
+    net: number
+    commission: number
+    orders: number
+    tickets: number
+  }
+  type RevenueResponse = {
+    monthlyRevenue: RevenueItem[]
+  }
+  //Default time range is 6 month
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [timeRange, setTimeRange] = useState('6m')
-  const [viewType, setViewType] = useState('gross')
+  // const [viewType, setViewType] = useState('gross')
+  const [grossRevenue, setGrossRevenue] = useState(0)
+  const [netRevenue, setNetRevenue] = useState(0)
+  const [avgOrderValue, setAvgOrderValue] = useState(0)
+  const [numOrder, setNumOrder] = useState(0)
+  const [monthlyRevenueData, setMonthlyRevenueData] = useState<RevenueResponse | null>(null)
+  const [totalClick, setTotalClick] = useState(0)
+
+  useEffect(() => {
+    const fetchRevenueMetrics = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const [resGrossRev, resNetRev, resAvgVal, resMonthlyRev, resClickNum] = await Promise.all([
+          fetch(`/api/affiliate/gross-revenue?timeRange=${timeRange}`),
+          fetch(`/api/affiliate/net-revenue?timeRange=${timeRange}`),
+          fetch(`/api/affiliate/avg-order-value?timeRange=${timeRange}`),
+          fetch(`/api/affiliate/monthly-trends`),
+          fetch(`/api/affiliate/total-click?timeRange=${timeRange}`),
+        ])
+        const [dataGrossRev, dataNetRev, dataAvgVal, dataMonthlyRev, dataClickNum] =
+          await Promise.all([
+            resGrossRev.json(),
+            resNetRev.json(),
+            resAvgVal.json(),
+            resMonthlyRev.json().then((data) => data as RevenueResponse),
+            resClickNum.json(),
+          ])
+        setGrossRevenue(dataGrossRev.grossRevenue)
+        setNetRevenue(dataNetRev.netRevenue)
+        setAvgOrderValue(dataAvgVal.avgOrderValue)
+        setNumOrder(dataAvgVal.numOrder)
+        setMonthlyRevenueData(dataMonthlyRev)
+        setTotalClick(dataClickNum.totalClick)
+      } catch (err) {
+        console.error('Failed to fetch revenue:', err)
+        setError('Failed to load revenue data')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchRevenueMetrics()
+  }, [timeRange])
 
   return (
     <ProtectedRoute>
@@ -92,11 +148,12 @@ export default function RevenuePage() {
                   <div className="flex gap-4 mb-6">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Time Range</label>
+                      {/* onclick: change timeRange variable */}
                       <Select value={timeRange} onValueChange={setTimeRange}>
                         <SelectTrigger className="w-[180px]">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white">
                           <SelectItem value="1m">Last Month</SelectItem>
                           <SelectItem value="3m">Last 3 Months</SelectItem>
                           <SelectItem value="6m">Last 6 Months</SelectItem>
@@ -104,26 +161,26 @@ export default function RevenuePage() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <label className="text-sm font-medium">View Type</label>
                       <Select value={viewType} onValueChange={setViewType}>
                         <SelectTrigger className="w-[180px]">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white">
                           <SelectItem value="gross">Gross Revenue</SelectItem>
                           <SelectItem value="net">Net Revenue</SelectItem>
                           <SelectItem value="commission">Commission</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Summary Cards */}
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 mb-8">
                     <AffiliateMetricsCard
                       title="Gross Revenue"
-                      value={`$${mockRevenueData.summary.totalGrossRevenue.toLocaleString()}`}
+                      value={formatMoney(grossRevenue)}
                       change={mockRevenueData.summary.monthlyGrowth}
                       period="vs last period"
                       icon={DollarSign}
@@ -131,7 +188,7 @@ export default function RevenuePage() {
                     />
                     <AffiliateMetricsCard
                       title="Net Revenue"
-                      value={`$${mockRevenueData.summary.totalNetRevenue.toLocaleString()}`}
+                      value={formatMoney(netRevenue)}
                       change={15.2}
                       period="vs last period"
                       icon={TrendingUp}
@@ -139,7 +196,7 @@ export default function RevenuePage() {
                     />
                     <AffiliateMetricsCard
                       title="Your Commission"
-                      value={`$${mockRevenueData.summary.totalCommission.toLocaleString()}`}
+                      value={formatMoney(netRevenue * 0.1)}
                       change={18.7}
                       period="vs last period"
                       icon={PieChart}
@@ -147,7 +204,7 @@ export default function RevenuePage() {
                     />
                     <AffiliateMetricsCard
                       title="Avg Order Value"
-                      value={`$${mockRevenueData.summary.averageOrderValue}`}
+                      value={formatMoney(avgOrderValue)}
                       change={5.3}
                       period="vs last period"
                       icon={BarChart3}
@@ -195,22 +252,23 @@ export default function RevenuePage() {
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
-                                {mockRevenueData.monthlyRevenue.map((month) => (
+                                {/* For each month in mock revenue data */}
+                                {monthlyRevenueData?.monthlyRevenue.map((month) => (
                                   <TableRow key={month.month}>
                                     <TableCell className="font-medium">{month.month}</TableCell>
                                     <TableCell className="text-right">
-                                      ${month.gross.toLocaleString()}
+                                      {formatMoney(month.gross)}
                                     </TableCell>
                                     <TableCell className="text-right">
-                                      ${month.net.toLocaleString()}
+                                      {formatMoney(month.net)}
                                     </TableCell>
                                     <TableCell className="text-right font-medium text-green-600">
-                                      ${month.commission.toLocaleString()}
+                                      {formatMoney(month.commission)}
                                     </TableCell>
                                     <TableCell className="text-right">{month.orders}</TableCell>
                                     <TableCell className="text-right">{month.tickets}</TableCell>
                                     <TableCell className="text-right">
-                                      ${(month.gross / month.orders).toFixed(2)}
+                                      {formatMoney(month.net / month.orders)}
                                     </TableCell>
                                   </TableRow>
                                 ))}
@@ -297,30 +355,22 @@ export default function RevenuePage() {
                           <CardContent className="space-y-4">
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium">Gross Revenue</span>
-                              <span className="text-sm">
-                                ${mockRevenueData.summary.totalGrossRevenue.toLocaleString()}
-                              </span>
+                              <span className="text-sm">{formatMoney(grossRevenue)}</span>
                             </div>
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium">Discounts Applied</span>
                               <span className="text-sm text-red-600">
-                                -$
-                                {(
-                                  mockRevenueData.summary.totalGrossRevenue -
-                                  mockRevenueData.summary.totalNetRevenue
-                                ).toLocaleString()}
+                                -{formatMoney(grossRevenue - netRevenue)}
                               </span>
                             </div>
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium">Net Revenue</span>
-                              <span className="text-sm">
-                                ${mockRevenueData.summary.totalNetRevenue.toLocaleString()}
-                              </span>
+                              <span className="text-sm">{formatMoney(netRevenue)}</span>
                             </div>
                             <div className="flex items-center justify-between border-t pt-2">
                               <span className="text-sm font-semibold">Your Commission (10%)</span>
                               <span className="text-sm font-semibold text-green-600">
-                                ${mockRevenueData.summary.totalCommission.toLocaleString()}
+                                {formatMoney(netRevenue * 0.1)}
                               </span>
                             </div>
                           </CardContent>
@@ -334,22 +384,22 @@ export default function RevenuePage() {
                           <CardContent className="space-y-4">
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium">Total Orders</span>
-                              <span className="text-sm">506</span>
+                              <span className="text-sm">{numOrder}</span>
                             </div>
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium">Average Order Value</span>
-                              <span className="text-sm">
-                                ${mockRevenueData.summary.averageOrderValue}
-                              </span>
+                              <span className="text-sm">{formatMoney(avgOrderValue)}</span>
                             </div>
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium">Revenue per Click</span>
-                              <span className="text-sm">$15.89</span>
+                              <span className="text-sm">
+                                {formatMoney(netRevenue / totalClick)}
+                              </span>
                             </div>
                             <div className="flex items-center justify-between border-t pt-2">
                               <span className="text-sm font-semibold">Commission per Order</span>
                               <span className="text-sm font-semibold text-green-600">
-                                ${(mockRevenueData.summary.totalCommission / 506).toFixed(2)}
+                                {formatMoney(avgOrderValue * 0.1)}
                               </span>
                             </div>
                           </CardContent>
