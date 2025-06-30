@@ -16,12 +16,16 @@ import { Error } from '../Error'
 import { Width } from '../Width'
 import { countryOptions } from './options'
 
+import { useTranslate } from '@/providers/I18n/client'
+
 export const Country: React.FC<
   CountryField & {
     control: Control
     errors: Partial<FieldErrorsImpl>
   }
 > = ({ name, control, errors, label, required, width }) => {
+  const { t } = useTranslate()
+
   return (
     <Width width={width}>
       <Label className="" htmlFor={name}>
@@ -45,7 +49,7 @@ export const Country: React.FC<
               <SelectTrigger className="w-full" id={name}>
                 <SelectValue placeholder={label} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white select-content">
                 {countryOptions.map(({ label, value }) => {
                   return (
                     <SelectItem key={value} value={value}>
@@ -57,7 +61,7 @@ export const Country: React.FC<
             </Select>
           )
         }}
-        rules={{ required }}
+        rules={{ required: required ? t('message.requiredField') : false }}
       />
       {errors[name] && <Error name={name} />}
     </Width>

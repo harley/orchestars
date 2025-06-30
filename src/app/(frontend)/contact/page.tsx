@@ -2,10 +2,12 @@ import PageClient from "./page.client"
 import { FormBlock } from "@/blocks/Form/Component"
 import type { Form } from "@payloadcms/plugin-form-builder/types"
 import { getPayload } from "@/payload-config/getPayloadConfig"
+import { getLocale } from "@/providers/I18n/server"
 
 async function ContactForm() {
   try {
     const payload = await getPayload()
+    const locale = await getLocale()
 
     const formData = await payload.find({
       collection: 'forms',
@@ -18,6 +20,7 @@ async function ContactForm() {
         }
       },
       limit: 1,
+      locale: locale
     })
 
     const form = formData.docs.length > 0 ? formData.docs[0] : null

@@ -8,12 +8,16 @@ import React from 'react'
 import { Error } from '../Error'
 import { Width } from '../Width'
 
+import { useTranslate } from '@/providers/I18n/client'
+
 export const Text: React.FC<
   TextField & {
     errors: Partial<FieldErrorsImpl>
     register: UseFormRegister<FieldValues>
   }
 > = ({ name, defaultValue, errors, label, register, required, width }) => {
+  const { t } = useTranslate()
+
   return (
     <Width width={width}>
       <Label htmlFor={name}>
@@ -25,7 +29,7 @@ export const Text: React.FC<
           </span>
         )}
       </Label>
-      <Input defaultValue={defaultValue} id={name} type="text" {...register(name, { required })} />
+      <Input defaultValue={defaultValue} id={name} type="text" {...register(name, { required: required ? t('message.requiredField') : false })} />
       {errors[name] && <Error name={name} />}
     </Width>
   )

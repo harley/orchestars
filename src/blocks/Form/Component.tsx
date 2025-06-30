@@ -165,7 +165,7 @@ export const FormBlock: React.FC<
             <Button form={formID} type="submit" variant="default" className="border px-8" disabled={isSubmitting}>
               {isSubmitting ? (
                 <span className="flex items-center">
-                  <Loader2 className="w-4 h-4 mr-2" />
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   {t('message.submitting')}
                 </span>
               ) : (
