@@ -62,7 +62,11 @@ import * as migration_20250611_080103_add_affiliate_to_order_collection from './
 import * as migration_20250612_060257_add_promotions_to_affiliate_setting from './20250612_060257_add_promotions_to_affiliate_setting';
 import * as migration_20250612_102521_update_affiliate_link from './20250612_102521_update_affiliate_link';
 import * as migration_20250619_091356 from './20250619_091356';
-// import * as migration_20250621_175024_create_affiliate_ranks from './20250621_175024_create_affiliate_ranks';
+import * as migration_20250624_164118_create_affiliate_ranks from './20250624_164118_create_affiliate_ranks';
+import * as migration_20250626_015908_add_fields_affiliate_ranks from './20250626_015908_add_fields_affiliate_ranks';
+import * as migration_20250626_162808_add_virtual_rank_name_label_field from './20250626_162808_add_virtual_rank_name_label_field';
+import * as migration_20250627_083211_add_tax_and_fields_event_affiliate_user_rank from './20250627_083211_add_tax_and_fields_event_affiliate_user_rank';
+import * as migration_20250627_084556_add_fields_to_affiliate_user_rank from './20250627_084556_add_fields_to_affiliate_user_rank';
 
 export const migrations = [
   {
@@ -386,10 +390,28 @@ export const migrations = [
     name: '20250619_091356',
   },
   {
-
-    // temp, will remove after affiliate ranks applied on prod
-    // up: migration_20250621_175024_create_affiliate_ranks.up,
-    // down: migration_20250621_175024_create_affiliate_ranks.down,
-    // name: '20250621_175024_create_affiliate_ranks'
+    up: migration_20250624_164118_create_affiliate_ranks.up,
+    down: migration_20250624_164118_create_affiliate_ranks.down,
+    name: '20250624_164118_create_affiliate_ranks',
+  },
+  {
+    up: migration_20250626_015908_add_fields_affiliate_ranks.up,
+    down: migration_20250626_015908_add_fields_affiliate_ranks.down,
+    name: '20250626_015908_add_fields_affiliate_ranks',
+  },
+  {
+    up: migration_20250626_162808_add_virtual_rank_name_label_field.up,
+    down: migration_20250626_162808_add_virtual_rank_name_label_field.down,
+    name: '20250626_162808_add_virtual_rank_name_label_field',
+  },
+  {
+    up: migration_20250627_083211_add_tax_and_fields_event_affiliate_user_rank.up,
+    down: migration_20250627_083211_add_tax_and_fields_event_affiliate_user_rank.down,
+    name: '20250627_083211_add_tax_and_fields_event_affiliate_user_rank',
+  },
+  {
+    up: migration_20250627_084556_add_fields_to_affiliate_user_rank.up,
+    down: migration_20250627_084556_add_fields_to_affiliate_user_rank.down,
+    name: '20250627_084556_add_fields_to_affiliate_user_rank'
   },
 ];

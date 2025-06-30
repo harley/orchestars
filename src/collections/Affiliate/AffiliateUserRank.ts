@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { AFFILIATE_RANKS } from './constants'
+import { AFFILIATE_RANK, AFFILIATE_RANKS } from './constants'
 
 export const AffiliateUserRanks: CollectionConfig = {
   slug: 'affiliate-user-ranks',
@@ -7,8 +7,10 @@ export const AffiliateUserRanks: CollectionConfig = {
     useAsTitle: 'affiliateUser',
     description: 'Lưu trữ thông tin hạng tổng của Affiliate User',
     components: {
-      beforeList: ['@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate'],
-    }
+      beforeList: [
+        '@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate',
+      ],
+    },
   },
   access: {},
   fields: [
@@ -35,10 +37,12 @@ export const AffiliateUserRanks: CollectionConfig = {
       type: 'select',
       label: 'Hạng Hiện Tại',
       required: true,
-      defaultValue: 'seller',
+      defaultValue: AFFILIATE_RANK.Tier1.value,
       options: AFFILIATE_RANKS,
       admin: {
         description: 'Hạng hiện tại của Affiliate User',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -49,26 +53,45 @@ export const AffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng số điểm tích lũy (1 điểm = 1000 VND doanh thu)',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
       name: 'totalRevenue',
       type: 'number',
-      label: 'Tổng Doanh Thu (VND)',
+      label: 'Tổng Doanh Thu sau khi trừ VAT (VND)',
       required: true,
       defaultValue: 0,
       admin: {
-        description: 'Tổng doanh thu từ các đơn hàng của Affiliate User',
+        description:
+          'Tổng doanh thu từ các đơn hàng của Affiliate User.',
+        readOnly: true,
+        // disabled: true,
+      },
+    },
+    {
+      name: 'totalRevenueBeforeTax',
+      type: 'number',
+      label: 'Tổng Tiền Trước Thuế (VND) (Chưa trừ VAT) (Đã tính giảm giá nếu có)',
+      required: true,
+      defaultValue: 0,
+      admin: {
+        description: 'Tổng Tiền trước khi trừ thuế VAT của Affiliate User',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
       name: 'totalRevenueBeforeDiscount',
       type: 'number',
-      label: 'Tổng Doanh Thu Trước Giảm Giá (VND)',
+      label: 'Tổng Tiền Trước Giảm Giá (VND) (Chưa trừ VAT)',
       required: true,
       defaultValue: 0,
       admin: {
-        description: 'Tổng doanh thu trước giảm giá từ các đơn hàng của Affiliate User',
+        description: 'Tổng Tiền trước giảm giá từ các đơn hàng của Affiliate User',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -79,6 +102,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng số vé đã bán được trong tất cả các sự kiện',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -89,6 +114,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng số tiền hoa hồng đã nhận được từ các sự kiện',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -99,6 +126,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Tổng số vé thưởng đã nhận được từ các sự kiện',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -107,6 +136,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       label: 'Ngày Đạt Hạng Hiện Tại',
       admin: {
         description: 'Ngày Affiliate User đạt được hạng hiện tại',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -116,6 +147,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       admin: {
         description:
           'Thời điểm Affiliate User thực hiện hành động gần nhất (bán vé, tích điểm, nâng hạng, v.v.)',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -125,6 +158,8 @@ export const AffiliateUserRanks: CollectionConfig = {
       options: AFFILIATE_RANKS,
       admin: {
         description: 'Hạng mà Affiliate User đủ điều kiện nâng cấp nhưng chưa xác nhận',
+        readOnly: true,
+        // disabled: true,
       },
     },
   ],

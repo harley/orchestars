@@ -1,10 +1,11 @@
 import type { CollectionConfig } from 'payload'
 import { AFFILIATE_RANK, AFFILIATE_RANKS } from './constants'
+import { rankNameLabel } from './fields/rankNameLabel'
 
 export const AffiliateRanks: CollectionConfig = {
   slug: 'affiliate-ranks',
   admin: {
-    useAsTitle: 'rankName',
+    useAsTitle: 'rankNameLabel',
     description: 'Cấu hình các hạng của Affiliate Seller',
     components: {
       beforeList: ['@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate'],
@@ -20,6 +21,7 @@ export const AffiliateRanks: CollectionConfig = {
       options: AFFILIATE_RANKS,
       unique: true,
     },
+    rankNameLabel,
     {
       name: 'description',
       type: 'text',
@@ -46,20 +48,22 @@ export const AffiliateRanks: CollectionConfig = {
           type: 'array',
           label: 'Thưởng Vé (Dành cho Fan)',
           admin: {
-            condition: (data) => data.rankName === 'fan',
+            condition: (data) => [AFFILIATE_RANK.Tier2.value].includes(data.rankName),
           },
           fields: [
             {
               name: 'minTickets',
               type: 'number',
               label: 'Số Vé Bán Tối Thiểu',
-              required: true,
+              required: false,
+              hidden: true
             },
             {
               name: 'maxTickets',
               type: 'number',
               label: 'Số Vé Bán Tối Đa',
               required: false,
+              hidden: true
             },
             {
               name: 'minRevenue',
@@ -106,20 +110,22 @@ export const AffiliateRanks: CollectionConfig = {
           label: 'Thưởng Hoa Hồng dành cho hạng đã chọn',
           admin: {
             condition: (data) =>
-              [AFFILIATE_RANK.ambassador.value, AFFILIATE_RANK.patron.value].includes(data.rankName),
+              [AFFILIATE_RANK.Tier3.value, AFFILIATE_RANK.Tier4.value].includes(data.rankName),
           },
           fields: [
             {
               name: 'minTickets',
               type: 'number',
               label: 'Số Vé Bán Tối Thiểu',
-              required: true,
+              required: false,
+              hidden: true
             },
             {
               name: 'maxTickets',
               type: 'number',
               label: 'Số Vé Bán Tối Đa',
               required: false,
+              hidden: true
             },
             {
               name: 'minRevenue',

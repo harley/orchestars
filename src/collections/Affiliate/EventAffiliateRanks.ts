@@ -1,16 +1,20 @@
 import type { CollectionConfig } from 'payload'
 import { AFFILIATE_RANK, AFFILIATE_RANK_STATUSES, AFFILIATE_RANKS } from './constants'
+import { rankNameLabel } from './fields/rankNameLabel'
 /**
  * Collection configuration for Event Affiliate Ranks in PayloadCMS
  */
 export const EventAffiliateRanks: CollectionConfig = {
   slug: 'event-affiliate-ranks',
   admin: {
-    useAsTitle: 'event',
-    description: 'Quản lý hạng của Affiliate Seller trong từng event cụ thể',
+    useAsTitle: 'rankNameLabel',
+    defaultColumns: ['event', 'rankName', 'eventRewards', 'status'],
+    description: 'Cấu hình hạng của Affiliate Seller trong từng event cụ thể',
     components: {
-      beforeList: ['@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate'],
-    }
+      beforeList: [
+        '@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate',
+      ],
+    },
   },
 
   fields: [
@@ -25,23 +29,6 @@ export const EventAffiliateRanks: CollectionConfig = {
       },
     },
     {
-      name: 'affiliateUser',
-      type: 'relationship',
-      label: 'Affiliate User',
-      relationTo: 'users',
-      required: true,
-      filterOptions: () => {
-        return {
-          role: {
-            equals: 'affiliate',
-          },
-        }
-      },
-      admin: {
-        description: 'Chọn Affiliate User (chỉ hiển thị users có role là affiliate)',
-      },
-    },
-    {
       name: 'rankName',
       type: 'select',
       label: 'Tên Hạng',
@@ -51,6 +38,7 @@ export const EventAffiliateRanks: CollectionConfig = {
         description: 'Hạng được gán cho Affiliate User trong event',
       },
     },
+    rankNameLabel,
     {
       name: 'status',
       type: 'select',
@@ -64,15 +52,6 @@ export const EventAffiliateRanks: CollectionConfig = {
       },
     },
     {
-      name: 'isLocked',
-      type: 'checkbox',
-      label: 'Khóa Hạng',
-      defaultValue: true,
-      admin: {
-        description: 'Khi khóa, hạng này sẽ không thay đổi trong suốt event',
-      },
-    },
-    {
       name: 'eventRewards',
       type: 'group',
       label: 'Cấu Hình Thưởng Trong Event',
@@ -82,32 +61,36 @@ export const EventAffiliateRanks: CollectionConfig = {
           type: 'array',
           label: 'Thưởng Vé (Dành cho Fan trong Event)',
           admin: {
-            condition: (data) => data.rankName === 'fan',
+            condition: (data) => [AFFILIATE_RANK.Tier2.value].includes(data.rankName),
           },
           fields: [
             {
               name: 'minTickets',
               type: 'number',
               label: 'Số Vé Bán Tối Thiểu',
-              required: true,
+              required: false,
+              hidden: true,
             },
             {
               name: 'maxTickets',
               type: 'number',
               label: 'Số Vé Bán Tối Đa',
               required: false,
+              hidden: true,
             },
             {
               name: 'minRevenue',
               type: 'number',
               label: 'Doanh Thu Tối Thiểu (VND)',
               required: true,
+              min: 0,
             },
             {
               name: 'maxRevenue',
               type: 'number',
               label: 'Doanh Thu Tối Đa (VND)',
               required: false,
+              min: 0,
             },
             {
               name: 'rewardTickets',
@@ -124,34 +107,36 @@ export const EventAffiliateRanks: CollectionConfig = {
           label: 'Thưởng Hoa Hồng dành cho hạng đã chọn',
           admin: {
             condition: (data) =>
-              [AFFILIATE_RANK.ambassador.value, AFFILIATE_RANK.patron.value].includes(
-                data.rankName,
-              ),
+              [AFFILIATE_RANK.Tier3.value, AFFILIATE_RANK.Tier4.value].includes(data.rankName),
           },
           fields: [
             {
               name: 'minTickets',
               type: 'number',
               label: 'Số Vé Bán Tối Thiểu',
-              required: true,
+              required: false,
+              hidden: true,
             },
             {
               name: 'maxTickets',
               type: 'number',
               label: 'Số Vé Bán Tối Đa',
               required: false,
+              hidden: true,
             },
             {
               name: 'minRevenue',
               type: 'number',
               label: 'Doanh Thu Tối Thiểu (VND)',
               required: true,
+              min: 0,
             },
             {
               name: 'maxRevenue',
               type: 'number',
               label: 'Doanh Thu Tối Đa (VND)',
               required: false,
+              min: 0,
             },
             {
               name: 'commissionRate',
@@ -167,15 +152,4 @@ export const EventAffiliateRanks: CollectionConfig = {
       ],
     },
   ],
-  hooks: {
-    beforeChange: [
-      ({ data, originalDoc }) => {
-        // Đảm bảo hạng không thay đổi nếu đã khóa
-        if (originalDoc?.isLocked && data.rankName !== originalDoc.rankName) {
-          throw new Error('Hạng đã bị khóa và không thể thay đổi trong suốt event.')
-        }
-        return data
-      },
-    ],
-  },
 }

@@ -9,9 +9,12 @@ export const AffiliateRankLogs: CollectionConfig = {
     description: 'Lưu trữ lịch sử các thay đổi điểm và hạng của Affiliate User',
     components: {
       beforeList: ['@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate'],
-    }
+    },
   },
-
+  access: {
+    update: () => false,
+    delete: () => false,
+  },
   fields: [
     {
       name: 'affiliateUser',
@@ -28,6 +31,24 @@ export const AffiliateRankLogs: CollectionConfig = {
       },
       admin: {
         description: 'Affiliate User liên quan đến log này',
+        readOnly: true,
+        // disabled: true,
+      },
+    },
+    {
+      name: 'rankContext',
+      type: 'select',
+      label: 'Ngữ Cảnh Hạng',
+      required: true,
+      defaultValue: 'user',
+      options: [
+        { value: 'user', label: 'Rank Tổng (Affiliate User)' },
+        { value: 'event', label: 'Rank Theo Event' },
+      ],
+      admin: {
+        description: 'Xác định log này liên quan đến hạng tổng hay hạng theo sự kiện',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -35,9 +56,11 @@ export const AffiliateRankLogs: CollectionConfig = {
       type: 'select',
       label: 'Loại Hành Động',
       required: true,
-      options:AFFILIATE_ACTION_TYPE_LOGS,
+      options: AFFILIATE_ACTION_TYPE_LOGS,
       admin: {
         description: 'Loại hành động liên quan đến điểm hoặc hạng',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -47,6 +70,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'Số điểm thay đổi (dương hoặc âm, 0 nếu không thay đổi điểm)',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -55,6 +80,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       label: 'Điểm Trước Khi Thay Đổi',
       admin: {
         description: 'Số điểm của Affiliate User trước khi sự kiện xảy ra',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -63,6 +90,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       label: 'Điểm Sau Khi Thay Đổi',
       admin: {
         description: 'Số điểm của Affiliate User sau khi sự kiện xảy ra',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -71,7 +100,9 @@ export const AffiliateRankLogs: CollectionConfig = {
       label: 'Hạng Trước',
       options: AFFILIATE_RANKS,
       admin: {
-        description: 'Hạng trước khi sự kiện xảy ra (nếu có)',
+        description: 'Hạng trước khi sự kiện xảy ra (nếu có, áp dụng cho rank tổng)',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -80,15 +111,31 @@ export const AffiliateRankLogs: CollectionConfig = {
       label: 'Hạng Sau',
       options: AFFILIATE_RANKS,
       admin: {
-        description: 'Hạng sau khi sự kiện xảy ra (nếu có)',
+        description: 'Hạng sau khi sự kiện xảy ra (nếu có, áp dụng cho rank tổng)',
+        readOnly: true,
+        // disabled: true,
+      },
+    },
+    {
+      name: 'eventAffiliateRank',
+      type: 'relationship',
+      label: 'Hạng Theo Event',
+      relationTo: 'event-affiliate-ranks',
+      admin: {
+        description: 'Hạng trong event nếu log liên quan đến EventAffiliateUserRanks',
+        condition: (data) => data.rankContext === 'event',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
       name: 'description',
-      type: 'text',
+      type: 'textarea',
       label: 'Mô Tả',
       admin: {
         description: 'Mô tả chi tiết về sự kiện (ví dụ: lý do thay đổi điểm hoặc hạng)',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -102,6 +149,8 @@ export const AffiliateRankLogs: CollectionConfig = {
           pickerAppearance: 'dayAndTime',
           timeFormat: 'HH:mm a',
         },
+        readOnly: true,
+        // disabled: true,
       },
       defaultValue: () => new Date().toISOString(),
     },
@@ -112,6 +161,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       relationTo: 'events',
       admin: {
         description: 'Sự kiện liên quan đến thay đổi này (nếu có)',
+        readOnly: true,
+        disabled: true,
       },
     },
     {
@@ -121,6 +172,8 @@ export const AffiliateRankLogs: CollectionConfig = {
       relationTo: 'orders',
       admin: {
         description: 'Đơn hàng liên quan đến thay đổi này (nếu có)',
+        readOnly: true,
+        // disabled: true,
       },
     },
     {
@@ -138,17 +191,27 @@ export const AffiliateRankLogs: CollectionConfig = {
       },
       admin: {
         description: 'Admin thực hiện hành động này (nếu có)',
+        readOnly: true,
+        // disabled: true,
       },
     },
   ],
   hooks: {
     beforeChange: [
       ({ data }) => {
-        // Đảm bảo pointsAfter = pointsBefore + pointsChange nếu có thay đổi điểm
+        // Tính pointsAfter nếu có thay đổi điểm
         if (data.pointsBefore !== undefined && data.pointsChange !== undefined) {
-          data.pointsAfter = (data.pointsBefore || 0) + (data.pointsChange || 0)
+          data.pointsAfter = (data.pointsBefore || 0) + (data.pointsChange || 0);
         }
-        return data
+        // Đảm bảo rankContext được gán
+        if (!data.rankContext) {
+          data.rankContext = 'user'; // Mặc định là rank tổng
+        }
+        // Nếu là rank event, kiểm tra eventAffiliateRank
+        if (data.rankContext === 'event' && !data.event && !data.eventAffiliateRank) {
+          throw new Error('Log cho rank event phải có sự kiện hoặc hạng event liên quan');
+        }
+        return data;
       },
     ],
   },

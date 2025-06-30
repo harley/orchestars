@@ -23,6 +23,11 @@ const collections: Entity[] = [
     type: 'collections',
     label: 'Affiliate User Ranks',
   },
+  {
+    slug: 'event-affiliate-user-ranks',
+    type: 'collections',
+    label: 'Event Affiliate User Ranks',
+  },
 ]
 
 export const AffiliateCollectionList = () => {
