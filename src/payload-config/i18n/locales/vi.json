@@ -467,5 +467,32 @@
     "signInSignUp": "Đăng nhập",
     "buyTicketNow": "Mua vé ngay",
     "buyNow": "Mua ngay"
+  },
+  "paymentResult": {
+    "processingPayment": "Đang Xử Lý Thanh Toán",
+    "processingDescription": "Vui lòng chờ trong khi chúng tôi xác nhận thanh toán...",
+    "backToHome": "Về Trang Chủ",
+    "paymentSuccessful": "Thanh Toán Thành Công! 🎉",
+    "paymentFailed": "Thanh Toán Thất Bại",
+    "orderCanceled": "Đơn Hàng Đã Bị Hủy",
+    "successDescription": "Giao dịch của bạn đã được hoàn thành thành công và vé của bạn đã sẵn sàng!",
+    "canceledDescription": "Đơn hàng của bạn đã bị hủy vì thanh toán không được hoàn thành trong thời gian quy định.",
+    "failedDescription": "Có vấn đề xảy ra khi xử lý thanh toán của bạn. Vui lòng thử lại hoặc liên hệ hỗ trợ.",
+    "orderDetails": "Chi Tiết Đơn Hàng",
+    "orderNumber": "Mã Đơn Hàng",
+    "dateTime": "Ngày & Giờ",
+    "paymentMethod": "Phương Thức Thanh Toán",
+    "onlinePayment": "Thanh Toán Trực Tuyến",
+    "totalAmount": "Tổng Số Tiền",
+    "paymentNotCompleted": "Thanh Toán Chưa Hoàn Thành",
+    "failedReason": "Thanh toán của bạn không thể được xử lý. Điều này có thể do không đủ tiền, thông tin thanh toán không chính xác, hoặc vấn đề tạm thời với nhà cung cấp thanh toán.",
+    "canceledReason": "Đơn hàng của bạn đã tự động bị hủy vì thanh toán không được hoàn thành trong thời gian quy định. Nếu điều này không có chủ ý, vui lòng đặt đơn hàng mới và đảm bảo thanh toán được thực hiện để xác nhận mua hàng của bạn.",
+    "whatWouldYouLikeToDo": "Bạn muốn làm gì?",
+    "tryPaymentAgain": "Thử thanh toán lại với cùng hoặc phương thức thanh toán khác",
+    "checkCardDetails": "Kiểm tra chi tiết thẻ và số dư khả dụng",
+    "contactSupport": "Liên hệ hỗ trợ khách hàng nếu vấn đề vẫn tiếp tục",
+    "tryAgain": "Thử Lại",
+    "ticketsSent": "🎫 Vé của bạn đã được gửi đến địa chỉ email. Bạn cũng có thể đăng nhập và xem thông tin vé trong tài khoản của mình.",
+    "goToUpcomingEvents": "Đi đến các sự kiện sắp tới"
   }
 }
