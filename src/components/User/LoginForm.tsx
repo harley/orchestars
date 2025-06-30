@@ -4,6 +4,9 @@ import { useTranslate } from '@/providers/I18n/client'
 import { useToast } from '@/hooks/use-toast'
 import ForgotPasswordForm from './ForgotPasswordForm'
 import { Info } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Star, ArrowRight, Users } from 'lucide-react'
 
 interface LoginFormProps {
   onSuccess?: () => void
@@ -112,7 +115,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
             >
               {isLoading ? t('auth.signingIn') : t('auth.signIn')}
             </button>
-            <div className="text-center text-sm">
+            <div className="w-full text-center text-sm flex flex-col items-center gap-2">
               <button
                 type="button"
                 onClick={() => setFormMode('forgotPassword')}
@@ -120,10 +123,38 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
               >
                 {t('auth.forgotPassword')}
               </button>
+              <div className="w-full mx-auto bg-white py-5 px-2 rounded-xl shadow-md hover:shadow-lg flex flex-col items-center">
+                <div className="flex items-center mb-6 w-full justify-around">
+                  <div className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full items-center justify-center bg-black text-white">
+                    {/* Custom icon styling to match the image */}
+                    <Star className="h-5 w-5" />
+                  </div>
+                  <div className="flex flex-col">
+                    <h2 className="text-base font-bold text-gray-900">
+                      {t('auth.joinAmbassadorProgram')}
+                    </h2>
+                    <p className="text-gray-600">{t('auth.joinAmbassadorProgramDescription')}</p>
+                  </div>
+                </div>
+
+                <button className="w-full">
+                  <Link
+                    href="/affiliate"
+                    aria-label={t('auth.affiliateLoginLink')}
+                    className={`flex flex-row justify-around w-full py-3 text-white rounded-lg font-semibold transition ${
+                      isLoading ? 'bg-gray-700 cursor-not-allowed' : 'bg-gray-900 hover:bg-black'
+                    }`}
+                  >
+                    <Users className="h-5 w-5"/>
+                    <span>{t('auth.affiliateLoginLink')}</span>
+                    <ArrowRight className="h-4 w-4 mt-0.5" />
+                  </Link>
+                </button>
+              </div>
               <button
                 type="button"
                 onClick={() => setFormMode('firstTimeLogin')}
-                className="font-medium text-gray-900 hover:underline focus:outline-none mt-2"
+                className="font-medium text-gray-900 hover:underline focus:outline-none"
               >
                 {t('auth.firstTimeLoginLink')}
               </button>
