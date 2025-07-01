@@ -112,7 +112,7 @@ export const EventAffiliateUserRanks: CollectionConfig = {
     {
       name: 'totalRevenue',
       type: 'number',
-      label: 'Tổng Doanh Thu sau khi trừ VAT (VND)',
+      label: 'Tổng Doanh Thu Trước Thuế (VND) (Chưa trừ VAT) (Đã tính giảm giá nếu có)',
       required: true,
       defaultValue: 0,
       admin: {
@@ -129,7 +129,19 @@ export const EventAffiliateUserRanks: CollectionConfig = {
       required: true,
       defaultValue: 0,
       admin: {
-        description: 'Tổng Tiền trước khi trừ thuế VAT của Affiliate User',
+        description: 'Tổng tiền trước khi trừ thuế VAT của Affiliate User',
+        readOnly: true,
+        // disabled: true,
+      },
+    },
+    {
+      name: 'totalRevenueAfterTax',
+      type: 'number',
+      label: 'Tổng Tiền Sau Thuế (VND) (Đã bao gồm VAT) (Đã tính giảm giá nếu có)',
+      required: true,
+      defaultValue: 0,
+      admin: {
+        description: 'Tổng tiền từ các đơn hàng của Affiliate User.',
         readOnly: true,
         // disabled: true,
       },
@@ -137,11 +149,11 @@ export const EventAffiliateUserRanks: CollectionConfig = {
     {
       name: 'totalRevenueBeforeDiscount',
       type: 'number',
-      label: 'Tổng Tiền Trước Giảm Giá (VND) (Chưa trừ VAT)',
+      label: 'Tổng Tiền Trước Giảm Giá (VND) (Đã bao gồm VAT)',
       required: true,
       defaultValue: 0,
       admin: {
-        description: 'Tổng Tiền trước giảm giá từ các đơn hàng của Affiliate User',
+        description: 'Tổng tiền trước giảm giá từ các đơn hàng của Affiliate User',
         readOnly: true,
         // disabled: true,
       },
@@ -290,10 +302,10 @@ export const EventAffiliateUserRanks: CollectionConfig = {
 
           const sortedRanks = affiliateRanks.sort((a, b) => b.minPoints - a.minPoints)
 
-          const newRank = sortedRanks.find((rank) => doc.totalPoints >= rank.minPoints)
           if (!affiliateUserRank) {
             // create a new one
-
+            
+            const newRank = sortedRanks.find((rank) => doc.totalPoints >= rank.minPoints)
             await req.payload.create({
               collection: 'affiliate-user-ranks',
               data: {
@@ -302,6 +314,7 @@ export const EventAffiliateUserRanks: CollectionConfig = {
                 totalPoints: doc.totalPoints,
                 totalRevenue: doc.totalRevenue,
                 totalRevenueBeforeTax: doc.totalRevenueBeforeTax,
+                totalRevenueAfterTax: doc.totalRevenueAfterTax,
                 totalRevenueBeforeDiscount: doc.totalRevenueBeforeDiscount,
                 totalTicketsSold: doc.totalTicketsSold,
                 totalCommissionEarned: doc.totalCommissionEarned,
@@ -313,8 +326,10 @@ export const EventAffiliateUserRanks: CollectionConfig = {
           } else {
             // update affiliate user rank
             let pendingRankUpgrade: AffiliateRank | null = null
-            if (newRank && newRank.rankName !== affiliateUserRank.currentRank) {
-              pendingRankUpgrade = newRank.rankName as AffiliateRank
+            const totalPoints = (affiliateUserRank.totalPoints || 0) + (doc.totalPoints || 0)
+            const nextRankCanReach = sortedRanks.find((rank) => totalPoints >= rank.minPoints)
+            if (nextRankCanReach && nextRankCanReach.rankName !== affiliateUserRank.currentRank) {
+              pendingRankUpgrade = nextRankCanReach.rankName as AffiliateRank
             }
             await req.payload.update({
               collection: 'affiliate-user-ranks',
@@ -322,11 +337,12 @@ export const EventAffiliateUserRanks: CollectionConfig = {
               data: {
                 pendingRankUpgrade,
                 lastActivityDate: new Date().toISOString(),
-                totalPoints: (affiliateUserRank.totalPoints || 0) + (doc.totalPoints || 0),
+                totalPoints: totalPoints,
                 totalRevenue: (affiliateUserRank.totalRevenue || 0) + (doc.totalRevenue || 0),
                 totalRevenueBeforeTax:
-                  (affiliateUserRank.totalRevenueBeforeTax || 0) +
-                  (doc.totalRevenueBeforeTax || 0),
+                  (affiliateUserRank.totalRevenueBeforeTax || 0) + (doc.totalRevenueBeforeTax || 0),
+                totalRevenueAfterTax:
+                  (affiliateUserRank.totalRevenueAfterTax || 0) + (doc.totalRevenueAfterTax || 0),
                 totalRevenueBeforeDiscount:
                   (affiliateUserRank.totalRevenueBeforeDiscount || 0) +
                   (doc.totalRevenueBeforeDiscount || 0),
@@ -354,7 +370,6 @@ export const EventAffiliateUserRanks: CollectionConfig = {
               pointsBefore,
               pointsAfter,
               rankBefore: affiliateUserRank?.currentRank,
-              rankAfter: newRank?.rankName as AffiliateRank,
               actionType: AFFILIATE_ACTION_TYPE_LOG.event_completed.value,
               occurredAt: new Date().toISOString(),
               description: `Cập nhật điểm tích lũy, doanh thu, số vé bán được, hoa hồng nhận được, số vé thưởng có thể nhận được từ sự kiện sau khi event đã hoàn thành`,
