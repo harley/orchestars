@@ -91,12 +91,16 @@ export function PerformanceAnalytics() {
     if (result.success) {
       setPerformanceData(result.data as PerformanceData)
     } else {
-      throw new Error(result.error || 'Failed to fetch performance data')
+      setPerformanceData(null)
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch some data',
+        variant: 'destructive',
+      })
     }
   }
 
   const fetchLinkBreakdownData = async (page = 1, timeRangeValue: string, sortByValue: string) => {
-    console.log('Fetching link breakdown data:', { page, timeRangeValue, sortByValue })
     const params = new URLSearchParams({
       timeRange: timeRangeValue,
       sortBy: sortByValue,
@@ -110,7 +114,11 @@ export function PerformanceAnalytics() {
       setLinkBreakdownData(result.data as LinkBreakdownData)
       setLinkBreakdownPagination(result.pagination as PaginationInfo)
     } else {
-      throw new Error(result.error || 'Failed to fetch link breakdown data')
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch some data',
+        variant: 'destructive',
+      })
     }
   }
 
@@ -124,87 +132,51 @@ export function PerformanceAnalytics() {
     if (result.success) {
       setSourceCampaignBreakdownData(result.data as SourceCampaignBreakdownData)
     } else {
-      throw new Error(result.error || 'Failed to fetch source/campaign breakdown data')
+      setSourceCampaignBreakdownData(null)
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch some data',
+        variant: 'destructive',
+      })
     }
   }
 
   const fetchInitialData = async () => {
-    try {
-      setLoading(true)
-      await Promise.all([
-        fetchPerformanceData(timeRange),
-        fetchLinkBreakdownData(1, timeRange, sortBy),
-        fetchSourceCampaignBreakdownData(timeRange),
-      ])
-    } catch (error) {
-      console.error('Error fetching initial data:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch initial data',
-        variant: 'destructive',
-      })
-    } finally {
-      setLoading(false)
-    }
+    setLoading(true)
+    await Promise.all([
+      fetchPerformanceData(timeRange),
+      fetchLinkBreakdownData(1, timeRange, sortBy),
+      fetchSourceCampaignBreakdownData(timeRange),
+    ])
+    setLoading(false)
   }
 
-  useEffect(() => {
-    fetchInitialData()
-  }, [])
+  // useEffect(() => {
+  //   fetchInitialData()
+  // }, [])
 
   const toggleTimeRange = async (value: string) => {
-    try {
-      setLoading(true)
-      setTimeRange(value)
-
-      await Promise.all([
-        fetchPerformanceData(value),
-        fetchLinkBreakdownData(linkBreakdownPagination.page, value, sortBy),
-        fetchSourceCampaignBreakdownData(value),
-      ])
-    } catch (error) {
-      console.error('Error changing time range:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to change time range',
-        variant: 'destructive',
-      })
-    } finally {
-      setLoading(false)
-    }
+    setLoading(true)
+    setTimeRange(value)
+    await Promise.all([
+      fetchPerformanceData(value),
+      fetchLinkBreakdownData(linkBreakdownPagination.page, value, sortBy),
+      fetchSourceCampaignBreakdownData(value),
+    ])
+    setLoading(false)
   }
 
   const toggleSortBy = async (value: string) => {
-    try {
-      setLoading(true)
-      setSortBy(value)
-      await fetchLinkBreakdownData(linkBreakdownPagination.page, timeRange, value)
-    } catch (error) {
-      console.error('Error changing sort by:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to change sort option',
-        variant: 'destructive',
-      })
-    } finally {
-      setLoading(false)
-    }
+    setLoading(true)
+    setSortBy(value)
+    await fetchLinkBreakdownData(linkBreakdownPagination.page, timeRange, value)
+    setLoading(false)
   }
 
-  const handlePageChange = (newPage: number) => {
-    try {
-      setLoading(true)
-      fetchLinkBreakdownData(newPage, timeRange, sortBy)
-    } catch (error) {
-      console.error('Error changing page:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to change page',
-        variant: 'destructive',
-      })
-    } finally {
-      setLoading(false)
-    }
+  const handlePageChange = async (newPage: number) => {
+    setLoading(true)
+    await fetchLinkBreakdownData(newPage, timeRange, sortBy)
+    setLoading(false)
   }
 
   return (
@@ -247,7 +219,14 @@ export function PerformanceAnalytics() {
           <CardContent>
             {
               loading ? (
-                <Skeleton className="h-4 w-6 rounded-xl"/>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20 bg-gray-200" />
+                  <Skeleton className="h-3 w-24 bg-gray-200" />
+                </div>
+              ) : !performanceData ? (
+                <div className="text-center py-8">
+                  Failed to load performance data
+                </div>
               ) : (
                 <>
                   <div className="text-2xl font-bold">
@@ -268,7 +247,14 @@ export function PerformanceAnalytics() {
           <CardContent>
             {
               loading ? (
-                <Skeleton className="h-4 w-6 rounded-xl"/>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20 bg-gray-200" />
+                  <Skeleton className="h-3 w-24 bg-gray-200" />
+                </div>
+              ) : !performanceData ? (
+                <div className="text-center py-8">
+                  Failed to load performance data
+                </div>
               ) : (
                 <>
                   <div className="text-2xl font-bold">
@@ -289,7 +275,14 @@ export function PerformanceAnalytics() {
           <CardContent>
             {
               loading ? (
-                <Skeleton className="h-4 w-6 rounded-xl"/>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20 bg-gray-200" />
+                  <Skeleton className="h-3 w-24 bg-gray-200" />
+                </div>
+              ) : !performanceData ? (
+                <div className="text-center py-8">
+                  Failed to load performance data
+                </div>
               ) : (
                 <>
                   <div className="text-2xl font-bold">
@@ -310,14 +303,21 @@ export function PerformanceAnalytics() {
           <CardContent>
             {
               loading ? (
-                <Skeleton className="h-4 w-6 rounded-xl"/>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20 bg-gray-200" />
+                  <Skeleton className="h-3 w-24 bg-gray-200" />
+                </div>
+              ) : !performanceData ? (
+                <div className="text-center py-8">
+                  Failed to load performance data
+                </div>
               ) : (
                 <>
                   <div className="text-2xl font-bold">
-                    {loading ? <Skeleton/> : `${formatMoney(performanceData?.grossRevenue ?? 0)}`}
+                    {`${formatMoney(performanceData?.grossRevenue ?? 0)}`}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {loading ? <Skeleton/> : `Before discounts`}
+                    {`Before discounts`}
                   </p>
                 </>
               )
@@ -380,13 +380,17 @@ export function PerformanceAnalytics() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-8">
-                      Loading affiliate links...
+                    <TableCell colSpan={6} className="text-center py-8">
+                      <div className="space-y-4">
+                        <Skeleton className="h-7 w-full bg-gray-200" />
+                        <Skeleton className="h-7 w-full bg-gray-200" />
+                        <Skeleton className="h-7 w-full bg-gray-200" />
+                      </div>
                     </TableCell>
                   </TableRow>
-                ) : linkBreakdownData?.length === 0 ? (
+                ) : linkBreakdownData?.length === 0 || !linkBreakdownData ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8">
+                      <TableCell colSpan={6} className="text-center py-8">
                         No affiliate links found
                       </TableCell>
                     </TableRow>
@@ -472,10 +476,11 @@ export function PerformanceAnalytics() {
           </CardHeader>
           <CardContent className="space-y-4">
             { loading ? (
-              <div className="text-center py-8">
-                Loading revenue data...
+              <div className="flex flex-row justify-between">
+                <Skeleton className="h-4 w-32 bg-gray-200" />
+                <Skeleton className="h-4 w-24 bg-gray-200" />
               </div>
-            ) : sourceCampaignBreakdownData?.bySource.length === 0 ? (
+            ) : sourceCampaignBreakdownData?.bySource.length === 0 || !sourceCampaignBreakdownData ? (
               <div className="text-center py-8">
                 No traffic source found
               </div>
@@ -502,10 +507,11 @@ export function PerformanceAnalytics() {
           </CardHeader>
           <CardContent className="space-y-4">
             {loading ? (
-              <div className="text-center py-8">
-                Loading campaign data...
+              <div className="flex flex-row justify-between">
+                <Skeleton className="h-4 w-32 bg-gray-200" />
+                <Skeleton className="h-4 w-24 bg-gray-200" />
               </div>
-            ) : sourceCampaignBreakdownData?.byCampaign.length === 0 ? (
+            ) : sourceCampaignBreakdownData?.byCampaign.length === 0 || !sourceCampaignBreakdownData ? (
               <div className="text-center py-8">
                 No campaign found
               </div>
