@@ -151,9 +151,9 @@ export function PerformanceAnalytics() {
     setLoading(false)
   }
 
-  // useEffect(() => {
-  //   fetchInitialData()
-  // }, [])
+  useEffect(() => {
+    fetchInitialData()
+  }, [])
 
   const toggleTimeRange = async (value: string) => {
     setLoading(true)
