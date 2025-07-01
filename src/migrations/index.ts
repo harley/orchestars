@@ -67,6 +67,7 @@ import * as migration_20250626_015908_add_fields_affiliate_ranks from './2025062
 import * as migration_20250626_162808_add_virtual_rank_name_label_field from './20250626_162808_add_virtual_rank_name_label_field';
 import * as migration_20250627_083211_add_tax_and_fields_event_affiliate_user_rank from './20250627_083211_add_tax_and_fields_event_affiliate_user_rank';
 import * as migration_20250627_084556_add_fields_to_affiliate_user_rank from './20250627_084556_add_fields_to_affiliate_user_rank';
+import * as migration_20250701_083830_add_fields_to_affiliate_user_rank from './20250701_083830_add_fields_to_affiliate_user_rank';
 
 export const migrations = [
   {
@@ -412,6 +413,11 @@ export const migrations = [
   {
     up: migration_20250627_084556_add_fields_to_affiliate_user_rank.up,
     down: migration_20250627_084556_add_fields_to_affiliate_user_rank.down,
-    name: '20250627_084556_add_fields_to_affiliate_user_rank'
+    name: '20250627_084556_add_fields_to_affiliate_user_rank',
+  },
+  {
+    up: migration_20250701_083830_add_fields_to_affiliate_user_rank.up,
+    down: migration_20250701_083830_add_fields_to_affiliate_user_rank.down,
+    name: '20250701_083830_add_fields_to_affiliate_user_rank'
   },
 ];

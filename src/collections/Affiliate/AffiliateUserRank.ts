@@ -60,12 +60,12 @@ export const AffiliateUserRanks: CollectionConfig = {
     {
       name: 'totalRevenue',
       type: 'number',
-      label: 'Tổng Doanh Thu sau khi trừ VAT (VND)',
+      label: 'Tổng Doanh Thu Trước Thuế (VND) (Chưa trừ VAT) (Đã tính giảm giá nếu có)',
       required: true,
       defaultValue: 0,
       admin: {
         description:
-          'Tổng doanh thu từ các đơn hàng của Affiliate User.',
+          'Tổng doanh thu từ các đơn hàng của Affiliate User. Sẽ tính phần thưởng dựa trên giá trị này',
         readOnly: true,
         // disabled: true,
       },
@@ -77,7 +77,20 @@ export const AffiliateUserRanks: CollectionConfig = {
       required: true,
       defaultValue: 0,
       admin: {
-        description: 'Tổng Tiền trước khi trừ thuế VAT của Affiliate User',
+        description: 'Tổng tiền trước khi trừ thuế VAT của Affiliate User',
+        readOnly: true,
+        // disabled: true,
+      },
+    },
+    {
+      name: 'totalRevenueAfterTax',
+      type: 'number',
+      label: 'Tổng Tiền Sau Thuế (VND) (Đã bao gồm VAT) (Đã tính giảm giá nếu có)',
+      required: true,
+      defaultValue: 0,
+      admin: {
+        description:
+          'Tổng tiền từ các đơn hàng của Affiliate User.',
         readOnly: true,
         // disabled: true,
       },
@@ -85,11 +98,11 @@ export const AffiliateUserRanks: CollectionConfig = {
     {
       name: 'totalRevenueBeforeDiscount',
       type: 'number',
-      label: 'Tổng Tiền Trước Giảm Giá (VND) (Chưa trừ VAT)',
+      label: 'Tổng Tiền Trước Giảm Giá (VND) (Đã bao gồm VAT)',
       required: true,
       defaultValue: 0,
       admin: {
-        description: 'Tổng Tiền trước giảm giá từ các đơn hàng của Affiliate User',
+        description: 'Tổng tiền trước giảm giá từ các đơn hàng của Affiliate User',
         readOnly: true,
         // disabled: true,
       },
