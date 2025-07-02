@@ -3,15 +3,26 @@ import { sendMailAndWriteLog } from '@/collections/Emails/utils'
 import { getServerSideURL } from '@/utilities/getURL'
 import { affiliateAccountSetupEmailHtml } from '@/mail/templates/AffiliateAccountSetup'
 import { setUserResetPasswordToken } from '@/collections/Users/utils/setUserResetPasswordToken'
+import { AFFILIATE_USER_STATUS } from '../constants'
 
 export const sendAffiliateSetupEmail: CollectionAfterChangeHook = async ({
   doc,
   req,
-  operation,
+  data,
+  previousDoc,
 }) => {
   // Only trigger for create operations and affiliate users
 
-  if (operation !== 'create' || doc.role !== 'affiliate') {
+  if (doc.role !== 'affiliate') {
+    return doc
+  }
+
+  const isAllowSendingMail =
+    previousDoc?.affiliateStatus !== AFFILIATE_USER_STATUS.approved.value &&
+    data?.affiliateStatus === AFFILIATE_USER_STATUS.approved.value
+
+
+  if (!isAllowSendingMail) {
     return doc
   }
 
@@ -33,7 +44,7 @@ export const sendAffiliateSetupEmail: CollectionAfterChangeHook = async ({
       },
       emailData: { user: doc.id },
       payload,
-      transactionID
+      transactionID,
     })
 
     console.log(`Affiliate setup email sent to: ${doc.email}`)
