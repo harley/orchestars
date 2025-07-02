@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
     ROUND(SUM(net_revenue) * 1.0 / NULLIF(SUM(num_orders), 0)) AS average_order_value
   FROM metrics_1;
     `)
-    const data = result.rows[0] as CardMetrics
+    const data = (result as { rows: any[] }).rows[0] as CardMetrics
     const metrics = {
       grossRevenue: data.gross_revenue,
       netRevenue: data.net_revenue,

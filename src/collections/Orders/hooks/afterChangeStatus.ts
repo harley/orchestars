@@ -124,16 +124,20 @@ const getAffiliateAggregates = async (
   `
 
   const [resultCountTotal, resultCountTotalTicketSold] = await Promise.all([
-    db.drizzle
-      .execute(valueQuery)
-      .then(
-        (res: {
-          rows: Array<{ total_after_discount_value?: string; total_before_discount_value?: string }>
-        }) => res.rows?.[0],
-      ),
+    db.drizzle.execute(valueQuery).then(
+      (res) =>
+        (
+          res as {
+            rows: Array<{
+              total_after_discount_value?: string
+              total_before_discount_value?: string
+            }>
+          }
+        ).rows?.[0],
+    ),
     db.drizzle
       .execute(ticketsQuery)
-      .then((res: { rows?: Array<{ total_ticket_sold?: string }> }) => res.rows?.[0]),
+      .then((res) => (res as { rows?: Array<{ total_ticket_sold?: string }> }).rows?.[0]),
   ])
 
   const totalBeforeDiscountValue = Number(resultCountTotal?.total_before_discount_value) || 0
@@ -201,7 +205,9 @@ const upsertEventAffiliateUserRank = async (
     const ticketRewards = eventAffiliateRank.eventRewards?.ticketRewards?.sort(
       (a, b) => b.minRevenue - a.minRevenue,
     )
-    const ticketReward = ticketRewards?.find((reward) => reward.minRevenue <= totalValueBeforeTaxAfterDiscount)
+    const ticketReward = ticketRewards?.find(
+      (reward) => reward.minRevenue <= totalValueBeforeTaxAfterDiscount,
+    )
     if (ticketReward) {
       commonData.totalTicketsRewarded = ticketReward.rewardTickets || 0
     }

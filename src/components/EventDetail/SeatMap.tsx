@@ -76,7 +76,7 @@ const generateSeats = (ticketPrices: any[]) => {
       if (currentIndexRow >= rows.length) break // Prevent out-of-bounds errors
 
       const rowName = rows[currentIndexRow] // Get the row letter
-      const rowSeats = []
+      const rowSeats: any[] = []
 
       for (let s = 1; s <= seatsPerRow; s++) {
         rowSeats.push({

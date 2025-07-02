@@ -188,7 +188,7 @@ const checkTicketClassAvailable = async ({
   `,
     )
     .then((result) =>
-      (result?.rows || []).reduce(
+      ((result as { rows: any[] })?.rows || []).reduce(
         (obj, row) => {
           obj[row.ticketClassName as string] = Number(row.total)
 
@@ -228,7 +228,7 @@ const checkTicketClassAvailable = async ({
     `,
     )
     .then((result) =>
-      (result.rows || []).reduce(
+      ((result as { rows: any[] })?.rows || []).reduce(
         (obj, row) => {
           obj[row.ticketPriceName as string] = Number(row.total)
 

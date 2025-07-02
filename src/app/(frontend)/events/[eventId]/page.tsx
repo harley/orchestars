@@ -67,7 +67,7 @@ export async function generateMetadata(
     imageUrl = `${getServerSideURL()}${encodedPath}`
   }
 
-  const images = []
+  const images: typeof previousImages = []
   if (imageUrl) {
     images.push({ url: imageUrl })
   } else {

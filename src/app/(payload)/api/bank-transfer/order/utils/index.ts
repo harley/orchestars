@@ -119,7 +119,7 @@ export const checkBookedOrPendingPaymentSeats = async ({
     GROUP BY ticket.seat
   `,
     )
-    .then((result) => result.rows)
+    .then((result) => (result as { rows: any[] }).rows)
     .catch((err) => {
       console.error('Error during checkBookedOrPendingPaymentSeats ', err)
 
@@ -284,7 +284,7 @@ export const checkTicketClassAvailable = async ({
       `,
       )
       .then((result) =>
-        (result.rows || []).reduce(
+        ((result as { rows: any[] }).rows || []).reduce(
           (obj, row) => {
             obj[row.ticketPriceName as string] = Number(row.total)
 
@@ -820,7 +820,7 @@ export const createOrderAndTicketsWithTicketClassType = async ({
       throw new Error('TICK004')
     }
 
-    const promises = []
+    const promises: any[] = []
 
     for (let i = 1; i <= orderItem.quantity; i++) {
       promises.push(
@@ -1292,7 +1292,7 @@ export const checkRemainingQuantitySeats = async ({
       )
       .then(
         (result) =>
-          result.rows.map((row) => ({ ...row, totalBooked: Number(row.totalBooked) })) as Array<{
+          (result as { rows: any[] }).rows.map((row) => ({ ...row, totalBooked: Number(row.totalBooked) })) as Array<{
             eventScheduleId: string
             ticketPriceId: string
             totalBooked: number
