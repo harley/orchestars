@@ -266,6 +266,9 @@ importers:
       recharts:
         specifier: ^2.15.4
         version: 2.15.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      require-in-the-middle:
+        specifier: ^7.5.2
+        version: 7.5.2
       sharp:
         specifier: 0.32.6
         version: 0.32.6
@@ -15628,7 +15631,7 @@ snapshots:
     dependencies:
       debug: 4.4.1
       module-details-from-path: 1.0.4
-      resolve: 1.22.8
+      resolve: 1.22.10
     transitivePeerDependencies:
       - supports-color
 
