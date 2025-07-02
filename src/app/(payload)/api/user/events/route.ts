@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
       ORDER BY event_id DESC
     `)
 
-    const eventIds = (eventIdsResult.rows || []).map(row => row.event_id)
+    const eventIds = ((eventIdsResult as { rows: any[] }).rows || []).map(row => row.event_id)
 
     if (!eventIds.length) {
       return NextResponse.json({ 

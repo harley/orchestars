@@ -39,7 +39,7 @@ export async function GET(req: NextRequest){
             AND "affiliate_affiliate_user_id" = ${userRequest.id}
             ${dateFrom ? sql`AND "created_at" >= ${dateFrom.toISOString()}` : sql``}
         `)
-        const netRevenue = result.rows[0]?.net_revenue ?? 0
+        const netRevenue = (result as {rows: any[]}).rows[0]?.net_revenue ?? 0
         
         //Return response
         return NextResponse.json({ netRevenue })

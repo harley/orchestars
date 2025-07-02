@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
       active: 0,
       total: 0,
     }
-    const rows = result.rows as statusRow[]
+    const rows = (result as {rows: any[]}).rows as statusRow[]
     rows.forEach((row: statusRow) => {
       eventCountByStatus.total += Number(row.count)
       if (row.status === 'published_upcoming') {

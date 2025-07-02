@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
 
     const ticketResult = await payload.db.drizzle.execute(query)
 
-    const tickets = (ticketResult.rows || []) as unknown as TicketRecord[]
+    const tickets = ((ticketResult as { rows: any[] }).rows || []) as unknown as TicketRecord[]
 
     // Return 404 if no tickets found
     if (!tickets.length) {

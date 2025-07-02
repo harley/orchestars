@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
     ORDER BY wc.event_id DESC;
     `)
 
-    const performanceSummaryArray = (result.rows as PerformanceSummary[]).map((row) => {
+    const performanceSummaryArray = ((result as {rows: any[]}).rows as PerformanceSummary[]).map((row) => {
       let status = ''
       if (row.status === 'published_open_sales') {
         status = 'Active'

@@ -50,7 +50,7 @@ export async function getTicketsForSchedule(eventId: string, scheduleId: string)
     `)
 
     // Transform the data to match the expected format
-    const tickets = result.rows.map((ticket) => ({
+    const tickets = (result as any).rows.map((ticket) => ({
       ...ticket,
       order: ticket.promotionCode ? { promotion_code: ticket.promotionCode } : undefined,
     }))
@@ -103,17 +103,20 @@ export async function getBookedTicketsCounts(eventId: string): Promise<TicketCou
   `)
 
   // Transform the result into the expected format
-  const countsByScheduleAndPrice = result.rows.reduce<TicketCounts>((acc, row) => {
-    const ticketPriceName = row.ticketPriceName as string
-    const eventScheduleId = row.eventScheduleId as string
-    const count = Number(row.count)
+  const countsByScheduleAndPrice = (result as { rows: any[] }).rows.reduce<TicketCounts>(
+    (acc, row) => {
+      const ticketPriceName = row.ticketPriceName as string
+      const eventScheduleId = row.eventScheduleId as string
+      const count = Number(row.count)
 
-    if (!acc[ticketPriceName]) {
-      acc[ticketPriceName] = {}
-    }
-    acc[ticketPriceName][eventScheduleId] = count
-    return acc
-  }, {})
+      if (!acc[ticketPriceName]) {
+        acc[ticketPriceName] = {}
+      }
+      acc[ticketPriceName][eventScheduleId] = count
+      return acc
+    },
+    {},
+  )
 
   return countsByScheduleAndPrice
 }
@@ -184,7 +187,7 @@ export const getBookedSeatsByEventScheduleId = async (eventId: number, eventSche
         AND ticket.status = 'booked'
     `)
 
-    return result?.rows || []
+    return (result as { rows: any[] })?.rows || []
   } catch (error) {
     console.log('error', error)
 
@@ -324,7 +327,7 @@ export const swapSeats = async (
             user: user.id,
             event: event?.id,
             ticket: updatedTicket.id,
-            status: 'sent'
+            status: 'sent',
           },
         })
       }

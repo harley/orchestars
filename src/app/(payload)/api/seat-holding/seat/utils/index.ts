@@ -36,7 +36,7 @@ export const getExistingSeatHolding = async ({
         ${sql.raw(strInSeatsQuery)}
   `,
     )
-    .then((res) => res.rows)
+    .then((res) => (res as { rows: any[] }).rows)
     .catch((error) => {
       console.error('Error getting existing seat holdings:', error)
 

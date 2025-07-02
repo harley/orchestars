@@ -57,9 +57,9 @@ export async function GET(req: NextRequest) {
       grossRevenue: 0,
       netRevenue: 0,
     }
-    eventMetrics.ticketNumber = Number(result.rows[0]?.num_ticket ?? 0)
-    eventMetrics.grossRevenue = Number(result.rows[0]?.gross_revenue ?? 0)
-    eventMetrics.netRevenue = Number(result.rows[0]?.net_revenue ?? 0)
+    eventMetrics.ticketNumber = Number((result as {rows: any[]}).rows[0]?.num_ticket ?? 0)
+    eventMetrics.grossRevenue = Number((result as {rows: any[]}).rows[0]?.gross_revenue ?? 0)
+    eventMetrics.netRevenue = Number((result as {rows: any[]}).rows[0]?.net_revenue ?? 0)
 
     //Return the response
     return NextResponse.json(eventMetrics)
