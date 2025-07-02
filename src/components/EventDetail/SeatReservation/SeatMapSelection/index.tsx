@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React from 'react'
 import { Button } from '@/components/ui/button'
 
-import { isSameDay } from 'date-fns'
+// import { isSameDay } from 'date-fns'
 import { TicketPrice } from '../../types'
 import { Event } from '@/payload-types'
 import { useRouter } from 'next/navigation'
@@ -30,29 +30,29 @@ const SeatMapSelection = ({
   // const searchParams = useSearchParams()
   const { t } = useTranslate()
 
-  const [selectedEventScheduleId, setSelectedEventScheduleId] = useState('')
+  // const [selectedEventScheduleId, setSelectedEventScheduleId] = useState('')
 
   // const eventScheduleId = searchParams.get('eventScheduleId')
 
-  const selectedSchedule = useMemo(() => {
-    const schedule = event.schedules?.find((sche) => sche.id === selectedEventScheduleId)
+  // const selectedSchedule = useMemo(() => {
+  //   const schedule = event.schedules?.find((sche) => sche.id === selectedEventScheduleId)
 
-    return schedule
-  }, [selectedEventScheduleId, event.schedules])
+  //   return schedule
+  // }, [selectedEventScheduleId, event.schedules])
 
-  const handleDateSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const date = new Date(e.target.value)
+  // const handleDateSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  //   const date = new Date(e.target.value)
 
-    const schedule = date
-      ? event.schedules?.find((sche) => isSameDay(sche.date as string, date))
-      : null
-    const eventScheduleId = schedule?.id || ''
+  //   const schedule = date
+  //     ? event.schedules?.find((sche) => isSameDay(sche.date as string, date))
+  //     : null
+  //   const eventScheduleId = schedule?.id || ''
 
-    setSelectedEventScheduleId(eventScheduleId)
-    // const newPathname = `${pathname}?eventScheduleId=${eventScheduleId}`
+  //   setSelectedEventScheduleId(eventScheduleId)
+  //   // const newPathname = `${pathname}?eventScheduleId=${eventScheduleId}`
 
-    // router.replace(newPathname, { scroll: false })
-  }
+  //   // router.replace(newPathname, { scroll: false })
+  // }
 
   // const [isOpen, setIsOpen] = useState(false)
 
