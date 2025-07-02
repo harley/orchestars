@@ -57,7 +57,6 @@ export default function AffiliateRegisterPage() {
         }),
       })
       const result = await res.json()
-      console.log(result)
       if (res.ok) {
         toast({
           title: 'Registration successful! 🎉',

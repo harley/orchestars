@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     const existing = await payload.find({
       collection: 'users',
       where: {
-        or: [{ email: { equals: value.email } }, { phoneNumber: { equals: value.phoneNumber } }],
+        or: [{ email: { equals: String(value.email).toLowerCase() } }, { phoneNumber: { equals: value.phoneNumber } }],
       },
       limit: 1,
     })
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       data: {
         firstName: value.firstName,
         lastName: value.lastName,
-        email: value.email,
+        email: String(value.email).toLowerCase(),
         phoneNumber: value.phoneNumber,
         role: USER_ROLE.affiliate.value,
         affiliateStatus: AFFILIATE_USER_STATUS.pending.value,
