@@ -49,8 +49,6 @@ export async function getTicketsForSchedule(eventId: string, scheduleId: string)
         ticket.seat
     `)
 
-    console.log('result', result)
-
     // Transform the data to match the expected format
     const tickets = (result as any).rows.map((ticket) => ({
       ...ticket,
