@@ -33,7 +33,7 @@ export const getAffiliateDataFromCookies = async (
           },
           limit: 1,
           depth: 0,
-          showHiddenFields: true
+          showHiddenFields: true,
         })
         .then((res) => res.docs?.[0])
 
@@ -60,7 +60,7 @@ export const getAffiliateDataFromCookies = async (
           },
           limit: 1,
           depth: 0,
-          showHiddenFields: true
+          showHiddenFields: true,
         })
         .then((res) => res.docs?.[0])
 
@@ -430,6 +430,14 @@ export const createCustomerIfNotExist = async ({
     })
   } else {
     // update phone number
+    const updateOtherInfo: Record<string, any> = {}
+    if (!customerData.firstName && customer.firstName) {
+      updateOtherInfo.firstName = customer.firstName
+    }
+    if (!customerData.lastName && customer.lastName) {
+      updateOtherInfo.lastName = customer.lastName
+    }
+
     const updatePhoneNumbers = customerData.phoneNumbers || []
     if (customer.phoneNumber) {
       const existPhone = updatePhoneNumbers.find((p) => p.phone === customer.phoneNumber)
@@ -441,14 +449,18 @@ export const createCustomerIfNotExist = async ({
           isUsing: false,
         })
 
-        await payload.update({
-          collection: 'users',
-          id: customerData.id,
-          data: {
-            phoneNumbers: updatePhoneNumbers,
-          },
-        })
+        updateOtherInfo.phoneNumbers = updatePhoneNumbers
       }
+    }
+
+    if (Object.keys(updateOtherInfo).length > 0) {
+      customerData = await payload.update({
+        collection: 'users',
+        id: customerData.id,
+        data: {
+          ...updateOtherInfo,
+        },
+      })
     }
   }
 
@@ -1292,7 +1304,10 @@ export const checkRemainingQuantitySeats = async ({
       )
       .then(
         (result) =>
-          (result as { rows: any[] }).rows.map((row) => ({ ...row, totalBooked: Number(row.totalBooked) })) as Array<{
+          (result as { rows: any[] }).rows.map((row) => ({
+            ...row,
+            totalBooked: Number(row.totalBooked),
+          })) as Array<{
             eventScheduleId: string
             ticketPriceId: string
             totalBooked: number

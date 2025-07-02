@@ -7,6 +7,7 @@ export const Orders: CollectionConfig = {
   slug: 'orders',
   access: {
     create: () => false,
+    delete: () => false,
   },
   admin: {
     useAsTitle: 'orderCode',
@@ -19,12 +20,18 @@ export const Orders: CollectionConfig = {
       name: 'orderCode',
       type: 'text',
       index: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'user',
       type: 'relationship',
       relationTo: 'users',
       index: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'category',
@@ -36,6 +43,7 @@ export const Orders: CollectionConfig = {
           Field:
             '@/components/AdminViews/Order/SelectOrderCategory/SelectOrderCategoryPayloadComponent#SelectOrderCategory',
         },
+        readOnly: true,
       },
     },
     {
@@ -51,6 +59,9 @@ export const Orders: CollectionConfig = {
     {
       name: 'currency',
       type: 'text',
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'promotion',
@@ -94,6 +105,7 @@ export const Orders: CollectionConfig = {
       label: 'Applied Promotions',
       admin: {
         description: 'List of promotions applied to this order',
+        readOnly: true,
       },
       fields: [
         {
@@ -102,18 +114,27 @@ export const Orders: CollectionConfig = {
           relationTo: 'promotions',
           required: true,
           index: true,
+          admin: {
+            readOnly: true,
+          },
         },
         {
           name: 'promotionCode',
           type: 'text',
           required: true,
           index: true,
+          admin: {
+            readOnly: true,
+          },
         },
         {
           name: 'discountAmount',
           type: 'number',
           required: true,
           min: 0,
+          admin: {
+            readOnly: true,
+          },
         },
       ],
     },
@@ -121,29 +142,45 @@ export const Orders: CollectionConfig = {
       name: 'totalBeforeDiscount',
       type: 'number',
       required: false,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'totalDiscount',
       type: 'number',
       required: false,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'total',
       type: 'number',
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'customerData',
       type: 'json',
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'note',
       type: 'textarea',
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'affiliate',
       type: 'group',
       admin: {
-        description: 'Affiliate information'
+        description: 'Affiliate information',
+        readOnly: true,
       },
       fields: [
         {
@@ -154,6 +191,7 @@ export const Orders: CollectionConfig = {
           index: true,
           admin: {
             description: 'Affiliate link used for this order',
+            readOnly: true,
           },
         },
         {
@@ -163,6 +201,7 @@ export const Orders: CollectionConfig = {
           index: true,
           admin: {
             description: 'Affiliate code used for this order',
+            readOnly: true,
           },
         },
         {
@@ -173,6 +212,7 @@ export const Orders: CollectionConfig = {
           index: true,
           admin: {
             description: 'Affiliate user who referred this order',
+            readOnly: true,
           },
           filterOptions: () => {
             return {
@@ -192,6 +232,7 @@ export const Orders: CollectionConfig = {
           pickerAppearance: 'dayAndTime',
           timeFormat: 'HH:mm a',
         },
+        readOnly: true,
       },
     },
     {
@@ -199,6 +240,9 @@ export const Orders: CollectionConfig = {
       type: 'relationship',
       relationTo: 'admins',
       index: true,
+      admin: {
+        readOnly: true,
+      },
     },
   ],
   endpoints: [
