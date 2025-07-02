@@ -69,6 +69,7 @@ import * as migration_20250627_083211_add_tax_and_fields_event_affiliate_user_ra
 import * as migration_20250627_084556_add_fields_to_affiliate_user_rank from './20250627_084556_add_fields_to_affiliate_user_rank';
 import * as migration_20250701_083830_add_fields_to_affiliate_user_rank from './20250701_083830_add_fields_to_affiliate_user_rank';
 import * as migration_20250702_060608_add_admin_session from './20250702_060608_add_admin_session';
+import * as migration_20250702_131553_add_affiliate_status from './20250702_131553_add_affiliate_status';
 
 export const migrations = [
   {
@@ -424,6 +425,11 @@ export const migrations = [
   {
     up: migration_20250702_060608_add_admin_session.up,
     down: migration_20250702_060608_add_admin_session.down,
-    name: '20250702_060608_add_admin_session'
+    name: '20250702_060608_add_admin_session',
+  },
+  {
+    up: migration_20250702_131553_add_affiliate_status.up,
+    down: migration_20250702_131553_add_affiliate_status.down,
+    name: '20250702_131553_add_affiliate_status'
   },
 ];

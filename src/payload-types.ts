@@ -460,6 +460,7 @@ export interface User {
   lastName?: string | null;
   lastActive?: string | null;
   role?: ('affiliate' | 'user') | null;
+  affiliateStatus?: ('pending' | 'approved' | 'rejected') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2707,6 +2708,7 @@ export interface UsersSelect<T extends boolean = true> {
   lastName?: T;
   lastActive?: T;
   role?: T;
+  affiliateStatus?: T;
   updatedAt?: T;
   createdAt?: T;
 }
