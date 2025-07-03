@@ -6,7 +6,10 @@ import { getBookedSeat } from './handler/getBookedSeat'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
-
+  access: {
+    create: () => false,
+    delete: () => false,
+  },
   admin: {
     components: {
       edit: {
@@ -18,12 +21,18 @@ export const Tickets: CollectionConfig = {
     {
       name: 'attendeeName',
       type: 'text',
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'user',
       type: 'relationship',
       relationTo: 'users',
       index: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'userEmail',
@@ -55,11 +64,17 @@ export const Tickets: CollectionConfig = {
       name: 'ticketCode',
       type: 'text',
       index: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'seat',
       type: 'text',
       index: true,
+      admin: {
+        readOnly: true,
+      },
       hooks: {
         afterChange: [afterChangeSeat],
       },
@@ -68,22 +83,34 @@ export const Tickets: CollectionConfig = {
       name: 'ticketPriceName',
       type: 'text',
       index: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'ticketPriceInfo',
       type: 'json',
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'event',
       type: 'relationship',
       relationTo: 'events',
       index: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'eventScheduleId',
       type: 'text',
       required: false,
       index: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'eventDate',
@@ -121,6 +148,9 @@ export const Tickets: CollectionConfig = {
       relationTo: 'orderItems',
       maxDepth: 1,
       hasMany: false,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'order',
@@ -129,6 +159,9 @@ export const Tickets: CollectionConfig = {
       maxDepth: 1,
       hasMany: false,
       index: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'orderCode',
@@ -163,6 +196,9 @@ export const Tickets: CollectionConfig = {
       type: 'select',
       options: TICKET_STATUSES,
       required: false,
+      admin: {
+        readOnly: true,
+      },
       hooks: {
         // afterChange: [afterChangeStatus],
       },

@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
       COUNT(DISTINCT order_id) AS num_orders,
       SUM(total) AS gross_revenue_by_event,
       vat_percentage,
-      ROUND(SUM(total * (100 - vat_percentage) / 100)) AS net_revenue
+      ROUND( SUM(total / (1 + (vat_percentage / 100))) ) AS net_revenue
     FROM metrics_base
     GROUP BY event_id, vat_percentage
   )
