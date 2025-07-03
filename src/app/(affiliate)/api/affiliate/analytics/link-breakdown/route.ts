@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       WITH link_performance AS (
         SELECT
           affiliate_links.id,
-          COALESCE(affiliate_links.name, 'Unamed Link') AS name,
+          COALESCE(affiliate_links.name, 'Unnamed Link') AS name,
           COALESCE(affiliate_links.utm_params_source, 'Unknown') AS utm_source,
           COALESCE(affiliate_links.utm_params_campaign, 'Unknown') AS utm_campaign,
 
@@ -49,9 +49,6 @@ export async function GET(request: NextRequest) {
               AND orders.created_at >= ${startDate}
               AND orders.created_at <= ${endDate}
           ) AS gross_revenue,
-
-          -- Get the tax rate from the events table
-          --(SELECT )
 
           -- Calculate tickets for this link
           (SELECT COUNT(*)
@@ -131,14 +128,13 @@ export async function GET(request: NextRequest) {
         grossRevenue: Number(row.gross_revenue),
         netRevenue: Number(row.net_revenue),
         commission: Number(row.commission),
-        // totalCount: Number(row.total_count),
       })),
       pagination: {
         page: page,
         limit: limit,
-        totalPages: Math.ceil(results.rowCount / limit),
-        totalDocs: results.rowCount,
-        hasNextPage: page < Math.ceil(results.rowCount / limit),
+        totalPages: Math.ceil((results.rows[0]?.total_count || 0) / limit),
+        totalDocs: results.rows[0]?.total_count || 0,
+        hasNextPage: page < Math.ceil((results.rows[0]?.total_count || 0) / limit),
         hasPrevPage: page > 1,
       }
     })
