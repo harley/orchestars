@@ -70,6 +70,7 @@ import * as migration_20250627_084556_add_fields_to_affiliate_user_rank from './
 import * as migration_20250701_083830_add_fields_to_affiliate_user_rank from './20250701_083830_add_fields_to_affiliate_user_rank';
 import * as migration_20250702_060608_add_admin_session from './20250702_060608_add_admin_session';
 import * as migration_20250702_131553_add_affiliate_status from './20250702_131553_add_affiliate_status';
+import * as migration_20250703_154624_add_name_affiliate_links from './20250703_154624_add_name_affiliate_links';
 
 export const migrations = [
   {
@@ -430,6 +431,11 @@ export const migrations = [
   {
     up: migration_20250702_131553_add_affiliate_status.up,
     down: migration_20250702_131553_add_affiliate_status.down,
-    name: '20250702_131553_add_affiliate_status'
+    name: '20250702_131553_add_affiliate_status',
+  },
+  {
+    up: migration_20250703_154624_add_name_affiliate_links.up,
+    down: migration_20250703_154624_add_name_affiliate_links.down,
+    name: '20250703_154624_add_name_affiliate_links'
   },
 ];
