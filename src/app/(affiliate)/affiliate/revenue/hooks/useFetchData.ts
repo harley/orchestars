@@ -7,8 +7,11 @@ interface FetchResult<T> {
   refetch: () => void
 }
 
-function useFetchData<T = any>(apiPath: string): FetchResult<T> {
-  const [loading, setLoading] = useState<boolean>(false)
+function useFetchData<T = any>(
+  apiPath: string,
+  options?: { defaultLoading?: boolean },
+): FetchResult<T> {
+  const [loading, setLoading] = useState<boolean>(!!options?.defaultLoading)
   const [error, setError] = useState<any>(null)
   const [data, setData] = useState<T | null>(null)
 

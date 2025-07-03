@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
       mb.month,
       COUNT(DISTINCT mb.order_id) AS order_count,
       SUM(mb.total) AS gross_revenue,
-      ROUND(SUM(mb.total * (100 - mb.vat_percentage) / 100)) AS net_revenue,
+      ROUND( SUM(mb.total / (1 + (mb.vat_percentage / 100))) ) AS net_revenue,
       COALESCE(SUM(tc.ticket_count), 0) AS tickets
     FROM metrics_base mb
     LEFT JOIN ticket_counts tc ON mb.order_id = tc.order_id
@@ -71,7 +71,8 @@ export async function GET(req: NextRequest) {
 
     // Transform monthly data to match expected format
 
-    const monthlyRevenue = (result.rows as RevenueRow[]).map((row) => {
+
+    const monthlyRevenue = (result as { rows: RevenueRow[] }).rows.map((row) => {
       const date = new Date(row.month) //TS Date object
       const month = date.toLocaleString('en-US', { month: 'short', year: 'numeric' })
       return {
