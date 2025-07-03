@@ -211,7 +211,7 @@ export function PerformanceAnalytics() {
       </Card>
 
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card className="shadow-md">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Clicks</CardTitle>
@@ -296,7 +296,7 @@ export function PerformanceAnalytics() {
             }
           </CardContent>
         </Card>
-        <Card className="shadow-md">
+        <Card className="bg-gray-200 text-gray-800 shadow-md">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Gross Revenue</CardTitle>
           </CardHeader>
@@ -324,19 +324,34 @@ export function PerformanceAnalytics() {
             }
           </CardContent>
         </Card>
-        {/* <Card className="shadow-md">
+        <Card className="bg-gray-200 text-gray-800 shadow-md">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Your Commission</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {loading ? 'Loading...' : `${formatMoney(performanceData?.commission ?? 0)}`}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {loading ? '' : `${performanceData?.commissionRate.toLocaleString()}% commission rate`}
-            </p>
+            {
+              loading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20 bg-gray-200" />
+                  <Skeleton className="h-3 w-24 bg-gray-200" />
+                </div>
+              ) : !performanceData ? (
+                <div className="text-center py-8">
+                  Failed to load performance data
+                </div>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold text-green-600">
+                    {`${formatMoney(performanceData?.commission ?? 0)}`}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {`${performanceData?.commissionRate.toLocaleString()}% commission rate`}
+                  </p>
+                </>
+              )
+            }
           </CardContent>
-        </Card> */}
+        </Card>
       </div>
 
       {/* Link Performance Table */}
@@ -366,21 +381,21 @@ export function PerformanceAnalytics() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Link Name</TableHead>
-                  <TableHead>Source/Campaign</TableHead>
-                  <TableHead className="text-right">Clicks</TableHead>
-                  <TableHead className="text-right">Orders</TableHead>
-                  <TableHead className="text-right">Tickets</TableHead>
-                  {/* <TableHead className="text-right">Conversion</TableHead> */}
-                  <TableHead className="text-right">Gross Revenue</TableHead>
-                  {/* <TableHead className="text-right">Net Revenue</TableHead> */}
-                  {/* <TableHead className="text-right">Commission</TableHead> */}
+                  <TableHead className="text-center">Link Name</TableHead>
+                  <TableHead className="text-center">Source/Campaign</TableHead>
+                  <TableHead className="text-center">Clicks</TableHead>
+                  <TableHead className="text-center">Orders</TableHead>
+                  <TableHead className="text-center">Tickets</TableHead>
+                  <TableHead className="text-center">Conversion</TableHead>
+                  <TableHead className="text-center bg-gray-200 text-gray-800">Gross Revenue</TableHead>
+                  <TableHead className="text-center bg-gray-200 text-gray-800">Net Revenue</TableHead>
+                  <TableHead className="text-center bg-gray-200 text-gray-800">Commission</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
+                    <TableCell colSpan={9} className="text-center py-8">
                       <div className="space-y-4">
                         <Skeleton className="h-7 w-full bg-gray-200" />
                         <Skeleton className="h-7 w-full bg-gray-200" />
@@ -390,15 +405,15 @@ export function PerformanceAnalytics() {
                   </TableRow>
                 ) : linkBreakdownData?.length === 0 || !linkBreakdownData ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8">
+                      <TableCell colSpan={9} className="text-center py-8">
                         No affiliate links found
                       </TableCell>
                     </TableRow>
                 ) : (
                   linkBreakdownData?.map((link) => (
                     <TableRow key={link.id}>
-                      <TableCell className="font-medium">{link.name}</TableCell>
-                      <TableCell>
+                      <TableCell className="font-medium text-center">{link.name}</TableCell>
+                      <TableCell className="text-center">
                         <div className="space-y-1">
                           <Badge variant="outline" className="text-xs">
                             {link.utmSource}
@@ -406,24 +421,24 @@ export function PerformanceAnalytics() {
                           <div className="text-xs text-muted-foreground">{link.utmCampaign}</div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-right">{link.clicks.toLocaleString()}</TableCell>
-                      <TableCell className="text-right">{link.orders.toLocaleString()}</TableCell>
-                      <TableCell className="text-right">{link.ticketsIssued.toLocaleString()}</TableCell>
-                      {/* <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
+                      <TableCell className="text-center">{link.clicks.toLocaleString()}</TableCell>
+                      <TableCell className="text-center">{link.orders.toLocaleString()}</TableCell>
+                      <TableCell className="text-center">{link.ticketsIssued.toLocaleString()}</TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-2">
                           <span>{link.conversionRate.toLocaleString()}%</span>
                           {link.conversionRate >= 6 ? (
-                            <TrendingUp className="h-3 w-3 text-green-500" />
+                            <TrendingUp className="h-3 w-3 text-green-500 bg-gray-200 text-gray-800" />
                           ) : (
                             <TrendingDown className="h-3 w-3 text-red-500" />
                           )}
                         </div>
-                      </TableCell> */}
-                      <TableCell className="text-right">{formatMoney(link.grossRevenue)}</TableCell>
-                      {/* <TableCell className="text-right">{formatMoney(link.netRevenue)} VND</TableCell>
-                      <TableCell className="text-right font-medium text-green-600">
+                      </TableCell>
+                      <TableCell className="text-center bg-gray-200 text-gray-800">{formatMoney(link.grossRevenue)}</TableCell>
+                      <TableCell className="text-center bg-gray-200 text-gray-800">{formatMoney(link.netRevenue)}</TableCell>
+                      <TableCell className="text-center bg-gray-200 text-gray-800 font-medium text-green-600">
                         {link.commission.toLocaleString()} VND
-                      </TableCell> */}
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
