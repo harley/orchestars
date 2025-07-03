@@ -6,7 +6,7 @@ import { AffiliateSidebar } from '@/components/Affiliate/AffiliateSidebar'
 import { PerformanceAnalytics } from '@/components/Affiliate/PerformanceAnalytics'
 import { ProtectedRoute } from '@/components/Affiliate/ProtectedRoute'
 
-export default function AnalyticsPage() {
+export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <SidebarProvider>
@@ -17,9 +17,9 @@ export default function AnalyticsPage() {
               <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
                 <div className="p-6">
                   <div className="mb-8">
-                    <h1 className="text-3xl font-bold tracking-tight">Performance Analytics</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">Affiliate Dashboard</h1>
                     <p className="text-muted-foreground">
-                      Detailed breakdown of your affiliate performance and revenue tracking
+                      Track your affiliate performance
                     </p>
                   </div>
                   <PerformanceAnalytics />
