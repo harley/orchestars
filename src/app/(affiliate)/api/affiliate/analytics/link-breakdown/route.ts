@@ -4,7 +4,7 @@ import { getPayload } from '@/payload-config/getPayloadConfig';
 import { sql } from '@payloadcms/db-postgres/drizzle';
 import { authorizeApiRequest } from '@/app/(affiliate)/utils/authorizeApiRequest';
 import { getDateRangeFromTimeRange } from '@/app/(affiliate)/utils/getDateRangeFromTimeRange';
-import { getLinkId } from '@/app/(affiliate)/utils/getLinkId';
+import { TAX_PERCENTAGE_DEFAULT } from '@/collections/Events/constants/tax';
 
 export async function GET(request: NextRequest) {
   try {
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
           END AS conversion_rate,
 
           -- Calculate net revenue
-          gross_revenue as net_revenue,
+          ROUND(gross_revenue / (100 + ${TAX_PERCENTAGE_DEFAULT}) * 100, 2) as net_revenue,
 
           -- Calculate commission
           '0' as commission
