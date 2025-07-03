@@ -296,7 +296,7 @@ export function PerformanceAnalytics() {
             }
           </CardContent>
         </Card>
-        <Card className="bg-gray-200 text-gray-800 shadow-md">
+        <Card className="shadow-md">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Gross Revenue</CardTitle>
           </CardHeader>
@@ -387,8 +387,8 @@ export function PerformanceAnalytics() {
                   <TableHead className="text-center">Orders</TableHead>
                   <TableHead className="text-center">Tickets</TableHead>
                   <TableHead className="text-center">Conversion</TableHead>
-                  <TableHead className="text-center bg-gray-200 text-gray-800">Gross Revenue</TableHead>
-                  <TableHead className="text-center bg-gray-200 text-gray-800">Net Revenue</TableHead>
+                  <TableHead className="text-center">Gross Revenue</TableHead>
+                  <TableHead className="text-center">Net Revenue</TableHead>
                   <TableHead className="text-center bg-gray-200 text-gray-800">Commission</TableHead>
                 </TableRow>
               </TableHeader>
@@ -434,8 +434,8 @@ export function PerformanceAnalytics() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="text-center bg-gray-200 text-gray-800">{formatMoney(link.grossRevenue)}</TableCell>
-                      <TableCell className="text-center bg-gray-200 text-gray-800">{formatMoney(link.netRevenue)}</TableCell>
+                      <TableCell className="text-center">{formatMoney(link.grossRevenue)}</TableCell>
+                      <TableCell className="text-center">{formatMoney(link.netRevenue)}</TableCell>
                       <TableCell className="text-center bg-gray-200 text-gray-800 font-medium text-green-600">
                         {link.commission.toLocaleString()} VND
                       </TableCell>
