@@ -17,17 +17,17 @@ import { useTranslate } from '@/providers/I18n/client'
 
 import { PAYMENT_METHODS } from '@/constants/paymentMethod'
 import { formatMoney } from '@/utilities/formatMoney'
-import ZalopayIcon from '@/components/Icons/Zalopay'
+// import ZalopayIcon from '@/components/Icons/Zalopay'
 // import PromotionList from '../PromotionList'
 import { calculateMultiPromotionsTotalOrder, isAppliedPromotion } from './utils/calculateTotal'
 import PromotionListCheckbox from '../PromotionListCheckbox'
 import { cn } from '@/lib/utils'
 import Cookies from 'js-cookie'
-interface PaymentMethod {
-  id: string
-  name: string
-  icon: React.ReactNode
-}
+// interface PaymentMethod {
+//   id: string
+//   name: string
+//   icon: React.ReactNode
+// }
 
 type FormValues = {
   firstName: string
