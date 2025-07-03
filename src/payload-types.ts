@@ -1152,6 +1152,7 @@ export interface Promotion {
  */
 export interface AffiliateLink {
   id: number;
+  name?: string | null;
   affiliateUser: number | User;
   event?: (number | null) | Event;
   affiliateCode: string;
@@ -3261,6 +3262,7 @@ export interface AffiliateRankLogsSelect<T extends boolean = true> {
  * via the `definition` "affiliate-links_select".
  */
 export interface AffiliateLinksSelect<T extends boolean = true> {
+  name?: T;
   affiliateUser?: T;
   event?: T;
   affiliateCode?: T;
