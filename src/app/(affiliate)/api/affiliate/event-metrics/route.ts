@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
           mb.event_id,
           COUNT(DISTINCT mb.order_id) AS num_orders,
           SUM(mb.total) AS gross_revenue_by_event,
-          ROUND(SUM(mb.total * (100 - mb.vat_percentage) / 100)) AS net_revenue,
+          ROUND(SUM(mb.total / (1 + (mb.vat_percentage / 100)))) AS net_revenue,
           COALESCE(SUM(tc.ticket_count), 0) AS ticket_number
         FROM metrics_base mb
         LEFT JOIN ticket_counts tc ON mb.order_id = tc.order_id
