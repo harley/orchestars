@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
       FROM campaign_totals 
       WHERE rank <= 5
       ORDER BY type, rank
-    `)
+    `) as { rows: any[] };
 
     const bySource = results.rows
       .filter(row => row.type === 'source')

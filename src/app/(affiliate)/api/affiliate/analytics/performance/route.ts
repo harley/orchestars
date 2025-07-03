@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         AND orders.created_at >= ${startDate} AND orders.created_at <= ${endDate}
       LEFT JOIN tickets ON tickets.order_id = orders.id
       WHERE affiliate_links.affiliate_user_id = ${userRequest.id}
-    `)
+    `) as { rows: any[] }
 
     return NextResponse.json({
       success: true,

@@ -50,6 +50,9 @@ export async function GET(request: NextRequest) {
               AND orders.created_at <= ${endDate}
           ) AS gross_revenue,
 
+          -- Get the tax rate from the events table
+          --(SELECT )
+
           -- Calculate tickets for this link
           (SELECT COUNT(*)
             FROM tickets t
@@ -113,7 +116,7 @@ export async function GET(request: NextRequest) {
       FROM sorted_results
       WHERE row_num BETWEEN ${(page - 1) * limit + 1} AND ${page * limit}
       ORDER BY row_num
-    `)
+    `) as { rows: any[], rowCount: number };
 
     return NextResponse.json({
       success: true,
