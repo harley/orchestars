@@ -86,7 +86,7 @@ export function PerformanceAnalytics() {
       timeRange: timeRangeValue,
     })
 
-    const response = await fetch(`/api/affiliate/analytics/performance?${params.toString()}`)
+    const response = await fetch(`/api/affiliate/performance?${params.toString()}`)
     const result: ApiResponse = await response.json()
     if (result.success) {
       setPerformanceData(result.data as PerformanceData)
@@ -108,7 +108,7 @@ export function PerformanceAnalytics() {
       limit: linkBreakdownPagination.limit.toString(),
     })
 
-    const response = await fetch(`/api/affiliate/analytics/link-breakdown?${params.toString()}`)
+    const response = await fetch(`/api/affiliate/link-breakdown?${params.toString()}`)
     const result: ApiResponse = await response.json()
     if (result.success) {
       setLinkBreakdownData(result.data as LinkBreakdownData)
@@ -127,7 +127,7 @@ export function PerformanceAnalytics() {
       timeRange: timeRangeValue,
     })
 
-    const response = await fetch(`/api/affiliate/analytics/source-campaign-breakdown?${params.toString()}`)
+    const response = await fetch(`/api/affiliate/source-campaign-breakdown?${params.toString()}`)
     const result: ApiResponse = await response.json()
     if (result.success) {
       setSourceCampaignBreakdownData(result.data as SourceCampaignBreakdownData)
@@ -182,7 +182,7 @@ export function PerformanceAnalytics() {
   return (
     <div className="space-y-6">
       {/* Filters */}
-      <Card className="shadow-md">
+      {/* <Card className="shadow-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
@@ -192,7 +192,7 @@ export function PerformanceAnalytics() {
             Detailed breakdown of your affiliate link performance and revenue tracking
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent> */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Time Range</label>
             <Select value={timeRange} onValueChange={toggleTimeRange}>
@@ -207,8 +207,8 @@ export function PerformanceAnalytics() {
               </SelectContent>
             </Select>
           </div>
-        </CardContent>
-      </Card>
+        {/* </CardContent>
+      </Card> */}
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
@@ -395,12 +395,32 @@ export function PerformanceAnalytics() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-8">
-                      <div className="space-y-4">
-                        <Skeleton className="h-7 w-full bg-gray-200" />
-                        <Skeleton className="h-7 w-full bg-gray-200" />
-                        <Skeleton className="h-7 w-full bg-gray-200" />
-                      </div>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
+                    </TableCell>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
+                    </TableCell>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
+                    </TableCell>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
+                    </TableCell>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
+                    </TableCell>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
+                    </TableCell>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
+                    </TableCell>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
+                    </TableCell>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
                     </TableCell>
                   </TableRow>
                 ) : linkBreakdownData?.length === 0 || !linkBreakdownData ? (
@@ -437,7 +457,7 @@ export function PerformanceAnalytics() {
                       <TableCell className="text-center">{formatMoney(link.grossRevenue)}</TableCell>
                       <TableCell className="text-center">{formatMoney(link.netRevenue)}</TableCell>
                       <TableCell className="text-center bg-gray-200 text-gray-800 font-medium text-green-600">
-                        {link.commission.toLocaleString()} VND
+                        {formatMoney(link.commission)}
                       </TableCell>
                     </TableRow>
                   ))
