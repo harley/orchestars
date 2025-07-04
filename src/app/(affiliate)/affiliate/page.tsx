@@ -3,10 +3,10 @@
 import React from 'react'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { AffiliateSidebar } from '@/components/Affiliate/AffiliateSidebar'
-import { DashboardOverview } from '@/components/Affiliate/DashboardOverview'
+import { PerformanceAnalytics } from '@/components/Affiliate/PerformanceAnalytics'
 import { ProtectedRoute } from '@/components/Affiliate/ProtectedRoute'
 
-export default function AffiliatePage() {
+export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <SidebarProvider>
@@ -16,13 +16,13 @@ export default function AffiliatePage() {
             <div className="flex flex-col gap-4 p-4 pt-0">
               <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
                 <div className="p-6">
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold tracking-tight">Affiliate Dashboard</h1>
+                  <div className="mb-6">
+                    <h1 className="text-3xl font-bold tracking-tight">Performance Analytics</h1>
                     <p className="text-muted-foreground">
-                      Track your affiliate performance and create new affiliate links
+                      Detailed metrics for your affiliate link performance and revenue tracking
                     </p>
                   </div>
-                  <DashboardOverview />
+                  <PerformanceAnalytics />
                 </div>
               </div>
             </div>
