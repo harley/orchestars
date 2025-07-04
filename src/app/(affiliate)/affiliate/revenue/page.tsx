@@ -4,7 +4,6 @@ import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { AffiliateSidebar } from '@/components/Affiliate/AffiliateSidebar'
 
 import { ProtectedRoute } from '@/components/Affiliate/ProtectedRoute'
-import useFetchData from './hooks/useFetchData'
 // import { RevenueTimeRangeFilter } from '@/components/Affiliate/Revenue/RevenueTimeRangeFilter'
 import { RevenueSummaryCards } from '@/components/Affiliate/Revenue/RevenueSummaryCards'
 import { RevenueMonthlyTable } from '@/components/Affiliate/Revenue/RevenueMonthlyTable'
@@ -17,6 +16,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { BarChart3 } from 'lucide-react'
+import useFetchData from '@/hooks/useFetchData'
 
 
 export default function RevenuePage() {
