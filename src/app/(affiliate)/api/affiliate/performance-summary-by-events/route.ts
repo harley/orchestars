@@ -5,6 +5,7 @@ import { sql } from '@payloadcms/db-postgres/drizzle'
 
 type PerformanceSummary = {
   event_id: number
+  affiliate_user_id: number
   title: string
   event_location: string
   status: string
@@ -17,6 +18,16 @@ type PerformanceSummary = {
   min_price: number
   max_price: number
 }
+
+// Utility to parse Postgres array string to JS array
+function parsePostgresArray(str: string): string[] {
+  if (!str || typeof str !== 'string') return [];
+  const trimmed = str.replace(/^{|}$/g, '');
+  const matches = trimmed.match(/"((?:[^"\\]|\\.)*)"|([^,]+)/g);
+  if (!matches) return [];
+  return matches.map((m) => m.replace(/^"|"$/g, ''));
+}
+
 export async function GET(req: NextRequest) {
   try {
     //Authenticate user
@@ -58,6 +69,7 @@ export async function GET(req: NextRequest) {
     )
     SELECT 
       wc.event_id,
+      wc.affiliate_user_id,
       wc.title,
       wc.event_location,
       wc.status,
@@ -70,9 +82,12 @@ export async function GET(req: NextRequest) {
       MIN(o.price) AS min_price,
       MAX(o.price) AS max_price
     FROM with_clicks wc
-    LEFT JOIN order_items o ON o.event_id = wc.event_id
+    -- get min and max price that orders have been booked for affiliate user
+    LEFT JOIN orders ord ON ord.affiliate_affiliate_user_id = wc.affiliate_user_id
+    LEFT JOIN order_items o ON o.event_id = wc.event_id AND o.order_id = ord.id
     GROUP BY 
       wc.event_id,
+      wc.affiliate_user_id,
       wc.title,
       wc.event_location,
       wc.status,
@@ -85,32 +100,37 @@ export async function GET(req: NextRequest) {
     ORDER BY wc.event_id DESC;
     `)
 
-    const performanceSummaryArray = (result.rows as PerformanceSummary[]).map((row) => {
-      let status = ''
-      if (row.status === 'published_open_sales') {
-        status = 'Active'
-      } else if (row.status === 'published_upcoming') {
-        status = 'Upcoming'
-      } else if (row.status === 'completed') {
-        status = 'Completed'
-      } else {
-        status = 'Unknown'
-      }
-      return {
-        eventID: row.event_id,
-        eventName: row.title,
-        location: row.event_location,
-        eventStatus: status,
-        totalPoints: row.total_points,
-        affLink: row.target_link,
-        ticketNum: row.total_tickets_sold,
-        totalRevenue: row.total_revenue,
-        clickNum: row.click_count,
-        minPrice: row.min_price,
-        maxPrice: row.max_price,
-        schedules: row.schedule_dates,
-      }
-    })
+    const performanceSummaryArray = ((result as { rows: any[] }).rows as PerformanceSummary[]).map(
+      (row) => {
+        let status = ''
+        if (row.status === 'published_open_sales') {
+          status = 'Active'
+        } else if (row.status === 'published_upcoming') {
+          status = 'Upcoming'
+        } else if (row.status === 'completed') {
+          status = 'Completed'
+        } else {
+          status = 'Unknown'
+        }
+        return {
+          eventID: row.event_id,
+          affiliateUserId: row.affiliate_user_id,
+          eventName: row.title,
+          location: row.event_location,
+          eventStatus: status,
+          totalPoints: Number(row.total_points) || 0,
+          affLink: row.target_link,
+          ticketNum: Number(row.total_tickets_sold) || 0,
+          totalRevenue: Number(row.total_revenue) || 0,
+          clickNum: Number(row.click_count) || 0,
+          minPrice: Number(row.min_price) || 0,
+          maxPrice: Number(row.max_price) || 0,
+          schedules: Array.isArray(row.schedule_dates)
+            ? row.schedule_dates
+            : parsePostgresArray(row.schedule_dates),
+        }
+      },
+    )
 
     //Return the response
     return NextResponse.json(performanceSummaryArray)

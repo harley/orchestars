@@ -25,6 +25,7 @@ export const RevenueBySourcesList: React.FC<RevenueBySourcesListProps> = ({
       <CardDescription>Performance breakdown by traffic source</CardDescription>
     </CardHeader>
     <CardContent className="space-y-6">
+
       {sources?.map((source: RevenueBySource) => (
         <div key={source.source} className="space-y-2">
           <div className="flex items-center justify-between">

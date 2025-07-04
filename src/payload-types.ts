@@ -170,6 +170,7 @@ export interface Config {
   };
   jobs: {
     tasks: {
+      createCollectionExport: TaskCreateCollectionExport;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -459,6 +460,7 @@ export interface User {
   lastName?: string | null;
   lastActive?: string | null;
   role?: ('affiliate' | 'user') | null;
+  affiliateStatus?: ('pending' | 'approved' | 'rejected') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1150,6 +1152,7 @@ export interface Promotion {
  */
 export interface AffiliateLink {
   id: number;
+  name?: string | null;
   affiliateUser: number | User;
   event?: (number | null) | Event;
   affiliateCode: string;
@@ -1210,6 +1213,13 @@ export interface Admin {
   hash?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
   password?: string | null;
 }
 /**
@@ -1539,15 +1549,19 @@ export interface AffiliateUserRank {
    */
   totalPoints: number;
   /**
-   * Tổng doanh thu từ các đơn hàng của Affiliate User.
+   * Tổng doanh thu từ các đơn hàng của Affiliate User. Sẽ tính phần thưởng dựa trên giá trị này
    */
   totalRevenue: number;
   /**
-   * Tổng Tiền trước khi trừ thuế VAT của Affiliate User
+   * Tổng tiền trước khi trừ thuế VAT của Affiliate User
    */
   totalRevenueBeforeTax: number;
   /**
-   * Tổng Tiền trước giảm giá từ các đơn hàng của Affiliate User
+   * Tổng tiền từ các đơn hàng của Affiliate User.
+   */
+  totalRevenueAfterTax: number;
+  /**
+   * Tổng tiền trước giảm giá từ các đơn hàng của Affiliate User
    */
   totalRevenueBeforeDiscount: number;
   /**
@@ -1614,11 +1628,15 @@ export interface EventAffiliateUserRank {
    */
   totalRevenue: number;
   /**
-   * Tổng Tiền trước khi trừ thuế VAT của Affiliate User
+   * Tổng tiền trước khi trừ thuế VAT của Affiliate User
    */
   totalRevenueBeforeTax: number;
   /**
-   * Tổng Tiền trước giảm giá từ các đơn hàng của Affiliate User
+   * Tổng tiền từ các đơn hàng của Affiliate User.
+   */
+  totalRevenueAfterTax: number;
+  /**
+   * Tổng tiền trước giảm giá từ các đơn hàng của Affiliate User
    */
   totalRevenueBeforeDiscount: number;
   /**
@@ -2089,7 +2107,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'schedulePublish';
+        taskSlug: 'inline' | 'createCollectionExport' | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -2122,7 +2140,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'schedulePublish') | null;
+  taskSlug?: ('inline' | 'createCollectionExport' | 'schedulePublish') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -2691,6 +2709,7 @@ export interface UsersSelect<T extends boolean = true> {
   lastName?: T;
   lastActive?: T;
   role?: T;
+  affiliateStatus?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3071,6 +3090,13 @@ export interface AdminsSelect<T extends boolean = true> {
   hash?: T;
   loginAttempts?: T;
   lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3175,6 +3201,7 @@ export interface AffiliateUserRanksSelect<T extends boolean = true> {
   totalPoints?: T;
   totalRevenue?: T;
   totalRevenueBeforeTax?: T;
+  totalRevenueAfterTax?: T;
   totalRevenueBeforeDiscount?: T;
   totalTicketsSold?: T;
   totalCommissionEarned?: T;
@@ -3198,6 +3225,7 @@ export interface EventAffiliateUserRanksSelect<T extends boolean = true> {
   totalPoints?: T;
   totalRevenue?: T;
   totalRevenueBeforeTax?: T;
+  totalRevenueAfterTax?: T;
   totalRevenueBeforeDiscount?: T;
   totalTicketsSold?: T;
   totalCommissionEarned?: T;
@@ -3234,6 +3262,7 @@ export interface AffiliateRankLogsSelect<T extends boolean = true> {
  * via the `definition` "affiliate-links_select".
  */
 export interface AffiliateLinksSelect<T extends boolean = true> {
+  name?: T;
   affiliateUser?: T;
   event?: T;
   affiliateCode?: T;
@@ -3821,6 +3850,36 @@ export interface FooterSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskCreateCollectionExport".
+ */
+export interface TaskCreateCollectionExport {
+  input: {
+    name?: string | null;
+    format: 'csv' | 'json';
+    limit?: number | null;
+    sort?: string | null;
+    locale?: ('all' | 'en' | 'vi') | null;
+    drafts?: ('yes' | 'no') | null;
+    selectionToUse?: ('currentSelection' | 'currentFilters' | 'all') | null;
+    fields?: string[] | null;
+    collectionSlug: string;
+    where?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    user?: string | null;
+    userCollection?: string | null;
+    exportsCollection?: string | null;
+  };
+  output?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

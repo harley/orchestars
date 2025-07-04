@@ -8,6 +8,8 @@ import React from 'react'
 import { Error } from '../Error'
 import { Width } from '../Width'
 
+import { useTranslate } from '@/providers/I18n/client'
+
 export const Textarea: React.FC<
   TextField & {
     errors: Partial<FieldErrorsImpl>
@@ -15,6 +17,8 @@ export const Textarea: React.FC<
     rows?: number
   }
 > = ({ name, defaultValue, errors, label, register, required, rows = 3, width }) => {
+  const { t } = useTranslate()
+  
   return (
     <Width width={width}>
       <Label htmlFor={name}>
@@ -31,7 +35,7 @@ export const Textarea: React.FC<
         defaultValue={defaultValue}
         id={name}
         rows={rows}
-        {...register(name, { required: required })}
+        {...register(name, { required: required ? t('message.requiredField') : false })}
       />
 
       {errors[name] && <Error name={name} />}

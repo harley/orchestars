@@ -38,7 +38,7 @@ const HomeClient = ({
   }, [])
 
   const visibleSections = useMemo(() => {
-    const array = []
+    const array: any[] = []
     if (onGoingPaginatedDocs?.docs?.length > 0) {
       array.push({
         Component: NowShowingList,

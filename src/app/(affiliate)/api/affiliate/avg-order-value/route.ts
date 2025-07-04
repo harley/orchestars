@@ -42,8 +42,8 @@ export async function GET(req: NextRequest){
             AND "affiliate_affiliate_user_id" = ${userRequest.id}
             ${dateFrom ? sql`AND "created_at" >= ${dateFrom.toISOString()}` : sql``}
         `)
-        const avgOrderValue = result.rows[0]?.average_order_value ?? 0
-        const numOrder = result.rows[0]?.num_order ?? 0
+        const avgOrderValue = (result as {rows: any[]}).rows[0]?.average_order_value ?? 0
+        const numOrder = (result as {rows: any[]}).rows[0]?.num_order ?? 0
 
         //Return response
         return NextResponse.json({ avgOrderValue, numOrder })

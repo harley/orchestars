@@ -15,12 +15,16 @@ import { Controller } from 'react-hook-form'
 import { Error } from '../Error'
 import { Width } from '../Width'
 
+import { useTranslate } from '@/providers/I18n/client'
+
 export const Select: React.FC<
   SelectField & {
     control: Control
     errors: Partial<FieldErrorsImpl>
   }
 > = ({ name, control, errors, label, options, required, width }) => {
+  const { t } = useTranslate()
+
   return (
     <Width width={width}>
       <Label htmlFor={name}>
@@ -55,7 +59,7 @@ export const Select: React.FC<
             </SelectComponent>
           )
         }}
-        rules={{ required }}
+        rules={{ required: required ? t('message.requiredField') : false }}
       />
       {errors[name] && <Error name={name} />}
     </Width>

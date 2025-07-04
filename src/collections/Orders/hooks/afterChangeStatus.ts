@@ -124,31 +124,40 @@ const getAffiliateAggregates = async (
   `
 
   const [resultCountTotal, resultCountTotalTicketSold] = await Promise.all([
-    db.drizzle
-      .execute(valueQuery)
-      .then(
-        (res: {
-          rows: Array<{ total_after_discount_value?: string; total_before_discount_value?: string }>
-        }) => res.rows?.[0],
-      ),
+    db.drizzle.execute(valueQuery).then(
+      (res) =>
+        (
+          res as {
+            rows: Array<{
+              total_after_discount_value?: string
+              total_before_discount_value?: string
+            }>
+          }
+        ).rows?.[0],
+    ),
     db.drizzle
       .execute(ticketsQuery)
-      .then((res: { rows?: Array<{ total_ticket_sold?: string }> }) => res.rows?.[0]),
+      .then((res) => (res as { rows?: Array<{ total_ticket_sold?: string }> }).rows?.[0]),
   ])
 
-  const totalAfterDiscountValue = Number(resultCountTotal?.total_after_discount_value) || 0
   const totalBeforeDiscountValue = Number(resultCountTotal?.total_before_discount_value) || 0
+  const totalAfterDiscountValue = Number(resultCountTotal?.total_after_discount_value) || 0
+
+  // totalAfterDiscountValue = total after tax + total after discount value
 
   const taxPercentage = event?.vat?.enabled ? event.vat?.percentage || TAX_PERCENTAGE_DEFAULT : 0
 
-  const totalValueAfterTax =
-    totalAfterDiscountValue - (totalAfterDiscountValue * taxPercentage) / 100
-  const totalValueBeforeTax = totalAfterDiscountValue
+  // total beforeVATAndAfterDiscountValue = totalAfterDiscountValue / 1 + (taxPercentage / 100)
+
+  const totalValueAfterTaxAfterDiscount = totalAfterDiscountValue
+  const totalValueBeforeTaxAfterDiscount = Number(
+    (totalAfterDiscountValue / (1 + taxPercentage / 100)).toFixed(2),
+  )
   const totalTicketSold = Number(resultCountTotalTicketSold?.total_ticket_sold) || 0
 
   return {
-    totalValueAfterTax,
-    totalValueBeforeTax,
+    totalValueAfterTaxAfterDiscount,
+    totalValueBeforeTaxAfterDiscount,
     totalAfterDiscountValue,
     totalBeforeDiscountValue,
     totalTicketSold,
@@ -161,17 +170,17 @@ const upsertEventAffiliateUserRank = async (
     affiliateUserId,
     exchangedToPoints,
     totalBeforeDiscountValue,
-    totalValueAfterTax,
-    totalValueBeforeTax,
+    totalValueAfterTaxAfterDiscount,
+    totalValueBeforeTaxAfterDiscount,
     totalTicketSold,
     eventAffiliateRank,
   }: {
     eventAffiliateUserRank?: EventAffiliateUserRank
     affiliateUserId: string
     exchangedToPoints: number
-    totalBeforeDiscountValue: number,
-    totalValueAfterTax: number,
-    totalValueBeforeTax: number,
+    totalBeforeDiscountValue: number
+    totalValueAfterTaxAfterDiscount: number
+    totalValueBeforeTaxAfterDiscount: number
     totalTicketSold: number
     eventAffiliateRank: EventAffiliateRank
   },
@@ -179,9 +188,10 @@ const upsertEventAffiliateUserRank = async (
 ) => {
   const commonData = {
     totalPoints: exchangedToPoints,
-    totalRevenue: totalValueAfterTax,
+    totalRevenue: totalValueBeforeTaxAfterDiscount,
+    totalRevenueBeforeTax: totalValueBeforeTaxAfterDiscount,
+    totalRevenueAfterTax: totalValueAfterTaxAfterDiscount,
     totalRevenueBeforeDiscount: totalBeforeDiscountValue,
-    totalRevenueBeforeTax: totalValueBeforeTax,
     totalTicketsSold: totalTicketSold,
     totalCommissionEarned: 0, // todo
     totalTicketsRewarded: 0, // todo
@@ -195,7 +205,9 @@ const upsertEventAffiliateUserRank = async (
     const ticketRewards = eventAffiliateRank.eventRewards?.ticketRewards?.sort(
       (a, b) => b.minRevenue - a.minRevenue,
     )
-    const ticketReward = ticketRewards?.find((reward) => reward.minRevenue <= totalValueAfterTax)
+    const ticketReward = ticketRewards?.find(
+      (reward) => reward.minRevenue <= totalValueBeforeTaxAfterDiscount,
+    )
     if (ticketReward) {
       commonData.totalTicketsRewarded = ticketReward.rewardTickets || 0
     }
@@ -206,11 +218,15 @@ const upsertEventAffiliateUserRank = async (
     const commissionRewards = eventAffiliateRank.eventRewards?.commissionRewards?.sort(
       (a, b) => b.minRevenue - a.minRevenue,
     )
-    const commissionReward = commissionRewards?.find((reward) => reward.minRevenue <= totalValueAfterTax)
+    const commissionReward = commissionRewards?.find(
+      (reward) => reward.minRevenue <= totalValueBeforeTaxAfterDiscount,
+    )
     if (commissionReward) {
       const commissionRate = commissionReward.commissionRate || 0
 
-      commonData.totalCommissionEarned = Number(((totalValueAfterTax * commissionRate) / 100).toFixed(2))
+      commonData.totalCommissionEarned = Number(
+        ((totalValueBeforeTaxAfterDiscount * commissionRate) / 100).toFixed(2),
+      )
     }
   }
 
@@ -321,8 +337,8 @@ const updateAffiliateStats = async (
 
   const {
     totalBeforeDiscountValue,
-    totalValueAfterTax,
-    totalValueBeforeTax,
+    totalValueAfterTaxAfterDiscount,
+    totalValueBeforeTaxAfterDiscount,
     totalTicketSold,
   } = await getAffiliateAggregates(
     Number(affiliateUserId),
@@ -331,7 +347,7 @@ const updateAffiliateStats = async (
     req.payload.db,
   )
 
-  const exchangedToPoints = Math.ceil(totalValueAfterTax / POINT_PER_VND)
+  const exchangedToPoints = Math.ceil(totalValueBeforeTaxAfterDiscount / POINT_PER_VND)
   const sortedRanks = affiliateRanks.sort((a, b) => b.minPoints - a.minPoints)
 
   // if eventAffiliateUserRank is not set, get default rank of user
@@ -386,8 +402,8 @@ const updateAffiliateStats = async (
       affiliateUserId,
       exchangedToPoints,
       totalBeforeDiscountValue,
-      totalValueAfterTax,
-      totalValueBeforeTax,
+      totalValueAfterTaxAfterDiscount,
+      totalValueBeforeTaxAfterDiscount,
       totalTicketSold,
       eventAffiliateRank,
     },

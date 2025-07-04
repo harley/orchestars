@@ -7,6 +7,10 @@ export const Payments: CollectionConfig = {
   admin: {
     useAsTitle: 'total',
   },
+  access: {
+    create: () => false,
+    delete: () => false,
+  },
   fields: [
     {
       name: 'user',
@@ -14,6 +18,9 @@ export const Payments: CollectionConfig = {
       relationTo: 'users',
       required: true,
       index: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'order',
@@ -21,15 +28,24 @@ export const Payments: CollectionConfig = {
       relationTo: 'orders',
       required: true,
       index: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'paymentMethod',
       type: 'text',
       index: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'currency',
       type: 'text',
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'promotion',
@@ -72,6 +88,7 @@ export const Payments: CollectionConfig = {
       label: 'Applied Promotions',
       admin: {
         description: 'List of promotions applied to this order',
+        readOnly: true,
       },
       fields: [
         {
@@ -80,18 +97,27 @@ export const Payments: CollectionConfig = {
           relationTo: 'promotions',
           required: true,
           index: true,
+          admin: {
+            readOnly: true,
+          },
         },
         {
           name: 'promotionCode',
           type: 'text',
           required: true,
           index: true,
+          admin: {
+            readOnly: true,
+          },
         },
         {
           name: 'discountAmount',
           type: 'number',
           required: true,
           min: 0,
+          admin: {
+            readOnly: true,
+          },
         },
       ],
     },
@@ -99,24 +125,39 @@ export const Payments: CollectionConfig = {
       name: 'totalBeforeDiscount',
       type: 'number',
       required: false,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'totalDiscount',
       type: 'number',
       required: false,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'total',
       type: 'number',
       required: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'appTransId',
       type: 'text',
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'paymentData',
       type: 'json',
+      admin: {
+        readOnly: true,
+      },
       // jsonSchema: {
       //   fileMatch: [''],
       //   uri: '',
@@ -149,6 +190,9 @@ export const Payments: CollectionConfig = {
         {
           type: 'text',
           name: 'code',
+          admin: {
+            readOnly: true,
+          },
         },
       ],
     },
@@ -175,6 +219,7 @@ export const Payments: CollectionConfig = {
           pickerAppearance: 'dayAndTime',
           timeFormat: 'HH:mm a',
         },
+        readOnly: true,
       },
     },
   ],

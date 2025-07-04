@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
           WHERE "affiliate_user_id" = ${userRequest.id}
             ${dateFrom ? sql`AND "created_at" >= ${dateFrom.toISOString()}` : sql``}
         `)
-    const totalClick = result.rows[0]?.total_click ?? 0
+    const totalClick = (result as {rows: any[]}).rows[0]?.total_click ?? 0
 
     // Return response
     return NextResponse.json(totalClick)

@@ -160,7 +160,9 @@
     "submitting": "Submitting...",
     "submit": "Submit",
     "thankYouForYourSubmission": "Thank you! Your information has been submitted successfully. We will contact you soon.",
-    "failedMessage": "An error occurred! Please try again"
+    "failedMessage": "An error occurred! Please try again",
+    "requiredField": "This field is required",
+    "invalidEmail": "Please enter a valid email address"
   },
   "errorCode": {
     "SYS001": "An error occurred! Please try again",
@@ -454,7 +456,10 @@
     "firstTimeLoginHeader": "Access Your Tickets",
     "firstTimeLoginEmailPlaceholder": "Enter the email you used to book tickets",
     "pleaseEnterEmailAndPassword": "Please enter both email and password",
-    "signingIn": "Signing in..."
+    "signingIn": "Signing in...",
+    "affiliateLoginLink": "Become our ambassador",
+    "joinAmbassadorProgram": "Join Our Ambassador Program",
+    "joinAmbassadorProgramDescription": "Earn rewards and exclusive benefits"
   },
   "navbar": {
     "profile": "Profile",
@@ -462,5 +467,32 @@
     "signInSignUp": "Sign In",
     "buyTicketNow": "Buy Ticket Now",
     "buyNow": "Buy Now"
+  },
+  "paymentResult": {
+    "processingPayment": "Processing Your Payment",
+    "processingDescription": "Please wait while we confirm your payment...",
+    "backToHome": "Back to Home",
+    "paymentSuccessful": "Payment Successful! 🎉",
+    "paymentFailed": "Payment Failed",
+    "orderCanceled": "Order Canceled",
+    "successDescription": "Your transaction has been completed successfully and your tickets are ready!",
+    "canceledDescription": "Your order has been canceled because payment was not completed within the required timeframe.",
+    "failedDescription": "There was an issue processing your payment. Please try again or contact support.",
+    "orderDetails": "Order Details",
+    "orderNumber": "Order Number",
+    "dateTime": "Date & Time",
+    "paymentMethod": "Payment Method",
+    "onlinePayment": "Online Payment",
+    "totalAmount": "Total Amount",
+    "paymentNotCompleted": "Payment Not Completed",
+    "failedReason": "Your payment could not be processed. This could be due to insufficient funds, incorrect payment details, or a temporary issue with the payment provider.",
+    "canceledReason": "Your order was automatically canceled because the payment was not completed within the required timeframe. If this was unintentional, please place a new order and ensure payment is made to confirm your purchase.",
+    "whatWouldYouLikeToDo": "What would you like to do?",
+    "tryPaymentAgain": "Try the payment again with the same or different payment method",
+    "checkCardDetails": "Check your card details and available balance",
+    "contactSupport": "Contact customer support if the issue persists",
+    "tryAgain": "Try Again",
+    "ticketsSent": "🎫 Your tickets have been sent to your email address. You can also view them in your account dashboard.",
+    "goToUpcomingEvents": "Go to upcoming events"
   }
 }

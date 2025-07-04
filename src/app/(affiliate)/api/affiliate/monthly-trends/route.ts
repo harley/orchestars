@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
 
     // Transform monthly data to match expected format
 
-    const monthlyRevenue = (result.rows as RevenueRow[]).map((row) => {
+    const monthlyRevenue = ((result as {rows: RevenueRow[]}).rows).map((row) => {
       const date = new Date(row.month) //TS Date object
       const month = date.toLocaleString('en-US', { month: 'short', year: 'numeric' })
       return {

@@ -8,12 +8,16 @@ import React from 'react'
 import { Error } from '../Error'
 import { Width } from '../Width'
 
+import { useTranslate } from '@/providers/I18n/client'
+
 export const Email: React.FC<
   EmailField & {
     errors: Partial<FieldErrorsImpl>
     register: UseFormRegister<FieldValues>
   }
 > = ({ name, defaultValue, errors, label, register, required, width }) => {
+  const { t } = useTranslate()
+
   return (
     <Width width={width}>
       <Label htmlFor={name}>
@@ -29,7 +33,13 @@ export const Email: React.FC<
         defaultValue={defaultValue}
         id={name}
         type="text"
-        {...register(name, { pattern: /^\S[^\s@]*@\S+$/, required })}
+        {...register(name, {
+          pattern: {
+            value: /^\S[^\s@]*@\S+$/,
+            message: t('message.invalidEmail'),
+          },
+          required: required ? t('message.requiredField') : false,
+        })}
       />
 
       {errors[name] && <Error name={name} />}

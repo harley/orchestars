@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
       COUNT(DISTINCT order_id) AS num_orders,
       SUM(total) AS gross_revenue_by_event,
       vat_percentage,
-      ROUND(SUM(total * (100 - vat_percentage) / 100)) AS net_revenue
+      ROUND( SUM(total / (1 + (vat_percentage / 100))) ) AS net_revenue
     FROM metrics_base
     GROUP BY event_id, vat_percentage
   )
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
     ROUND(SUM(net_revenue) * 1.0 / NULLIF(SUM(num_orders), 0)) AS average_order_value
   FROM metrics_1;
     `)
-    const data = result.rows[0] as CardMetrics
+    const data = (result as { rows: any[] }).rows[0] as CardMetrics
     const metrics = {
       grossRevenue: data.gross_revenue,
       netRevenue: data.net_revenue,
