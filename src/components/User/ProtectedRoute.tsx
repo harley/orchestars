@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
   redirectTo?: string
 }
 
-export function ProtectedRoute({ children, redirectTo = '/affiliate/login' }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, redirectTo = '/' }: ProtectedRouteProps) {
   const authUser = useAffiliateAuthenticated()
 
   if (authUser) {
