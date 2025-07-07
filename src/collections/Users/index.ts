@@ -98,7 +98,6 @@ export const Users: CollectionConfig = {
       name: 'affiliateStatus',
       type: 'select',
       options: AFFILIATE_USER_STATUSES,
-      defaultValue: AFFILIATE_USER_STATUS.pending.value,
       admin: {
         condition: (data) => data.role === USER_ROLE.affiliate.value, // Chỉ hiển thị nếu user có vai trò affiliate
       },
