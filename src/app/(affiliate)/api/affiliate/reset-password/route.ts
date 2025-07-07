@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { signJwtToken } from '@/app/(user)/api/user/utils'
 import { updateNewPasswordUserResetPassword } from '@/collections/Users/utils/updateNewPasswordResetPassword'
+import { signJwtToken } from '@/app/(user)/utils/auth/signJwtToken'
 
 export async function POST(req: NextRequest) {
   try {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { generateSalt, hashPassword } from '@/utilities/password'
-import { signJwtToken } from '../utils'
+import { signJwtToken } from '@/app/(user)/utils/auth/signJwtToken'
 
 export async function POST(req: NextRequest) {
   try {

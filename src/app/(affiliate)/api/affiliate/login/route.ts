@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { signJwtToken } from '@/app/(user)/api/user/utils'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { verifyPassword } from '@/utilities/password'
 import { AFFILIATE_USER_STATUS, USER_ROLE } from '@/collections/Users/constants'
+import { signJwtToken } from '@/app/(user)/utils/auth/signJwtToken'
 
 export async function POST(req: NextRequest) {
   try {

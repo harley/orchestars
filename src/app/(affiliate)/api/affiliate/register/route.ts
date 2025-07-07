@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import Joi from 'joi'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { AFFILIATE_USER_STATUS, USER_ROLE } from '@/collections/Users/constants'
-import { sendMailAndWriteLog } from '@/collections/Emails/utils'
-import { affiliateRegistrationEmailHtml } from '@/mail/templates/AffiliateRegistrationEmail'
-import { EMAIL_DEFAULT_FROM_ADDRESS } from '@/config/email'
+// import { sendMailAndWriteLog } from '@/collections/Emails/utils'
+// import { affiliateRegistrationEmailHtml } from '@/mail/templates/AffiliateRegistrationEmail'
+// import { EMAIL_DEFAULT_FROM_ADDRESS } from '@/config/email'
 
 const affiliateRegisterSchema = Joi.object({
   firstName: Joi.string().trim().min(1).max(50).required().messages({
@@ -72,19 +72,19 @@ export async function POST(request: NextRequest) {
         email: String(value.email).toLowerCase(),
         phoneNumber: value.phoneNumber,
         role: USER_ROLE.affiliate.value,
-        affiliateStatus: AFFILIATE_USER_STATUS.pending.value,
+        affiliateStatus: AFFILIATE_USER_STATUS.approved.value,
       },
     })
-    // Send email
-    await sendMailAndWriteLog({
-      resendMailData: {
-        to: value.email,
-        subject: 'Affiliate Registration Confirmation',
-        html: affiliateRegistrationEmailHtml({ contactEmail: EMAIL_DEFAULT_FROM_ADDRESS }),
-      },
-      emailData: { user: user.id },
-      payload,
-    })
+    // Send email if status is pending
+    // await sendMailAndWriteLog({
+    //   resendMailData: {
+    //     to: value.email,
+    //     subject: 'Affiliate Registration Confirmation',
+    //     html: affiliateRegistrationEmailHtml({ contactEmail: EMAIL_DEFAULT_FROM_ADDRESS }),
+    //   },
+    //   emailData: { user: user.id },
+    //   payload,
+    // })
     return NextResponse.json({
       success: true,
       message: 'Registration successful!',

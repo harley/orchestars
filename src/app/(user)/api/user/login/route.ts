@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { verifyPassword } from '@/utilities/password'
-import { signJwtToken } from '../utils'
+import { signJwtToken } from '@/app/(user)/utils/auth/signJwtToken'
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       collection: 'users',
       where: { email: { equals: email } },
       limit: 1,
-      select: { id: true, email: true, hash: true, salt: true },
+      select: { id: true, email: true, role: true, affiliateStatus: true, hash: true, salt: true },
       showHiddenFields: true,
     })
     const user = userRes.docs[0]
@@ -33,7 +33,12 @@ export async function POST(req: NextRequest) {
     }
 
     await signJwtToken({
-      fieldsToSign: { id: user.id, email: user.email },
+      fieldsToSign: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        affiliateStatus: user.affiliateStatus,
+      },
     })
 
     return NextResponse.json({ user: { id: user.id, email: user.email } })
