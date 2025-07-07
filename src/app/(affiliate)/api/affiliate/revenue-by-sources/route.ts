@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
         FROM order_items oi
         JOIN orders o ON oi.order_id = o.id
         JOIN events e ON oi.event_id = e.id
-        JOIN affiliate_links al ON al.event_id = e.id
+        JOIN affiliate_links al ON o.affiliate_affiliate_link_id = al.id
         WHERE o.status = 'completed'
         AND o.affiliate_affiliate_user_id = ${userRequest.id}
         ${dateFrom ? sql`AND o.created_at >= ${dateFrom.toISOString()}` : sql``}
@@ -43,8 +43,7 @@ export async function GET(req: NextRequest) {
         FROM metrics_base m
         GROUP BY m.utm_params_source;
          `)
-    const rows = result.rows as unknown as sourceMetricsRow[]
-    const revenueBySource = rows.map((row) => {
+    const revenueBySource = (result as { rows: sourceMetricsRow[] }).rows.map((row) => {
       return {
         source: row.source,
         grossRevenue: row.gross_revenue,

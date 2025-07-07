@@ -14,7 +14,6 @@ type eventMetricsRow = {
 export async function GET(req: NextRequest) {
   try {
     const dateFrom = await setDateFrom(req)
-
     //Authenticate user
     const userRequest = await authorizeApiRequest()
 
@@ -45,19 +44,19 @@ export async function GET(req: NextRequest) {
         JOIN events_locales l ON m.event_id = l._parent_id
         GROUP BY m.event_id, m.vat_percentage, l.title;
     `)
-    const rows = result.rows as unknown as eventMetricsRow[]
-
-    const revenueByEvents = rows.map((row) => ({
-      eventID: row.event_id,
-      eventTitle: row.title,
-      grossRevenue: row.gross_revenue,
-      netRevenue: row.net_revenue,
-    }))
+    const revenueByEvents = (result as { rows: eventMetricsRow[] }).rows.map((row) => {
+      return {
+        eventID: row.event_id,
+        eventTitle: row.title,
+        grossRevenue: row.gross_revenue,
+        netRevenue: row.net_revenue,
+      }
+    })
 
     //Return the response
     return NextResponse.json(revenueByEvents)
   } catch (err) {
     console.error(err)
-    return NextResponse.json({ message: 'An error occured' }, { status: 500 })
+    return NextResponse.json({ message: 'An error occurred' }, { status: 500 })
   }
 }

@@ -25,37 +25,33 @@ export const RevenueBySourcesList: React.FC<RevenueBySourcesListProps> = ({
       <CardDescription>Performance breakdown by traffic source</CardDescription>
     </CardHeader>
     <CardContent className="space-y-6">
-      {sources?.map((source: RevenueBySource) => (
-        <div key={source.source} className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-sm font-medium">{source.source}</span>
-              <div className="flex gap-2">
-                <Badge variant="outline" className="text-xs">
-                  Gross: {formatMoney(source.grossRevenue)}
-                </Badge>
-                <Badge variant="secondary" className="text-xs">
-                  Net: {formatMoney(source.netRevenue)}
-                </Badge>
+      {sources && sources.length > 0 ? (
+        sources.map((source: RevenueBySource) => {
+          const percentage =
+            totalGrossRevenue > 0 ? Math.round((source.grossRevenue / totalGrossRevenue) * 100) : 0
+          return (
+            <div key={source.source} className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <span className="text-sm font-medium">{source.source}</span>
+                  <div className="flex gap-2">
+                    <Badge variant="outline" className="text-xs">
+                      Gross: {formatMoney(source.grossRevenue)}
+                    </Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      Net: {formatMoney(source.netRevenue)}
+                    </Badge>
+                  </div>
+                </div>
+                <span className="text-sm text-muted-foreground">{percentage}%</span>
               </div>
+              <Progress value={percentage} className="h-2" />
             </div>
-            <span className="text-sm text-muted-foreground">
-              {totalGrossRevenue > 0
-                ? Math.round((source.grossRevenue / totalGrossRevenue) * 100)
-                : 0}
-              %
-            </span>
-          </div>
-          <Progress
-            value={
-              totalGrossRevenue > 0
-                ? Math.round((source.grossRevenue / totalGrossRevenue) * 100)
-                : 0
-            }
-            className="h-2"
-          />
-        </div>
-      ))}
+          )
+        })
+      ) : (
+        <div>Reload</div>
+      )}
     </CardContent>
   </Card>
 )
