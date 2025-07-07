@@ -47,7 +47,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         })
 
         if (onSuccess) onSuccess()
-        else router.replace('/user/profile')
+        else router.replace('/user/my-tickets')
       } else {
         const err = await res.json()
         console.error('err', err)

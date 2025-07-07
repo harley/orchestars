@@ -10,7 +10,7 @@ export const EnvironmentIndicator = () => {
   if (!env || env === 'production') return null
 
   return (
-    <div className="fixed top-20 left-4 z-50 pointer-events-none">
+    <div className="fixed top-20 left-4 z-[1000] pointer-events-none">
       <div
         className={cn(
           'relative transform -rotate-12 select-none',

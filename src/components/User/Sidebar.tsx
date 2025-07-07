@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react'
 import { useTranslate } from '@/providers/I18n/client'
 import { User } from '@/payload-types'
@@ -11,17 +13,36 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
-import { Star, Sparkles, Info } from 'lucide-react'
+import { Star, Sparkles, Info, CreditCard, Settings, Calendar, Menu } from 'lucide-react'
 import Link from 'next/link'
 import { useToast } from '@/components/ui/use-toast'
+import { useUserAuthenticated } from '@/app/(user)/providers'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { cn } from '@/utilities/ui'
+import { usePathname } from 'next/navigation'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 
-type Section = 'tickets' | 'account' | 'events'
+interface SidebarProps {
+  className?: string
+}
 
-const Sidebar: React.FC<{
-  activeSection: Section
-  setActiveSection: (section: Section) => void
-  user?: User
-}> = ({ activeSection, setActiveSection, user }) => {
+const menuItems = [
+  { icon: Settings, label: 'Account Settings', href: '/user/profile' },
+  { icon: CreditCard, label: 'Purchased Tickets', href: '/user/my-tickets', active: true },
+  { icon: Calendar, label: 'My Events', href: '/user/my-events' },
+]
+
+const ContentSideBar = ({
+  className,
+  onClickMenuItem,
+}: {
+  className?: string
+  onClickMenuItem?: () => any
+}) => {
+  const authUser = useUserAuthenticated()
+  const pathname = usePathname()
+  const user = authUser?.userInfo
+
   const { t } = useTranslate()
   const { toast } = useToast()
   const [userRole, setUserRole] = useState<User['role']>(user?.role)
@@ -77,32 +98,49 @@ const Sidebar: React.FC<{
   }
 
   return (
-    <aside className="w-64 bg-gray-900 text-white p-6 space-y-4 pt-10">
-      <div className="text-sm text-gray-400">{t('userprofile.sidebar.accountOf')}</div>
-      <div className="flex items-center gap-2">
-        <div className="text-lg font-bold">
-          {user?.firstName || ''} {user?.lastName || ''}
+    <div
+      className={cn(
+        'h-screen bg-sidebar-bg text-sidebar-foreground flex flex-col pt-28 text-white',
+        'w-64 fixed left-0 top-0',
+        className,
+      )}
+    >
+      <div className="p-6 pt-2 border-b border-sidebar-muted/10">
+        <div className="text-sm text-gray-400 text-center">
+          {t('userprofile.sidebar.accountOf')}
+        </div>
+        <div className="flex items-center gap-2 justify-center">
+          <div className="text-lg font-bold text-center">
+            {user?.firstName || ''} {user?.lastName || ''}
+          </div>
         </div>
       </div>
-      <nav className="mt-6 space-y-2">
-        <button
-          onClick={() => setActiveSection('account')}
-          className={`block w-full text-left ${activeSection === 'account' ? 'text-green-400' : 'hover:text-green-400'}`}
-        >
-          {t('userprofile.sidebar.accountSettings')}
-        </button>
-        <button
-          onClick={() => setActiveSection('tickets')}
-          className={`block w-full text-left ${activeSection === 'tickets' ? 'text-green-400' : 'hover:text-green-400'}`}
-        >
-          {t('userprofile.sidebar.purchasedTickets')}
-        </button>
-        <button
-          onClick={() => setActiveSection('events')}
-          className={`block w-full text-left ${activeSection === 'events' ? 'text-green-400' : 'hover:text-green-400'}`}
-        >
-          {t('userprofile.sidebar.myEvents')}
-        </button>
+
+      {/* Navigation */}
+      <ScrollArea className="flex-1 px-4 py-6">
+        <nav className="space-y-1">
+          {menuItems.map((item) => {
+            const isActive = pathname === item.href
+            return (
+              <Link
+                onClick={onClickMenuItem}
+                key={item.label}
+                href={item.href}
+                className={cn(
+                  'flex w-full justify-start items-center  hover:bg-sidebar-muted/20 hover:text-green-400 transition-smooth rounded-none border-l-4 border-transparent text-left py-3',
+                  isActive
+                    ? 'border-l-sidebar-highlight text-sidebar-foreground bg-sidebar-muted/10 text-green-400'
+                    : 'text-sidebar-foreground/80',
+                )}
+              >
+                <item.icon className="mr-3 h-4 w-4" />
+                {item.label}
+              </Link>
+            )
+          })}
+        </nav>
+      </ScrollArea>
+      <div className="p-4">
         <hr className="my-4 border-gray-700" />
         {userAffiliateStatus === 'pending' ? (
           <div className="bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-lg flex items-start gap-3 mb-2">
@@ -211,8 +249,37 @@ const Sidebar: React.FC<{
             </DialogContent>
           </Dialog>
         )}
-      </nav>
+      </div>
+    </div>
+  )
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ className }) => {
+  return (
+    <aside className="w-64 bg-gray-900 text-white p-6 space-y-4">
+      <ContentSideBar className={className} />
     </aside>
+  )
+}
+
+export const SidebarMobile = ({ className }: { className?: string }) => {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="lg:hidden rounded-full p-2 h-10 w-10 bg-black/30 hover:bg-black hover:text-white transition-all"
+        >
+          <Menu className="h-8 w-8" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className=" w-[256px] bg-gray-900 text-white border-none">
+        <ContentSideBar className={className} onClickMenuItem={() => setIsOpen(false)} />
+      </SheetContent>
+    </Sheet>
   )
 }
 

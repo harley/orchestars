@@ -3,8 +3,9 @@
 import { JWT_USER_SECRET } from '@/config/jwt'
 import { extractJWT } from '@/utilities/jwt'
 import { cookies } from 'next/headers'
+import { AuthUser } from '@/app/(user)/types'
 
-export const checkUserAuthenticated = async () => {
+export const checkUserAuthenticated = async (): Promise<AuthUser | null> => {
   const cookie = await cookies()
   // todo verify auth token
   const authToken = cookie.get('authToken')
@@ -13,7 +14,7 @@ export const checkUserAuthenticated = async () => {
   if(!extracted) return null
 
   return {
-    token: authToken?.value,
+    token: authToken?.value as string,
     userInfo: extracted as { id: number; email: string },
   }
 }

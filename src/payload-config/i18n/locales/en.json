@@ -368,6 +368,7 @@
     "deselectAll": "Deselect All"
   },
   "userprofile": {
+    "userProfile": "User Profile",
     "title": "Purchased Tickets",
     "all": "All",
     "success": "Success",

@@ -8,7 +8,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslate } from '@/providers/I18n/client'
 
 const MyEvents = ({ className }: { className?: string }) => {
@@ -25,10 +25,11 @@ const MyEvents = ({ className }: { className?: string }) => {
     prevPage,
   } = useUserEvents()
 
+  const [mounted, setMounted] = useState(false)
   useEffect(() => {
+    setMounted(true)
     // Initial fetch
     void nextPage()
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -36,8 +37,10 @@ const MyEvents = ({ className }: { className?: string }) => {
     return <div className="text-center py-8 text-red-500">{error}</div>
   }
 
+  const containerClass = `max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 mt-8 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className || ''}`
+
   return (
-    <div className={`bg-white min-h-screen text-black font-sans p-6 ${className || ''}`}>
+    <div className={containerClass}>
       <div className="space-y-6">
         <h1 className="text-2xl font-bold my-4">{t('userprofile.myEvents')}</h1>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 transition-opacity duration-200 ease-in-out">
