@@ -48,7 +48,6 @@ import { EventAffiliateRanks } from './collections/Affiliate/EventAffiliateRanks
 import { AffiliateRankLogs } from './collections/Affiliate/AffiliateRankLogs'
 import { AffiliateUserRanks } from './collections/Affiliate/AffiliateUserRank'
 import { EventAffiliateUserRanks } from './collections/Affiliate/EventAffiliateUserRanks'
-import { HIDE_AFFILIATE_RANK_CONFIG } from './collections/Affiliate/helper'
 import { MembershipCollections } from './collections/Membership'
 // import { sendMailJob } from './collections/Emails/jobs/sendMail'
 
@@ -135,7 +134,7 @@ export default buildConfig({
     Media,
     Categories,
     Users,
-    ...(HIDE_AFFILIATE_RANK_CONFIG ? [] : MembershipCollections),
+    ...MembershipCollections,
     CheckInRecords,
     SeatingCharts,
     Events,
@@ -153,15 +152,11 @@ export default buildConfig({
     FAQs,
     Admins,
     Emails,
-    ...(HIDE_AFFILIATE_RANK_CONFIG
-      ? []
-      : [
-          AffiliateRanks,
-          EventAffiliateRanks,
-          AffiliateUserRanks,
-          EventAffiliateUserRanks,
-          AffiliateRankLogs,
-        ]),
+    AffiliateRanks,
+    EventAffiliateRanks,
+    AffiliateUserRanks,
+    EventAffiliateUserRanks,
+    AffiliateRankLogs,
     AffiliateLinks,
     AffiliateSettings,
     AffiliateClickLogs,
