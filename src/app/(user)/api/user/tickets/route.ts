@@ -1,24 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { getPayload } from '@/payload-config/getPayloadConfig'
-import { extractJWT } from '@/utilities/jwt'
-import { JWT_USER_SECRET } from '@/config/jwt'
+import { authorizeApiRequest } from '@/app/(user)/utils/authorizeApiRequest'
 
 export async function GET(req: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const authToken = cookieStore.get('authToken')
-
-    if (!authToken) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
-    }
-
     // Verify the JWT token
-    const userRequest = await extractJWT(authToken.value, JWT_USER_SECRET)
-    if (!userRequest) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
-    }
-
+    const userRequest = await authorizeApiRequest()
     const userId = userRequest.id
     const payload = await getPayload()
 

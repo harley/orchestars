@@ -15,6 +15,7 @@ import { AFFILIATE_RANKS, AFFILIATE_RANK } from '@/collections/Affiliate/constan
 import { POINT_PER_VND } from '@/config/affiliate'
 import { AFFILIATE_ACTION_TYPE_LOG } from '@/collections/Affiliate/constants/actionTypeLog'
 import { TAX_PERCENTAGE_DEFAULT } from '@/collections/Events/constants/tax'
+import { calculatePointCompletedOrder } from '@/collections/Membership/hooks/calculatePointCompletedOrder'
 
 const updateTicketsAndSendEmail = async (originalDoc: Order, req: FieldHookArgs['req']) => {
   const orderItems = await req.payload
@@ -438,13 +439,49 @@ const handleCompletedOrder = async (originalDoc: Order, req: FieldHookArgs['req'
   }
 }
 
-export const afterChangeStatus = async ({ value, originalDoc, req, context }: FieldHookArgs) => {
+const handleCalculatingPointCompletedOrder = async (
+  originalDoc: Order,
+  req: FieldHookArgs['req'],
+) => {
+  try {
+    const total = originalDoc.total || 0
+    const points = Math.ceil(total / POINT_PER_VND)
+    const userId = (originalDoc.user as Order)?.id || originalDoc.user
+    if (userId && points > 0) {
+      await calculatePointCompletedOrder({
+        payload: req.payload,
+        userId: userId as number,
+        points,
+        transactionID: req.transactionID,
+        historyData: {
+          orderCode: originalDoc.orderCode as string,
+          orderId: originalDoc.id,
+        },
+      })
+    }
+  } catch (error) {
+    req.payload.logger.error({
+      msg: `Error calculating point completed order [${originalDoc.id}] #${originalDoc.orderCode}`,
+      error,
+      orderCode: originalDoc.orderCode,
+    })
+  }
+}
+
+export const afterChangeStatus = async ({
+  value,
+  originalDoc,
+  req,
+  context,
+  previousValue,
+}: FieldHookArgs) => {
   if (context.triggerAfterCreated === false) {
     return value
   }
   // When an order's status is updated to 'completed'
-  if (value === 'completed' && originalDoc) {
+  if (value === 'completed' && previousValue !== 'completed' && originalDoc) {
     await handleCompletedOrder(originalDoc, req)
+    await handleCalculatingPointCompletedOrder(originalDoc, req)
   }
   return value
 }
