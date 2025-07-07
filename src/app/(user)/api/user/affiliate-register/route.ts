@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { USER_ROLE, AFFILIATE_USER_STATUS } from '@/collections/Users/constants'
 import { authorizeApiRequest } from '@/app/(user)/utils/authorizeApiRequest'
-import { signJwtToken } from '../utils'
+import { signJwtToken } from '@/app/(user)/utils/auth/signJwtToken'
 
 export async function POST(_req: NextRequest) {
   try {
@@ -42,6 +42,9 @@ export async function POST(_req: NextRequest) {
       data: {
         role: USER_ROLE.affiliate.value,
         affiliateStatus: AFFILIATE_USER_STATUS.approved.value,
+      },
+      context: {
+        disableSendingAffiliateSetupEmail: true,
       },
     })
 

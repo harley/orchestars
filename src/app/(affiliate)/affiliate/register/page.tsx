@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import React from 'react'
 import { useForm } from 'react-hook-form'
@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,
   FormControl,
@@ -20,24 +21,38 @@ import { UserPlus, LogIn } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 
 const registerSchema = z.object({
-  firstName: z.string().min(1, 'First name is required').max(50, 'First name must not exceed 50 characters'),
-  lastName: z.string().min(1, 'Last name is required').max(50, 'Last name must not exceed 50 characters'),
+  firstName: z
+    .string()
+    .min(1, 'First name is required')
+    .max(50, 'First name must not exceed 50 characters'),
+  lastName: z
+    .string()
+    .min(1, 'Last name is required')
+    .max(50, 'Last name must not exceed 50 characters'),
   email: z.string().min(1, 'Email is required').email('Please enter a valid email address'),
-  phoneNumber: z.string().min(7, 'Phone number is required').max(20, 'Phone number must not exceed 20 characters').regex(/^[0-9+\-() ]+$/, 'Phone number must be valid'),
+  phoneNumber: z
+    .string()
+    .min(7, 'Phone number is required')
+    .max(20, 'Phone number must not exceed 20 characters')
+    .regex(/^[0-9+\-() ]+$/, 'Phone number must be valid'),
+  acceptTerms: z.literal(true as boolean, {
+    errorMap: () => ({ message: 'You must accept the terms and conditions' }),
+  }),
 })
 
 type RegisterFormData = z.infer<typeof registerSchema>
 
 export default function AffiliateRegisterPage() {
-    const { toast } = useToast()
+  const { toast } = useToast()
 
-  const form = useForm<RegisterFormData>({
+  const form = useForm<RegisterFormData & { acceptTerms: boolean }>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       firstName: '',
       lastName: '',
       email: '',
       phoneNumber: '',
+      acceptTerms: false,
     },
   })
 
@@ -54,13 +69,15 @@ export default function AffiliateRegisterPage() {
           lastName: data.lastName,
           email: data.email,
           phoneNumber: data.phoneNumber,
+          acceptTerms: data.acceptTerms,
         }),
       })
       const result = await res.json()
       if (res.ok) {
         toast({
           title: 'Registration successful! 🎉',
-          description: 'Your application has been submitted. We appreciate your interest and will be in touch soon.',
+          description:
+            'Your application has been submitted. We have sent you an email for confirmation. Please check your email for further instructions.',
           variant: 'success',
         })
         form.reset()
@@ -91,7 +108,9 @@ export default function AffiliateRegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-white py-10 sm:py-16 lg:py-20">
       <div className="max-w-md w-full space-y-8 animate-fade-in-up">
         <div className="text-center animate-fade-in">
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-2 tracking-tight drop-shadow-lg">Affiliate Registration</h1>
+          <h1 className="text-4xl font-extrabold text-gray-900 mb-2 tracking-tight drop-shadow-lg">
+            Affiliate Registration
+          </h1>
           <p className="text-lg text-gray-700">Register to become an affiliate partner</p>
         </div>
         <Card className="shadow-2xl bg-white border border-gray-200 transition-all duration-700 hover:scale-[1.02] hover:shadow-2xl animate-fade-in-up">
@@ -112,7 +131,12 @@ export default function AffiliateRegisterPage() {
                     <FormItem className="mb-1">
                       <FormLabel>First Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your first name" {...field} disabled={isSubmitting} className="transition-all duration-300 focus:ring-2 focus:ring-blue-400/80 bg-white text-gray-900" />
+                        <Input
+                          placeholder="Enter your first name"
+                          {...field}
+                          disabled={isSubmitting}
+                          className="transition-all duration-300 focus:ring-2 focus:ring-blue-400/80 bg-white text-gray-900"
+                        />
                       </FormControl>
                       <FormMessage className="text-red-600" />
                     </FormItem>
@@ -125,7 +149,12 @@ export default function AffiliateRegisterPage() {
                     <FormItem className="mb-1">
                       <FormLabel>Last Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your last name" {...field} disabled={isSubmitting} className="transition-all duration-300 focus:ring-2 focus:ring-blue-400/80 bg-white text-gray-900" />
+                        <Input
+                          placeholder="Enter your last name"
+                          {...field}
+                          disabled={isSubmitting}
+                          className="transition-all duration-300 focus:ring-2 focus:ring-blue-400/80 bg-white text-gray-900"
+                        />
                       </FormControl>
                       <FormMessage className="text-red-600" />
                     </FormItem>
@@ -138,7 +167,13 @@ export default function AffiliateRegisterPage() {
                     <FormItem className="mb-1">
                       <FormLabel>Email Address</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="Enter your email" {...field} disabled={isSubmitting} className="transition-all duration-300 focus:ring-2 focus:ring-blue-400/80 bg-white text-gray-900" />
+                        <Input
+                          type="email"
+                          placeholder="Enter your email"
+                          {...field}
+                          disabled={isSubmitting}
+                          className="transition-all duration-300 focus:ring-2 focus:ring-blue-400/80 bg-white text-gray-900"
+                        />
                       </FormControl>
                       <FormMessage className="text-red-600" />
                     </FormItem>
@@ -151,14 +186,60 @@ export default function AffiliateRegisterPage() {
                     <FormItem className="mb-1">
                       <FormLabel>Phone Number</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your phone number" {...field} disabled={isSubmitting} className="transition-all duration-300 focus:ring-2 focus:ring-blue-400/80 bg-white text-gray-900" />
+                        <Input
+                          placeholder="Enter your phone number"
+                          {...field}
+                          disabled={isSubmitting}
+                          className="transition-all duration-300 focus:ring-2 focus:ring-blue-400/80 bg-white text-gray-900"
+                        />
                       </FormControl>
                       <FormMessage className="text-red-600" />
                     </FormItem>
                   )}
                 />
 
-                <Button type="submit" className="w-full transition-all duration-300 hover:scale-[1.01]" disabled={isSubmitting} size="lg" variant="secondary">
+                {/* Terms and Conditions Checkbox */}
+                <FormField
+                  control={form.control}
+                  name="acceptTerms"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col mb-2 mt-2">
+                      <div className="flex items-center">
+                        <FormControl>
+                          <Checkbox
+                            id="acceptTerms"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={isSubmitting}
+                            aria-checked={field.value}
+                            className="mr-2"
+                          />
+                        </FormControl>
+                        <FormLabel htmlFor="acceptTerms" className="mb-0 text-gray-700 select-none">
+                          I agree to the{' '}
+                          <Link
+                            href="/affiliate/terms-conditions"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline hover:text-blue-800 transition-colors duration-200 font-medium"
+                          >
+                            Terms and Conditions
+                          </Link>
+                        </FormLabel>
+                      </div>
+
+                      <FormMessage className=" text-red-600" />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="submit"
+                  className="w-full transition-all duration-300 hover:scale-[1.01]"
+                  disabled={isSubmitting}
+                  size="lg"
+                  variant="secondary"
+                >
                   {isSubmitting ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
@@ -173,8 +254,12 @@ export default function AffiliateRegisterPage() {
                 </Button>
                 <div className="text-center mt-2 animate-fade-in">
                   <span className="text-sm text-gray-600">Already have an affiliate account? </span>
-                  <Link href="/affiliate/login" className="text-blue-600 hover:underline font-medium">
-                    <LogIn className="inline h-4 w-4 mr-1" />Login
+                  <Link
+                    href="/affiliate/login"
+                    className="text-blue-600 hover:underline font-medium"
+                  >
+                    <LogIn className="inline h-4 w-4 mr-1" />
+                    Login
                   </Link>
                 </div>
               </form>

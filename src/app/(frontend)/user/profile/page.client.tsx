@@ -13,7 +13,7 @@ const UserProfilePageClient: React.FC<{ userData: User }> = ({ userData }) => {
   const [activeSection, setActiveSection] = useState<Section>('tickets')
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex flex-1 min-h-0 bg-gray-100">
       <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} user={userData} />
       <main className="flex-1 p-6">
         <TicketBought className={activeSection === 'tickets' ? '' : 'hidden'} />
