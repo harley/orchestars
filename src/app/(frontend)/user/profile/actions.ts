@@ -32,6 +32,19 @@ export async function getUserData({ userId }: { userId: number }): Promise<User 
     const result = await payload.find({
       collection: 'users',
       where: { id: { equals: userId } },
+      select: {
+        id: true,
+        email: true,
+        phoneNumbers: true,
+        phoneNumber: true,
+        firstName: true,
+        lastName: true,
+        username: true,
+        affiliateStatus: true,
+        role: true,
+        status: true,
+        createdAt: true,
+      }
     })
     return result.docs[0] as User
   } catch (error) {
