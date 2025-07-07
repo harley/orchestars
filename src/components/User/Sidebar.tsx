@@ -97,6 +97,9 @@ const ContentSideBar = ({
     }
   }
 
+  const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+  const hideBecomeAmbassador = !env || env === 'production'
+
   return (
     <div
       className={cn(
@@ -140,116 +143,119 @@ const ContentSideBar = ({
           })}
         </nav>
       </ScrollArea>
-      <div className="p-4">
-        <hr className="my-4 border-gray-700" />
-        {userAffiliateStatus === 'pending' ? (
-          <div className="bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-lg flex items-start gap-3 mb-2">
-            <Info className="w-5 h-5 mt-0.5 text-yellow-500" />
-            <div>
-              <div className="font-semibold">
-                {t('userprofile.sidebar.affiliatePendingTitle') || 'Affiliate Application Pending'}
-              </div>
-              <div className="text-sm">
-                {t('userprofile.sidebar.affiliatePendingDesc') ||
-                  'Your request to become an ambassador is under review. You will be notified once approved.'}
-              </div>
-            </div>
-          </div>
-        ) : userRole === 'affiliate' && userAffiliateStatus === 'approved' ? (
-          <Link
-            href="/affiliate"
-            className="block w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold rounded-lg px-4 py-3 text-center transition-colors shadow-md mb-2"
-          >
-            <span className="flex items-center justify-center gap-2">
-              <Star className="w-5 h-5" />
-              {t('userprofile.sidebar.goToAffiliateDashboard') || 'Go to Affiliate Dashboard'}
-            </span>
-            {/* <span className="block text-xs font-normal text-gray-700 mt-1">
-              {t('userprofile.sidebar.affiliateDashboardDesc') || 'View your affiliate performance, links, and rewards'}
-            </span> */}
-          </Link>
-        ) : (
-          <Dialog
-            open={showAmbassador}
-            onOpenChange={(open) => {
-              setShowAmbassador(open)
-              setAcceptedTerms(false)
-              setLoading(false)
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                className="w-full flex items-center gap-2 px-2 py-2 text-left text-yellow-400 hover:bg-yellow-900/20 hover:text-yellow-300 transition-colors"
-              >
-                <Star className="w-4 h-4" />
-                <span>{t('userprofile.sidebar.becomeAmbassador') || 'Become Ambassador'}</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="rounded-xl shadow-2xl border border-gray-200 p-0 overflow-hidden bg-white animate-fade-in">
-              <div className="px-8 pt-8 pb-2 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-blue-500" />
-                <DialogTitle className="text-gray-900 text-xl font-bold">
-                  {t('userprofile.sidebar.becomeAmbassador') || 'Become Ambassador'}
-                </DialogTitle>
-              </div>
-              <div className="px-8 pt-4 pb-2">
-                <DialogDescription>
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 mb-4 flex flex-col gap-1">
-                    <span className="text-sm text-gray-700 font-medium mb-1">
-                      {t('userprofile.sidebar.pleaseReadTerms') || 'Please read:'}
-                    </span>
-                    <a
-                      href="/affiliate/terms-conditions"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline hover:text-blue-800 transition-colors text-sm"
-                    >
-                      {t('userprofile.sidebar.affiliateTerms') || 'Affiliate Terms & Conditions'}
-                    </a>
-                  </div>
-                </DialogDescription>
-                <div className="flex items-center gap-3 mb-6">
-                  <Checkbox
-                    id="accept-terms"
-                    checked={acceptedTerms}
-                    onCheckedChange={(checked) => setAcceptedTerms(!!checked)}
-                    className="border-gray-400 data-[state=checked]:bg-white"
-                  />
-                  <label htmlFor="accept-terms" className="text-sm cursor-pointer text-gray-900">
-                    {t('userprofile.sidebar.acceptTerms') || 'I accept the terms and conditions'}
-                  </label>
+      {!hideBecomeAmbassador && (
+        <div className="p-4">
+          <hr className="my-4 border-gray-700" />
+          {userAffiliateStatus === 'pending' ? (
+            <div className="bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-lg flex items-start gap-3 mb-2">
+              <Info className="w-5 h-5 mt-0.5 text-yellow-500" />
+              <div>
+                <div className="font-semibold">
+                  {t('userprofile.sidebar.affiliatePendingTitle') ||
+                    'Affiliate Application Pending'}
+                </div>
+                <div className="text-sm">
+                  {t('userprofile.sidebar.affiliatePendingDesc') ||
+                    'Your request to become an ambassador is under review. You will be notified once approved.'}
                 </div>
               </div>
-              <DialogFooter className="bg-gray-50 px-8 py-4 rounded-b-xl flex-row gap-3 border-t border-gray-200">
+            </div>
+          ) : userRole === 'affiliate' && userAffiliateStatus === 'approved' ? (
+            <Link
+              href="/affiliate"
+              className="block w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold rounded-lg px-4 py-3 text-center transition-colors shadow-md mb-2"
+            >
+              <span className="flex items-center justify-center gap-2">
+                <Star className="w-5 h-5" />
+                {t('userprofile.sidebar.goToAffiliateDashboard') || 'Go to Affiliate Dashboard'}
+              </span>
+              {/* <span className="block text-xs font-normal text-gray-700 mt-1">
+              {t('userprofile.sidebar.affiliateDashboardDesc') || 'View your affiliate performance, links, and rewards'}
+            </span> */}
+            </Link>
+          ) : (
+            <Dialog
+              open={showAmbassador}
+              onOpenChange={(open) => {
+                setShowAmbassador(open)
+                setAcceptedTerms(false)
+                setLoading(false)
+              }}
+            >
+              <DialogTrigger asChild>
                 <Button
-                  onClick={() => {
-                    if (acceptedTerms && !loading) onBecomeAmbassador()
-                  }}
-                  disabled={!acceptedTerms || loading}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow-sm transition-colors flex items-center gap-2"
+                  variant="ghost"
+                  className="w-full flex items-center gap-2 px-2 py-2 text-left text-yellow-400 hover:bg-yellow-900/20 hover:text-yellow-300 transition-colors"
                 >
-                  {loading && (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  )}
-                  {t('userprofile.sidebar.confirmBecomeAmbassador') || 'Confirm'}
+                  <Star className="w-4 h-4" />
+                  <span>{t('userprofile.sidebar.becomeAmbassador') || 'Become Ambassador'}</span>
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setShowAmbassador(false)
-                    setAcceptedTerms(false)
-                    setLoading(false)
-                  }}
-                  className="border-gray-300 text-gray-700 hover:bg-gray-100 px-6 py-2 rounded-lg"
-                >
-                  {t('userprofile.sidebar.cancel') || 'Cancel'}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
-      </div>
+              </DialogTrigger>
+              <DialogContent className="rounded-xl shadow-2xl border border-gray-200 p-0 overflow-hidden bg-white animate-fade-in">
+                <div className="px-8 pt-8 pb-2 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-blue-500" />
+                  <DialogTitle className="text-gray-900 text-xl font-bold">
+                    {t('userprofile.sidebar.becomeAmbassador') || 'Become Ambassador'}
+                  </DialogTitle>
+                </div>
+                <div className="px-8 pt-4 pb-2">
+                  <DialogDescription>
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 mb-4 flex flex-col gap-1">
+                      <span className="text-sm text-gray-700 font-medium mb-1">
+                        {t('userprofile.sidebar.pleaseReadTerms') || 'Please read:'}
+                      </span>
+                      <a
+                        href="/affiliate/terms-conditions"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline hover:text-blue-800 transition-colors text-sm"
+                      >
+                        {t('userprofile.sidebar.affiliateTerms') || 'Affiliate Terms & Conditions'}
+                      </a>
+                    </div>
+                  </DialogDescription>
+                  <div className="flex items-center gap-3 mb-6">
+                    <Checkbox
+                      id="accept-terms"
+                      checked={acceptedTerms}
+                      onCheckedChange={(checked) => setAcceptedTerms(!!checked)}
+                      className="border-gray-400 data-[state=checked]:bg-white"
+                    />
+                    <label htmlFor="accept-terms" className="text-sm cursor-pointer text-gray-900">
+                      {t('userprofile.sidebar.acceptTerms') || 'I accept the terms and conditions'}
+                    </label>
+                  </div>
+                </div>
+                <DialogFooter className="bg-gray-50 px-8 py-4 rounded-b-xl flex-row gap-3 border-t border-gray-200">
+                  <Button
+                    onClick={() => {
+                      if (acceptedTerms && !loading) onBecomeAmbassador()
+                    }}
+                    disabled={!acceptedTerms || loading}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow-sm transition-colors flex items-center gap-2"
+                  >
+                    {loading && (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    )}
+                    {t('userprofile.sidebar.confirmBecomeAmbassador') || 'Confirm'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowAmbassador(false)
+                      setAcceptedTerms(false)
+                      setLoading(false)
+                    }}
+                    className="border-gray-300 text-gray-700 hover:bg-gray-100 px-6 py-2 rounded-lg"
+                  >
+                    {t('userprofile.sidebar.cancel') || 'Cancel'}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
+      )}
     </div>
   )
 }
