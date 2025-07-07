@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
             WHERE orders.affiliate_affiliate_link_id = affiliate_links.id
               AND orders.created_at >= ${startDate}
               AND orders.created_at <= ${endDate}
+              AND orders.status = 'completed'
           ) AS orders,
 
           -- Calculate gross revenue for this link
@@ -48,19 +49,22 @@ export async function GET(request: NextRequest) {
             WHERE orders.affiliate_affiliate_link_id = affiliate_links.id
               AND orders.created_at >= ${startDate}
               AND orders.created_at <= ${endDate}
+              AND orders.status = 'completed'
           ) AS gross_revenue,
 
           -- Calculate tickets for this link
           (SELECT COUNT(*)
-            FROM tickets t
-            INNER JOIN orders o ON t.order_id = o.id
-            WHERE o.affiliate_affiliate_link_id = affiliate_links.id
-              AND o.created_at >= ${startDate}
-              AND o.created_at <= ${endDate}
+            FROM tickets
+            INNER JOIN orders ON tickets.order_id = orders.id
+            WHERE orders.affiliate_affiliate_link_id = affiliate_links.id
+              AND orders.created_at >= ${startDate}
+              AND orders.created_at <= ${endDate}
+              AND orders.status = 'completed'
           ) AS tickets_issued
 
         FROM affiliate_links
         WHERE affiliate_links.affiliate_user_id = ${userRequest.id}
+          AND affiliate_links.status = 'active'
       ),
 
       calculated_metrics AS (

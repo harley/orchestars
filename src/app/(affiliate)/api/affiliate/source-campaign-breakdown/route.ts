@@ -24,6 +24,8 @@ export async function GET(request: NextRequest) {
         INNER JOIN affiliate_links ON orders.affiliate_affiliate_link_id = affiliate_links.id
         WHERE orders.created_at >= ${startDate} AND orders.created_at <= ${endDate}
           AND affiliate_links.affiliate_user_id = ${userRequest.id}
+          AND orders.status = 'completed'
+          AND affiliate_links.status = 'active'
         GROUP BY source, campaign
       ),
       total_revenue AS (

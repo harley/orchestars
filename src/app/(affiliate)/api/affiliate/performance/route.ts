@@ -22,8 +22,10 @@ export async function GET(request: NextRequest) {
           FROM orders
           INNER JOIN affiliate_links ON orders.affiliate_affiliate_link_id = affiliate_links.id
           WHERE affiliate_links.affiliate_user_id = ${userRequest.id}
+            AND affiliate_links.status = 'active'
             AND orders.created_at >= ${startDate} 
             AND orders.created_at <= ${endDate}
+            AND orders.status = 'completed'
         ) AS total_revenue,
         COUNT(DISTINCT tickets.id) AS total_tickets,
 
@@ -45,8 +47,10 @@ export async function GET(request: NextRequest) {
         AND affiliate_click_logs.created_at >= ${startDate} AND affiliate_click_logs.created_at <= ${endDate}
       LEFT JOIN orders ON orders.affiliate_affiliate_link_id = affiliate_links.id
         AND orders.created_at >= ${startDate} AND orders.created_at <= ${endDate}
+        AND orders.status = 'completed'
       LEFT JOIN tickets ON tickets.order_id = orders.id
       WHERE affiliate_links.affiliate_user_id = ${userRequest.id}
+        AND affiliate_links.status = 'active'
     `) as { rows: any[] }
 
     return NextResponse.json({

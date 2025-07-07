@@ -211,7 +211,7 @@ export function PerformanceAnalytics() {
       </Card> */}
 
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="shadow-md">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Clicks</CardTitle>
@@ -232,9 +232,9 @@ export function PerformanceAnalytics() {
                   <div className="text-2xl font-bold">
                     {performanceData?.clicks.toLocaleString()}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  {/* <p className="text-xs text-muted-foreground">
                     {`Across all links`}
-                  </p>
+                  </p> */}
                 </>
               )
             }
@@ -260,9 +260,9 @@ export function PerformanceAnalytics() {
                   <div className="text-2xl font-bold">
                     {performanceData?.orders.toLocaleString()}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  {/* <p className="text-xs text-muted-foreground">
                     {`Conversion Rate: ${performanceData?.overallConversionRate.toLocaleString()}%`}
-                  </p>
+                  </p> */}
                 </>
               )
             }
@@ -288,9 +288,9 @@ export function PerformanceAnalytics() {
                   <div className="text-2xl font-bold">
                     {performanceData?.ticketsIssued.toLocaleString()}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  {/* <p className="text-xs text-muted-foreground">
                     {`Avg: ${performanceData?.averageTicketsPerOrder.toLocaleString()} per order`}
-                  </p> 
+                  </p>  */}
                 </>
               )
             }
@@ -316,15 +316,15 @@ export function PerformanceAnalytics() {
                   <div className="text-2xl font-bold">
                     {`${formatMoney(performanceData?.grossRevenue ?? 0)}`}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  {/* <p className="text-xs text-muted-foreground">
                     {`Before discounts`}
-                  </p>
+                  </p> */}
                 </>
               )
             }
           </CardContent>
         </Card>
-        <Card className="bg-gray-200 text-gray-800 shadow-md">
+        {/* <Card className="bg-gray-200 text-gray-800 shadow-md">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Your Commission</CardTitle>
           </CardHeader>
@@ -351,7 +351,7 @@ export function PerformanceAnalytics() {
               )
             }
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       {/* Link Performance Table */}
@@ -389,7 +389,7 @@ export function PerformanceAnalytics() {
                   <TableHead className="text-center">Conversion</TableHead>
                   <TableHead className="text-center">Gross Revenue</TableHead>
                   <TableHead className="text-center">Net Revenue</TableHead>
-                  <TableHead className="text-center bg-gray-200 text-gray-800">Commission</TableHead>
+                  {/* <TableHead className="text-center bg-gray-200 text-gray-800">Commission</TableHead> */}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -419,9 +419,9 @@ export function PerformanceAnalytics() {
                     <TableCell className="text-center py-8">
                       <Skeleton className="h-4  rounded-xl bg-black/10" />
                     </TableCell>
-                    <TableCell className="text-center py-8">
+                    {/* <TableCell className="text-center py-8">
                       <Skeleton className="h-4  rounded-xl bg-black/10" />
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 ) : linkBreakdownData?.length === 0 || !linkBreakdownData ? (
                     <TableRow>
@@ -436,9 +436,9 @@ export function PerformanceAnalytics() {
                       <TableCell className="text-center">
                         <div className="space-y-1">
                           <Badge variant="outline" className="text-xs">
-                            {link.utmSource}
+                            {link.utmSource ? link.utmSource : 'Unknown'}
                           </Badge>
-                          <div className="text-xs text-muted-foreground">{link.utmCampaign}</div>
+                          <div className="text-xs text-muted-foreground">{link.utmCampaign ? link.utmCampaign : 'Unknown'}</div>
                         </div>
                       </TableCell>
                       <TableCell className="text-center">{link.clicks.toLocaleString()}</TableCell>
@@ -456,9 +456,9 @@ export function PerformanceAnalytics() {
                       </TableCell>
                       <TableCell className="text-center">{formatMoney(link.grossRevenue)}</TableCell>
                       <TableCell className="text-center">{formatMoney(link.netRevenue)}</TableCell>
-                      <TableCell className="text-center bg-gray-200 text-gray-800 font-medium text-green-600">
+                      {/* <TableCell className="text-center bg-gray-200 text-gray-800 font-medium text-green-600">
                         {formatMoney(link.commission)}
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   ))
                 )}
@@ -523,7 +523,7 @@ export function PerformanceAnalytics() {
               sourceCampaignBreakdownData?.bySource.map((item) => (
               <div key={item.source} className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium capitalize">{item.source}</span>
+                  <span className="text-sm font-medium capitalize">{item.source ? item.source : 'Unknown'}</span>
                   <span className="text-sm text-muted-foreground">
                     {formatMoney(item.revenue)} ({item.percentage.toLocaleString()}%)
                   </span>
@@ -554,7 +554,7 @@ export function PerformanceAnalytics() {
               sourceCampaignBreakdownData?.byCampaign.map((item) => (
                 <div key={item.campaign} className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{item.campaign}</span>
+                    <span className="text-sm font-medium">{item.campaign ? item.campaign: 'Unknown'}</span>
                     <span className="text-sm text-muted-foreground">
                       {formatMoney(item.revenue)} ({item.percentage.toLocaleString()}%)
                     </span>
