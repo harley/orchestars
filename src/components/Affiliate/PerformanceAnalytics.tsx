@@ -436,9 +436,9 @@ export function PerformanceAnalytics() {
                       <TableCell className="text-center">
                         <div className="space-y-1">
                           <Badge variant="outline" className="text-xs">
-                            {link.utmSource ? link.utmSource : 'Unknown'}
+                            {link.utmSource || 'Unknown'}
                           </Badge>
-                          <div className="text-xs text-muted-foreground">{link.utmCampaign ? link.utmCampaign : 'Unknown'}</div>
+                          <div className="text-xs text-muted-foreground">{link.utmCampaign || 'Unknown'}</div>
                         </div>
                       </TableCell>
                       <TableCell className="text-center">{link.clicks.toLocaleString()}</TableCell>
@@ -523,7 +523,7 @@ export function PerformanceAnalytics() {
               sourceCampaignBreakdownData?.bySource.map((item) => (
               <div key={item.source} className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium capitalize">{item.source ? item.source : 'Unknown'}</span>
+                  <span className="text-sm font-medium capitalize">{item.source || 'Unknown'}</span>
                   <span className="text-sm text-muted-foreground">
                     {formatMoney(item.revenue)} ({item.percentage.toLocaleString()}%)
                   </span>
@@ -554,7 +554,7 @@ export function PerformanceAnalytics() {
               sourceCampaignBreakdownData?.byCampaign.map((item) => (
                 <div key={item.campaign} className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{item.campaign ? item.campaign: 'Unknown'}</span>
+                    <span className="text-sm font-medium">{item.campaign || 'Unknown'}</span>
                     <span className="text-sm text-muted-foreground">
                       {formatMoney(item.revenue)} ({item.percentage.toLocaleString()}%)
                     </span>
