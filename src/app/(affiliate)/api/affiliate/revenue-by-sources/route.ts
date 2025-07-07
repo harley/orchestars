@@ -4,7 +4,7 @@ import { authorizeApiRequest } from '@/app/(affiliate)/utils/authorizeApiRequest
 import { sql } from '@payloadcms/db-postgres/drizzle'
 import { setDateFrom } from '@/app/(affiliate)/utils/setDateFrom'
 
-type sourceMetricsRow = {
+type SourceMetricsRow = {
   source: string
   gross_revenue: number
   net_revenue: number
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
         FROM metrics_base m
         GROUP BY m.utm_params_source;
          `)
-    const revenueBySource = (result as { rows: sourceMetricsRow[] }).rows.map((row) => {
+    const revenueBySource = (result as { rows: SourceMetricsRow[] }).rows.map((row) => {
       return {
         source: row.source,
         grossRevenue: row.gross_revenue,

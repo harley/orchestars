@@ -4,7 +4,7 @@ import { authorizeApiRequest } from '@/app/(affiliate)/utils/authorizeApiRequest
 import { sql } from '@payloadcms/db-postgres/drizzle'
 import { setDateFrom } from '@/app/(affiliate)/utils/setDateFrom'
 
-type eventMetricsRow = {
+type EventMetricsRow = {
   event_id: number
   title: string
   gross_revenue: number
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
         JOIN events_locales l ON m.event_id = l._parent_id
         GROUP BY m.event_id, m.vat_percentage, l.title;
     `)
-    const revenueByEvents = (result as { rows: eventMetricsRow[] }).rows.map((row) => {
+    const revenueByEvents = (result as { rows: EventMetricsRow[] }).rows.map((row) => {
       return {
         eventID: row.event_id,
         eventTitle: row.title,
