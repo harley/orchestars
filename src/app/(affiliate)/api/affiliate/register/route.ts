@@ -30,6 +30,18 @@ const affiliateRegisterSchema = Joi.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+    const showRegistrationPage = !env || env === 'production'
+    if (!showRegistrationPage) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Affiliate registration is currently unavailable.'
+        },
+        { status: 503 },
+      )
+    }
+
     const body = await request.json()
     const { error, value } = affiliateRegisterSchema.validate(body, {
       abortEarly: false,
