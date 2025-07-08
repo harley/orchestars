@@ -37,9 +37,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Affiliate registration is currently unavailable.'
+          error: 'Page not found',
         },
-        { status: 503 },
+        { status: 404 },
       )
     }
 
@@ -63,7 +63,10 @@ export async function POST(request: NextRequest) {
     const existing = await payload.find({
       collection: 'users',
       where: {
-        or: [{ email: { equals: String(value.email).toLowerCase() } }, { phoneNumber: { equals: value.phoneNumber } }],
+        or: [
+          { email: { equals: String(value.email).toLowerCase() } },
+          { phoneNumber: { equals: value.phoneNumber } },
+        ],
       },
       limit: 1,
     })
