@@ -19,6 +19,8 @@ import {
 import Link from 'next/link'
 import { UserPlus, LogIn } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
+import { Clock, ArrowLeft } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 const registerSchema = z.object({
   firstName: z
@@ -44,7 +46,10 @@ type RegisterFormData = z.infer<typeof registerSchema>
 
 export default function AffiliateRegisterPage() {
   const { toast } = useToast()
-
+  const router = useRouter()
+  const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+  const showRegistrationPage = !env || env === 'production'
+ 
   const form = useForm<RegisterFormData & { acceptTerms: boolean }>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -102,6 +107,49 @@ export default function AffiliateRegisterPage() {
         variant: 'destructive',
       })
     }
+  }
+
+  const handleGoBack = () => {
+    router.back()
+  }
+
+  if (!showRegistrationPage) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white py-10 sm:py-16 lg:py-20">
+        <div className="max-w-lg w-full space-y-8 px-4">
+          <Card className="shadow-2xl bg-white border border-gray-200 animate-fade-in-up">
+            <CardContent className="p-12 text-center space-y-6">
+              {/* Icon */}
+              <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                <Clock className="h-8 w-8 text-blue-600" />
+              </div>
+              
+              {/* Main Text */}
+              <div className="space-y-4">
+                <h1 className="text-4xl font-bold text-gray-900">
+                  Coming Soon
+                </h1>
+                <h2 className="text-xl text-gray-700">
+                  Affiliate Program
+                </h2>
+                <p className="text-gray-600 leading-relaxed">
+                  We&apos;re working hard to bring you an amazing affiliate program. 
+                  Stay tuned for updates!
+                </p>
+              </div>
+
+              {/* Back Button */}
+              <div className="pt-4">
+                  <Button onClick={handleGoBack} variant="outline" className="group">
+                    <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+                    Go back
+                  </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
   }
 
   return (
