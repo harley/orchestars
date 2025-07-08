@@ -6,9 +6,21 @@ import { signJwtToken } from '@/app/(user)/utils/auth/signJwtToken'
 
 export async function POST(_req: NextRequest) {
   try {
+    // remove when production is ready
+    const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+    const hiddenRegistrationPage = !env || env === 'production'
+    if (hiddenRegistrationPage) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Page not found',
+        },
+        { status: 404 },
+      )
+    }
     // Verify the JWT token
     const userRequest = await authorizeApiRequest()
-    
+
     const payload = await getPayload()
 
     // Fetch the user
@@ -20,7 +32,7 @@ export async function POST(_req: NextRequest) {
         id: true,
         role: true,
         affiliateStatus: true,
-      }
+      },
     })
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
@@ -48,13 +60,13 @@ export async function POST(_req: NextRequest) {
       },
     })
 
-    // Sign JWT token if approved 
+    // Sign JWT token if approved
     await signJwtToken({
       fieldsToSign: {
         id: user.id,
         email: user.email,
-        role: USER_ROLE.affiliate.value
-      }
+        role: USER_ROLE.affiliate.value,
+      },
     })
 
     return NextResponse.json({
