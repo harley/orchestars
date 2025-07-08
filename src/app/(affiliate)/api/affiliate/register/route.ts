@@ -30,9 +30,10 @@ const affiliateRegisterSchema = Joi.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // hidden registration form when env is production
     const env = process.env.NEXT_PUBLIC_ENVIRONMENT
-    const showRegistrationPage = !env || env === 'production'
-    if (!showRegistrationPage) {
+    const hiddenRegistrationPage = !env || env === 'production'
+    if (hiddenRegistrationPage) {
       return NextResponse.json(
         {
           success: false,

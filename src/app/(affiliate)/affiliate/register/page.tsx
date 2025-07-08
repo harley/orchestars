@@ -47,8 +47,10 @@ type RegisterFormData = z.infer<typeof registerSchema>
 export default function AffiliateRegisterPage() {
   const { toast } = useToast()
   const router = useRouter()
+
+  // hidden registration form when env is production
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT
-  const showRegistrationPage = !env || env === 'production'
+  const hiddenRegistrationPage = !env || env === 'production'
  
   const form = useForm<RegisterFormData & { acceptTerms: boolean }>({
     resolver: zodResolver(registerSchema),
@@ -113,7 +115,7 @@ export default function AffiliateRegisterPage() {
     router.back()
   }
 
-  if (!showRegistrationPage) {
+  if (hiddenRegistrationPage) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white py-10 sm:py-16 lg:py-20">
         <div className="max-w-lg w-full space-y-8 px-4">
