@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { DISCOUNT_APPLY_SCOPE, DISCOUNT_APPLY_SCOPES } from './constants'
+import { revalidateTag } from 'next/cache'
 
 export const Promotions: CollectionConfig = {
   slug: 'promotions',
@@ -146,4 +147,18 @@ export const Promotions: CollectionConfig = {
       label: 'Disable Public Visibility',
     },
   ],
+  hooks: {
+    afterChange: [
+      ({ doc, req: { payload, context } }) => {
+        // revalidate home data on client side
+        if (!context.disableRevalidate) {
+          payload.logger.info(`Revalidating promotions by eventId ${doc.event}`)
+
+          revalidateTag(`promotions:${doc.event}`)
+        }
+
+        return doc
+      },
+    ],
+  },
 }
