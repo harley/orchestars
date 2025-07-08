@@ -1,124 +1,188 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Progress } from '@/components/ui/progress'
-import { BarChart3, TrendingUp, TrendingDown } from 'lucide-react'
+import { BarChart3, TrendingUp, TrendingDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useToast } from '@/components/ui/use-toast'
+import { Skeleton } from '@/components/ui/skeleton'
+import { formatMoney } from '@/utilities/formatMoney'
 
-// Mock data - in real implementation, this would come from API
-const mockAnalyticsData = {
-  linkPerformance: [
-    {
-      id: '1',
-      name: 'Summer Concert Series',
-      utmSource: 'facebook',
-      utmCampaign: 'summer-2024',
-      clicks: 1247,
-      orders: 89,
-      ticketsIssued: 890,
-      grossRevenue: 4450,
-      netRevenue: 4005,
-      conversionRate: 7.14,
-      commission: 445,
-    },
-    {
-      id: '2',
-      name: 'Classical Nights',
-      utmSource: 'instagram',
-      utmCampaign: 'classical-nights',
-      clicks: 892,
-      orders: 56,
-      ticketsIssued: 560,
-      grossRevenue: 2800,
-      netRevenue: 2520,
-      conversionRate: 6.28,
-      commission: 280,
-    },
-    {
-      id: '3',
-      name: 'Holiday Special',
-      utmSource: 'newsletter',
-      utmCampaign: 'holiday-2024',
-      clicks: 634,
-      orders: 41,
-      ticketsIssued: 410,
-      grossRevenue: 2050,
-      netRevenue: 1845,
-      conversionRate: 6.47,
-      commission: 205,
-    },
-    {
-      id: '4',
-      name: 'Orchestra Gala',
-      utmSource: 'google',
-      utmCampaign: 'gala-2024',
-      clicks: 456,
-      orders: 23,
-      ticketsIssued: 230,
-      grossRevenue: 1150,
-      netRevenue: 1035,
-      conversionRate: 5.04,
-      commission: 115,
-    },
-  ],
-  revenueBreakdown: {
-    bySource: [
-      { source: 'facebook', revenue: 4450, percentage: 42.1 },
-      { source: 'instagram', revenue: 2800, percentage: 26.5 },
-      { source: 'newsletter', revenue: 2050, percentage: 19.4 },
-      { source: 'google', revenue: 1150, percentage: 10.9 },
-      { source: 'twitter', revenue: 120, percentage: 1.1 },
-    ],
-    byCampaign: [
-      { campaign: 'summer-2024', revenue: 4450, percentage: 42.1 },
-      { campaign: 'classical-nights', revenue: 2800, percentage: 26.5 },
-      { campaign: 'holiday-2024', revenue: 2050, percentage: 19.4 },
-      { campaign: 'gala-2024', revenue: 1150, percentage: 10.9 },
-      { campaign: 'spring-promo', revenue: 120, percentage: 1.1 },
-    ],
-  },
+type PerformanceData = {
+  clicks: number
+  orders: number
+  overallConversionRate: number
+  ticketsIssued: number
+  averageTicketsPerOrder: number
+  grossRevenue: number
+  commission: number
+  commissionRate: number
+}
+
+type LinkBreakdownData = {
+  id: string
+  name?: string
+  utmSource?: string
+  utmCampaign?: string
+  clicks: number
+  orders: number
+  ticketsIssued: number
+  conversionRate: number
+  grossRevenue: number
+  netRevenue: number
+  commission: number
+}[]
+
+type SourceCampaignBreakdownData = {
+  bySource: { source: string; revenue: number; percentage: number }[]
+  byCampaign: { campaign: string; revenue: number; percentage: number }[]
+}
+
+type PaginationInfo = {
+  page: number
+  limit: number
+  totalPages: number
+  totalDocs: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
+}
+
+interface ApiResponse {
+  success: boolean
+  data: PerformanceData | LinkBreakdownData | SourceCampaignBreakdownData
+  pagination?: PaginationInfo
+  error?: string
 }
 
 export function PerformanceAnalytics() {
+  const { toast } = useToast()
+  const [loading, setLoading] = useState(true)
+
+  // Data
+  const [performanceData, setPerformanceData] = useState<PerformanceData | null>(null)
+  const [linkBreakdownData, setLinkBreakdownData] = useState<LinkBreakdownData | null>(null)
+  const [sourceCampaignBreakdownData, setSourceCampaignBreakdownData] = useState<SourceCampaignBreakdownData | null>(null)
+
+  // Pagination
+  const [linkBreakdownPagination, setLinkBreakdownPagination] = useState<PaginationInfo>({
+    page: 1,
+    limit: 5,
+    totalPages: 1,
+    totalDocs: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+  })
+
+  // Filters
   const [timeRange, setTimeRange] = useState('30d')
   const [sortBy, setSortBy] = useState('revenue')
 
-  const sortedData = [...mockAnalyticsData.linkPerformance].sort((a, b) => {
-    switch (sortBy) {
-      case 'revenue':
-        return b.grossRevenue - a.grossRevenue
-      case 'clicks':
-        return b.clicks - a.clicks
-      case 'orders':
-        return b.orders - a.orders
-      case 'conversion':
-        return b.conversionRate - a.conversionRate
-      default:
-        return 0
+  const fetchPerformanceData = async (timeRangeValue: string) => {
+    const params = new URLSearchParams({
+      timeRange: timeRangeValue,
+    })
+
+    const response = await fetch(`/api/affiliate/performance?${params.toString()}`)
+    const result: ApiResponse = await response.json()
+    if (result.success) {
+      setPerformanceData(result.data as PerformanceData)
+    } else {
+      setPerformanceData(null)
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch some data',
+        variant: 'destructive',
+      })
     }
-  })
+  }
 
-  const totalMetrics = mockAnalyticsData.linkPerformance.reduce(
-    (acc, link) => ({
-      clicks: acc.clicks + link.clicks,
-      orders: acc.orders + link.orders,
-      ticketsIssued: acc.ticketsIssued + link.ticketsIssued,
-      grossRevenue: acc.grossRevenue + link.grossRevenue,
-      netRevenue: acc.netRevenue + link.netRevenue,
-      commission: acc.commission + link.commission,
-    }),
-    { clicks: 0, orders: 0, ticketsIssued: 0, grossRevenue: 0, netRevenue: 0, commission: 0 }
-  )
+  const fetchLinkBreakdownData = async (page = 1, timeRangeValue: string, sortByValue: string) => {
+    const params = new URLSearchParams({
+      timeRange: timeRangeValue,
+      sortBy: sortByValue,
+      page: page.toString(),
+      limit: linkBreakdownPagination.limit.toString(),
+    })
 
-  const overallConversionRate = totalMetrics.clicks > 0 ? (totalMetrics.orders / totalMetrics.clicks) * 100 : 0
+    const response = await fetch(`/api/affiliate/link-breakdown?${params.toString()}`)
+    const result: ApiResponse = await response.json()
+    if (result.success) {
+      setLinkBreakdownData(result.data as LinkBreakdownData)
+      setLinkBreakdownPagination(result.pagination as PaginationInfo)
+    } else {
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch some data',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const fetchSourceCampaignBreakdownData = async (timeRangeValue: string) => {
+    const params = new URLSearchParams({
+      timeRange: timeRangeValue,
+    })
+
+    const response = await fetch(`/api/affiliate/source-campaign-breakdown?${params.toString()}`)
+    const result: ApiResponse = await response.json()
+    if (result.success) {
+      setSourceCampaignBreakdownData(result.data as SourceCampaignBreakdownData)
+    } else {
+      setSourceCampaignBreakdownData(null)
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch some data',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const fetchInitialData = async () => {
+    setLoading(true)
+    await Promise.all([
+      fetchPerformanceData(timeRange),
+      fetchLinkBreakdownData(1, timeRange, sortBy),
+      fetchSourceCampaignBreakdownData(timeRange),
+    ])
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    fetchInitialData()
+  }, [])
+
+  const toggleTimeRange = async (value: string) => {
+    setLoading(true)
+    setTimeRange(value)
+    await Promise.all([
+      fetchPerformanceData(value),
+      fetchLinkBreakdownData(linkBreakdownPagination.page, value, sortBy),
+      fetchSourceCampaignBreakdownData(value),
+    ])
+    setLoading(false)
+  }
+
+  const toggleSortBy = async (value: string) => {
+    setLoading(true)
+    setSortBy(value)
+    await fetchLinkBreakdownData(linkBreakdownPagination.page, timeRange, value)
+    setLoading(false)
+  }
+
+  const handlePageChange = async (newPage: number) => {
+    setLoading(true)
+    await fetchLinkBreakdownData(newPage, timeRange, sortBy)
+    setLoading(false)
+  }
 
   return (
     <div className="space-y-6">
       {/* Filters */}
-      <Card className="shadow-md">
+      {/* <Card className="shadow-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
@@ -128,49 +192,52 @@ export function PerformanceAnalytics() {
             Detailed breakdown of your affiliate link performance and revenue tracking
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Time Range</label>
-              <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className='bg-white'>
-                  <SelectItem value="7d">Last 7 days</SelectItem>
-                  <SelectItem value="30d">Last 30 days</SelectItem>
-                  <SelectItem value="90d">Last 90 days</SelectItem>
-                  <SelectItem value="1y">Last year</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Sort By</label>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className='bg-white'>
-                  <SelectItem value="revenue">Revenue</SelectItem>
-                  <SelectItem value="clicks">Clicks</SelectItem>
-                  <SelectItem value="orders">Orders</SelectItem>
-                  <SelectItem value="conversion">Conversion Rate</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+        <CardContent> */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Time Range</label>
+            <Select value={timeRange} onValueChange={toggleTimeRange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className='bg-white'>
+                <SelectItem value="7d">Last 7 days</SelectItem>
+                <SelectItem value="30d">Last 30 days</SelectItem>
+                <SelectItem value="90d">Last 90 days</SelectItem>
+                <SelectItem value="1y">Last year</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </CardContent>
-      </Card>
+        {/* </CardContent>
+      </Card> */}
 
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="shadow-md">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Clicks</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalMetrics.clicks.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Across all links</p>
+            {
+              loading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20 bg-gray-200" />
+                  <Skeleton className="h-3 w-24 bg-gray-200" />
+                </div>
+              ) : !performanceData ? (
+                <div className="text-center py-8">
+                  Failed to load performance data
+                </div>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">
+                    {performanceData?.clicks.toLocaleString()}
+                  </div>
+                  {/* <p className="text-xs text-muted-foreground">
+                    {`Across all links`}
+                  </p> */}
+                </>
+              )
+            }
           </CardContent>
         </Card>
         <Card className="shadow-md">
@@ -178,8 +245,27 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalMetrics.orders.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Conversion rate: {overallConversionRate.toFixed(2)}%</p>
+            {
+              loading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20 bg-gray-200" />
+                  <Skeleton className="h-3 w-24 bg-gray-200" />
+                </div>
+              ) : !performanceData ? (
+                <div className="text-center py-8">
+                  Failed to load performance data
+                </div>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">
+                    {performanceData?.orders.toLocaleString()}
+                  </div>
+                  {/* <p className="text-xs text-muted-foreground">
+                    {`Conversion Rate: ${performanceData?.overallConversionRate.toLocaleString()}%`}
+                  </p> */}
+                </>
+              )
+            }
           </CardContent>
         </Card>
         <Card className="shadow-md">
@@ -187,8 +273,27 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Tickets Issued</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalMetrics.ticketsIssued.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Avg {(totalMetrics.ticketsIssued / totalMetrics.orders).toFixed(1)} per order</p>
+            {
+              loading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20 bg-gray-200" />
+                  <Skeleton className="h-3 w-24 bg-gray-200" />
+                </div>
+              ) : !performanceData ? (
+                <div className="text-center py-8">
+                  Failed to load performance data
+                </div>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">
+                    {performanceData?.ticketsIssued.toLocaleString()}
+                  </div>
+                  {/* <p className="text-xs text-muted-foreground">
+                    {`Avg: ${performanceData?.averageTicketsPerOrder.toLocaleString()} per order`}
+                  </p>  */}
+                </>
+              )
+            }
           </CardContent>
         </Card>
         <Card className="shadow-md">
@@ -196,78 +301,204 @@ export function PerformanceAnalytics() {
             <CardTitle className="text-sm font-medium">Gross Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalMetrics.grossRevenue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Before discounts</p>
+            {
+              loading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20 bg-gray-200" />
+                  <Skeleton className="h-3 w-24 bg-gray-200" />
+                </div>
+              ) : !performanceData ? (
+                <div className="text-center py-8">
+                  Failed to load performance data
+                </div>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">
+                    {`${formatMoney(performanceData?.grossRevenue ?? 0)}`}
+                  </div>
+                  {/* <p className="text-xs text-muted-foreground">
+                    {`Before discounts`}
+                  </p> */}
+                </>
+              )
+            }
           </CardContent>
         </Card>
-        <Card className="shadow-md">
+        {/* <Card className="bg-gray-200 text-gray-800 shadow-md">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Your Commission</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">${totalMetrics.commission.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">10% commission rate</p>
+            {
+              loading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20 bg-gray-200" />
+                  <Skeleton className="h-3 w-24 bg-gray-200" />
+                </div>
+              ) : !performanceData ? (
+                <div className="text-center py-8">
+                  Failed to load performance data
+                </div>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold text-green-600">
+                    {`${formatMoney(performanceData?.commission ?? 0)}`}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {`${performanceData?.commissionRate.toLocaleString()}% commission rate`}
+                  </p>
+                </>
+              )
+            }
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       {/* Link Performance Table */}
       <Card className="shadow-md">
-        <CardHeader>
-          <CardTitle>Link Performance Breakdown</CardTitle>
-          <CardDescription>Detailed metrics for each affiliate link</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div className="space-y-2">
+            <CardTitle>Link Performance Breakdown</CardTitle>
+            <CardDescription>Detailed metrics for each affiliate link</CardDescription>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Sort By</label>
+            <Select value={sortBy} onValueChange={toggleSortBy}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className='bg-white'>
+                <SelectItem value="revenue">Revenue</SelectItem>
+                <SelectItem value="clicks">Clicks</SelectItem>
+                <SelectItem value="orders">Orders</SelectItem>
+                <SelectItem value="conversion">Conversion Rate</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Link Name</TableHead>
-                  <TableHead>Source/Campaign</TableHead>
-                  <TableHead className="text-right">Clicks</TableHead>
-                  <TableHead className="text-right">Orders</TableHead>
-                  <TableHead className="text-right">Tickets</TableHead>
-                  <TableHead className="text-right">Conversion</TableHead>
-                  <TableHead className="text-right">Gross Revenue</TableHead>
-                  <TableHead className="text-right">Net Revenue</TableHead>
-                  <TableHead className="text-right">Commission</TableHead>
+                  <TableHead className="text-center">Link Name</TableHead>
+                  <TableHead className="text-center">Source/Campaign</TableHead>
+                  <TableHead className="text-center">Clicks</TableHead>
+                  <TableHead className="text-center">Orders</TableHead>
+                  <TableHead className="text-center">Tickets</TableHead>
+                  <TableHead className="text-center">Conversion</TableHead>
+                  <TableHead className="text-center">Gross Revenue</TableHead>
+                  <TableHead className="text-center">Net Revenue</TableHead>
+                  {/* <TableHead className="text-center bg-gray-200 text-gray-800">Commission</TableHead> */}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedData.map((link) => (
-                  <TableRow key={link.id}>
-                    <TableCell className="font-medium">{link.name}</TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <Badge variant="outline" className="text-xs">
-                          {link.utmSource}
-                        </Badge>
-                        <div className="text-xs text-muted-foreground">{link.utmCampaign}</div>
-                      </div>
+                {loading ? (
+                  <TableRow>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
                     </TableCell>
-                    <TableCell className="text-right">{link.clicks.toLocaleString()}</TableCell>
-                    <TableCell className="text-right">{link.orders}</TableCell>
-                    <TableCell className="text-right">{link.ticketsIssued.toLocaleString()}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <span>{link.conversionRate.toFixed(2)}%</span>
-                        {link.conversionRate >= 6 ? (
-                          <TrendingUp className="h-3 w-3 text-green-500" />
-                        ) : (
-                          <TrendingDown className="h-3 w-3 text-red-500" />
-                        )}
-                      </div>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
                     </TableCell>
-                    <TableCell className="text-right">${link.grossRevenue.toLocaleString()}</TableCell>
-                    <TableCell className="text-right">${link.netRevenue.toLocaleString()}</TableCell>
-                    <TableCell className="text-right font-medium text-green-600">
-                      ${link.commission.toLocaleString()}
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
                     </TableCell>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
+                    </TableCell>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
+                    </TableCell>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
+                    </TableCell>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
+                    </TableCell>
+                    <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
+                    </TableCell>
+                    {/* <TableCell className="text-center py-8">
+                      <Skeleton className="h-4  rounded-xl bg-black/10" />
+                    </TableCell> */}
                   </TableRow>
-                ))}
+                ) : linkBreakdownData?.length === 0 || !linkBreakdownData ? (
+                    <TableRow>
+                      <TableCell colSpan={9} className="text-center py-8">
+                        No affiliate links found
+                      </TableCell>
+                    </TableRow>
+                ) : (
+                  linkBreakdownData?.map((link) => (
+                    <TableRow key={link.id}>
+                      <TableCell className="font-medium text-center">{link.name}</TableCell>
+                      <TableCell className="text-center">
+                        <div className="space-y-1">
+                          <Badge variant="outline" className="text-xs">
+                            {link.utmSource || 'Unknown'}
+                          </Badge>
+                          <div className="text-xs text-muted-foreground">{link.utmCampaign || 'Unknown'}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">{link.clicks.toLocaleString()}</TableCell>
+                      <TableCell className="text-center">{link.orders.toLocaleString()}</TableCell>
+                      <TableCell className="text-center">{link.ticketsIssued.toLocaleString()}</TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <span>{link.conversionRate.toLocaleString()}%</span>
+                          {link.conversionRate >= 6 ? (
+                            <TrendingUp className="h-3 w-3 text-green-500 bg-gray-200 text-gray-800" />
+                          ) : (
+                            <TrendingDown className="h-3 w-3 text-red-500" />
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">{formatMoney(link.grossRevenue)}</TableCell>
+                      <TableCell className="text-center">{formatMoney(link.netRevenue)}</TableCell>
+                      {/* <TableCell className="text-center bg-gray-200 text-gray-800 font-medium text-green-600">
+                        {formatMoney(link.commission)}
+                      </TableCell> */}
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
+
+          {/* Pagination */}
+          {linkBreakdownPagination.totalPages > 1 && (
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                Showing {(linkBreakdownPagination.page - 1) * linkBreakdownPagination.limit + 1} to{' '}
+                {Math.min(linkBreakdownPagination.page * linkBreakdownPagination.limit, linkBreakdownPagination.totalDocs)} of{' '}
+                {linkBreakdownPagination.totalDocs} results
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(linkBreakdownPagination.page - 1)}
+                  disabled={!linkBreakdownPagination.hasPrevPage}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+                <span className="text-sm">
+                  Page {linkBreakdownPagination.page} of {linkBreakdownPagination.totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(linkBreakdownPagination.page + 1)}
+                  disabled={!linkBreakdownPagination.hasNextPage}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -279,17 +510,28 @@ export function PerformanceAnalytics() {
             <CardDescription>Performance breakdown by traffic source</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {mockAnalyticsData.revenueBreakdown.bySource.map((item) => (
+            { loading ? (
+              <div className="flex flex-row justify-between">
+                <Skeleton className="h-4 w-32 bg-gray-200" />
+                <Skeleton className="h-4 w-24 bg-gray-200" />
+              </div>
+            ) : sourceCampaignBreakdownData?.bySource.length === 0 || !sourceCampaignBreakdownData ? (
+              <div className="text-center py-8">
+                No traffic source found
+              </div>
+            ) : (
+              sourceCampaignBreakdownData?.bySource.map((item) => (
               <div key={item.source} className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium capitalize">{item.source}</span>
+                  <span className="text-sm font-medium capitalize">{item.source || 'Unknown'}</span>
                   <span className="text-sm text-muted-foreground">
-                    ${item.revenue.toLocaleString()} ({item.percentage}%)
+                    {formatMoney(item.revenue)} ({item.percentage.toLocaleString()}%)
                   </span>
                 </div>
                 <Progress value={item.percentage} className="h-2" />
               </div>
-            ))}
+              ))
+            )}
           </CardContent>
         </Card>
 
@@ -299,17 +541,28 @@ export function PerformanceAnalytics() {
             <CardDescription>Performance breakdown by campaign</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {mockAnalyticsData.revenueBreakdown.byCampaign.map((item) => (
-              <div key={item.campaign} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{item.campaign}</span>
-                  <span className="text-sm text-muted-foreground">
-                    ${item.revenue.toLocaleString()} ({item.percentage}%)
-                  </span>
-                </div>
-                <Progress value={item.percentage} className="h-2" />
+            {loading ? (
+              <div className="flex flex-row justify-between">
+                <Skeleton className="h-4 w-32 bg-gray-200" />
+                <Skeleton className="h-4 w-24 bg-gray-200" />
               </div>
-            ))}
+            ) : sourceCampaignBreakdownData?.byCampaign.length === 0 || !sourceCampaignBreakdownData ? (
+              <div className="text-center py-8">
+                No campaign found
+              </div>
+            ) : (
+              sourceCampaignBreakdownData?.byCampaign.map((item) => (
+                <div key={item.campaign} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{item.campaign || 'Unknown'}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {formatMoney(item.revenue)} ({item.percentage.toLocaleString()}%)
+                    </span>
+                  </div>
+                  <Progress value={item.percentage} className="h-2" />
+                </div>
+              ))
+            )}
           </CardContent>
         </Card>
       </div>

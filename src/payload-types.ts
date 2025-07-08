@@ -72,6 +72,10 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    memberships: Membership;
+    'membership-rank-configs': MembershipRankConfig;
+    'membership-gifts': MembershipGift;
+    'membership-histories': MembershipHistory;
     checkinRecords: CheckinRecord;
     seatingCharts: SeatingChart;
     events: Event;
@@ -116,6 +120,10 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    memberships: MembershipsSelect<false> | MembershipsSelect<true>;
+    'membership-rank-configs': MembershipRankConfigsSelect<false> | MembershipRankConfigsSelect<true>;
+    'membership-gifts': MembershipGiftsSelect<false> | MembershipGiftsSelect<true>;
+    'membership-histories': MembershipHistoriesSelect<false> | MembershipHistoriesSelect<true>;
     checkinRecords: CheckinRecordsSelect<false> | CheckinRecordsSelect<true>;
     seatingCharts: SeatingChartsSelect<false> | SeatingChartsSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
@@ -882,23 +890,233 @@ export interface CardDetailBlock {
   blockType: 'cardDetailBlock';
 }
 /**
+ * Stores membership-related information for users, including points, rank, and activity details.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "checkinRecords".
+ * via the `definition` "memberships".
  */
-export interface CheckinRecord {
+export interface Membership {
   id: number;
-  event: number | Event;
   user: number | User;
-  ticket: number | Ticket;
-  seat: string;
-  ticketCode: string;
-  eventScheduleId?: string | null;
-  eventDate?: string | null;
-  checkInTime?: string | null;
-  checkedInBy?: (number | null) | Admin;
-  ticketGivenTime?: string | null;
-  ticketGivenBy?: string | null;
-  deletedAt?: string | null;
+  totalPoints: number;
+  membershipRank?: (number | null) | MembershipRankConfig;
+  lastActive: string;
+  pointsExpirationDate?: string | null;
+  /**
+   * Thời gian nhận điểm sinh nhật gần nhất
+   */
+  lastReceivedBirthdayPointAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Cấu hình các hạng của Membership
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membership-rank-configs".
+ */
+export interface MembershipRankConfig {
+  id: number;
+  rankName: 'Tier1' | 'Tier2' | 'Tier3' | 'Tier4';
+  rankNameLabel?: string | null;
+  /**
+   * Khoảng thời gian nếu không hoạt động sẽ bị xuống hạng (ngày) (không tính hạng thấp nhất)
+   */
+  expiresIn?: number | null;
+  description?: string | null;
+  condition: {
+    /**
+     * Số điểm tối thiểu để đạt hạng này (1 điểm = 1000 VND doanh thu)
+     */
+    minPoints: number;
+  };
+  benefits?: {
+    /**
+     * Số điểm tặng vào dịp sinh nhật của thành viên thuộc hạng này
+     */
+    birthdayPoints?: number | null;
+    /**
+     * Loại vé tặng khi thành viên thăng hạng
+     */
+    ticketGift?: ('zone1' | 'zone2' | 'zone3' | 'zone4' | 'zone5') | null;
+    /**
+     * Thời gian hết hạn vé tặng (ngày)
+     */
+    giftExpiresIn?: number | null;
+    /**
+     * Phần trăm giảm giá khi mua vé cho hạng này (%)
+     */
+    discountPercentage?: number | null;
+    /**
+     * Cho phép check-in tại khu VIP khi tham gia show
+     */
+    vipCheckIn?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Quản lý các vé tặng thăng hạng của thành viên
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membership-gifts".
+ */
+export interface MembershipGift {
+  id: number;
+  user: number | User;
+  giftType: 'giftTicket';
+  /**
+   * Loại vé tặng khi thành viên thăng hạng
+   */
+  ticketGift?: ('zone1' | 'zone2' | 'zone3' | 'zone4' | 'zone5') | null;
+  receivedAt?: string | null;
+  /**
+   * Thời gian hết hạn của quà tặng(Nếu không thiết lập thì quà tặng sẽ không hết hạn)
+   */
+  expiresAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membership-histories".
+ */
+export interface MembershipHistory {
+  id: number;
+  /**
+   * User người mà có thay đổi điểm tích lũy hoặc hạng thành viên
+   */
+  user: number | User;
+  membership?: (number | null) | Membership;
+  /**
+   * Đơn hàng liên quan
+   */
+  order?: (number | null) | Order;
+  /**
+   * Số điểm của Membership trước khi thay đổi
+   */
+  pointsBefore?: number | null;
+  /**
+   * Số điểm thay đổi (dương hoặc âm, 0 nếu không thay đổi điểm)
+   */
+  pointsChange?: number | null;
+  /**
+   * Số điểm của Membership sau khi thay đổi
+   */
+  pointsAfter?: number | null;
+  type: 'earned' | 'spent' | 'birthday' | 'receivedTicketGift';
+  /**
+   * Mô tả giao dịch, ví dụ: "Tích điểm từ đơn hàng #123"
+   */
+  description?: string | null;
+  /**
+   * Thông tin bổ sung về giao dịch
+   */
+  moreInformation?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  orderCode?: string | null;
+  user?: (number | null) | User;
+  category?: string | null;
+  status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
+  currency?: string | null;
+  /**
+   * Legacy field for a single promotion. Use "promotionsApplied" instead.
+   */
+  promotion?: (number | null) | Promotion;
+  /**
+   * Legacy field for a single promotion. Use "promotionsApplied" instead.
+   */
+  promotionCode?: string | null;
+  /**
+   * List of promotions applied to this order
+   */
+  promotionsApplied?:
+    | {
+        promotion: number | Promotion;
+        promotionCode: string;
+        discountAmount: number;
+        id?: string | null;
+      }[]
+    | null;
+  totalBeforeDiscount?: number | null;
+  totalDiscount?: number | null;
+  total?: number | null;
+  customerData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  note?: string | null;
+  /**
+   * Affiliate information
+   */
+  affiliate?: {
+    /**
+     * Affiliate link used for this order
+     */
+    affiliateLink?: (number | null) | AffiliateLink;
+    /**
+     * Affiliate code used for this order
+     */
+    affiliateCode?: string | null;
+    /**
+     * Affiliate user who referred this order
+     */
+    affiliateUser?: (number | null) | User;
+  };
+  expireAt?: string | null;
+  createdByAdmin?: (number | null) | Admin;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promotions".
+ */
+export interface Promotion {
+  id: number;
+  code: string;
+  event?: (number | null) | Event;
+  appliedTicketClasses?:
+    | {
+        ticketClass: string;
+        id?: string | null;
+      }[]
+    | null;
+  maxRedemptions: number;
+  totalUsed?: number | null;
+  perUserLimit: number;
+  conditions?: {
+    isApplyCondition?: boolean | null;
+    minTickets?: number | null;
+  };
+  discountApplyScope?: ('total_order_value' | 'per_order_item') | null;
+  discountType: 'percentage' | 'fixed_amount';
+  discountValue: number;
+  startDate: string;
+  endDate: string;
+  status: 'draft' | 'active' | 'disabled';
+  isPrivate?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1005,153 +1223,11 @@ export interface SeatingChart {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tickets".
- */
-export interface Ticket {
-  id: number;
-  attendeeName?: string | null;
-  user?: (number | null) | User;
-  userEmail?: string | null;
-  ticketCode?: string | null;
-  seat?: string | null;
-  ticketPriceName?: string | null;
-  ticketPriceInfo?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  event?: (number | null) | Event;
-  eventScheduleId?: string | null;
-  eventDate?: string | null;
-  orderItem?: (number | null) | OrderItem;
-  order?: (number | null) | Order;
-  orderCode?: string | null;
-  status?: ('booked' | 'pending_payment' | 'hold' | 'cancelled') | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orderItems".
- */
-export interface OrderItem {
-  id: number;
-  order: number | Order;
-  event: number | Event;
-  ticketPriceId: string;
-  ticketPriceName?: string | null;
-  seat?: string | null;
-  quantity: number;
-  price: number;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orders".
- */
-export interface Order {
-  id: number;
-  orderCode?: string | null;
-  user?: (number | null) | User;
-  category?: string | null;
-  status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
-  currency?: string | null;
-  /**
-   * Legacy field for a single promotion. Use "promotionsApplied" instead.
-   */
-  promotion?: (number | null) | Promotion;
-  /**
-   * Legacy field for a single promotion. Use "promotionsApplied" instead.
-   */
-  promotionCode?: string | null;
-  /**
-   * List of promotions applied to this order
-   */
-  promotionsApplied?:
-    | {
-        promotion: number | Promotion;
-        promotionCode: string;
-        discountAmount: number;
-        id?: string | null;
-      }[]
-    | null;
-  totalBeforeDiscount?: number | null;
-  totalDiscount?: number | null;
-  total?: number | null;
-  customerData?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  note?: string | null;
-  /**
-   * Affiliate information
-   */
-  affiliate?: {
-    /**
-     * Affiliate link used for this order
-     */
-    affiliateLink?: (number | null) | AffiliateLink;
-    /**
-     * Affiliate code used for this order
-     */
-    affiliateCode?: string | null;
-    /**
-     * Affiliate user who referred this order
-     */
-    affiliateUser?: (number | null) | User;
-  };
-  expireAt?: string | null;
-  createdByAdmin?: (number | null) | Admin;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "promotions".
- */
-export interface Promotion {
-  id: number;
-  code: string;
-  event?: (number | null) | Event;
-  appliedTicketClasses?:
-    | {
-        ticketClass: string;
-        id?: string | null;
-      }[]
-    | null;
-  maxRedemptions: number;
-  totalUsed?: number | null;
-  perUserLimit: number;
-  conditions?: {
-    isApplyCondition?: boolean | null;
-    minTickets?: number | null;
-  };
-  discountApplyScope?: ('total_order_value' | 'per_order_item') | null;
-  discountType: 'percentage' | 'fixed_amount';
-  discountValue: number;
-  startDate: string;
-  endDate: string;
-  status: 'draft' | 'active' | 'disabled';
-  isPrivate?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "affiliate-links".
  */
 export interface AffiliateLink {
   id: number;
+  name?: string | null;
   affiliateUser: number | User;
   event?: (number | null) | Event;
   affiliateCode: string;
@@ -1220,6 +1296,74 @@ export interface Admin {
       }[]
     | null;
   password?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "checkinRecords".
+ */
+export interface CheckinRecord {
+  id: number;
+  event: number | Event;
+  user: number | User;
+  ticket: number | Ticket;
+  seat: string;
+  ticketCode: string;
+  eventScheduleId?: string | null;
+  eventDate?: string | null;
+  checkInTime?: string | null;
+  checkedInBy?: (number | null) | Admin;
+  ticketGivenTime?: string | null;
+  ticketGivenBy?: string | null;
+  deletedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tickets".
+ */
+export interface Ticket {
+  id: number;
+  attendeeName?: string | null;
+  user?: (number | null) | User;
+  userEmail?: string | null;
+  ticketCode?: string | null;
+  seat?: string | null;
+  ticketPriceName?: string | null;
+  ticketPriceInfo?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  event?: (number | null) | Event;
+  eventScheduleId?: string | null;
+  eventDate?: string | null;
+  orderItem?: (number | null) | OrderItem;
+  order?: (number | null) | Order;
+  orderCode?: string | null;
+  status?: ('booked' | 'pending_payment' | 'hold' | 'cancelled') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orderItems".
+ */
+export interface OrderItem {
+  id: number;
+  order: number | Order;
+  event: number | Event;
+  ticketPriceId: string;
+  ticketPriceName?: string | null;
+  seat?: string | null;
+  quantity: number;
+  price: number;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * Configure rules and conditions for promotions
@@ -2174,6 +2318,22 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'memberships';
+        value: number | Membership;
+      } | null)
+    | ({
+        relationTo: 'membership-rank-configs';
+        value: number | MembershipRankConfig;
+      } | null)
+    | ({
+        relationTo: 'membership-gifts';
+        value: number | MembershipGift;
+      } | null)
+    | ({
+        relationTo: 'membership-histories';
+        value: number | MembershipHistory;
+      } | null)
+    | ({
         relationTo: 'checkinRecords';
         value: number | CheckinRecord;
       } | null)
@@ -2709,6 +2869,76 @@ export interface UsersSelect<T extends boolean = true> {
   lastActive?: T;
   role?: T;
   affiliateStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "memberships_select".
+ */
+export interface MembershipsSelect<T extends boolean = true> {
+  user?: T;
+  totalPoints?: T;
+  membershipRank?: T;
+  lastActive?: T;
+  pointsExpirationDate?: T;
+  lastReceivedBirthdayPointAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membership-rank-configs_select".
+ */
+export interface MembershipRankConfigsSelect<T extends boolean = true> {
+  rankName?: T;
+  rankNameLabel?: T;
+  expiresIn?: T;
+  description?: T;
+  condition?:
+    | T
+    | {
+        minPoints?: T;
+      };
+  benefits?:
+    | T
+    | {
+        birthdayPoints?: T;
+        ticketGift?: T;
+        giftExpiresIn?: T;
+        discountPercentage?: T;
+        vipCheckIn?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membership-gifts_select".
+ */
+export interface MembershipGiftsSelect<T extends boolean = true> {
+  user?: T;
+  giftType?: T;
+  ticketGift?: T;
+  receivedAt?: T;
+  expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membership-histories_select".
+ */
+export interface MembershipHistoriesSelect<T extends boolean = true> {
+  user?: T;
+  membership?: T;
+  order?: T;
+  pointsBefore?: T;
+  pointsChange?: T;
+  pointsAfter?: T;
+  type?: T;
+  description?: T;
+  moreInformation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3261,6 +3491,7 @@ export interface AffiliateRankLogsSelect<T extends boolean = true> {
  * via the `definition` "affiliate-links_select".
  */
 export interface AffiliateLinksSelect<T extends boolean = true> {
+  name?: T;
   affiliateUser?: T;
   event?: T;
   affiliateCode?: T;

@@ -368,6 +368,7 @@
     "deselectAll": "Bỏ chọn tất cả"
   },
   "userprofile": {
+    "userProfile": "Thông tin tài khoản",
     "title": "Vé Đã Mua",
     "all": "Tất Cả",
     "success": "Thành Công",
@@ -410,7 +411,23 @@
       "accountSettings": "Cài Đặt Tài Khoản",
       "accountInfo": "Thông Tin Tài Khoản",
       "purchasedTickets": "Vé Đã Mua",
-      "myEvents": "Sự Kiện Của Tôi"
+      "myEvents": "Sự Kiện Của Tôi",
+      "becomeAmbassador": "Trở thành Đại sứ",
+      "affiliateTerms": "Đọc Điều khoản & Điều kiện dành cho Đại sứ",
+      "acceptTerms": "Tôi đồng ý với Điều khoản & Điều kiện dành cho Đại sứ",
+      "confirmBecomeAmbassador": "Xác nhận",
+      "cancel": "Hủy",
+      "pleaseReadTerms": "Vui lòng đọc kỹ điều khoản và điều kiện để trở thành Đại sứ",
+      "goToAffiliateDashboard": "Đến trang Đại sứ",
+      "affiliateDashboard": "Bảng điều khiển Đại sứ",
+      "affiliateDashboardDesc": "Xem hiệu suất, liên kết và phần thưởng của bạn với tư cách Đại sứ",
+      "affiliatePendingTitle": "Đang chờ duyệt Đại sứ",
+      "affiliatePendingDesc": "Yêu cầu trở thành Đại sứ của bạn đang được xem xét. Bạn sẽ nhận được thông báo khi được phê duyệt.",
+      "affiliateSuccessTitle": "Chúc mừng! Bạn đã trở thành Đại sứ!",
+      "affiliateSuccessDesc": "Yêu cầu trở thành Đại sứ của bạn đã được gửi.",
+      "affiliateErrorTitle": "Lỗi",
+      "affiliateErrorDesc": "Gửi yêu cầu thất bại. Vui lòng thử lại sau.",
+      "successToBecomeAmbassador": "Bạn có thể bắt đầu kiếm tiền bằng cách chia sẻ liên kết của mình."
     },
     "myEvents": "Sự kiện của tôi",
     "noEvents": "Bạn chưa có sự kiện nào",

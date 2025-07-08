@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { signJwtToken } from '@/app/(payload)/api/user/utils'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { verifyPassword } from '@/utilities/password'
+import { AFFILIATE_USER_STATUS, USER_ROLE } from '@/collections/Users/constants'
+import { signJwtToken } from '@/app/(user)/utils/auth/signJwtToken'
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +23,8 @@ export async function POST(req: NextRequest) {
       collection: 'users',
       where: { 
         email: { equals: email.toLowerCase() },
-        role: { equals: 'affiliate' }
+        role: { equals: USER_ROLE.affiliate.value },
+        affiliateStatus: { equals: AFFILIATE_USER_STATUS.approved.value }
      },
       limit: 1,
       select: {

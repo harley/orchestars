@@ -8,7 +8,7 @@ import { useTranslate } from '@/providers/I18n/client'
 import { Event } from '@/types/Event'
 import LoginForm from '@/components/User/LoginForm'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { logout } from '@/app/(frontend)/user/actions/logout'
+import { logout } from '@/app/(user)/user/actions/logout'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
 import { usePathname } from 'next/navigation'
 

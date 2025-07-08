@@ -45,11 +45,11 @@ const navigationItems = [
   //   url: '/affiliate/performance',
   //   icon: TrendingUp,
   // },
-  {
-    title: 'Analytics',
-    url: '/affiliate/analytics',
-    icon: BarChart3,
-  },
+  // {
+  //   title: 'Analytics',
+  //   url: '/affiliate/analytics',
+  //   icon: BarChart3,
+  // },
 ]
 
 const metricsItems = [

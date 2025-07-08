@@ -10,6 +10,7 @@ export const sendAffiliateSetupEmail: CollectionAfterChangeHook = async ({
   req,
   data,
   previousDoc,
+  context,
 }) => {
   // Only trigger for create operations and affiliate users
 
@@ -19,8 +20,8 @@ export const sendAffiliateSetupEmail: CollectionAfterChangeHook = async ({
 
   const isAllowSendingMail =
     previousDoc?.affiliateStatus !== AFFILIATE_USER_STATUS.approved.value &&
-    data?.affiliateStatus === AFFILIATE_USER_STATUS.approved.value
-
+    data?.affiliateStatus === AFFILIATE_USER_STATUS.approved.value &&
+    !context?.disableSendingAffiliateSetupEmail
 
   if (!isAllowSendingMail) {
     return doc
