@@ -23,10 +23,16 @@ const EventBanner = ({ event }: { event: Event }) => {
       ></div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className={`${event.slug === 'disney-25' ? 'rounded-xl shadow-xl overflow-hidden' : 'bg-white rounded-xl shadow-xl overflow-hidden'}`}>
-          <div className={`flex flex-col md:flex-row${event.slug === 'disney-25' ? ' items-stretch' : ''}`}>
+        <div
+          className={`${event.slug === 'disney-25' ? 'rounded-xl shadow-xl overflow-hidden' : 'bg-white rounded-xl shadow-xl overflow-hidden'}`}
+        >
+          <div
+            className={`flex flex-col md:flex-row${event.slug === 'disney-25' ? ' items-stretch' : ''}`}
+          >
             {/* Left Content */}
-            <div className={`flex flex-col ${event.slug === 'disney-25' ? 'flex-1 min-w-0 p-8 md:p-10 space-y-8' : 'md:w-5/12 p-8 md:p-10 space-y-8'}`}>
+            <div
+              className={`flex flex-col ${event.slug === 'disney-25' ? 'flex-1 min-w-0 p-8 md:p-10 space-y-8' : 'md:w-5/12 p-8 md:p-10 space-y-8'}`}
+            >
               {/* Title Section */}
               {!!event.configuration?.showBannerTitle && (
                 <div>
@@ -55,19 +61,33 @@ const EventBanner = ({ event }: { event: Event }) => {
                     </div>
                     <div className="text-gray-800">
                       <span className="font-medium">
-                        {tzFormat(toZonedTime(new Date(event.startDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm')} –&nbsp;
+                        {tzFormat(
+                          toZonedTime(new Date(event.startDatetime), 'Asia/Ho_Chi_Minh'),
+                          'HH:mm',
+                        )}{' '}
+                        –&nbsp;
                         {event.endDatetime
-                          ? tzFormat(toZonedTime(new Date(event.endDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm')
+                          ? tzFormat(
+                              toZonedTime(new Date(event.endDatetime), 'Asia/Ho_Chi_Minh'),
+                              'HH:mm',
+                            )
                           : ''}
                       </span>
                       <br />
                       <span className="text-gray-600">
-                        {tzFormat(toZonedTime(new Date(event.startDatetime), 'Asia/Ho_Chi_Minh'), 'dd/MM/yyyy')}
+                        {tzFormat(
+                          toZonedTime(new Date(event.startDatetime), 'Asia/Ho_Chi_Minh'),
+                          'dd/MM/yyyy',
+                        )}
                       </span>
                       {event.endDatetime && (
                         <span className="text-gray-600">
                           {' '}
-                          - {tzFormat(toZonedTime(new Date(event.endDatetime), 'Asia/Ho_Chi_Minh'), 'dd/MM/yyyy')}
+                          -{' '}
+                          {tzFormat(
+                            toZonedTime(new Date(event.endDatetime), 'Asia/Ho_Chi_Minh'),
+                            'dd/MM/yyyy',
+                          )}
                         </span>
                       )}
                     </div>
@@ -102,8 +122,27 @@ const EventBanner = ({ event }: { event: Event }) => {
               </div>
             </div>
 
+            <div className="relative w-full md:min-w-[200px] md:max-w-[40vw] flex-shrink-0 flex-grow-0 flex items-center justify-center p-4 md:p-0">
+              <div className="relative w-full h-[60vw] md:h-[500px] aspect-[3/4] flex items-center justify-center">
+                <Image
+                  src={
+                    (event.eventThumbnail as Media)?.url ||
+                    (event.eventBanner as Media)?.url ||
+                    (event?.mobileEventBanner as Media)?.url ||
+                    '/images/logos/logo-black-adjacent.png'
+                  }
+                  alt={event.title || 'Event'}
+                  className="object-contain w-full h-full"
+                  fill={false}
+                  width={600}
+                  height={800}
+                />
+                {/* No overlay for Disney-25, let default background show */}
+              </div>
+            </div>
+
             {/* Right Content - Event Banner Image */}
-            {event.slug === 'disney-25' ? (
+            {/* {event.slug === 'disney-25' ? (
               <div className="relative w-full md:min-w-[200px] md:max-w-[40vw] flex-shrink-0 flex-grow-0 flex items-center justify-center p-4 md:p-0">
                 <div className="relative w-full h-[60vw] md:h-[500px] aspect-[3/4] flex items-center justify-center">
                   <Image
@@ -114,7 +153,6 @@ const EventBanner = ({ event }: { event: Event }) => {
                     width={600}
                     height={800}
                   />
-                  {/* No overlay for Disney-25, let default background show */}
                 </div>
               </div>
             ) : (
@@ -142,11 +180,10 @@ const EventBanner = ({ event }: { event: Event }) => {
                     className="object-cover md:hidden"
                   />
 
-                  {/* Gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent pointer-events-none"></div>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>
