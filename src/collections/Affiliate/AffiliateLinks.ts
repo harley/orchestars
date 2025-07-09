@@ -1,5 +1,5 @@
 import { generateCode } from '@/utilities/generateCode'
-import type { CollectionConfig } from 'payload'
+import { APIError, type CollectionConfig } from 'payload'
 
 export const AffiliateLinks: CollectionConfig = {
   slug: 'affiliate-links',
@@ -154,6 +154,18 @@ export const AffiliateLinks: CollectionConfig = {
       ],
     },
     {
+      name: 'slug',
+      type: 'text',
+      required: false,
+      index: true,
+      admin: {
+        description: 'Slug for the affiliate link',
+        components: {
+          Field: '@/components/AdminViews/Affiliate/Links/ShortLink#ShortLink',
+        },
+      },
+    },
+    {
       name: 'targetLink',
       type: 'text',
       required: false,
@@ -172,6 +184,35 @@ export const AffiliateLinks: CollectionConfig = {
         { label: 'Disabled', value: 'disabled' },
       ],
       defaultValue: 'active',
+    },
+  ],
+  hooks: {
+    beforeValidate: [
+      async ({ data, originalDoc, req }) => {
+        // check duplication slug
+        const slug = data?.slug
+        if (!slug) return data
+
+        const existing = await req.payload.find({
+          collection: 'affiliate-links',
+          where: { slug: { equals: slug } },
+          limit: 1,
+          depth: 0,
+        })
+
+        const existingLink = existing?.docs?.[0]
+
+        if (existingLink && (!originalDoc || originalDoc.id !== existingLink.id)) {
+          throw new APIError('Short link has been already existed!', 400, {}, true)
+        }
+
+        return data
+      },
+    ],
+  },
+  indexes: [
+    {
+      fields: ['slug', 'status'],
     },
   ],
 }

@@ -72,6 +72,8 @@ import * as migration_20250702_060608_add_admin_session from './20250702_060608_
 import * as migration_20250702_131553_add_affiliate_status from './20250702_131553_add_affiliate_status';
 import * as migration_20250703_154624_add_name_affiliate_links from './20250703_154624_add_name_affiliate_links';
 import * as migration_20250706_140853_create_membership_collections from './20250706_140853_create_membership_collections';
+import * as migration_20250709_051135_remove_default_user_affiliate_status from './20250709_051135_remove_default_user_affiliate_status';
+import * as migration_20250709_051424_add_affiliate_link_slug from './20250709_051424_add_affiliate_link_slug';
 
 export const migrations = [
   {
@@ -442,6 +444,16 @@ export const migrations = [
   {
     up: migration_20250706_140853_create_membership_collections.up,
     down: migration_20250706_140853_create_membership_collections.down,
-    name: '20250706_140853_create_membership_collections'
+    name: '20250706_140853_create_membership_collections',
+  },
+  {
+    up: migration_20250709_051135_remove_default_user_affiliate_status.up,
+    down: migration_20250709_051135_remove_default_user_affiliate_status.down,
+    name: '20250709_051135_remove_default_user_affiliate_status',
+  },
+  {
+    up: migration_20250709_051424_add_affiliate_link_slug.up,
+    down: migration_20250709_051424_add_affiliate_link_slug.down,
+    name: '20250709_051424_add_affiliate_link_slug'
   },
 ];
