@@ -203,7 +203,7 @@ export const AffiliateLinks: CollectionConfig = {
         const existingLink = existing?.docs?.[0]
 
         if (existingLink && (!originalDoc || originalDoc.id !== existingLink.id)) {
-          throw new APIError('Short link has been already existed!', 400, {}, true)
+          throw new APIError('Short link already exists!', 400, {}, true)
         }
 
         return data
