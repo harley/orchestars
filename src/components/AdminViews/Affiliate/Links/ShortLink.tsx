@@ -7,7 +7,7 @@ import { Copy, CopyCheck } from 'lucide-react'
 export const ShortLink = (props: { path: string } & Record<string, any>) => {
   const { value: eventId } = useField<string>({ path: 'event' })
   const { value: promotionId } = useField<string>({ path: 'affiliatePromotion' })
-  const { setValue, value: slug } = useField<string>({ path: props.path })
+  const { setValue: setSlug, value: slug } = useField<string>({ path: props.path })
   const [copied, setCopied] = useState(false)
   const [event, setEvent] = useState<Event | null>()
   const [promotion, setPromotion] = useState<Promotion | null>()
@@ -18,7 +18,7 @@ export const ShortLink = (props: { path: string } & Record<string, any>) => {
       return setEvent(null)
     }
 
-    fetch(`/api/events/${eventId}`)
+    fetch(`/api/events/${eventId}?depth=0`)
       .then((res) => {
         if (res.ok) {
           return res.json()
@@ -38,7 +38,7 @@ export const ShortLink = (props: { path: string } & Record<string, any>) => {
       return setPromotion(null)
     }
 
-    fetch(`/api/promotions/${promotionId}`)
+    fetch(`/api/promotions/${promotionId}?depth=0`)
       .then((res) => {
         if (res.ok) {
           return res.json()
@@ -65,7 +65,25 @@ export const ShortLink = (props: { path: string } & Record<string, any>) => {
 
   useEffect(() => {
     // if the slug is set, no need to set default
-    if (slug) return
+    if (slug) {
+      // as only set event slu
+      let updatedSlug = slug
+      if (updatedSlug === event?.slug) {
+        if (promotion?.code) {
+          updatedSlug += `-${promotion.code.toLowerCase()}`
+
+          setSlug(updatedSlug)
+        }
+      } else if (promotion?.code && updatedSlug === `-${promotion.code.toLowerCase()}`) {
+        if (event?.slug) {
+          updatedSlug = `${event.slug}` + updatedSlug
+
+          setSlug(updatedSlug)
+        }
+      }
+
+      return
+    }
     let defaultSlug = ''
 
     if (event) {
@@ -76,8 +94,8 @@ export const ShortLink = (props: { path: string } & Record<string, any>) => {
       defaultSlug += `-${promotion.code.toLowerCase()}`
     }
 
-    setValue(defaultSlug)
-  }, [event, promotion, setValue, slug])
+    setSlug(defaultSlug)
+  }, [event, promotion, setSlug, slug])
 
   const generateSlug = (length: number = 8): string => {
     const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -88,7 +106,7 @@ export const ShortLink = (props: { path: string } & Record<string, any>) => {
       slug += letters[randomIndex]
     }
 
-    setValue(slug)
+    setSlug(slug)
 
     return slug
   }
@@ -128,7 +146,7 @@ export const ShortLink = (props: { path: string } & Record<string, any>) => {
               width: '100%',
             }}
             onChange={(e) => {
-              setValue(e.target.value)
+              setSlug(e.target.value)
             }}
           />
         </div>
