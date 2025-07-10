@@ -48,7 +48,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
         )}
       >
         <Globe size={16} className="" />
-        <span className="text-sm hidden sm:inline mt-1">{currentLanguage.code.toUpperCase()}</span>
+        <span className="text-sm inline mt-1">{currentLanguage.code.toUpperCase()}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-white backdrop-blur-md border-white/10">
         {languages.map((language) => (

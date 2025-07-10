@@ -164,5 +164,5 @@ function getClientIP(request: NextRequest): string {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/', '/events/:path*', '/((?!api|_next/static|_next/image|favicon.ico|admin).*)'],
+  matcher: ['/', '/events/:path*', '/((?!api|_next/static|_next/image|favicon.ico|admin|checkin).*)'],
 }
