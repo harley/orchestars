@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1', 10) || 1
     const limit = parseInt(searchParams.get('limit') || '10', 10) || 10
     const timeStatus = searchParams.get('timeStatus') // 'upcoming', 'past', or undefined for all
+    const ticketType = searchParams.get('ticketType')
 
     // Get current date for comparison
     const now = new Date()
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
           ? {
               startDatetime: { greater_than: now.toISOString() },
             }
-          : timeStatus === 'past'
+          : timeStatus === ''
             ? {
                 endDatetime: { less_than: now.toISOString() },
               }
@@ -45,6 +46,9 @@ export async function GET(req: NextRequest) {
       where: {
         user: {
           equals: userId,
+        },
+        status: {
+          equals: ticketType,
         },
         ...(eventIds.length > 0
           ? {

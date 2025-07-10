@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { Ticket } from '@/types/Ticket'
 
 interface TicketsResponse {
@@ -12,10 +12,11 @@ interface TicketsResponse {
 }
 
 interface UseTicketsProps {
-  type: 'upcoming' | 'past'
+  eventType: 'upcoming' | 'finished'
+  ticketType: 'booked' | 'cancelled' | 'gifted'
 }
 
-export function useTickets({ type }: UseTicketsProps) {
+export function useTickets({ eventType, ticketType }: UseTicketsProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [tickets, setTickets] = useState<Ticket[]>([])
@@ -23,47 +24,52 @@ export function useTickets({ type }: UseTicketsProps) {
   const [totalPages, setTotalPages] = useState(1)
   const cache = useRef<Map<string, TicketsResponse>>(new Map())
 
-  const fetchTickets = useCallback(async (page: number) => {
-    const cacheKey = `${type}-${page}`
-    
-    // Check cache first
-    const cachedData = cache.current.get(cacheKey)
+  const fetchTickets = useCallback(
+    async (page: number) => {
+      const cacheKey = `${eventType}-${ticketType}-${page}`
 
-    if (cachedData) {
-      setTickets(cachedData.data.docs)
-      setCurrentPage(cachedData.data.page)
-      setTotalPages(cachedData.data.totalPages)
-      return
-    }
+      // Check cache first
+      const cachedData = cache.current.get(cacheKey)
 
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const response = await fetch(
-        `/api/user/tickets?timeStatus=${type}&page=${page}&limit=10`,
-      )
-      const data: TicketsResponse = await response.json()
-
-      if (!response.ok) {
-        console.error('Failed to fetch tickets', data)
-        throw new Error((data as any)?.message || 'Failed to fetch tickets')
+      if (cachedData) {
+        setTickets(cachedData.data.docs)
+        setCurrentPage(cachedData.data.page)
+        setTotalPages(cachedData.data.totalPages)
+        return
       }
 
-      // Cache the response
-      cache.current.set(cacheKey, data)
+      setIsLoading(true)
+      setError(null)
 
-      setTickets(data.data.docs)
-      setCurrentPage(data.data.page)
-      setTotalPages(data.data.totalPages)
-    } catch (err) {
-      setError('Failed to load tickets')
-      console.error('Error fetching tickets:', err)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [type])
+      try {
+        const response = await fetch(
+          `/api/user/tickets?timeStatus=${eventType}&ticketType=${ticketType}&page=${page}&limit=10`,
+        )
+        const data: TicketsResponse = await response.json()
 
+        if (!response.ok) {
+          console.error('Failed to fetch tickets', data)
+          throw new Error((data as any)?.message || 'Failed to fetch tickets')
+        }
+
+        // Cache the response
+        cache.current.set(cacheKey, data)
+
+        setTickets(data.data.docs)
+        setCurrentPage(data.data.page)
+        setTotalPages(data.data.totalPages)
+      } catch (err) {
+        setError('Failed to load tickets')
+        console.error('Error fetching tickets:', err)
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [eventType, ticketType],
+  )
+  useEffect(() => {
+    fetchTickets(1)
+  }, [eventType, ticketType, fetchTickets])
   const nextPage = useCallback(() => {
     if (currentPage < totalPages) {
       fetchTickets(currentPage + 1)
@@ -86,6 +92,6 @@ export function useTickets({ type }: UseTicketsProps) {
     hasPrevPage: currentPage > 1,
     nextPage,
     prevPage,
-    refresh: () => fetchTickets(currentPage)
+    refresh: () => fetchTickets(currentPage),
   }
 }
