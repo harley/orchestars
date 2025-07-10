@@ -1,4 +1,4 @@
-import { Menu, ChevronDown, Ticket, User, LogOut, ChevronRight } from 'lucide-react'
+import { Menu, ChevronDown, Ticket, User, LogOut, ChevronRight, LogIn } from 'lucide-react'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
@@ -232,7 +232,7 @@ const Navbar = ({
                   aria-label={t('navbar.signInSignUp')}
                   title={t('navbar.signInSignUp')}
                 >
-                  <User size={24} />
+                  <LogIn size={24} />
                 </button>
                 {/* Login Modal */}
                 <Sheet open={loginOpen} onOpenChange={setLoginOpen}>
@@ -255,125 +255,177 @@ const Navbar = ({
                 </button>
               </SheetTrigger>
               <SheetContent side="right" className="bg-white border-gray-800">
-                <div className="flex flex-col mt-10 space-y-3 px-2">
-                  {/* Navigation links */}
-                  {navItems.map(({ link, children }) => {
-                    const hasChildren = children && children.length > 0
-                    const isSubMenuOpen = openSubMenu === (link.url ?? link.label)
-                    return (
-                      <div key={link.url ?? link.label}>
-                        {hasChildren ? (
-                          <button
-                            type="button"
-                            className="flex items-center justify-between w-full gap-3 px-4 py-3 rounded-xl font-semibold text-base text-black hover:bg-gray-100 transition focus:outline-none"
-                            onClick={() =>
-                              setOpenSubMenu(isSubMenuOpen ? null : (link.url ?? link.label))
-                            }
+                <div className="flex flex-col mt-8 space-y-1 px-2">
+                  {/* SECTION 1: PRIMARY NAVIGATION */}
+                  <div className="mb-2">
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">Navigation</h3>
+                    {navItems.map(({ link, children }) => {
+                      const hasChildren = children && children.length > 0
+                      const isSubMenuOpen = openSubMenu === (link.url ?? link.label)
+                      return (
+                        <div key={link.url ?? link.label}>
+                          {hasChildren ? (
+                            <button
+                              type="button"
+                              className="flex items-center justify-between w-full gap-3 px-4 py-3 rounded-xl font-medium text-base text-black hover:bg-gray-100 transition focus:outline-none"
+                              onClick={() =>
+                                setOpenSubMenu(isSubMenuOpen ? null : (link.url ?? link.label))
+                              }
+                            >
+                              <span className="flex items-center gap-3">{link.label}</span>
+                              <ChevronDown
+                                size={18}
+                                className={`transition-transform ${isSubMenuOpen ? 'rotate-180' : ''}`}
+                              />
+                            </button>
+                          ) : (
+                            <Link
+                              href={renderNavItemUrl(link)}
+                              onClick={() => setIsOpen(false)}
+                              className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-base text-black hover:bg-gray-100 transition"
+                            >
+                              {link.label}
+                            </Link>
+                          )}
+                          {/* Submenu */}
+                          {hasChildren && isSubMenuOpen && isArray(children) && (
+                            <div className="flex flex-col space-y-1 pl-8 py-2 bg-gray-50 rounded-lg animate-fade-in">
+                              {children.map((child) => (
+                                <Link
+                                  key={child.link?.url ?? child.link?.label}
+                                  href={renderNavItemUrl(child.link)}
+                                  onClick={() => setIsOpen(false)}
+                                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-black hover:bg-gray-200 transition"
+                                >
+                                  <ChevronRight size={16} />
+                                  {child.link?.label}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                    {navigationItems.map(({ link }) => {
+                      if (link.onClick) {
+                        return (
+                          <a
+                            key={link.url ?? link.label}
+                            href={link.url}
+                            onClick={link.onClick}
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-base text-black hover:bg-gray-100 transition"
                           >
-                            <span className="flex items-center gap-3">{link.label}</span>
-                            <ChevronDown
-                              size={18}
-                              className={`transition-transform ${isSubMenuOpen ? 'rotate-180' : ''}`}
-                            />
-                          </button>
-                        ) : (
+                            {link.label}
+                          </a>
+                        )
+                      } else if (link.isDropdown) {
+                        // Handle "Shows" dropdown in mobile
+                        const isSubMenuOpen = openSubMenu === link.label
+                        return (
+                          <div key={link.url ?? link.label}>
+                            <button
+                              type="button"
+                              className="flex items-center justify-between w-full gap-3 px-4 py-3 rounded-xl font-medium text-base text-black hover:bg-gray-100 transition focus:outline-none"
+                              onClick={() =>
+                                setOpenSubMenu(isSubMenuOpen ? null : link.label)
+                              }
+                            >
+                              <span className="flex items-center gap-3">{link.label}</span>
+                              <ChevronDown
+                                size={18}
+                                className={`transition-transform ${isSubMenuOpen ? 'rotate-180' : ''}`}
+                              />
+                            </button>
+                            {/* Shows submenu */}
+                            {isSubMenuOpen && (
+                              <div className="flex flex-col space-y-1 pl-8 py-2 bg-gray-50 rounded-lg animate-fade-in">
+                                {events && events.length > 0 ? (
+                                  events.map((event) => (
+                                    <Link
+                                      key={event.id}
+                                      href={`/events/${event.slug}`}
+                                      onClick={() => setIsOpen(false)}
+                                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-black hover:bg-gray-200 transition"
+                                    >
+                                      <ChevronRight size={16} />
+                                      {event.title}
+                                    </Link>
+                                  ))
+                                ) : (
+                                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-500">
+                                    <ChevronRight size={16} />
+                                    {t('home.noShows')}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      } else {
+                        return (
                           <Link
-                            href={renderNavItemUrl(link)}
+                            key={link.url ?? link.label}
+                            href={link.url || '#'}
                             onClick={() => setIsOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-base text-black hover:bg-gray-100 transition"
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-base text-black hover:bg-gray-100 transition"
                           >
                             {link.label}
                           </Link>
-                        )}
-                        {/* Submenu */}
-                        {hasChildren && isSubMenuOpen && isArray(children) && (
-                          <div className="flex flex-col space-y-1 pl-8 py-2 bg-gray-50 rounded-lg animate-fade-in">
-                            {children.map((child) => (
-                              <Link
-                                key={child.link?.url ?? child.link?.label}
-                                href={renderNavItemUrl(child.link)}
-                                onClick={() => setIsOpen(false)}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg text-base text-black hover:bg-gray-200 transition"
-                              >
-                                <ChevronRight size={16} />
-                                {child.link?.label}
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                  {navigationItems.map(({ link }) =>
-                    link.onClick ? (
-                      <a
-                        key={link.url ?? link.label}
-                        href={link.url}
-                        onClick={link.onClick}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-base text-black hover:bg-gray-100 transition"
-                      >
-                        {/* Optionally add an icon here if you have one for this nav item */}
-                        {link.label}
-                      </a>
-                    ) : link.isDropdown ? null : (
-                      <Link
-                        key={link.url ?? link.label}
-                        href={link.url || '#'}
-                        onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-base text-black hover:bg-gray-100 transition"
-                      >
-                        {/* Optionally add an icon here if you have one for this nav item */}
-                        {link.label}
-                      </Link>
-                    ),
-                  )}
-                  <hr className="my-2 border-gray-200" />
-                  {/* User actions */}
-                  {authData ? (
-                    <>
-                      <Link
-                        href="/user/profile"
-                        onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-base text-black hover:bg-gray-100 transition"
-                      >
-                        <User size={20} />
-                        {t('navbar.profile')}
-                      </Link>
-                      <form action={logout} className="w-full">
-                        <button
-                          type="submit"
-                          className="flex items-center gap-3 px-4 py-3 rounded-xl text-base text-red-600 hover:bg-gray-100 transition w-full text-left"
+                        )
+                      }
+                    })}
+                  </div>
+
+                  <hr className="my-3 border-gray-200" />
+
+                  {/* SECTION 2: ACCOUNT */}
+                  <div className="mb-2">
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">Account</h3>
+                    {authData ? (
+                      <>
+                        <Link
+                          href="/user/profile"
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 rounded-xl text-base text-black hover:bg-gray-100 transition"
                         >
-                          <LogOut size={20} />
-                          {t('navbar.logout')}
-                        </button>
-                      </form>
-                    </>
-                  ) : (
-                    <button
-                      className="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-full font-medium transition-all duration-200 hover:scale-105"
-                      onClick={() => {
-                        setIsOpen(false)
-                        setLoginOpen(true)
-                      }}
-                      aria-label={t('navbar.signInSignUp')}
-                      title={t('navbar.signInSignUp')}
-                    >
-                      <User size={24} /> {t('navbar.signInSignUp')}
-                    </button>
-                  )}
-                  <hr className="my-2 border-gray-200" />
-                  {/* Buy Ticket Now button for mobile */}
-                  {shouldShowBuyTicketButton && (
-                    <Link
-                      href={eventTicketPath}
-                      className="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-full font-medium transition-all duration-200 hover:scale-105"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <Ticket size={22} />
-                      {t('navbar.buyNow')}
-                    </Link>
-                  )}
+                          <User size={20} />
+                          {t('navbar.profile')}
+                        </Link>
+                        <form action={logout} className="w-full">
+                          <button
+                            type="submit"
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-base text-red-600 hover:bg-gray-100 transition w-full text-left"
+                          >
+                            <LogOut size={20} />
+                            {t('navbar.logout')}
+                          </button>
+                        </form>
+                      </>
+                    ) : (
+                      <button
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-base text-black hover:bg-gray-100 transition w-full text-left"
+                        onClick={() => {
+                          setIsOpen(false)
+                          setLoginOpen(true)
+                        }}
+                        aria-label={t('navbar.signInSignUp')}
+                        title={t('navbar.signInSignUp')}
+                      >
+                        <LogIn size={20} />
+                        {t('navbar.signInSignUp')}
+                      </button>
+                    )}
+                  </div>
+
+                  <hr className="my-3 border-gray-200" />
+
+                  {/* SECTION 3: PREFERENCES */}
+                  <div className="mb-2">
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">Language</h3>
+                    <div className="px-4 py-3">
+                      <LanguageSwitcher className="flex items-center space-x-2 h-10 px-3 rounded-full border border-gray-300 hover:bg-gray-50 transition-colors duration-200" />
+                    </div>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
