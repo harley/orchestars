@@ -1,5 +1,10 @@
+import ProtectedComponent from '@/components/User/Protected/Component'
 import MyTicketsPageClient from './page.client'
 
 export default function MyTicketsPage() {
-  return <MyTicketsPageClient />
+  return (
+    <ProtectedComponent>
+      <MyTicketsPageClient />
+    </ProtectedComponent>
+  )
 }
