@@ -34,6 +34,7 @@ import { SelectOrderCategory as SelectOrderCategory_049671e81ae6d06dcf2439baca2a
 import { ActionViews as ActionViews_c625c4a830674427dc2497d62b0046dd } from '@/components/AdminViews/Order/ActionViews'
 import { default as default_e6b30098bdd062bcc6e4cf9467eed8df } from '@/components/Tickets/Actions/SendMailButton'
 import { BackToManagementAffiliate as BackToManagementAffiliate_e4cfc8d47ceec056e42a7dd2643c7d64 } from '@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate'
+import { ShortLink as ShortLink_12ccbf8823640be71e7eeeb3f892bbdd } from '@/components/AdminViews/Affiliate/Links/ShortLink'
 import { TargetLink as TargetLink_fee2cd5f2a9fe1a01c55a441ca6e0d70 } from '@/components/AdminViews/Affiliate/Links/TargetLink'
 import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
@@ -90,6 +91,7 @@ export const importMap = {
   "@/components/AdminViews/Order/ActionViews#ActionViews": ActionViews_c625c4a830674427dc2497d62b0046dd,
   "@/components/Tickets/Actions/SendMailButton#default": default_e6b30098bdd062bcc6e4cf9467eed8df,
   "@/components/AdminViews/ManagementAffiliate/BackToManagementAffiliate#BackToManagementAffiliate": BackToManagementAffiliate_e4cfc8d47ceec056e42a7dd2643c7d64,
+  "@/components/AdminViews/Affiliate/Links/ShortLink#ShortLink": ShortLink_12ccbf8823640be71e7eeeb3f892bbdd,
   "@/components/AdminViews/Affiliate/Links/TargetLink#TargetLink": TargetLink_fee2cd5f2a9fe1a01c55a441ca6e0d70,
   "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,

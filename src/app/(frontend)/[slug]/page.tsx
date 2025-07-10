@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 
 import { PayloadRedirects } from '@/components/PayloadRedirects'
-import configPromise from '@payload-config'
-import { getPayload, type RequiredDataFromCollectionSlug } from 'payload'
+import { type RequiredDataFromCollectionSlug } from 'payload'
 import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
 import { homeStatic } from '@/endpoints/seed/home-static'
@@ -19,6 +18,8 @@ import { getLocale } from '@/providers/I18n/server'
 import { DEFAULT_FALLBACK_LOCALE, SupportedLocale } from '@/config/app'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import type { Header as HeaderType } from '@/payload-types'
+import { redirect } from 'next/navigation'
+import { getPayload } from '@/payload-config/getPayloadConfig'
 
 
 
@@ -29,7 +30,7 @@ export const dynamicParams = true
 
 export async function generateStaticParams() {
   
-  const payload = await getPayload({ config: configPromise })
+  const payload = await getPayload()
   const pages = await payload.find({
     collection: 'pages',
     draft: false,
@@ -74,6 +75,12 @@ export default async function Page({ params: paramsPromise }: Args) {
         {/* // </article> */}
       </>
     )
+  }
+
+  const affiliateLink = await queryAffiliateLinkBySlug({ slug })
+
+  if (affiliateLink?.targetLink) {
+    return redirect(affiliateLink.targetLink)
   }
 
   let page: RequiredDataFromCollectionSlug<'pages'> | null
@@ -136,7 +143,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 const queryPageBySlug = cache(async ({ slug, locale }: { slug: string, locale?: SupportedLocale }) => {
   const { isEnabled: draft } = await draftMode()
 
-  const payload = await getPayload({ config: configPromise })
+  const payload = await getPayload()
 
   const result = await payload.find({
     collection: 'pages',
@@ -150,6 +157,28 @@ const queryPageBySlug = cache(async ({ slug, locale }: { slug: string, locale?: 
       },
     },
     locale: locale || DEFAULT_FALLBACK_LOCALE,
+  })
+
+  return result.docs?.[0] || null
+})
+
+const queryAffiliateLinkBySlug = cache(async ({ slug }: { slug: string }) => {
+
+  const payload = await getPayload()
+
+  const result = await payload.find({
+    collection: 'affiliate-links',
+    limit: 1,
+    pagination: false,
+    depth: 0,
+    where: {
+      slug: {
+        equals: slug,
+      },
+      status: {
+        equals: 'active',
+      }
+    },
   })
 
   return result.docs?.[0] || null

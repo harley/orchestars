@@ -3,6 +3,7 @@ import payload from 'payload'
 import config from '@/payload.config'
 import { isAfter, isBefore } from 'date-fns'
 import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
+import { getNextBodyData } from '@/utilities/getNextBodyData'
 
 type SeatHoldingRequest = {
   code: string
@@ -11,7 +12,7 @@ type SeatHoldingRequest = {
 
 export async function POST(request: NextRequest) {
   try {
-    const body: SeatHoldingRequest = await request.json()
+    const body: SeatHoldingRequest = await getNextBodyData(request)
     if (!body.code) {
       throw new Error('PROMO001')
     }
@@ -123,6 +124,7 @@ export async function GET(request: NextRequest, _context: any) {
             conditions: true,
             discountApplyScope: true,
           },
+          depth: 0,
         })
         .then((res) => res.docs),
       payload

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 
 import { useToast } from '@/hooks/use-toast'
@@ -29,10 +29,14 @@ const SelectTicket = ({
   event,
   unavailableSeats,
   eventScheduleId,
+  promotions,
+  eventPromotionConfig,
 }: {
   event: Event
   unavailableSeats?: string[]
   eventScheduleId: string
+  promotions?: Promotion[]
+  eventPromotionConfig?: PromotionConfig
 }) => {
   const router = useRouter()
   const { toast } = useToast()
@@ -148,8 +152,8 @@ const SelectTicket = ({
     }
   }
 
-  const [promotions, setPromotions] = useState<Promotion[]>([])
-  const [eventPromotionConfig, setEventPromotionConfig] = useState<PromotionConfig>()
+  // const [promotions, setPromotions] = useState<Promotion[]>([])
+  // const [eventPromotionConfig, setEventPromotionConfig] = useState<PromotionConfig>()
 
   const handleCloseCheckoutModal = () => {
     if (showCheckout) {
@@ -158,17 +162,17 @@ const SelectTicket = ({
     }
   }
 
-  useEffect(() => {
-    fetch(`/api/promotion?eventId=${event.id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setPromotions(data?.promotions || [])
-        setEventPromotionConfig(data?.eventPromotionConfig)
-      })
-      .catch((err) => {
-        console.log('Error while fetching promotions', err)
-      })
-  }, [event.id])
+  // useEffect(() => {
+  //   fetch(`/api/promotion?eventId=${event.id}`)
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       setPromotions(data?.promotions || [])
+  //       setEventPromotionConfig(data?.eventPromotionConfig)
+  //     })
+  //     .catch((err) => {
+  //       console.log('Error while fetching promotions', err)
+  //     })
+  // }, [event.id])
 
   return (
     <section className="py-10">
@@ -325,7 +329,7 @@ const SelectTicket = ({
                 }}
                 selectedSeats={selectedSeats}
                 event={event}
-                promotions={promotions}
+                promotions={promotions || []}
                 eventScheduleId={eventScheduleId}
                 eventPromotionConfig={eventPromotionConfig}
               />

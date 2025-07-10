@@ -27,8 +27,6 @@ export const sendTicketMail = async ({
       eventLocation: data.eventLocation
     })
 
-    await new Promise((resolve) => setTimeout(resolve, 1000)) // Delay of 1 second
-
     const resendMailData = {
       to: user.email,
       cc: EMAIL_CC,

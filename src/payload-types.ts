@@ -1262,6 +1262,10 @@ export interface AffiliateLink {
     content?: string | null;
   };
   /**
+   * Slug for the affiliate link
+   */
+  slug?: string | null;
+  /**
    * Target link for the affiliate
    */
   targetLink?: string | null;
@@ -3506,6 +3510,7 @@ export interface AffiliateLinksSelect<T extends boolean = true> {
         term?: T;
         content?: T;
       };
+  slug?: T;
   targetLink?: T;
   status?: T;
   updatedAt?: T;

@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     } catch (error: any) {
       await payload.db.rollbackTransaction(transactionID)
 
-      logError({
+      await logError({
         payload,
         action: 'PAYMENT_CALLBACK_ERROR',
         description: `Error processing payment callback: ${error instanceof Error ? error.message : 'An unknown error occurred'}`,
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
   } catch (error: any) {
     console.error('Error processing payment:', error)
-    logError({
+    await logError({
       payload,
       action: 'PAYMENT_CALLBACK_ERROR',
       description: `Error processing payment callback: ${error instanceof Error ? error.message : 'An unknown error occurred'}`,
