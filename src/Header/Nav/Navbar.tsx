@@ -306,27 +306,74 @@ const Navbar = ({
                         </div>
                       )
                     })}
-                    {navigationItems.map(({ link }) =>
-                      link.onClick ? (
-                        <a
-                          key={link.url ?? link.label}
-                          href={link.url}
-                          onClick={link.onClick}
-                          className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-base text-black hover:bg-gray-100 transition"
-                        >
-                          {link.label}
-                        </a>
-                      ) : link.isDropdown ? null : (
-                        <Link
-                          key={link.url ?? link.label}
-                          href={link.url || '#'}
-                          onClick={() => setIsOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-base text-black hover:bg-gray-100 transition"
-                        >
-                          {link.label}
-                        </Link>
-                      ),
-                    )}
+                    {navigationItems.map(({ link }) => {
+                      if (link.onClick) {
+                        return (
+                          <a
+                            key={link.url ?? link.label}
+                            href={link.url}
+                            onClick={link.onClick}
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-base text-black hover:bg-gray-100 transition"
+                          >
+                            {link.label}
+                          </a>
+                        )
+                      } else if (link.isDropdown) {
+                        // Handle "Shows" dropdown in mobile
+                        const isSubMenuOpen = openSubMenu === link.label
+                        return (
+                          <div key={link.url ?? link.label}>
+                            <button
+                              type="button"
+                              className="flex items-center justify-between w-full gap-3 px-4 py-3 rounded-xl font-medium text-base text-black hover:bg-gray-100 transition focus:outline-none"
+                              onClick={() =>
+                                setOpenSubMenu(isSubMenuOpen ? null : link.label)
+                              }
+                            >
+                              <span className="flex items-center gap-3">{link.label}</span>
+                              <ChevronDown
+                                size={18}
+                                className={`transition-transform ${isSubMenuOpen ? 'rotate-180' : ''}`}
+                              />
+                            </button>
+                            {/* Shows submenu */}
+                            {isSubMenuOpen && (
+                              <div className="flex flex-col space-y-1 pl-8 py-2 bg-gray-50 rounded-lg animate-fade-in">
+                                {events && events.length > 0 ? (
+                                  events.map((event) => (
+                                    <Link
+                                      key={event.id}
+                                      href={`/events/${event.slug}`}
+                                      onClick={() => setIsOpen(false)}
+                                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-black hover:bg-gray-200 transition"
+                                    >
+                                      <ChevronRight size={16} />
+                                      {event.title}
+                                    </Link>
+                                  ))
+                                ) : (
+                                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-500">
+                                    <ChevronRight size={16} />
+                                    {t('home.noShows')}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      } else {
+                        return (
+                          <Link
+                            key={link.url ?? link.label}
+                            href={link.url || '#'}
+                            onClick={() => setIsOpen(false)}
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-base text-black hover:bg-gray-100 transition"
+                          >
+                            {link.label}
+                          </Link>
+                        )
+                      }
+                    })}
                   </div>
 
                   <hr className="my-3 border-gray-200" />
