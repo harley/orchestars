@@ -16,13 +16,11 @@ export const Logo = (props: Props) => {
   return (
     <img
       alt="Admin Logo"
-      width={193}
-      height={34}
       loading={loading}
       fetchPriority={priority}
       decoding="async"
       className={clsx('max-w-[9.375rem] w-full h-[34px]', className)}
-      src="/logos/logo-black-adjacent.png"
+      src="/logos/logo-white-adjacent.png"
     />
   )
 }
