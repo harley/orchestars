@@ -22,6 +22,7 @@ export interface QRScannerProps {
    */
   scanDelay?: number
   className?: string
+  paused?: boolean
 }
 
 const DEFAULT_DELAY = 700 // ms
@@ -31,6 +32,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({
   onError,
   scanDelay = DEFAULT_DELAY,
   className,
+  paused = false,
 }) => {
   const [lastValue, setLastValue] = useState<string | null>(null)
   const [lastTime, setLastTime] = useState<number>(0)
@@ -69,6 +71,8 @@ export const QRScanner: React.FC<QRScannerProps> = ({
         onScan={handleScan}
         onError={handleError}
         scanDelay={scanDelay}
+        paused={paused}
+        allowMultiple={true}
         formats={['qr_code']}
         /* Video will fill container */
         styles={{

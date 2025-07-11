@@ -1,33 +1,29 @@
 import { NextResponse } from 'next/server'
-import { headers as getHeaders } from 'next/headers'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 
 export async function GET() {
   try {
     const payload = await getPayload()
-    const headers = await getHeaders()
-    const { user } = await payload.auth({ headers })
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized - Invalid admin user' }, { status: 401 })
-    }
+    const oneDayAgo = new Date()
+    oneDayAgo.setDate(oneDayAgo.getDate() - 1)
 
-    // Query checkin records created by this user
-    // todo using pagination
     const result = await payload.find({
       collection: 'checkinRecords',
       where: {
         createdAt: {
-          greater_than: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(),
+          greater_than: oneDayAgo.toISOString(),
         },
         deletedAt: { equals: null },
       },
       sort: '-createdAt',
+      limit: 20,
+      depth: 1,
     })
 
-    return NextResponse.json({ records: result.docs }, { status: 200 })
-  } catch (error) {
-    console.error('Check-in query error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ docs: result.docs }, { status: 200 })
+  } catch (err) {
+    console.error('history-checkin-record error', err)
+    return NextResponse.json({ message: 'Error fetching history' }, { status: 500 })
   }
 }

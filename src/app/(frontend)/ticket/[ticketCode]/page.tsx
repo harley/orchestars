@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { cache } from 'react'
-import type { Ticket } from '@/payload-types'
+import type { Ticket, CheckinRecord } from '@/payload-types'
 import { QRCodeComponent } from '@/components/QRCode'
 import { Gutter } from '@payloadcms/ui'
 import { Calendar, MapPin, Wallet } from 'lucide-react'
@@ -36,6 +36,21 @@ export async function generateMetadata({ params }: { params: { ticketCode: strin
 
 export default async function TicketPage({ params: { ticketCode } }: { params: { ticketCode: string } }) {
   const ticket = await queryTicketByCode({ ticketCode })
+
+  // Fetch checkin record to see if already checked in
+  const payload = await getPayload({ config: configPromise })
+  const checkinRes = await payload.find({
+    collection: 'checkinRecords',
+    limit: 1,
+    pagination: false,
+    where: {
+      ticketCode: {
+        equals: ticketCode.toUpperCase(),
+      },
+    },
+  })
+  const checkedInRecord = (checkinRes?.docs?.[0] as CheckinRecord | undefined) ?? null
+  const isCheckedIn = Boolean(checkedInRecord)
 
   if (!ticket) {
     return (
@@ -95,7 +110,13 @@ export default async function TicketPage({ params: { ticketCode } }: { params: {
             </div>
             <div>
               <p className="text-gray-500">Status</p>
-              <p className="font-medium text-emerald-600 capitalize">{ticket.status || 'Going'}</p>
+              <p
+                className={
+                  isCheckedIn ? 'font-medium text-emerald-600' : 'font-medium text-gray-800'
+                }
+              >
+                {isCheckedIn ? '✅ Checked In' : ticket.status || 'Booked'}
+              </p>
             </div>
           </div>
 
