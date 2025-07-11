@@ -42,7 +42,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <GTM_NO_SCRIPT gtmKey={GOOGLE_TAG_MANAGER_KEY} />
-        <Providers>
+        <Providers locale={lang}>
           {/* <AdminBar
             adminBarProps={{
               preview: isEnabled,

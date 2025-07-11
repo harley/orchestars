@@ -1,3 +1,4 @@
+'use client'
 import React, { useMemo } from 'react'
 import { Globe } from 'lucide-react'
 import {
@@ -7,8 +8,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
-import { getCookie, setCookie } from '@/utilities/clientCookies'
-import { DEFAULT_FALLBACK_LOCALE } from '@/config/app'
+import { setCookie } from '@/utilities/clientCookies'
+import { useTranslate } from '@/providers/I18n/client'
 
 type Language = {
   code: string
@@ -23,11 +24,10 @@ const languages: Language[] = [
 
 interface LanguageSwitcherProps {
   className?: string
-  locale?: string
 }
 
 const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
-  const locale = getCookie('next-locale') || DEFAULT_FALLBACK_LOCALE
+  const { locale } = useTranslate()
 
   const currentLanguage = useMemo(() => {
     return languages.find((l) => l.code === (locale as string)) || (languages[0] as Language)
