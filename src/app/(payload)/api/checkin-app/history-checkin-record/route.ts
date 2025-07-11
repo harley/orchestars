@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
+import { checkAuthenticated } from '@/utilities/checkAuthenticated'
+import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 
 export async function GET() {
+  const authData = await checkAuthenticated()
+  if (!authData?.user || !isAdminOrSuperAdminOrEventAdmin({ req: { user: authData.user } })) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
   try {
     const payload = await getPayload()
 
