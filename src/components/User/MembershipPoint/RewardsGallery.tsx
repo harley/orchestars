@@ -77,7 +77,7 @@ export function RewardsGallery({ rewards, className }: RewardsGalleryProps) {
                     </Badge>
                   </div>
                   
-                  <p className="text-sm text-muted-foreground line-clamp-2 truncate">
+                  <p className="text-sm text-muted-foreground truncate">
                     {reward.description}
                   </p>
                   

@@ -43,7 +43,7 @@ const mockOrders = [
     description: "Friend Referral Bonus",
     amount: 0,
     pointsEarned: 500,
-    type: "purchase" as const
+    type: "bonus" as const
   },
   {
     id: "4",
@@ -92,17 +92,20 @@ const MembershipPoint = ({ className } : { className?: string }) => {
 
   // Animate points counter on load
   useEffect(() => {
-    const timer = setInterval(() => {
-      setPointsCounter(prev => {
-        if (prev < mockUserData.currentPoints) {
-          return Math.min(prev + 150, mockUserData.currentPoints);
-        }
-        clearInterval(timer);
-        return prev;
-      });
-    }, 20);
-
-    return () => clearInterval(timer);
+    let animationFrameId: number;
+    const startTime = performance.now();
+    const duration = 2000; // Animation duration in milliseconds
+    const animateCounter = (currentTime: number) => {
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(elapsedTime / duration, 1);
+      const currentValue = Math.round(progress * mockUserData.currentPoints);
+      setPointsCounter(currentValue);
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(animateCounter);
+      }
+    };
+    animationFrameId = requestAnimationFrame(animateCounter);
+    return () => cancelAnimationFrame(animationFrameId);
   }, []);
 
   useEffect(() => {
