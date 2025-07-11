@@ -105,7 +105,7 @@ async function checkCheckinAuth(request: NextRequest): Promise<boolean> {
 
   try {
     // Make internal API call to verify auth and permissions
-    const baseUrl = new URL(request.url).origin
+    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL
     const authRes = await fetch(`${baseUrl}/api/checkin-app/verify-auth`, {
       method: 'GET',
       headers: {
@@ -167,7 +167,7 @@ async function logAffiliateClick(
     }
 
     // Make internal API call to log the click
-    const baseUrl = new URL(request.url).origin
+    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL
     await fetch(`${baseUrl}/api/affiliate/track`, {
       method: 'POST',
       headers: {
