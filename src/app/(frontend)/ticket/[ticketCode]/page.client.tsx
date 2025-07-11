@@ -5,6 +5,7 @@ import type { Ticket } from '@/payload-types'
 import { QRCodeComponent } from '@/components/QRCode'
 import { Calendar, Download, MapPin } from 'lucide-react'
 import html2canvas from 'html2canvas'
+import DOMPurify from 'dompurify'
 import { useTranslate } from '@/providers/I18n/client'
 
 export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheckedIn: boolean }) {
@@ -26,7 +27,7 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
         },
       }).then(canvas => {
         const link = document.createElement('a')
-        link.download = `ticket-${ticket.ticketCode}.png`
+        link.download = `ticket-${DOMPurify.sanitize(ticket.ticketCode || '')}.png`
         link.href = canvas.toDataURL('image/png')
         link.click()
       })
@@ -56,7 +57,12 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
             <span className="inline-flex items-center bg-gray-200 text-gray-800 text-xs font-bold uppercase tracking-wider rounded-md px-3 py-1.5">
               {t('ticket.ticket')}
             </span>
-            {event?.title && <h2 className="text-2xl font-bold mt-2">{event.title}</h2>}
+            {event?.title && (
+              <h2
+                className="text-2xl font-bold mt-2"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.title) }}
+              />
+            )}
           </div>
           <div className="text-right flex-shrink-0">
             <p
@@ -96,7 +102,10 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
       {/* QR Section */}
       <section className="flex justify-center p-6 border-b border-gray-100">
         {isBooked ? (
-          <QRCodeComponent payload={ticket.ticketCode || ''} className="w-56 h-56" />
+          <QRCodeComponent
+            payload={DOMPurify.sanitize(ticket.ticketCode || '')}
+            className="w-56 h-56"
+          />
         ) : (
           <div className="w-56 h-56 bg-gray-100 flex items-center justify-center rounded-lg">
             <p className="text-gray-500 text-center">QR code available for booked tickets only.</p>
