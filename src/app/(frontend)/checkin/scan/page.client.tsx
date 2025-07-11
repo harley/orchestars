@@ -4,6 +4,9 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { QRScanner } from '@/components/QRScanner'
 import { MapPin } from 'lucide-react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
+import ErrorBoundary from './ErrorBoundary'
+
 interface _ValidateResponse {
   status: number
   ticket?: {
@@ -14,6 +17,21 @@ interface _ValidateResponse {
   checkedInAt?: string
 }
 
+// Lazy load the history component
+const HistorySection = dynamic(() => import('./HistorySection'), {
+  ssr: false,
+  loading: () => (
+    <div className="mt-6 w-full max-w-md">
+      <h2 className="text-lg font-semibold mb-2">Recent Check-ins</h2>
+      <div className="animate-pulse space-y-1">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="bg-white/10 px-3 py-2 rounded h-10" />
+        ))}
+      </div>
+    </div>
+  ),
+})
+
 export const ScanPageClient: React.FC = () => {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
     null,
@@ -23,38 +41,30 @@ export const ScanPageClient: React.FC = () => {
     [],
   )
 
-  // Fetch initial recent check-ins
-  useEffect(() => {
-    ;(async () => {
-      try {
-        const res = await fetch('/api/checkin-app/history-checkin-record')
-        if (res.ok) {
-          const data = (await res.json()) as { docs: { ticketCode: string; createdAt: string }[] }
-          setHistory(
-            data.docs.slice(0, 20).map((d) => ({
-              code: d.ticketCode,
-              status: 'success' as const,
-              time: new Date(d.createdAt),
-            })),
-          )
-        }
-      } catch (err) {
-        console.error('Fetch history error', err)
-      }
-    })()
-  }, [])
+  const [cameraReady, setCameraReady] = useState(false)
 
-  const timeAgo = (date: Date) => {
-    const diff = Date.now() - date.getTime()
-    const sec = Math.floor(diff / 1000)
-    if (sec < 60) return `${sec}s ago`
-    const min = Math.floor(sec / 60)
-    if (min < 60) return `${min}m ago`
-    const hr = Math.floor(min / 60)
-    if (hr < 24) return `${hr}h ago`
-    const d = Math.floor(hr / 24)
-    return `${d}d ago`
-  }
+  // Preload camera permissions and resources
+  useEffect(() => {
+    const preloadCamera = async () => {
+      try {
+        // Request camera permission early
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: 'environment' } 
+          })
+          // Stop the stream immediately, we just wanted to get permission
+          stream.getTracks().forEach(track => track.stop())
+          setCameraReady(true)
+        }
+      } catch (error) {
+        console.log('Camera permission not granted or not available:', error)
+        // Don't block the UI, scanner will handle this gracefully
+        setCameraReady(true)
+      }
+    }
+
+    preloadCamera()
+  }, [])
 
   const validateAndCheckIn = useCallback(async (ticketCode: string) => {
     try {
@@ -109,7 +119,13 @@ export const ScanPageClient: React.FC = () => {
     <div className="min-h-screen bg-black text-white flex flex-col items-center py-6">
       {/* Scanner box */}
       <div className="relative w-64 h-64 rounded overflow-hidden border-2 border-white">
-        <QRScanner onScan={validateAndCheckIn} paused={!!feedback} className="w-full h-full" />
+        {cameraReady ? (
+          <QRScanner onScan={validateAndCheckIn} paused={!!feedback} className="w-full h-full" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-800">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+          </div>
+        )}
       </div>
 
       {/* Feedback overlay */}
@@ -124,24 +140,10 @@ export const ScanPageClient: React.FC = () => {
         </div>
       )}
 
-      {/* History */}
-      <div className="mt-6 w-full max-w-md">
-        <h2 className="text-lg font-semibold mb-2">Recent Check-ins</h2>
-        <ul className="space-y-1 text-sm">
-          {history.length === 0 && <li className="text-gray-400">No scans yet</li>}
-          {history.map((h, idx) => (
-            <li key={idx} className="flex justify-between bg-white/10 px-3 py-2 rounded">
-              <span>{h.code}</span>
-              <span className="flex gap-2 items-center">
-                <span className={h.status === 'success' ? 'text-emerald-400' : 'text-red-400'}>
-                  {h.status}
-                </span>
-                <span className="text-gray-400 text-xs">{timeAgo(h.time)}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {/* Lazy-loaded History with Error Boundary */}
+      <ErrorBoundary>
+        <HistorySection history={history} setHistory={setHistory} />
+      </ErrorBoundary>
 
       {/* Manual entry fallback */}
       <div className="mt-auto pt-6">

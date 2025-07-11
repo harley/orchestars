@@ -9,6 +9,18 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next()
   const url = new URL(request.url)
 
+  // --- Check-in Authentication Start ---
+  if (request.nextUrl.pathname.startsWith('/checkin/') && 
+      request.nextUrl.pathname !== '/checkin' && 
+      !request.nextUrl.pathname.startsWith('/checkin/logout/')) {
+    
+    const authResult = await checkCheckinAuth(request)
+    if (!authResult) {
+      return NextResponse.redirect(new URL('/admin', request.url))
+    }
+  }
+  // --- Check-in Authentication End ---
+
   const locale =
     typeof url.searchParams.get('locale') === 'string'
       ? url.searchParams.get('locale')?.toLowerCase()
@@ -84,6 +96,32 @@ export async function middleware(request: NextRequest) {
   // --- Affiliate Tracking End ---
 
   return response
+}
+
+// Check authentication for checkin routes
+async function checkCheckinAuth(request: NextRequest): Promise<boolean> {
+  try {
+    const payloadToken = request.cookies.get('payload-token')?.value
+    
+    if (!payloadToken) {
+      return false
+    }
+
+    // Make internal API call to verify auth and permissions
+    const baseUrl = new URL(request.url).origin
+    const authRes = await fetch(`${baseUrl}/api/checkin-app/verify-auth`, {
+      method: 'GET',
+      headers: {
+        'Cookie': `payload-token=${payloadToken}`,
+        'X-Api-Key': X_API_KEY, // Mark as internal request
+      },
+    })
+
+    return authRes.ok
+  } catch (error) {
+    console.error('Error checking checkin auth:', error)
+    return false
+  }
 }
 
 // Generate a simple session ID
@@ -164,5 +202,5 @@ function getClientIP(request: NextRequest): string {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/', '/events/:path*', '/((?!api|_next/static|_next/image|favicon.ico|admin|checkin).*)'],
+  matcher: ['/', '/events/:path*', '/((?!api|_next/static|_next/image|favicon.ico|admin).*)'],
 }

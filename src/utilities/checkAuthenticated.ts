@@ -1,7 +1,8 @@
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { headers as getHeaders } from 'next/headers'
+import { cache } from 'react'
 
-export const checkAuthenticated = async () => {
+export const checkAuthenticated = cache(async () => {
   try {
     const payload = await getPayload()
     const headers = await getHeaders()
@@ -10,4 +11,4 @@ export const checkAuthenticated = async () => {
   } catch (_error) {
     return null
   }
-}
+})

@@ -8,23 +8,39 @@ export async function GET() {
   if (!authData?.user || !isAdminOrSuperAdminOrEventAdmin({ req: { user: authData.user } })) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  
   try {
     const payload = await getPayload()
 
     const oneDayAgo = new Date()
     oneDayAgo.setDate(oneDayAgo.getDate() - 1)
 
+    // Optimized query with explicit field selection and improved where clause
     const result = await payload.find({
       collection: 'checkinRecords',
       where: {
-        createdAt: {
-          greater_than: oneDayAgo.toISOString(),
-        },
-        deletedAt: { equals: null },
+        and: [
+          {
+            createdAt: {
+              greater_than: oneDayAgo.toISOString(),
+            },
+          },
+          {
+            or: [
+              { deletedAt: { exists: false } },
+              { deletedAt: { equals: null } },
+            ],
+          },
+        ],
+      },
+      select: {
+        id: true,
+        ticketCode: true,
+        createdAt: true,
       },
       sort: '-createdAt',
       limit: 20,
-      depth: 1,
+      depth: 0, // Avoid loading related documents
     })
 
     return NextResponse.json({ docs: result.docs }, { status: 200 })
