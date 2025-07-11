@@ -1,5 +1,10 @@
 import MembershipPointPageClient from './page.client'
+import ProtectedComponent from '@/components/User/Protected/Component'
 
 export default function MyEventsPage() {
-  return <MembershipPointPageClient />
+  return (
+    <ProtectedComponent>
+      <MembershipPointPageClient />
+    </ProtectedComponent>
+  )
 }
