@@ -45,7 +45,7 @@ export const TicketCard: React.FC<{ ticket: Ticket }> = ({ ticket }) => {
           )}
           {ticket.status === 'pending_payment' && (
             <span className="inline-block bg-yellow-500 text-xs px-2 py-1 rounded">
-              {t('userprofile.statusProcessing')}
+              {t('userprofile.statusPendingPayment')}
             </span>
           )}
           {ticket.status === 'hold' && (
@@ -53,7 +53,7 @@ export const TicketCard: React.FC<{ ticket: Ticket }> = ({ ticket }) => {
               {t('userprofile.statusHold')}
             </span>
           )}
-          {ticket.status === 'cancelled' && (
+          {ticket.status === 'canceled' && (
             <span className="inline-block bg-red-600 text-xs px-2 py-1 rounded">
               {t('userprofile.statusCancelled')}
             </span>

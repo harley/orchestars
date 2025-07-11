@@ -11,9 +11,9 @@ export const TICKET_STATUS = {
     label: 'Hold', // The seat is hold while pending user continue to pay
     value: 'hold',
   },
-  cancelled: {
-    label: 'Cancelled', // The seat has been cancelled by user: eg user has not paid for this ticket
-    value: 'cancelled',
+  canceled: {
+    label: 'Canceled', // The seat has been cancelled by user: eg user has not paid for this ticket
+    value: 'canceled',
   },
 }
 
