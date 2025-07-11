@@ -12,7 +12,7 @@ export const TICKET_STATUS = {
     value: 'hold',
   },
   cancelled: {
-    label: 'Cancelled', // The seat has been cancelled by user: eg user has not paid for this ticket
+    label: 'Canceled', // The seat has been cancelled by user: eg user has not paid for this ticket
     value: 'cancelled',
   },
 }
