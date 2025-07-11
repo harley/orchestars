@@ -24,15 +24,16 @@ export async function POST(req: NextRequest) {
     if (!result.user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
+    const cookieStore = await cookies()
 
     if (!isAdminOrSuperAdminOrEventAdmin({ req: { user: result.user } })) {
+      cookieStore.delete('payload-token')
       return NextResponse.json(
         { error: 'Unauthorized access. Only event admins can access the check-in app.' },
         { status: 403 },
       )
     }
 
-    const cookieStore = await cookies()
     cookieStore.set('payload-token', result.token as string, {
       maxAge: 60 * 60 * 24 * 1, // 1 day
       httpOnly: true,

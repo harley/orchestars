@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/providers/CheckIn/useAuth'
 import { Clock3, X } from 'lucide-react'
 import { useTranslate } from '@/providers/I18n/client'
 import { useToast } from '@/hooks/use-toast'
@@ -20,27 +19,15 @@ interface CheckinRecord {
 export default function HistoryClientPage({ history = [] }: { history: CheckinRecord[] }) {
   const [checkins, setCheckins] = useState<CheckinRecord[]>(history)
   const router = useRouter()
-  const { isHydrated, token } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const { t } = useTranslate()
   const { toast } = useToast()
 
-  useEffect(() => {
-    if (!isHydrated) return
-    if (!token) {
-      router.replace('/checkin')
-      return
-    }
-  }, [isHydrated, token, router])
-
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (ticketCode: string) => {
     if (!confirm(t('checkin.confirmDeleteRecord'))) return
     try {
-      const response = await fetch(`/api/checkin-app/checkin/${id}/delete-checkin`, {
+      const response = await fetch(`/api/checkin-app/checkin/${ticketCode}/delete-checkin`, {
         method: 'POST',
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
       })
       if (!response.ok) {
         const error = await response.json()
@@ -51,7 +38,7 @@ export default function HistoryClientPage({ history = [] }: { history: CheckinRe
         })
         return
       }
-      setCheckins((prev) => prev.filter((item) => item.id !== id))
+      setCheckins((prev) => prev.filter(item => item.ticketCode !== ticketCode))
 
       toast({
         description: t('checkin.recordDeletedSuccessfully'),

@@ -9,6 +9,7 @@ import { headers as getHeaders } from 'next/headers'
 import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
+import { revalidateTag } from 'next/cache'
 // import { getClientSideURL } from '@/utilities/getURL'
 
 export async function POST(req: NextRequest) {
@@ -48,6 +49,8 @@ export async function POST(req: NextRequest) {
     if (!updatedRecord) {
       throw new Error('CHECKIN006')
     }
+
+    revalidateTag('checkin-history')
 
     return NextResponse.json({ checkinRecord: updatedRecord }, { status: 200 })
   } catch (error: any) {

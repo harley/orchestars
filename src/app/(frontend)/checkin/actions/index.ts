@@ -2,11 +2,8 @@ import { getPayload } from '@/payload-config/getPayloadConfig'
 import { unstable_cache } from 'next/cache'
 import type { CheckinRecord } from '@/payload-types'
 
-type Query = {
-  token?: string | null
-}
 
-export async function getCheckinHistory(_query: Query): Promise<CheckinRecord[] | null> {
+export async function getCheckinHistory(): Promise<CheckinRecord[] | null> {
   try {
     const payload = await getPayload()
 
@@ -34,8 +31,8 @@ export async function getCheckinHistory(_query: Query): Promise<CheckinRecord[] 
 }
 
 // todo set tag by locale
-export const getCheckinHistoryCached = ({ token }: { token: string | null }) =>
-  unstable_cache(async () => getCheckinHistory({ token }), ['checkin-history'], {
+export const getCheckinHistoryCached = () =>
+  unstable_cache(async () => getCheckinHistory(), ['checkin-history'], {
     tags: [`checkin-history`],
     revalidate: 86400,
   })
