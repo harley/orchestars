@@ -1,15 +1,88 @@
 'use client'
 
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { QRScanner } from '@/components/QRScanner'
-import { MapPin } from 'lucide-react'
+import { MapPin, History, ChevronDown, Lightbulb, LightbulbOff } from 'lucide-react'
 import Link from 'next/link'
+import type { CheckinRecord, User } from '@/payload-types'
+
+const ScanHistory = ({ onScanSuccess }: { onScanSuccess: () => void }) => {
+  const [history, setHistory] = useState<CheckinRecord[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const hasFetched = useRef(false);
+
+
+  const fetchHistory = useCallback(async () => {
+    if (isLoading) return
+    setIsLoading(true)
+    try {
+      const res = await fetch('/api/checkin-app/scan-history')
+      if (res.ok) {
+        const data = await res.json()
+        setHistory(data.records || [])
+        hasFetched.current = true;
+      }
+    } catch (err) {
+      console.error('Failed to fetch scan history:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [isLoading])
+
+  useEffect(() => {
+    if (isOpen && !hasFetched.current) {
+      fetchHistory()
+    }
+  }, [isOpen, fetchHistory, hasFetched])
+  
+  useEffect(() => {
+    onScanSuccess()
+  }, [])
+
+  return (
+    <div className="w-full flex flex-col items-center">
+        {isOpen && (
+            <div className="w-full bg-white/90 p-4 rounded-t overflow-y-auto max-h-48 text-black mb-2">
+                {isLoading && <p>Loading history...</p>}
+                {!isLoading && history.length === 0 && <p>No recent scans.</p>}
+                <ul className="space-y-2">
+                    {history.map((record) => (
+                    <li key={record.id} className="text-sm text-gray-800 border-b pb-1">
+                        <p><strong>Ticket:</strong> {record.ticketCode}</p>
+                        <p><strong>Attendee:</strong> {`${(record.user as User)?.firstName || ''} ${(record.user as User)?.lastName || ''}`.trim() || 'N/A'}</p>
+                        <p>
+                        <strong>Time:</strong>{' '}
+                        {record.checkInTime ? new Date(record.checkInTime).toLocaleTimeString() : 'N/A'}
+                        </p>
+                    </li>
+                    ))}
+                </ul>
+            </div>
+        )}
+        <button
+            onClick={() => {
+            setIsOpen(!isOpen)
+            if(!isOpen) fetchHistory()
+            }}
+            className="inline-flex items-center justify-center w-full gap-1 bg-white/10 backdrop-blur px-4 py-3 rounded text-sm font-medium text-white"
+        >
+            <History className="w-5 h-5" />
+            <span>Scan History</span>
+            <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+    </div>
+  )
+}
 
 export const ScanPageClient: React.FC = () => {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
     null,
   )
   const [isProcessing, setIsProcessing] = useState(false)
+  const [torchOn, setTorchOn] = useState(false)
+  const historyRef = useRef<{ fetchHistory: () => void }>(null);
+
 
   const validateAndCheckIn = useCallback(async (ticketCode: string) => {
     if (isProcessing) return
@@ -20,6 +93,7 @@ export const ScanPageClient: React.FC = () => {
       const validateRes = await fetch(`/api/checkin-app/validate/${ticketCode}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
       })
 
       if (validateRes.status !== 200) {
@@ -42,6 +116,7 @@ export const ScanPageClient: React.FC = () => {
       if (checkinRes.status === 200) {
         setFeedback({ type: 'success', message: 'Checked In' })
         if (window.navigator.vibrate) window.navigator.vibrate(200)
+        historyRef.current?.fetchHistory();
       } else {
         let msg = 'Check-in failed'
         try {
@@ -68,33 +143,57 @@ export const ScanPageClient: React.FC = () => {
       return () => clearTimeout(id)
     }
   }, [feedback])
+  
+  const handleScanSuccess = () => {
+    if (historyRef.current) {
+      historyRef.current.fetchHistory();
+    }
+  };
+
 
   return (
-    <div className="relative min-h-screen bg-black">
-      <QRScanner
-        onScan={validateAndCheckIn}
-        paused={isProcessing || !!feedback}
-        className="absolute inset-0"
-      />
-
-      {/* Feedback overlay */}
-      {feedback && (
-        <div
-          className={`absolute inset-0 flex items-center justify-center p-4 text-center text-white text-4xl font-bold transition-opacity duration-200 ${
-            feedback.type === 'success' ? 'bg-emerald-600/90' : 'bg-red-600/90'
-          }`}
-        >
-          {feedback.message}
+    <div className="flex flex-col items-center justify-between min-h-screen bg-gray-900 text-white p-4">
+      <div className="w-full max-w-md mx-auto flex flex-col items-center justify-center flex-grow">
+        <h1 className="text-2xl font-bold mb-2">Scan QR Code</h1>
+        <p className="text-gray-400 mb-6">Position the code within the frame</p>
+        <div className="w-full relative aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 border-gray-700">
+          <QRScanner
+            onScan={validateAndCheckIn}
+            paused={isProcessing || !!feedback}
+            torch={torchOn}
+            className="absolute inset-0"
+          />
+          {/* Feedback overlay */}
+          {feedback && (
+            <div
+              className={`absolute inset-0 flex items-center justify-center p-4 text-center text-white text-4xl font-bold transition-opacity duration-200 ${
+                feedback.type === 'success' ? 'bg-emerald-600/90' : 'bg-red-600/90'
+              }`}
+            >
+              {feedback.message}
+            </div>
+          )}
         </div>
-      )}
 
-      {/* Manual entry fallback */}
-      <div className="absolute bottom-4 w-full flex justify-center">
+        <div className="mt-6 flex justify-around items-center w-full max-w-xs">
+            <button
+                onClick={() => setTorchOn(!torchOn)}
+                className={`p-3 rounded-full transition-colors ${torchOn ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-white'}`}
+            >
+                {torchOn ? <LightbulbOff className="w-6 h-6" /> : <Lightbulb className="w-6 h-6" />}
+            </button>
+        </div>
+        
+      </div>
+
+      <div className="w-full max-w-md mx-auto mt-6 space-y-3">
+        <ScanHistory onScanSuccess={handleScanSuccess} />
         <Link
-          href="/checkin/validates"
-          className="inline-flex items-center gap-1 bg-white/80 backdrop-blur px-4 py-2 rounded text-sm font-medium text-black"
+            href="/checkin/validates"
+            className="inline-flex items-center justify-center w-full gap-2 bg-gray-700 px-4 py-3 rounded text-sm font-medium text-white hover:bg-gray-600"
         >
-          <MapPin className="w-4 h-4" /> Manual Entry
+            <MapPin className="w-5 h-5" />
+            <span>Manual Entry</span>
         </Link>
       </div>
     </div>

@@ -39,7 +39,12 @@ export async function POST(req: NextRequest) {
     const { user } = await payload.auth({ headers })
 
     //Get params event-id and event-scheduler-id by url
-    const body = await req.json()
+    let body: { eventId?: string, eventScheduleId?: string } = {}
+    try {
+      body = await req.json()
+    } catch (e) {
+      // The scanner page may not send a body.
+    }
     const eventId = body.eventId
     const eventScheduleId = body.eventScheduleId
 
@@ -50,9 +55,6 @@ export async function POST(req: NextRequest) {
 
     if (!ticketCode) {
       throw new Error('CHECKIN013')
-    }
-    if (!eventId && !eventScheduleId) {
-      throw new Error('CHECKIN014')
     }
 
     // Determine search type (seat label or ticket code)
@@ -84,9 +86,13 @@ export async function POST(req: NextRequest) {
       LEFT JOIN checkin_records cr ON cr.ticket_code = t.ticket_code AND cr.deleted_at IS NULL
       LEFT JOIN admins a ON cr.checked_in_by_id = a.id
       WHERE
-        ${isSearchBySeat ? sql`UPPER(t.seat) = ${ticketCodeParam}` : sql`t.ticket_code = ${ticketCodeParam}`}
-        AND t.event_id = ${eventId}
-        AND t.event_schedule_id = ${eventScheduleId}
+        ${
+          isSearchBySeat
+            ? sql`UPPER(t.seat) = ${ticketCodeParam}`
+            : sql`t.ticket_code = ${ticketCodeParam}`
+        }
+        ${eventId ? sql`AND t.event_id = ${eventId}` : sql``}
+        ${eventScheduleId ? sql`AND t.event_schedule_id = ${eventScheduleId}` : sql``}
         AND t.status = 'booked'
       ORDER BY t.created_at DESC
     `

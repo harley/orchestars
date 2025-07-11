@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 
 // Dynamically import the Scanner only on the client to avoid SSR issues
@@ -23,6 +23,7 @@ export interface QRScannerProps {
   scanDelay?: number
   className?: string
   paused?: boolean
+  torch?: boolean
 }
 
 const DEFAULT_DELAY = 700 // ms
@@ -33,9 +34,25 @@ export const QRScanner: React.FC<QRScannerProps> = ({
   scanDelay = DEFAULT_DELAY,
   className,
   paused = false,
+  torch = false,
 }) => {
   const [lastValue, setLastValue] = useState<string | null>(null)
   const [lastTime, setLastTime] = useState<number>(0)
+
+  useEffect(() => {
+    // Pre-request camera permission on mount
+    const requestCamera = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        stream.getTracks().forEach(track => track.stop());
+      } catch (err) {
+        console.error("Camera permission request failed:", err);
+        onError?.(err);
+      }
+    };
+
+    requestCamera();
+  }, [onError]);
 
   const handleScan = useCallback(
     (detectedCodes: any[]) => {
@@ -66,7 +83,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({
   )
 
   return (
-    <div className={className}>
+    <div className={`${className} relative`}>
       <DynamicScanner
         onScan={handleScan}
         onError={handleError}
@@ -74,6 +91,10 @@ export const QRScanner: React.FC<QRScannerProps> = ({
         paused={paused}
         allowMultiple={true}
         formats={['qr_code']}
+        components={{
+            torch: torch,
+            finder: true,
+        }}
         /* Video will fill container */
         styles={{
           container: { width: '100%', height: '100%' },
