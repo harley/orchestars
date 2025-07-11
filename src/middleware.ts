@@ -6,6 +6,16 @@ const SUPPORTED_LOCALES = ['vi', 'en'] as const
 
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
+  // --- Check-in Authentication ---
+  if (request.nextUrl.pathname.startsWith('/checkin/')) {
+    const isAuthenticated = await checkCheckinAuth(request)
+    if (!isAuthenticated) {
+      const loginUrl = new URL('/admin/login', request.url)
+      loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+  }
+
   const response = NextResponse.next()
   const url = new URL(request.url)
 
@@ -86,6 +96,32 @@ export async function middleware(request: NextRequest) {
   return response
 }
 
+// Check authentication for checkin routes
+async function checkCheckinAuth(request: NextRequest): Promise<boolean> {
+  const payloadToken = request.cookies.get('payload-token')?.value
+  if (!payloadToken) {
+    return false
+  }
+
+  try {
+    // Make internal API call to verify auth and permissions
+    const baseUrl = new URL(request.url).origin
+    const authRes = await fetch(`${baseUrl}/api/checkin-app/verify-auth`, {
+      method: 'GET',
+      headers: {
+        Cookie: `payload-token=${payloadToken}`,
+        'X-Api-Key': X_API_KEY, // Mark as internal request
+      },
+    })
+
+    return authRes.ok
+  } catch (error) {
+    console.error('Error checking checkin auth:', error)
+    return false
+  }
+}
+
+
 // Generate a simple session ID
 function generateSessionId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2)
@@ -164,5 +200,5 @@ function getClientIP(request: NextRequest): string {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/', '/events/:path*', '/((?!api|_next/static|_next/image|favicon.ico|admin|checkin).*)'],
+  matcher: ['/', '/events/:path*', '/((?!api|_next/static|_next/image|favicon.ico|admin).*)'],
 }
