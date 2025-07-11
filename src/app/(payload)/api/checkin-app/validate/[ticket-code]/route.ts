@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     let body: { eventId?: string, eventScheduleId?: string } = {}
     try {
       body = await req.json()
-    } catch (e) {
+    } catch (_e) {
       // The scanner page may not send a body.
     }
     const eventId = body.eventId

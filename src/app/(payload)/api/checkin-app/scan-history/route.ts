@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getPayload } from '@/payload-config/getPayloadConfig'
+import { getPayload } from 'payload'
+import configPromise from '@payload-config'
 import { checkAuthenticated } from '@/utilities/checkAuthenticated'
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
-    const payload = await getPayload()
+    const payload = await getPayload({ config: configPromise })
     const authData = await checkAuthenticated()
 
     if (!authData?.user) {

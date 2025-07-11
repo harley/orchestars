@@ -1,14 +1,14 @@
 'use client'
 
 import { Form, FormSubmit, Link, PasswordField, useAuth, useConfig, useTranslation } from '@payloadcms/ui'
-import { formatAdminURL, getLoginOptions, getSafeRedirect } from 'payload/shared'
+import { formatAdminURL, getLoginOptions } from 'payload/shared'
 import React, { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { LoginField } from './LoginField'
 
 const baseClass = 'login__form'
 
-export const LoginForm = ({ prefillEmail, prefillPassword, prefillUsername, searchParams }) => {
+export const LoginForm = ({ prefillEmail, prefillPassword, prefillUsername }) => {
   const config = useConfig() as any
   const {
     admin: { user: userSlug, routes: { admin: adminRoute, forgot: forgotRoute } },

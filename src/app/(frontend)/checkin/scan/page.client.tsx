@@ -2,9 +2,10 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { QRScanner } from '@/components/QRScanner'
-import { MapPin, History, ChevronDown, Lightbulb, LightbulbOff } from 'lucide-react'
+import { MapPin, History, ChevronDown, Lightbulb, LightbulbOff, Upload } from 'lucide-react'
 import Link from 'next/link'
 import type { CheckinRecord, User } from '@/payload-types'
+import jsQR from 'jsqr'
 
 const ScanHistory = ({ onScanSuccess }: { onScanSuccess: () => void }) => {
   const [history, setHistory] = useState<CheckinRecord[]>([])
@@ -38,7 +39,7 @@ const ScanHistory = ({ onScanSuccess }: { onScanSuccess: () => void }) => {
   
   useEffect(() => {
     onScanSuccess()
-  }, [])
+  }, [onScanSuccess])
 
   return (
     <div className="w-full flex flex-col items-center">
@@ -81,8 +82,64 @@ export const ScanPageClient: React.FC = () => {
   )
   const [isProcessing, setIsProcessing] = useState(false)
   const [torchOn, setTorchOn] = useState(false)
-  const historyRef = useRef<{ fetchHistory: () => void }>(null);
+  const historyRef = useRef<{ fetchHistory: () => void }>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const handleUploadClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file || isProcessing) return
+
+    setIsProcessing(true)
+
+    try {
+      const imageUrl = URL.createObjectURL(file)
+      const image = new Image()
+      image.src = imageUrl
+
+      image.onload = () => {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          setFeedback({ type: 'error', message: 'Canvas not supported' })
+          return
+        }
+
+        canvas.width = image.width
+        canvas.height = image.height
+        ctx.drawImage(image, 0, 0, image.width, image.height)
+
+        const imageData = ctx.getImageData(0, 0, image.width, image.height)
+        const code = jsQR(imageData.data, imageData.width, imageData.height)
+
+        if (code) {
+          validateAndCheckIn(code.data)
+        } else {
+          setFeedback({ type: 'error', message: 'No QR code found.' })
+          if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
+        }
+
+        URL.revokeObjectURL(imageUrl)
+      }
+
+      image.onerror = () => {
+        setFeedback({ type: 'error', message: 'Failed to load image.' })
+        if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
+        URL.revokeObjectURL(imageUrl)
+      }
+    } catch (err) {
+      console.error(err)
+      setFeedback({ type: 'error', message: 'Error processing image.' })
+      if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
+    }
+
+    if (event.target) {
+      event.target.value = ''
+    }
+  }
 
   const validateAndCheckIn = useCallback(async (ticketCode: string) => {
     if (isProcessing) return
@@ -146,13 +203,19 @@ export const ScanPageClient: React.FC = () => {
   
   const handleScanSuccess = () => {
     if (historyRef.current) {
-      historyRef.current.fetchHistory();
+      historyRef.current.fetchHistory()
     }
-  };
-
+  }
 
   return (
     <div className="flex flex-col items-center justify-between min-h-screen bg-gray-900 text-white p-4">
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/*"
+        className="hidden"
+      />
       <div className="w-full max-w-md mx-auto flex flex-col items-center justify-center flex-grow">
         <h1 className="text-2xl font-bold mb-2">Scan QR Code</h1>
         <p className="text-gray-400 mb-6">Position the code within the frame</p>
@@ -188,13 +251,24 @@ export const ScanPageClient: React.FC = () => {
 
       <div className="w-full max-w-md mx-auto mt-6 space-y-3">
         <ScanHistory onScanSuccess={handleScanSuccess} />
-        <Link
+        <div className="grid grid-cols-2 gap-3">
+          <Link
             href="/checkin/validates"
             className="inline-flex items-center justify-center w-full gap-2 bg-gray-700 px-4 py-3 rounded text-sm font-medium text-white hover:bg-gray-600"
-        >
+          >
             <MapPin className="w-5 h-5" />
             <span>Manual Entry</span>
-        </Link>
+          </Link>
+          <button
+            type="button"
+            onClick={handleUploadClick}
+            disabled={isProcessing}
+            className="inline-flex items-center justify-center w-full gap-2 bg-gray-700 px-4 py-3 rounded text-sm font-medium text-white hover:bg-gray-600 disabled:opacity-50"
+          >
+            <Upload className="w-5 h-5" />
+            <span>Upload QR</span>
+          </button>
+        </div>
       </div>
     </div>
   )
