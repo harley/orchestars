@@ -1349,7 +1349,7 @@ export interface Ticket {
   orderItem?: (number | null) | OrderItem;
   order?: (number | null) | Order;
   orderCode?: string | null;
-  status?: ('booked' | 'pending_payment' | 'hold' | 'cancelled') | null;
+  status?: ('booked' | 'pending_payment' | 'hold' | 'canceled') | null;
   updatedAt: string;
   createdAt: string;
 }
