@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -81,7 +81,7 @@ export function PerformanceAnalytics() {
   const [timeRange, setTimeRange] = useState('30d')
   const [sortBy, setSortBy] = useState('revenue')
 
-  const fetchPerformanceData = async (timeRangeValue: string) => {
+  const fetchPerformanceData = useCallback(async (timeRangeValue: string) => {
     const params = new URLSearchParams({
       timeRange: timeRangeValue,
     })
@@ -98,9 +98,9 @@ export function PerformanceAnalytics() {
         variant: 'destructive',
       })
     }
-  }
+  }, [toast])
 
-  const fetchLinkBreakdownData = async (page = 1, timeRangeValue: string, sortByValue: string) => {
+  const fetchLinkBreakdownData = useCallback(async (page = 1, timeRangeValue: string, sortByValue: string) => {
     const params = new URLSearchParams({
       timeRange: timeRangeValue,
       sortBy: sortByValue,
@@ -120,9 +120,9 @@ export function PerformanceAnalytics() {
         variant: 'destructive',
       })
     }
-  }
+  }, [linkBreakdownPagination.limit, toast])
 
-  const fetchSourceCampaignBreakdownData = async (timeRangeValue: string) => {
+  const fetchSourceCampaignBreakdownData = useCallback(async (timeRangeValue: string) => {
     const params = new URLSearchParams({
       timeRange: timeRangeValue,
     })
@@ -139,9 +139,9 @@ export function PerformanceAnalytics() {
         variant: 'destructive',
       })
     }
-  }
+  }, [toast])
 
-  const fetchInitialData = async () => {
+  const fetchInitialData = useCallback(async () => {
     setLoading(true)
     await Promise.all([
       fetchPerformanceData(timeRange),
@@ -149,11 +149,11 @@ export function PerformanceAnalytics() {
       fetchSourceCampaignBreakdownData(timeRange),
     ])
     setLoading(false)
-  }
+  }, [timeRange, sortBy, fetchPerformanceData, fetchLinkBreakdownData, fetchSourceCampaignBreakdownData])
 
   useEffect(() => {
     fetchInitialData()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fetchInitialData])
 
   const toggleTimeRange = async (value: string) => {
     setLoading(true)
