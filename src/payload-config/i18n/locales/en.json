@@ -383,7 +383,7 @@
     "all": "All",
     "success": "Success",
     "processing": "Processing",
-    "canceled": "Canceled",
+    "cancelled": "Cancelled",
     "booked": "Booked",
     "gifted": "Gifted",
     "pending_payment": "Pending Payment",
@@ -400,7 +400,7 @@
     "ticketPrice": "Ticket Type",
     "statusPendingPayment": "Pending Payment",
     "statusHold": "On Hold",
-    "statusCancelled": "Canceled",
+    "statusCancelled": "Cancelled",
     "userLogin": "Login",
     "accountSettings": {
       "infoHelper": "Providing accurate information will help support you during ticket purchases or when ticket verification is needed.",

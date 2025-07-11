@@ -91,10 +91,10 @@ const updateTicketStatusesBasedOnOrder = async (
   req: FieldHookArgs['req'],
 ) => {
   // Determine new ticket status based on order status
-  const statusMap: Record<string, 'pending_payment' | 'canceled' | 'booked' | null> = {
+  const statusMap: Record<string, 'pending_payment' | 'cancelled' | 'booked' | null> = {
     processing: 'pending_payment',
-    canceled: 'canceled',
-    failed: 'canceled',
+    cancelled: 'cancelled',
+    failed: 'cancelled',
     completed: 'booked',
   }
 

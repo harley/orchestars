@@ -13,7 +13,7 @@ interface TicketsResponse {
 
 interface UseTicketsProps {
   eventType: 'upcoming' | 'finished'
-  ticketType: 'booked' | 'canceled' | 'pending_payment' | 'gifted'
+  ticketType: 'booked' | 'cancelled' | 'pending_payment' | 'gifted'
 }
 
 export function useTickets({ eventType, ticketType }: UseTicketsProps) {

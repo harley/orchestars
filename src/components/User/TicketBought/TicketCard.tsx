@@ -53,7 +53,7 @@ export const TicketCard: React.FC<{ ticket: Ticket }> = ({ ticket }) => {
               {t('userprofile.statusHold')}
             </span>
           )}
-          {ticket.status === 'canceled' && (
+          {ticket.status === 'cancelled' && (
             <span className="inline-block bg-red-600 text-xs px-2 py-1 rounded">
               {t('userprofile.statusCancelled')}
             </span>

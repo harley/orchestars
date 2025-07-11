@@ -19,7 +19,7 @@ const TicketBought = ({ className }: { className?: string }) => {
   const [timeFilter, setTimeFilter] = useState<'upcoming' | 'finished'>('finished')
 
   const [ticketType, setTicketType] = useState<
-    'booked' | 'canceled' | 'pending_payment' | 'gifted'
+    'booked' | 'cancelled' | 'pending_payment' | 'gifted'
   >('booked')
 
   const {
