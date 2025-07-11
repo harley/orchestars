@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 export const setDateFrom = async (req: NextRequest) => {
   // Get time range param
   const { searchParams } = new URL(req.url)

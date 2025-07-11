@@ -66,7 +66,7 @@ export const MembershipGift: CollectionConfig = {
   ],
   hooks: {
     afterChange: [
-      async ({ doc, operation, req: { payload } }) => {
+      async ({ doc: _doc, operation: _operation, req: { payload: _payload } }) => {
         //    todo write history for receiving
       },
     ],

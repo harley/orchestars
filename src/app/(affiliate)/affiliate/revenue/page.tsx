@@ -1,5 +1,6 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useToast } from '@/components/ui/use-toast'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { AffiliateSidebar } from '@/components/Affiliate/AffiliateSidebar'
 
@@ -19,6 +20,7 @@ import { BarChart3 } from 'lucide-react'
 import useFetchData from '@/hooks/useFetchData'
 
 export default function RevenuePage() {
+  const { toast } = useToast()
   //Default time range is 6 month
   const [timeRange, setTimeRange] = useState('6m')
 
@@ -43,14 +45,14 @@ export default function RevenuePage() {
 
   const {
     data: revenueByEvents,
-    loading: loadingEventsRev,
+    loading: _loadingEventsRev,
     error: errorEventsRev,
     refetch: refetchEventsRev,
   } = useFetchData(`/api/affiliate/revenue-by-event?timeRange=${timeRange}`)
 
   const {
     data: revenueBySource,
-    loading: loadingSourceRev,
+    loading: _loadingSourceRev,
     error: errorSourceRev,
     refetch: refetchSourceRev,
   } = useFetchData(`/api/affiliate/revenue-by-sources?timeRange=${timeRange}`)
@@ -60,6 +62,37 @@ export default function RevenuePage() {
   //   loading: loadingClicks,
   //   error: errorClicks,
   // } = useFetchData(`/api/affiliate/total-click?timeRange=${timeRange}`)
+
+  // Handle errors for secondary API calls
+  useEffect(() => {
+    if (errorMonthly) {
+      toast({
+        title: 'Error loading monthly revenue data',
+        description: 'Failed to load monthly revenue trends. Some data may be incomplete.',
+        variant: 'destructive',
+      })
+    }
+  }, [errorMonthly, toast])
+
+  useEffect(() => {
+    if (errorEventsRev) {
+      toast({
+        title: 'Error loading events revenue data',
+        description: 'Failed to load revenue by events. Some data may be incomplete.',
+        variant: 'destructive',
+      })
+    }
+  }, [errorEventsRev, toast])
+
+  useEffect(() => {
+    if (errorSourceRev) {
+      toast({
+        title: 'Error loading source revenue data', 
+        description: 'Failed to load revenue by traffic sources. Some data may be incomplete.',
+        variant: 'destructive',
+      })
+    }
+  }, [errorSourceRev, toast])
 
   return (
     <ProtectedRoute>
@@ -105,12 +138,22 @@ export default function RevenuePage() {
                           Monthly Revenue Trends
                         </AccordionTrigger>
                         <AccordionContent className="flex flex-col gap-4 text-balance">
-                          {monthlyRevenueData && (
+                          {errorMonthly ? (
+                            <div className="text-center py-8 text-red-600">
+                              <p>Failed to load monthly revenue data.</p>
+                              <button 
+                                onClick={refetchMonthly}
+                                className="mt-2 px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200"
+                              >
+                                Retry
+                              </button>
+                            </div>
+                          ) : monthlyRevenueData ? (
                             <RevenueMonthlyTable
                               monthlyRevenue={monthlyRevenueData?.monthlyRevenue ?? []}
                               loading={loadingMonthly}
                             />
-                          )}
+                          ) : null}
                         </AccordionContent>
                       </AccordionItem>
                       <AccordionItem value="revenue-by-events">
@@ -119,12 +162,22 @@ export default function RevenuePage() {
                           Revenue by Events
                         </AccordionTrigger>
                         <AccordionContent className="flex flex-col gap-4 text-balance">
-                          {revenueByEvents && revenueCardMetrics && (
+                          {errorEventsRev ? (
+                            <div className="text-center py-8 text-red-600">
+                              <p>Failed to load revenue by events data.</p>
+                              <button 
+                                onClick={refetchEventsRev}
+                                className="mt-2 px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200"
+                              >
+                                Retry
+                              </button>
+                            </div>
+                          ) : revenueByEvents && revenueCardMetrics ? (
                             <RevenueByEventsList
                               events={revenueByEvents}
                               totalGrossRevenue={revenueCardMetrics?.grossRevenue}
                             />
-                          )}
+                          ) : null}
                         </AccordionContent>
                       </AccordionItem>
                       <AccordionItem value="revenue-by-sources">
@@ -133,12 +186,22 @@ export default function RevenuePage() {
                           Revenue by Traffic Sources
                         </AccordionTrigger>
                         <AccordionContent className="flex flex-col gap-4 text-balance">
-                          {revenueBySource && revenueCardMetrics && (
+                          {errorSourceRev ? (
+                            <div className="text-center py-8 text-red-600">
+                              <p>Failed to load revenue by sources data.</p>
+                              <button 
+                                onClick={refetchSourceRev}
+                                className="mt-2 px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200"
+                              >
+                                Retry
+                              </button>
+                            </div>
+                          ) : revenueBySource && revenueCardMetrics ? (
                             <RevenueBySourcesList
                               sources={revenueBySource}
                               totalGrossRevenue={revenueCardMetrics?.grossRevenue}
                             />
-                          )}
+                          ) : null}
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>

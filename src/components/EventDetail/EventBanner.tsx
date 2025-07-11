@@ -3,7 +3,7 @@
 import { Event, Media } from '@/payload-types'
 import { Calendar, MapPin } from 'lucide-react'
 import React from 'react'
-import { format as dateFnsFormat } from 'date-fns'
+
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 import Image from 'next/image'
 import { useTranslate } from '@/providers/I18n/client'

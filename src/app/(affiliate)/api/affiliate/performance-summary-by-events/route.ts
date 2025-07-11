@@ -28,7 +28,7 @@ function parsePostgresArray(str: string): string[] {
   return matches.map((m) => m.replace(/^"|"$/g, ''));
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     //Authenticate user
     const userRequest = await authorizeApiRequest() // returns { id, email }

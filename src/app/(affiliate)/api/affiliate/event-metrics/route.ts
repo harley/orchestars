@@ -3,7 +3,7 @@ import { getPayload } from '@/payload-config/getPayloadConfig'
 import { authorizeApiRequest } from '@/app/(affiliate)/utils/authorizeApiRequest'
 import { sql } from '@payloadcms/db-postgres/drizzle'
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     //Authenticate user
     const userRequest = await authorizeApiRequest() // returns { id, email }

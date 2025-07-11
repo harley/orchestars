@@ -15,7 +15,7 @@ const TicketBought = ({className}: {className?: string}) => {
 
   const containerClass = `max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 mt-8 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className || ''}`
 
-  const [timeFilter, setTimeFilter] = useState<'upcoming' | 'finished'>('upcoming')
+  const [timeFilter, _setTimeFilter] = useState<'upcoming' | 'finished'>('upcoming')
 
   return (
     <div className={containerClass}>
