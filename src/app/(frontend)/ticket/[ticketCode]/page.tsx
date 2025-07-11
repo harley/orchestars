@@ -30,16 +30,25 @@ const queryTicketByCode = cache(
 export async function generateMetadata({
   params,
 }: {
-  params: { ticketCode: string }
+  params: Promise<{ ticketCode: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }): Promise<Metadata> {
-  const ticket = await queryTicketByCode({ ticketCode: params.ticketCode })
+  const resolvedParams = await params
+  const ticket = await queryTicketByCode({ ticketCode: resolvedParams.ticketCode })
   const pageTitle: string = ticket?.ticketCode ? `Ticket ${ticket.ticketCode}` : 'Ticket'
   return {
     title: pageTitle,
   }
 }
 
-export default async function TicketPage({ params: { ticketCode } }: { params: { ticketCode: string } }) {
+export default async function TicketPage({
+  params,
+}: {
+  params: Promise<{ ticketCode: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const resolvedParams = await params
+  const { ticketCode } = resolvedParams
   const ticket = await queryTicketByCode({ ticketCode })
 
   // Fetch checkin record to see if already checked in

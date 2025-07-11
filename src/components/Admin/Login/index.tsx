@@ -71,7 +71,6 @@ export function LoginView({ initPageResult, params, searchParams }: AdminViewPro
           prefillEmail={prefillEmail}
           prefillPassword={prefillPassword}
           prefillUsername={prefillUsername}
-          searchParams={searchParams}
         />
       )}
       <RenderServerComponent

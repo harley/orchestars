@@ -54,7 +54,7 @@ export default function GlobalError({
         <title>{t('error.title')} - Orchestars</title>
       </head>
       <body>
-        <Providers>
+        <Providers locale="en">
           <main className="min-h-[calc(100vh-144px)] flex items-center justify-center pt-[72px]">
             <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-12 bg-gradient-to-b from-background to-muted/30 rounded-lg">
               <div className="max-w-md w-full bg-background shadow-lg rounded-lg overflow-hidden p-6 border border-[#dddddd] animate-fade-in">

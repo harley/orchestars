@@ -31,7 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
       </head>
       <body>
-        <Providers>
+        <Providers locale={lang}>
           <Suspense fallback={null}>
             <PixelTracker />
           </Suspense>
