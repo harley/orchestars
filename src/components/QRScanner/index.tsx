@@ -2,6 +2,7 @@
 
 import React, { useCallback, useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
+import { sanitizeLog } from '@/utilities/logUtils'
 
 // Dynamically import the Scanner only on the client to avoid SSR issues
 const DynamicScanner = dynamic(() => import('@yudiel/react-qr-scanner').then((m) => m.Scanner), {
@@ -46,7 +47,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         stream.getTracks().forEach(track => track.stop());
       } catch (err) {
-        console.error("Camera permission request failed:", err);
+        console.error("Camera permission request failed:", sanitizeLog(err));
         onError?.(err);
       }
     };
@@ -76,7 +77,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({
 
   const handleError = useCallback(
     (err: unknown) => {
-      console.error('QR Scanner error', err)
+      console.error('QR Scanner error', sanitizeLog(err))
       onError?.(err)
     },
     [onError],
