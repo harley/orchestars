@@ -127,7 +127,8 @@ export const TargetLink = (props: { path: string } & Record<string, any>) => {
           type="button"
           onClick={handleCopy}
           style={{
-            padding: '12px',
+            height: '40px',
+            padding: '0 12px',
             backgroundColor: !copied ? '#222222' : '#046c04',
             color: 'white',
             border: 'none',

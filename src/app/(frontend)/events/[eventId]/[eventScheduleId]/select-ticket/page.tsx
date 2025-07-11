@@ -11,6 +11,7 @@ import { getLocale } from '@/providers/I18n/server'
 import { getEventCached } from '../../actions'
 import SelectTicket from '@/components/EventDetail/SeatReservation/SeatMapSelection/SelectTicket'
 import UpcomingSaleBanner from '@/components/EventDetail/UpcomingSale'
+import { getPromotionsCached } from './actions'
 
 // export const dynamic = 'force-dynamic'
 export const revalidate = 86400 // 24 hours
@@ -39,6 +40,10 @@ const EventDetailSelectTicketPage = async (props: {
   if (!isValidEventScheduleId) {
     return notFound()
   }
+
+  const { promotions, eventPromotionConfig } = await getPromotionsCached({
+    eventId: eventDetail.id,
+  })()
 
   const isUpcoming = eventDetail.status === EVENT_STATUS.published_upcoming.value
   const isOpenForSales = eventDetail.status === EVENT_STATUS.published_open_sales.value
@@ -79,6 +84,8 @@ const EventDetailSelectTicketPage = async (props: {
               event={eventDetail}
               unavailableSeats={unavailableSeats as string[]}
               eventScheduleId={eventScheduleId}
+              promotions={promotions}
+              eventPromotionConfig={eventPromotionConfig}
             />
           )}
         </main>

@@ -30,6 +30,19 @@ const affiliateRegisterSchema = Joi.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // hidden registration form when env is production
+    const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+    const hiddenRegistrationPage = !env || env === 'production'
+    if (hiddenRegistrationPage) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Page not found',
+        },
+        { status: 404 },
+      )
+    }
+
     const body = await request.json()
     const { error, value } = affiliateRegisterSchema.validate(body, {
       abortEarly: false,
@@ -50,7 +63,10 @@ export async function POST(request: NextRequest) {
     const existing = await payload.find({
       collection: 'users',
       where: {
-        or: [{ email: { equals: String(value.email).toLowerCase() } }, { phoneNumber: { equals: value.phoneNumber } }],
+        or: [
+          { email: { equals: String(value.email).toLowerCase() } },
+          { phoneNumber: { equals: value.phoneNumber } },
+        ],
       },
       limit: 1,
     })

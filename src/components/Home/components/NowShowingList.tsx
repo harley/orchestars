@@ -87,7 +87,7 @@ const NowShowingList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, clas
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* Image section */}
-                  <div className="relative rounded-lg overflow-hidden w-full h-[250px] md:h-[600px] lg:h-[700px] xl:h-[890px] shadow-md">
+                  <div className="relative rounded-lg overflow-hidden w-full h-[500px] m-auto max-w-[435px] lg:max-w-[650px] sm:h-[580px] md:h-[470px] lg:h-[700px] xl:h-[890px] shadow-md">
                     <Image
                       fill
                       sizes="(max-width:768px) 100vw, 50vw"
@@ -98,7 +98,7 @@ const NowShowingList: React.FC<ConcertListProps> = ({ onGoingPaginatedDocs, clas
                   </div>
 
                   {/* Content section */}
-                  <div className="flex flex-col justify-center">
+                  <div className="flex flex-col justify-center m-auto">
                     <Link
                       href={`/events/${evt.slug}`}
                       className="text-[22px] md:text-6xl font-bold mb-3 hover:underline"
