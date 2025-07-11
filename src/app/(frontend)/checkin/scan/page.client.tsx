@@ -4,9 +4,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { QRScanner } from '@/components/QRScanner'
 import { MapPin } from 'lucide-react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
-
-interface ValidateResponse {
+interface _ValidateResponse {
   status: number
   ticket?: {
     attendeeName?: string

@@ -5,7 +5,6 @@ import { useToast } from '@/hooks/use-toast'
 import ForgotPasswordForm from './ForgotPasswordForm'
 import { Info } from 'lucide-react'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { Star, ArrowRight, Users } from 'lucide-react'
 
 interface LoginFormProps {

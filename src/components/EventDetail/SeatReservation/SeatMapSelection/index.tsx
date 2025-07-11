@@ -34,13 +34,13 @@ const SeatMapSelection = ({
 
   // const eventScheduleId = searchParams.get('eventScheduleId')
 
-  const selectedSchedule = useMemo(() => {
+  const _selectedSchedule = useMemo(() => {
     const schedule = event.schedules?.find((sche) => sche.id === selectedEventScheduleId)
 
     return schedule
   }, [selectedEventScheduleId, event.schedules])
 
-  const handleDateSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const _handleDateSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const date = new Date(e.target.value)
 
     const schedule = date

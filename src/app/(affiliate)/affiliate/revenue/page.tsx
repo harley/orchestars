@@ -35,24 +35,24 @@ export default function RevenuePage() {
   const {
     data: monthlyRevenueData,
     loading: loadingMonthly,
-    error: errorMonthly,
-    refetch: refetchMonthly,
+    error: _errorMonthly,
+    refetch: _refetchMonthly,
   } = useFetchData(`/api/affiliate/revenue-monthly-trends?timeRange=${timeRange}`, {
     defaultLoading: true,
   })
 
   const {
     data: revenueByEvents,
-    loading: loadingEventsRev,
-    error: errorEventsRev,
-    refetch: refetchEventsRev,
+    loading: _loadingEventsRev,
+    error: _errorEventsRev,
+    refetch: _refetchEventsRev,
   } = useFetchData(`/api/affiliate/revenue-by-event?timeRange=${timeRange}`)
 
   const {
     data: revenueBySource,
-    loading: loadingSourceRev,
-    error: errorSourceRev,
-    refetch: refetchSourceRev,
+    loading: _loadingSourceRev,
+    error: _errorSourceRev,
+    refetch: _refetchSourceRev,
   } = useFetchData(`/api/affiliate/revenue-by-sources?timeRange=${timeRange}`)
 
   // const {
