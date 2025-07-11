@@ -14,11 +14,8 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import {
-  BarChart3,
   Link2,
   Home,
-  TrendingUp,
-  Users,
   DollarSign,
   Calendar,
   LogOut,

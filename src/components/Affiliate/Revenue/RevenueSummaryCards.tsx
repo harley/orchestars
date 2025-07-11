@@ -18,8 +18,8 @@ interface RevenueSummaryCardsProps {
 export const RevenueSummaryCards: React.FC<RevenueSummaryCardsProps> = ({
   metrics,
   loading,
-  error,
-  onReload,
+  error: _error,
+  onReload: _onReload,
 }) => {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">

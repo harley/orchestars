@@ -8,7 +8,7 @@ type statusRow = {
   count: number
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     //Authenticate user
     const userRequest = await authorizeApiRequest()

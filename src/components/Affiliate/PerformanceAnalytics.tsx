@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Progress } from '@/components/ui/progress'
-import { BarChart3, TrendingUp, TrendingDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { TrendingUp, TrendingDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatMoney } from '@/utilities/formatMoney'
@@ -153,6 +153,7 @@ export function PerformanceAnalytics() {
 
   useEffect(() => {
     fetchInitialData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const toggleTimeRange = async (value: string) => {
