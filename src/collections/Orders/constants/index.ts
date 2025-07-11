@@ -1,6 +1,6 @@
 export const ORDER_STATUS = {
   processing: { label: 'Processing', value: 'processing' },
-  canceled: { label: 'Canceled', value: 'canceled' },
+  cancelled: { label: 'Cancelled', value: 'cancelled' },
   completed: { label: 'Completed', value: 'completed' },
   failed: { label: 'Failed', value: 'failed' },
 }

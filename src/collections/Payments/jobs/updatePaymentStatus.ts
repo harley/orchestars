@@ -45,14 +45,14 @@ export const updatePaymentStatus = async ({ payload }: { payload: BasePayload })
             -- Update orders table
             UPDATE orders
             SET 
-            status = '${ORDER_STATUS.canceled.value}',
+            status = '${ORDER_STATUS.cancelled.value}',
             updated_at = NOW()
             WHERE id IN (SELECT order_id FROM temp_expired_orders);
 
             -- Update tickets table
             UPDATE tickets
             SET 
-            status = '${TICKET_STATUS.canceled.value}',
+            status = '${TICKET_STATUS.cancelled.value}',
             updated_at = NOW()
             WHERE order_id IN (SELECT order_id FROM temp_expired_orders);
 

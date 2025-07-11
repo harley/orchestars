@@ -1033,7 +1033,7 @@ export interface Order {
   orderCode?: string | null;
   user?: (number | null) | User;
   category?: string | null;
-  status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
+  status?: ('processing' | 'cancelled' | 'completed' | 'failed') | null;
   currency?: string | null;
   /**
    * Legacy field for a single promotion. Use "promotionsApplied" instead.
@@ -1349,7 +1349,7 @@ export interface Ticket {
   orderItem?: (number | null) | OrderItem;
   order?: (number | null) | Order;
   orderCode?: string | null;
-  status?: ('booked' | 'pending_payment' | 'hold' | 'canceled') | null;
+  status?: ('booked' | 'pending_payment' | 'hold' | 'cancelled') | null;
   updatedAt: string;
   createdAt: string;
 }
