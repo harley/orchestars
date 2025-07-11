@@ -1,54 +1,34 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
-import Cookies from 'js-cookie' // Client-side cookie reader
+import { createContext, useContext } from 'react'
 import { logout } from '@/app/(frontend)/checkin/logout/actions'
 import { usePathname } from 'next/navigation'
 
+type AdminCheckInAuthResult = {
+  user: any
+}
+
 type AuthContextType = {
-  token: string | null
-  setToken: (token: string) => void
-  logout: () => void
-  isHydrated: boolean
+  authData
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [token, setTokenState] = useState<string | null>(null)
-  const [isHydrated, setIsHydrated] = useState(false)
-
+export const AuthProvider = ({
+  children,
+  authData,
+}: {
+  children: React.ReactNode
+  authData: AdminCheckInAuthResult
+}) => {
   const path = usePathname()
 
-  useEffect(() => {
-    const cookieToken = Cookies.get('token')
-
-    if (cookieToken) {
-      setTokenState(cookieToken)
-    }
-    setIsHydrated(true)
-  }, [])
-
-  const setToken = (token: string) => {
-    Cookies.set('token', token, {
-      expires: 1,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
-    })
-    setTokenState(token)
-  }
-
-  // const logout = () => {
-  //   Cookies.remove('token')
-  //   setTokenState(null)
-  // }
-
   return (
-    <AuthContext.Provider value={{ token, setToken, logout, isHydrated }}>
+    <AuthContext.Provider value={{ authData }}>
       <div className="relative">
         {children}
 
-        {token && path !== '/checkin' && (
+        {path !== '/checkin' && (
           <form action={logout}>
             <button
               type="submit"

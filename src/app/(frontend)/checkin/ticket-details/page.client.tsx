@@ -1,7 +1,6 @@
 'use client'
 
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useAuth } from '@/providers/CheckIn/useAuth'
 import { CheckCircle, XCircle } from 'lucide-react'
 import { useState } from 'react'
 import { categories } from '@/components/EventDetail/data/seat-maps/categories'
@@ -11,7 +10,6 @@ import { useToast } from '@/hooks/use-toast'
 export default function TicketDetailsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const { token } = useAuth()
   const { t } = useTranslate()
   const { toast } = useToast()
   const [isCheckingIn, setIsCheckingIn] = useState(false)
@@ -31,7 +29,6 @@ export default function TicketDetailsPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `JWT ${token}`,
         },
         body: JSON.stringify({ eventDate: ticketData.eventTime }),
       })

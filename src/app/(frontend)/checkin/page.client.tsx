@@ -2,7 +2,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Head from 'next/head'
-import { useAuth } from '@/providers/CheckIn/useAuth'
 import { useTranslate } from '@/providers/I18n/client'
 import { useToast } from '@/hooks/use-toast'
 
@@ -11,7 +10,6 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { setToken } = useAuth()
   const { t } = useTranslate()
   const { toast } = useToast()
 
@@ -36,8 +34,6 @@ export default function Login() {
       })
 
       if (res?.ok) {
-        const token = await res.json() // or decode from cookie if SSR-only
-        setToken(token.token) // optional since cookie already stores it
         router.replace('/checkin/events')
       } else {
         const err = await res.json()

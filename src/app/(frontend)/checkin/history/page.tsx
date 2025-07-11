@@ -1,8 +1,6 @@
-import { redirect } from 'next/navigation'
 import { getCheckinHistoryCached } from '../actions'
 import HistoryClientPage from './page.client'
-import { cookies } from 'next/headers'
-import { checkAuthenticated } from '@/utilities/checkAuthenticated'
+import ProtectedComponent from '@/components/CheckIn/Protected/ProtectedComponent'
 
 interface CheckinRecord {
   id: string
@@ -15,21 +13,19 @@ interface CheckinRecord {
 }
 
 const HistoryPage = async () => {
-  const token = (await cookies()).get('token')?.value
+  return (
+    <ProtectedComponent>
+      <HistoryPageComponent />
+    </ProtectedComponent>
+  )
+}
 
-  if (!token) {
-    return redirect('/checkin')
-  }
+export default HistoryPage
 
-  const authData = await checkAuthenticated()
-
-  if (!authData?.user) {
-    return redirect('/checkin')
-  }
-
+const HistoryPageComponent = async () => {
   let initialHistory: CheckinRecord[] = []
   try {
-    const response = await getCheckinHistoryCached({ token: token as string })()
+    const response = await getCheckinHistoryCached()()
 
     initialHistory = response as unknown as CheckinRecord[]
   } catch (error) {
@@ -38,5 +34,3 @@ const HistoryPage = async () => {
 
   return <HistoryClientPage history={initialHistory} />
 }
-
-export default HistoryPage
