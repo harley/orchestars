@@ -5,6 +5,7 @@ import { Coins, Target, TrendingUp } from 'lucide-react'
 import { ProgressBar } from '@/components/User/MembershipPoint/ProgressBar'
 import { OrderHistory } from '@/components/User/MembershipPoint/OrderHistory'
 import { RewardsGallery } from '@/components/User/MembershipPoint/RewardsGallery'
+import { useToast } from '@/components/ui/use-toast'
 
 // Mock data - in real app this would come from API
 const mockUserData = {
@@ -85,8 +86,82 @@ const mockRewards = [
   }
 ];
 
+type MembershipPoint = {
+  totalPoints: number,
+  membershipRank: "Standard" | "Silver" | "Gold" | "Platinum",
+  nextRank: "Standard" | "Silver" | "Gold" | "Platinum",
+  pointsToNextRank: number
+}
+
+type RewardsTimeline = {
+  
+}
+
+type PaginationInfo = {
+  page: number
+  limit: number
+  totalPages: number
+  totalDocs: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
+}
+
+interface ApiResponse {
+  success: boolean
+  data: MembershipPoint
+  pagination?: PaginationInfo
+  error?: string
+}
+
 const MembershipPoint = ({ className } : { className?: string }) => {
   const [mounted, setMounted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const { toast } = useToast()
+
+  const [membershipPoint, setMembershipPoint] = useState<MembershipPoint | null>(null);
+  const [rewards, setRewards] = useState<RewardsTimeline | null>(null);
+
+  const fetchMembershipPoint = async () => {
+    const response = await fetch('/api/user/membership-point');
+    const result: ApiResponse = await response.json();
+    if (result.success) {
+      setMembershipPoint(result.data as MembershipPoint);
+    } else {
+      setMembershipPoint(null);
+      toast({
+        title: "Error",
+        description: "Failed to fetch some data",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const fetchRewardsTimeline = async() => {
+    const response = await fetch('/api/user/reward-timeline');
+    const result: ApiResponse = await response.json();
+    if (result.success) {
+      setRewards(result.data as RewardsTimeline);
+    } else {
+      setRewards(null);
+      toast({
+        title: "Error",
+        description: "Failed to fetch some data",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const fetchInitialData = async () => {
+    setLoading(true);
+    await Promise.all([
+      fetchMembershipPoint(),
+    ])
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    fetchInitialData();
+  }, [])
 
   const [pointsCounter, setPointsCounter] = useState(0);
 
@@ -98,7 +173,7 @@ const MembershipPoint = ({ className } : { className?: string }) => {
     const animateCounter = (currentTime: number) => {
       const elapsedTime = currentTime - startTime;
       const progress = Math.min(elapsedTime / duration, 1);
-      const currentValue = Math.round(progress * mockUserData.currentPoints);
+      const currentValue = Math.round(progress * (membershipPoint?.totalPoints || 0));
       setPointsCounter(currentValue);
       if (progress < 1) {
         animationFrameId = requestAnimationFrame(animateCounter);
@@ -106,7 +181,7 @@ const MembershipPoint = ({ className } : { className?: string }) => {
     };
     animationFrameId = requestAnimationFrame(animateCounter);
     return () => cancelAnimationFrame(animationFrameId);
-  }, []);
+  }, [membershipPoint]);
 
   useEffect(() => {
     setMounted(true)
@@ -120,7 +195,7 @@ const MembershipPoint = ({ className } : { className?: string }) => {
       <Card className={containerClass}>
         <CardContent className="relative p-6 md:p-8">
           <div className="flex-1 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Coins className="w-4 h-4" />
@@ -133,14 +208,14 @@ const MembershipPoint = ({ className } : { className?: string }) => {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Target className="w-4 h-4" />
-                  <span className="text-sm">Points to {mockUserData.nextTier}</span>
+                  <span className="text-sm">Points to {membershipPoint?.nextRank || 'Standard'}</span>
                 </div>
                 <p className="text-2xl font-bold">
-                  {(mockUserData.pointsToNextTier - mockUserData.currentPoints).toLocaleString()}
+                  {((membershipPoint?.pointsToNextRank ?? 0) - (membershipPoint?.totalPoints ?? 0)).toLocaleString()}
                 </p>
               </div>
 
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <TrendingUp className="w-4 h-4" />
                   <span className="text-sm">Lifetime Points</span>
@@ -148,7 +223,7 @@ const MembershipPoint = ({ className } : { className?: string }) => {
                 <p className="text-2xl font-bold">
                   {mockUserData.totalLifetimePoints.toLocaleString()}
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
         </CardContent>
@@ -159,7 +234,7 @@ const MembershipPoint = ({ className } : { className?: string }) => {
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl">
-              Journey to {mockUserData.nextTier.charAt(0).toUpperCase() + mockUserData.nextTier.slice(1)}
+              Journey to {membershipPoint?.nextRank || 'Standard'} Tier
             </CardTitle>
             <div className="text-sm text-muted-foreground text-gray-600">
               Membership Tier Progression
@@ -168,9 +243,9 @@ const MembershipPoint = ({ className } : { className?: string }) => {
         </CardHeader>
         <CardContent>
           <ProgressBar 
-            current={mockUserData.currentPoints}
-            target={mockUserData.pointsToNextTier}
-            tier={mockUserData.currentTier}
+            current={membershipPoint?.totalPoints || 0}
+            target={membershipPoint?.pointsToNextRank || 1000}
+            tier={membershipPoint?.nextRank || 'Standard'}
           />
         </CardContent>
       </Card>

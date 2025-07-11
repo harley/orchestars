@@ -5,13 +5,13 @@ import { cn } from "@/lib/utils";
 interface ProgressBarProps {
   current: number;
   target: number;
-  tier: "bronze" | "silver" | "gold" | "platinum";
+  tier: "Standard" | "Silver" | "Gold" | "Platinum";
   className?: string;
   animated?: boolean;
 }
 
 const tierColors = {
-  bronze: "bg-gradient-bronze",
+  Standard: "bg-gradient-bronze",
   silver: "bg-gradient-silver", 
   gold: "bg-gradient-gold",
   platinum: "bg-gradient-platinum"
@@ -28,14 +28,16 @@ export function ProgressBar({
   const percentage = Math.min((current / target) * 100, 100);
 
   useEffect(() => {
-    if (animated) {
-      const timer = setTimeout(() => {
-        setProgress(percentage);
-      }, 500);
-      return () => clearTimeout(timer);
-    } else {
-      setProgress(percentage);
-    }
+    console.log(`Setting progress to ${percentage}% for tier ${tier}`);
+    // if (animated) {
+    //   const timer = setTimeout(() => {
+    //     setProgress(percentage);
+    //   }, 500);
+    //   return () => clearTimeout(timer);
+    // } else {
+    //   setProgress(percentage);
+    // }
+    setProgress(percentage);
   }, [percentage, animated]);
 
   return (
