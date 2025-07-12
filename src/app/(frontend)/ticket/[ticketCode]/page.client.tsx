@@ -77,7 +77,7 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
               }
             >
               {isCheckedIn
-                ? '✅ Checked In'
+                ? t('ticket.checkedIn')
                 : ticket.status === 'booked'
                 ? t('ticket.readyToCheckIn')
                 : ticket.status
