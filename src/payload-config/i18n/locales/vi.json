@@ -244,7 +244,8 @@
     "readyToCheckIn": "Sẵn sàng Check In",
     "checkedIn": "Đã Check In",
     "booked": "Đã đặt",
-    "qrCodeNotAvailable": "Mã QR chỉ có sẵn cho vé đã đặt."
+    "qrCodeNotAvailable": "Mã QR chỉ có sẵn cho vé đã đặt.",
+    "termsAndConditions": "Điều khoản & Điều kiện"
   },
   "checkout": {
     "personalInfo": "Thông tin cá nhân",

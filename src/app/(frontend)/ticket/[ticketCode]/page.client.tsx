@@ -7,6 +7,7 @@ import { Calendar, Download, MapPin, CheckCircle } from 'lucide-react'
 import html2canvas from 'html2canvas'
 import DOMPurify from 'dompurify'
 import { useTranslate } from '@/providers/I18n/client'
+import { TermsAndConditionsModal } from '@/components/Tickets/TermsAndConditionsModal'
 
 export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheckedIn: boolean }) {
   const ticketRef = useRef<HTMLElement>(null)
@@ -50,125 +51,129 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
   }
 
   return (
-    <article
-      ref={ticketRef}
-      className="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden"
-    >
-      {/* Header */}
-      <header className="p-6 pb-4 border-b border-gray-100">
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-gray-200 text-gray-800 text-sm font-bold rounded-md px-3 py-2">
-              <img src="/images/ticket.svg" alt="Ticket" className="w-5 h-5" />
-              <span className="uppercase tracking-wider">{t('ticket.ticket')}</span>
-            </div>
-            {event?.title && (
-              <h2
-                className="text-2xl font-bold mt-2"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.title) }}
-              />
-            )}
-          </div>
-          <div className="text-right flex-shrink-0">
-            <p
-              className={
-                isCheckedIn
-                  ? 'flex items-center gap-1.5 font-bold text-lg text-emerald-600'
+    <div>
+      <article
+        ref={ticketRef}
+        className="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200"
+      >
+        {/* Header */}
+        <header className="p-6 pb-4 border-b border-gray-100">
+          <div className="flex justify-between items-center">
+            <img src="/images/ticket.svg" alt="Ticket" className="h-16" />
+            <div className="text-right flex-shrink-0">
+              <p
+                className={
+                  isCheckedIn
+                    ? 'flex items-center gap-1.5 font-bold text-lg text-emerald-600'
+                    : ticket.status === 'booked'
+                    ? 'font-medium text-blue-600'
+                    : 'font-medium text-gray-800'
+                }
+              >
+                {isCheckedIn && <CheckCircle className="w-5 h-5" />}
+                {isCheckedIn
+                  ? t('ticket.checkedIn')
                   : ticket.status === 'booked'
-                  ? 'font-medium text-blue-600'
-                  : 'font-medium text-gray-800'
-              }
-            >
-              {isCheckedIn && <CheckCircle className="w-5 h-5" />}
-              {isCheckedIn
-                ? t('ticket.checkedIn')
-                : ticket.status === 'booked'
-                ? t('ticket.readyToCheckIn')
-                : ticket.status
-                ? ticket.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-                : t('ticket.booked')}
-            </p>
+                  ? t('ticket.readyToCheckIn')
+                  : ticket.status
+                  ? ticket.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                  : t('ticket.booked')}
+              </p>
+            </div>
           </div>
-        </div>
 
-        {formattedDateTime && (
-          <p className="mt-2 flex items-start text-sm text-gray-600">
-            <Calendar className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />{' '}
-            <span>{formattedDateTime}</span>
-          </p>
-        )}
-
-        {event?.eventLocation && (
-          <p className="flex items-start text-sm text-gray-600 mt-1">
-            <MapPin className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" /> <span>{event.eventLocation}</span>
-          </p>
-        )}
-      </header>
-
-      {/* QR Section */}
-      <section className="flex justify-center p-6 border-b border-gray-100">
-        {isBooked ? (
-          <div className="relative">
-            <QRCodeComponent
-              payload={ticket.ticketCode || ''}
-              className={`w-56 h-56 ${isCheckedIn ? 'filter grayscale' : ''}`}
+          {event?.title && (
+            <h2
+              className="text-2xl font-bold"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.title) }}
             />
-            {isCheckedIn && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70">
-                <span className="text-2xl font-bold text-gray-800 transform -rotate-12 border-4 border-gray-800 px-4 py-2 rounded-lg">
-                  USED
-                </span>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="w-56 h-56 bg-gray-100 flex items-center justify-center rounded-lg">
-            <p className="text-gray-500 text-center">{t('ticket.qrCodeNotAvailable')}</p>
-          </div>
-        )}
-      </section>
+          )}
 
-      {/* Info Section */}
-      <section className="p-6 space-y-4 text-sm border-b border-gray-100">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-gray-500">Guest</p>
-            <p className="font-medium text-gray-800">
-              {isBooked ? ticket.attendeeName ?? '—' : '********'}
+          {formattedDateTime && (
+            <p className="mt-2 flex items-start text-sm text-gray-600">
+              <Calendar className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />{' '}
+              <span>{formattedDateTime}</span>
             </p>
-          </div>
-          <div>
-            <p className="text-gray-500">Ticket</p>
-            <p className="font-medium text-gray-800">
-              {ticket.ticketPriceName ? `1× ${ticket.ticketPriceName}` : '1× Standard'}
+          )}
+
+          {event?.eventLocation && (
+            <p className="flex items-start text-sm text-gray-600 mt-1">
+              <MapPin className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" /> <span>{event.eventLocation}</span>
             </p>
+          )}
+        </header>
+
+        {/* QR Section */}
+        <section className="flex justify-center p-6 border-b border-gray-100">
+          {isBooked ? (
+            <div className="relative">
+              <QRCodeComponent
+                payload={ticket.ticketCode || ''}
+                className={`w-56 h-56 ${isCheckedIn ? 'filter grayscale' : ''}`}
+              />
+              {isCheckedIn && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70">
+                  <span className="text-2xl font-bold text-gray-800 transform -rotate-12 border-4 border-gray-800 px-4 py-2 rounded-lg">
+                    USED
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="w-56 h-56 bg-gray-100 flex items-center justify-center rounded-lg">
+              <p className="text-gray-500 text-center">{t('ticket.qrCodeNotAvailable')}</p>
+            </div>
+          )}
+        </section>
+
+        {/* Info Section */}
+        <section className="p-6 space-y-4 text-sm border-b border-gray-100">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-gray-500">Guest</p>
+              <p className="font-medium text-gray-800">
+                {isBooked ? ticket.attendeeName ?? '—' : '********'}
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-500">Ticket</p>
+              <p className="font-medium text-gray-800">
+                {ticket.ticketPriceName ? `1× ${ticket.ticketPriceName}` : '1× Standard'}
+              </p>
+            </div>
           </div>
+        </section>
+
+        {/* Actions */}
+        <footer className="p-6 bg-gray-50 flex flex-col sm:flex-row gap-4">
+          <a
+            href={
+              event?.eventLocation
+                ? `https://maps.google.com/?q=${encodeURIComponent(event.eventLocation ?? '')}`
+                : '#'
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 inline-flex items-center justify-center gap-2 border border-gray-300 rounded-lg px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-100 transition"
+          >
+            <MapPin className="w-4 h-4" /> {t('ticket.getDirections')}
+          </a>
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={isCheckedIn}
+            className="flex-1 inline-flex items-center justify-center gap-2 border border-gray-300 rounded-lg px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-100 transition disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4" /> {t('ticket.saveQRCode')}
+          </button>
+        </footer>
+      </article>
+
+      {event?.eventTermsAndConditions && (
+        <div className="mt-4 text-center">
+          <TermsAndConditionsModal terms={event.eventTermsAndConditions} />
         </div>
-      </section>
-
-      {/* Actions */}
-      <footer className="p-6 bg-gray-50 flex flex-col sm:flex-row gap-4">
-        <a
-          href={
-            event?.eventLocation
-              ? `https://maps.google.com/?q=${encodeURIComponent(event.eventLocation ?? '')}`
-              : '#'
-          }
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-1 inline-flex items-center justify-center gap-2 border border-gray-300 rounded-lg px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-100 transition"
-        >
-          <MapPin className="w-4 h-4" /> {t('ticket.getDirections')}
-        </a>
-        <button
-          type="button"
-          onClick={handleDownload}
-          disabled={isCheckedIn}
-          className="flex-1 inline-flex items-center justify-center gap-2 border border-gray-300 rounded-lg px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-100 transition disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
-        >
-          <Download className="w-4 h-4" /> {t('ticket.saveQRCode')}
-        </button>
-      </footer>
-    </article>
+      )}
+    </div>
   )
 } 

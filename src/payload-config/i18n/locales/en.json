@@ -244,7 +244,8 @@
     "readyToCheckIn": "Ready to Check In",
     "checkedIn": "Checked In",
     "booked": "Booked",
-    "qrCodeNotAvailable": "QR code available for booked tickets only."
+    "qrCodeNotAvailable": "QR code available for booked tickets only.",
+    "termsAndConditions": "Terms & Conditions"
   },
   "checkout": {
     "personalInfo": "Personal Information",
