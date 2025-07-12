@@ -8,7 +8,15 @@ import { LoginField } from './LoginField'
 
 const baseClass = 'login__form'
 
-export const LoginForm = ({ prefillEmail, prefillPassword, prefillUsername }) => {
+interface Props {
+  prefillEmail?: string;
+  prefillPassword?: string;
+  prefillUsername?: string;
+}
+
+type LoginType = 'emailOrUsername' | 'username' | 'email';
+
+export const LoginForm = ({ prefillEmail, prefillPassword, prefillUsername }: Props) => {
   const config = useConfig() as any
   const {
     admin: { user: userSlug, routes: { admin: adminRoute, forgot: forgotRoute } },
@@ -32,7 +40,7 @@ export const LoginForm = ({ prefillEmail, prefillPassword, prefillUsername }) =>
     return "email"
   }
 
-  const [loginType] = useState(getLoginType())
+  const [loginType] = useState<LoginType>(getLoginType())
   const { t } = useTranslation()
   const { setUser } = useAuth()
   const router = useRouter()
@@ -41,7 +49,7 @@ export const LoginForm = ({ prefillEmail, prefillPassword, prefillUsername }) =>
 
   const handleLogin = (data) => {
     setUser(data)
-    if (redirect) {
+    if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
       router.push(redirect)
     } else {
       router.push(adminRoute)

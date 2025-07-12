@@ -4,7 +4,12 @@ import { EmailField, TextField, useTranslation } from '@payloadcms/ui'
 import { email, username } from 'payload/shared'
 import React from 'react'
 
-export const LoginField = (props) => {
+interface Props {
+  type: 'email' | 'username' | 'emailOrUsername'
+  required?: boolean
+}
+
+export const LoginField = (props: Props) => {
   const { type, required: requiredFromProps } = props
   const required = requiredFromProps === undefined ? true : requiredFromProps
   const { t } = useTranslation()

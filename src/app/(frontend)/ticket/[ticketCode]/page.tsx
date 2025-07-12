@@ -6,6 +6,15 @@ import type { Ticket } from '@/payload-types'
 import { Gutter } from '@payloadcms/ui'
 import { TicketDetails } from './page.client'
 
+function isTicket(data: unknown): data is Ticket {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'ticketCode' in data &&
+    typeof (data as Ticket).ticketCode === 'string'
+  )
+}
+
 const getTicketAndCheckinStatus = cache(
   async ({
     ticketCode,
@@ -30,7 +39,9 @@ const getTicketAndCheckinStatus = cache(
       overrideAccess: true, // ticket is public to view
     })
 
-    const ticket = (ticketResult?.docs?.[0] as Ticket) || null
+    const ticketDoc = ticketResult?.docs?.[0]
+    const ticket = isTicket(ticketDoc) ? ticketDoc : null
+
 
     if (!ticket) {
       return { ticket: null, isCheckedIn: false }
