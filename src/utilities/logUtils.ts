@@ -1,23 +1,32 @@
-const sanitize = (value: any): any => {
+const sanitize = <T>(value: T, seen = new WeakSet()): T => {
   if (value === null || value === undefined) {
     return value
   }
 
   if (typeof value === 'string') {
-    return value.replace(/[\r\n]/g, '')
+    return value.replace(/[\r\n]/g, '') as any
   }
 
-  if (typeof value === 'object') {
-    const newObj: { [key: string]: any } = {}
-    for (const key in value) {
-      if (Object.prototype.hasOwnProperty.call(value, key)) {
-        newObj[key] = sanitize(value[key])
-      }
+  if (typeof value !== 'object') {
+    return value
+  }
+
+  if (seen.has(value as object)) {
+    return '[Circular Reference]' as any
+  }
+  seen.add(value as object)
+
+  if (Array.isArray(value)) {
+    return value.map(item => sanitize(item, seen)) as any
+  }
+
+  const newObj: { [key: string]: any } = {}
+  for (const key in value) {
+    if (Object.prototype.hasOwnProperty.call(value, key)) {
+      newObj[key] = sanitize((value as any)[key], seen)
     }
-    return newObj
   }
-
-  return value
+  return newObj as any
 }
 
 export const sanitizeLog = (error: unknown): string => {

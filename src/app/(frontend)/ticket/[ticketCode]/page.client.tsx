@@ -107,7 +107,7 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
           <QRCodeComponent payload={ticket.ticketCode || ''} className="w-56 h-56" />
         ) : (
           <div className="w-56 h-56 bg-gray-100 flex items-center justify-center rounded-lg">
-            <p className="text-gray-500 text-center">QR code available for booked tickets only.</p>
+            <p className="text-gray-500 text-center">{t('ticket.qrCodeNotAvailable')}</p>
           </div>
         )}
       </section>

@@ -243,7 +243,8 @@
     "ticket": "Ticket",
     "readyToCheckIn": "Ready to Check In",
     "checkedIn": "✅ Checked In",
-    "booked": "Booked"
+    "booked": "Booked",
+    "qrCodeNotAvailable": "QR code available for booked tickets only."
   },
   "checkout": {
     "personalInfo": "Personal Information",

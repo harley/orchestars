@@ -243,7 +243,8 @@
     "ticket": "Vé",
     "readyToCheckIn": "Sẵn sàng Check In",
     "checkedIn": "✅ Đã Check In",
-    "booked": "Đã đặt"
+    "booked": "Đã đặt",
+    "qrCodeNotAvailable": "Mã QR chỉ có sẵn cho vé đã đặt."
   },
   "checkout": {
     "personalInfo": "Thông tin cá nhân",
