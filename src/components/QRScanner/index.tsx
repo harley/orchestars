@@ -56,7 +56,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({
   }, [onError]);
 
   const handleScan = useCallback(
-    (detectedCodes: any[]) => {
+    (detectedCodes: { rawValue: string }[]) => {
       if (!detectedCodes || detectedCodes.length === 0) return
       const value: string = detectedCodes[0]?.rawValue || ''
       if (!value) return
