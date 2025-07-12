@@ -2,15 +2,22 @@ import type { Metadata } from 'next'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { cache } from 'react'
-import type { Ticket, CheckinRecord } from '@/payload-types'
+import type { Ticket } from '@/payload-types'
 import { Gutter } from '@payloadcms/ui'
 import { TicketDetails } from './page.client'
 
-const queryTicketByCode = cache(
-  async ({ ticketCode }: { ticketCode: string }): Promise<Ticket | null> => {
+const getTicketAndCheckinStatus = cache(
+  async ({
+    ticketCode,
+  }: {
+    ticketCode: string
+  }): Promise<{
+    ticket: Ticket | null
+    isCheckedIn: boolean
+  }> => {
     const payload = await getPayload({ config: configPromise })
 
-    const result = await payload.find({
+    const ticketResult = await payload.find({
       collection: 'tickets',
       limit: 1,
       pagination: false,
@@ -23,7 +30,25 @@ const queryTicketByCode = cache(
       overrideAccess: true, // ticket is public to view
     })
 
-    return (result?.docs?.[0] as Ticket) || null
+    const ticket = (ticketResult?.docs?.[0] as Ticket) || null
+
+    if (!ticket) {
+      return { ticket: null, isCheckedIn: false }
+    }
+
+    const checkinRes = await payload.find({
+      collection: 'checkinRecords',
+      limit: 1,
+      pagination: false,
+      where: {
+        ticketCode: {
+          equals: ticketCode.toUpperCase(),
+        },
+      },
+    })
+    const isCheckedIn = Boolean(checkinRes?.docs?.[0])
+
+    return { ticket, isCheckedIn }
   },
 )
 
@@ -34,7 +59,7 @@ export async function generateMetadata({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }): Promise<Metadata> {
   const resolvedParams = await params
-  const ticket = await queryTicketByCode({ ticketCode: resolvedParams.ticketCode })
+  const { ticket } = await getTicketAndCheckinStatus({ ticketCode: resolvedParams.ticketCode })
   const pageTitle: string = ticket?.ticketCode ? `Ticket ${ticket.ticketCode}` : 'Ticket'
   return {
     title: pageTitle,
@@ -49,22 +74,7 @@ export default async function TicketPage({
 }) {
   const resolvedParams = await params
   const { ticketCode } = resolvedParams
-  const ticket = await queryTicketByCode({ ticketCode })
-
-  // Fetch checkin record to see if already checked in
-  const payload = await getPayload({ config: configPromise })
-  const checkinRes = await payload.find({
-    collection: 'checkinRecords',
-    limit: 1,
-    pagination: false,
-    where: {
-      ticketCode: {
-        equals: ticketCode.toUpperCase(),
-      },
-    },
-  })
-  const checkedInRecord = (checkinRes?.docs?.[0] as CheckinRecord | undefined) ?? null
-  const isCheckedIn = Boolean(checkedInRecord)
+  const { ticket, isCheckedIn } = await getTicketAndCheckinStatus({ ticketCode })
 
   if (!ticket) {
     return (
