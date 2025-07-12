@@ -58,9 +58,10 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
       <header className="p-6 pb-4 border-b border-gray-100">
         <div className="flex justify-between items-start">
           <div>
-            <span className="inline-flex items-center bg-gray-200 text-gray-800 text-xs font-bold uppercase tracking-wider rounded-md px-3 py-1.5">
-              {t('ticket.ticket')}
-            </span>
+            <div className="inline-flex items-center gap-2 bg-gray-200 text-gray-800 text-sm font-bold rounded-md px-3 py-2">
+              <img src="/images/ticket.svg" alt="Ticket" className="w-5 h-5" />
+              <span className="uppercase tracking-wider">{t('ticket.ticket')}</span>
+            </div>
             {event?.title && (
               <h2
                 className="text-2xl font-bold mt-2"
