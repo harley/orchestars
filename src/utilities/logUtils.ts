@@ -37,10 +37,22 @@ export const sanitizeLog = (error: unknown): string => {
     sanitizedError.stack = sanitize(error.stack)
 
     // Using JSON.stringify to get a string representation of the sanitized error
-    return JSON.stringify(sanitize(sanitizedError))
+    try {
+      return JSON.stringify(sanitizedError)
+    } catch (e) {
+      return JSON.stringify({
+        error: 'Failed to stringify error object',
+        name: sanitizedError.name,
+        message: sanitizedError.message,
+      })
+    }
   }
   if (typeof error === 'object') {
-    return JSON.stringify(sanitize(error))
+    try {
+      return JSON.stringify(sanitize(error))
+    } catch (e) {
+      return '{"error": "Failed to serialize object"}'
+    }
   }
   return String(sanitize(error))
 } 
