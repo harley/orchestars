@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 import type { Ticket } from '@/payload-types'
 import { QRCodeComponent } from '@/components/QRCode'
-import { Calendar, Download, MapPin } from 'lucide-react'
+import { Calendar, Download, MapPin, CheckCircle } from 'lucide-react'
 import html2canvas from 'html2canvas'
 import DOMPurify from 'dompurify'
 import { useTranslate } from '@/providers/I18n/client'
@@ -72,12 +72,13 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
             <p
               className={
                 isCheckedIn
-                  ? 'font-medium text-emerald-600'
+                  ? 'flex items-center gap-1.5 font-bold text-lg text-emerald-600'
                   : ticket.status === 'booked'
                   ? 'font-medium text-blue-600'
                   : 'font-medium text-gray-800'
               }
             >
+              {isCheckedIn && <CheckCircle className="w-5 h-5" />}
               {isCheckedIn
                 ? t('ticket.checkedIn')
                 : ticket.status === 'booked'
@@ -106,7 +107,19 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
       {/* QR Section */}
       <section className="flex justify-center p-6 border-b border-gray-100">
         {isBooked ? (
-          <QRCodeComponent payload={ticket.ticketCode || ''} className="w-56 h-56" />
+          <div className="relative">
+            <QRCodeComponent
+              payload={ticket.ticketCode || ''}
+              className={`w-56 h-56 ${isCheckedIn ? 'filter grayscale' : ''}`}
+            />
+            {isCheckedIn && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70">
+                <span className="text-2xl font-bold text-gray-800 transform -rotate-12 border-4 border-gray-800 px-4 py-2 rounded-lg">
+                  USED
+                </span>
+              </div>
+            )}
+          </div>
         ) : (
           <div className="w-56 h-56 bg-gray-100 flex items-center justify-center rounded-lg">
             <p className="text-gray-500 text-center">{t('ticket.qrCodeNotAvailable')}</p>
@@ -149,7 +162,8 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
         <button
           type="button"
           onClick={handleDownload}
-          className="flex-1 inline-flex items-center justify-center gap-2 border border-gray-300 rounded-lg px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-100 transition"
+          disabled={isCheckedIn}
+          className="flex-1 inline-flex items-center justify-center gap-2 border border-gray-300 rounded-lg px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-100 transition disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
         >
           <Download className="w-4 h-4" /> {t('ticket.saveQRCode')}
         </button>
