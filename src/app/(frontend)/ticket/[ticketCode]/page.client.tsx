@@ -5,7 +5,6 @@ import type { Ticket } from '@/payload-types'
 import { QRCodeComponent } from '@/components/QRCode'
 import { Calendar, Download, MapPin, CheckCircle } from 'lucide-react'
 import html2canvas from 'html2canvas'
-import DOMPurify from 'dompurify'
 import { useTranslate } from '@/providers/I18n/client'
 import { TermsAndConditionsModal } from '@/components/Tickets/TermsAndConditionsModal'
 
@@ -83,10 +82,9 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
           </div>
 
           {event?.title && (
-            <h2
-              className="text-2xl font-bold"
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.title) }}
-            />
+            <h2 className="text-2xl font-bold">
+              {event.title}
+            </h2>
           )}
 
           {formattedDateTime && (
