@@ -242,7 +242,7 @@
     "saveQRCode": "Lưu mã QR",
     "ticket": "Vé",
     "readyToCheckIn": "Sẵn sàng Check In",
-    "checkedIn": "✅ Đã Check In",
+    "checkedIn": "Đã Check In",
     "booked": "Đã đặt",
     "qrCodeNotAvailable": "Mã QR chỉ có sẵn cho vé đã đặt."
   },

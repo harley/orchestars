@@ -242,7 +242,7 @@
     "saveQRCode": "Save QR Code",
     "ticket": "Ticket",
     "readyToCheckIn": "Ready to Check In",
-    "checkedIn": "✅ Checked In",
+    "checkedIn": "Checked In",
     "booked": "Booked",
     "qrCodeNotAvailable": "QR code available for booked tickets only."
   },
