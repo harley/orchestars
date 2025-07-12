@@ -194,7 +194,9 @@ export const ScanPageClient: React.FC = () => {
         try {
           const data = (await checkinRes.json()) as { errorCode?: string; message?: string }
           msg = data.message || data.errorCode || msg
-        } catch {}
+        } catch (e) {
+          console.error('Failed to parse check-in error response:', e)
+        }
         setFeedback({ type: 'error', message: msg })
         if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
       }

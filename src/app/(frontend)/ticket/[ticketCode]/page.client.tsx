@@ -44,7 +44,9 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
         dateStyle: 'medium',
         timeStyle: 'short',
       })
-    } catch {}
+    } catch (e) {
+      console.error('Failed to format event start time:', e)
+    }
   }
 
   return (
