@@ -211,7 +211,7 @@
     "ORD007": "The adjustment amount cannot be negative",
     "CHECKIN001": "Ticket not found",
     "CHECKIN002": "Seat is not assigned to ticket",
-    "CHECKIN003": "Ticket has already been used for check-in",
+    "CHECKIN003": "Ticket already checked in",
     "CHECKIN004": "Check-in failed",
     "CHECKIN005": "Unauthorized - Invalid admin user",
     "CHECKIN006": "Check-in record not found",
@@ -236,6 +236,15 @@
     "tryingAgainDescription": "Attempting to recover from the error",
     "goingHome": "Going home",
     "goingHomeDescription": "Navigating to the home page"
+  },
+  "ticket": {
+    "getDirections": "Get Directions",
+    "saveQRCode": "Save QR Code",
+    "ticket": "Ticket",
+    "readyToCheckIn": "Ready to Check In",
+    "checkedIn": "✅ Checked In",
+    "booked": "Booked",
+    "qrCodeNotAvailable": "QR code available for booked tickets only."
   },
   "checkout": {
     "personalInfo": "Personal Information",

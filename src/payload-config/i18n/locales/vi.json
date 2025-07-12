@@ -237,6 +237,15 @@
     "goingHome": "Đang về trang chủ",
     "goingHomeDescription": "Đang chuyển hướng về trang chủ"
   },
+  "ticket": {
+    "getDirections": "Chỉ đường",
+    "saveQRCode": "Lưu mã QR",
+    "ticket": "Vé",
+    "readyToCheckIn": "Sẵn sàng Check In",
+    "checkedIn": "✅ Đã Check In",
+    "booked": "Đã đặt",
+    "qrCodeNotAvailable": "Mã QR chỉ có sẵn cho vé đã đặt."
+  },
   "checkout": {
     "personalInfo": "Thông tin cá nhân",
     "lastName": "Họ",

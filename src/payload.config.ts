@@ -92,6 +92,9 @@ export default buildConfig({
         dashboard: {
           Component: '@/components/AdminViews/Dashboard/Component',
         },
+        login: {
+          Component: '@/components/Admin/Login/index.tsx',
+        },
       },
     },
     importMap: {

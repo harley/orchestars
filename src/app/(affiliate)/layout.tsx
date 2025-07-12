@@ -42,7 +42,7 @@ export default async function AffiliateLayout({ children }: { children: React.Re
       </head>
       <body>
         <GTM_NO_SCRIPT gtmKey={GOOGLE_TAG_MANAGER_KEY} />
-        <Providers>
+        <Providers locale={lang}>
           <AffiliateProviders initialEvents={eventsData} authUser={authUser} locale={lang}>
             <Suspense fallback={null}>
               <PixelTracker />

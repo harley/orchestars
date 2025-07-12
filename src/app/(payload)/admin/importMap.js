@@ -53,6 +53,7 @@ import { VercelBlobClientUploadHandler as VercelBlobClientUploadHandler_16c82c5e
 import { default as default_3efec95bcc976db851def6c50766ac0b } from '@/components/AdminViews/ManagementAffiliate/Page'
 import { default as default_8e5de8afbbc6bbe41b4747de1145e709 } from '@/components/AdminViews/Order/CreateOrder'
 import { default as default_cedb957be856ec83a6d609901bda3c39 } from '@/components/AdminViews/Dashboard/Component'
+import { default as default_16137f7a752a7290f527a1af3134e808 } from '@/components/Admin/Login/index.tsx'
 
 export const importMap = {
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -109,5 +110,6 @@ export const importMap = {
   "@payloadcms/storage-vercel-blob/client#VercelBlobClientUploadHandler": VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e,
   "@/components/AdminViews/ManagementAffiliate/Page#default": default_3efec95bcc976db851def6c50766ac0b,
   "@/components/AdminViews/Order/CreateOrder#default": default_8e5de8afbbc6bbe41b4747de1145e709,
-  "@/components/AdminViews/Dashboard/Component#default": default_cedb957be856ec83a6d609901bda3c39
+  "@/components/AdminViews/Dashboard/Component#default": default_cedb957be856ec83a6d609901bda3c39,
+  "@/components/Admin/Login/index.tsx#default": default_16137f7a752a7290f527a1af3134e808
 }

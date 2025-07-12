@@ -35,7 +35,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <GTM_NO_SCRIPT gtmKey={GOOGLE_TAG_MANAGER_KEY} />
         <EnvironmentIndicator />
-        <Providers>{children}</Providers>
+        <Providers locale={lang}>{children}</Providers>
         <Toaster />
         <Analytics />
       </body>

@@ -11,6 +11,23 @@ import { Toaster } from '@/components/ui/toaster'
 import { useEffect } from 'react'
 import { useTranslate } from '@/providers/I18n/client'
 import * as Sentry from '@sentry/nextjs'
+import { DEFAULT_FALLBACK_LOCALE, SupportedLocale } from '@/config/app'
+
+const getLocaleFromCookie = (): SupportedLocale => {
+  if (typeof document === 'undefined') {
+    return DEFAULT_FALLBACK_LOCALE
+  }
+  const cookies = document.cookie.split(';')
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=')
+    if (name === 'next-locale') {
+      if (value === 'en' || value === 'vi') {
+        return value
+      }
+    }
+  }
+  return DEFAULT_FALLBACK_LOCALE
+}
 
 export default function GlobalError({
   error,
@@ -21,8 +38,7 @@ export default function GlobalError({
   useEffect(() => {
     Sentry.captureException(error)
     console.error('Error while loading page:', error)
-    // eslint-disable-next-line
-  }, [])
+  }, [error])
 
   const { toast } = useToast()
   const { t } = useTranslate()
@@ -48,13 +64,15 @@ export default function GlobalError({
     }, 1500)
   }
 
+  const locale = getLocaleFromCookie()
+
   return (
     <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
       <head>
         <title>{t('error.title')} - Orchestars</title>
       </head>
       <body>
-        <Providers>
+        <Providers locale={locale}>
           <main className="min-h-[calc(100vh-144px)] flex items-center justify-center pt-[72px]">
             <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-12 bg-gradient-to-b from-background to-muted/30 rounded-lg">
               <div className="max-w-md w-full bg-background shadow-lg rounded-lg overflow-hidden p-6 border border-[#dddddd] animate-fade-in">
