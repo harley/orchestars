@@ -30,6 +30,8 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
         link.download = `ticket-${(ticket.ticketCode || '').replace(/[^a-zA-Z0-9_-]/g, '')}.png`
         link.href = canvas.toDataURL('image/png')
         link.click()
+      }).catch(error => {
+        console.error('Error generating ticket image:', error)
       })
     }
   }
