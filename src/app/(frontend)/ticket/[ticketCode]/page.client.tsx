@@ -10,7 +10,7 @@ import { useTranslate } from '@/providers/I18n/client'
 
 export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheckedIn: boolean }) {
   const ticketRef = useRef<HTMLElement>(null)
-  const { t } = useTranslate()
+  const { t, locale } = useTranslate()
   const isBooked = ticket.status === 'booked'
   const event = typeof ticket.event === 'object' ? ticket.event : null
 
@@ -40,7 +40,7 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
   let formattedDateTime: string | null = null
   if (event?.startDatetime) {
     try {
-      formattedDateTime = new Date(event.startDatetime).toLocaleString('en-US', {
+      formattedDateTime = new Date(event.startDatetime).toLocaleString(locale, {
         dateStyle: 'medium',
         timeStyle: 'short',
       })
