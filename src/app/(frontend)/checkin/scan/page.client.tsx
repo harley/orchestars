@@ -79,7 +79,6 @@ const ScanHistory = forwardRef((props: {}, ref) => {
       <button
         onClick={() => {
           setIsOpen(!isOpen)
-          if (!isOpen) fetchHistory()
         }}
         className="inline-flex items-center justify-center w-full gap-1 bg-white/10 backdrop-blur px-4 py-3 rounded text-sm font-medium text-white"
       >
