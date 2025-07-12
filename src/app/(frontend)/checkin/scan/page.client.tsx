@@ -1,18 +1,24 @@
 'use client'
 
-import React, { useState, useCallback, useEffect, useRef } from 'react'
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from 'react'
 import { QRScanner } from '@/components/QRScanner'
 import { MapPin, History, ChevronDown, Lightbulb, LightbulbOff, Upload } from 'lucide-react'
 import Link from 'next/link'
 import type { CheckinRecord, User } from '@/payload-types'
 import jsQR from 'jsqr'
 
-const ScanHistory = ({ onScanSuccess }: { onScanSuccess: () => void }) => {
+const ScanHistory = forwardRef((props: {}, ref) => {
   const [history, setHistory] = useState<CheckinRecord[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
-  const hasFetched = useRef(false);
-
+  const hasFetched = useRef(false)
 
   const fetchHistory = useCallback(async () => {
     if (isLoading) return
@@ -22,7 +28,7 @@ const ScanHistory = ({ onScanSuccess }: { onScanSuccess: () => void }) => {
       if (res.ok) {
         const data = await res.json()
         setHistory(data.records || [])
-        hasFetched.current = true;
+        hasFetched.current = true
       }
     } catch (err) {
       console.error('Failed to fetch scan history:', err)
@@ -31,50 +37,60 @@ const ScanHistory = ({ onScanSuccess }: { onScanSuccess: () => void }) => {
     }
   }, [isLoading])
 
+  useImperativeHandle(ref, () => ({
+    fetchHistory,
+  }))
+
   useEffect(() => {
     if (isOpen && !hasFetched.current) {
       fetchHistory()
     }
-  }, [isOpen, fetchHistory, hasFetched])
-  
-  useEffect(() => {
-    onScanSuccess()
-  }, [onScanSuccess])
+  }, [isOpen, fetchHistory])
 
   return (
     <div className="w-full flex flex-col items-center">
-        {isOpen && (
-            <div className="w-full bg-white/90 p-4 rounded-t overflow-y-auto max-h-48 text-black mb-2">
-                {isLoading && <p>Loading history...</p>}
-                {!isLoading && history.length === 0 && <p>No recent scans.</p>}
-                <ul className="space-y-2">
-                    {history.map((record) => (
-                    <li key={record.id} className="text-sm text-gray-800 border-b pb-1">
-                        <p><strong>Ticket:</strong> {record.ticketCode}</p>
-                        <p><strong>Attendee:</strong> {`${(record.user as User)?.firstName || ''} ${(record.user as User)?.lastName || ''}`.trim() || 'N/A'}</p>
-                        <p>
-                        <strong>Time:</strong>{' '}
-                        {record.checkInTime ? new Date(record.checkInTime).toLocaleTimeString() : 'N/A'}
-                        </p>
-                    </li>
-                    ))}
-                </ul>
-            </div>
-        )}
-        <button
-            onClick={() => {
-            setIsOpen(!isOpen)
-            if(!isOpen) fetchHistory()
-            }}
-            className="inline-flex items-center justify-center w-full gap-1 bg-white/10 backdrop-blur px-4 py-3 rounded text-sm font-medium text-white"
-        >
-            <History className="w-5 h-5" />
-            <span>Scan History</span>
-            <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      {isOpen && (
+        <div className="w-full bg-white/90 p-4 rounded-t overflow-y-auto max-h-48 text-black mb-2">
+          {isLoading && <p>Loading history...</p>}
+          {!isLoading && history.length === 0 && <p>No recent scans.</p>}
+          <ul className="space-y-2">
+            {history.map(record => (
+              <li key={record.id} className="text-sm text-gray-800 border-b pb-1">
+                <p>
+                  <strong>Ticket:</strong> {record.ticketCode}
+                </p>
+                <p>
+                  <strong>Attendee:</strong>{' '}
+                  {`${(record.user as User)?.firstName || ''} ${
+                    (record.user as User)?.lastName || ''
+                  }`.trim() || 'N/A'}
+                </p>
+                <p>
+                  <strong>Time:</strong>{' '}
+                  {record.checkInTime
+                    ? new Date(record.checkInTime).toLocaleTimeString()
+                    : 'N/A'}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <button
+        onClick={() => {
+          setIsOpen(!isOpen)
+          if (!isOpen) fetchHistory()
+        }}
+        className="inline-flex items-center justify-center w-full gap-1 bg-white/10 backdrop-blur px-4 py-3 rounded text-sm font-medium text-white"
+      >
+        <History className="w-5 h-5" />
+        <span>Scan History</span>
+        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
     </div>
   )
-}
+})
+ScanHistory.displayName = 'ScanHistory'
 
 export const ScanPageClient: React.FC = () => {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
@@ -200,12 +216,6 @@ export const ScanPageClient: React.FC = () => {
       return () => clearTimeout(id)
     }
   }, [feedback])
-  
-  const handleScanSuccess = () => {
-    if (historyRef.current) {
-      historyRef.current.fetchHistory()
-    }
-  }
 
   return (
     <div className="flex flex-col items-center justify-between min-h-screen bg-gray-900 text-white p-4">
@@ -246,11 +256,11 @@ export const ScanPageClient: React.FC = () => {
                 {torchOn ? <LightbulbOff className="w-6 h-6" /> : <Lightbulb className="w-6 h-6" />}
             </button>
         </div>
-        
+
       </div>
 
       <div className="w-full max-w-md mx-auto mt-6 space-y-3">
-        <ScanHistory onScanSuccess={handleScanSuccess} />
+        <ScanHistory ref={historyRef} />
         <div className="grid grid-cols-2 gap-3">
           <Link
             href="/checkin/validates"

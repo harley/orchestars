@@ -38,7 +38,6 @@ export default function GlobalError({
   useEffect(() => {
     Sentry.captureException(error)
     console.error('Error while loading page:', error)
-    // eslint-disable-next-line
   }, [error])
 
   const { toast } = useToast()
