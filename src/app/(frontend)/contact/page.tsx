@@ -2,12 +2,12 @@ import PageClient from "./page.client"
 import { FormBlock } from "@/blocks/Form/Component"
 import type { Form } from "@payloadcms/plugin-form-builder/types"
 import { getPayload } from "@/payload-config/getPayloadConfig"
-import { getLocale } from "@/providers/I18n/server"
+import { DEFAULT_FALLBACK_LOCALE } from "@/config/app"
 
 async function ContactForm() {
   try {
     const payload = await getPayload()
-    const locale = await getLocale()
+    const locale = DEFAULT_FALLBACK_LOCALE
 
     const formData = await payload.find({
       collection: 'forms',

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useState, useEffect } from 'react'
+import React, { useCallback, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { sanitizeLog } from '@/utilities/logUtils'
 
@@ -40,21 +40,6 @@ export const QRScanner: React.FC<QRScannerProps> = ({
   const [lastValue, setLastValue] = useState<string | null>(null)
   const [lastTime, setLastTime] = useState<number>(0)
 
-  useEffect(() => {
-    // Pre-request camera permission on mount
-    const requestCamera = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        stream.getTracks().forEach(track => track.stop());
-      } catch (err) {
-        console.error("Camera permission request failed:", sanitizeLog(err));
-        onError?.(err);
-      }
-    };
-
-    requestCamera();
-  }, [onError]);
-
   const handleScan = useCallback(
     (detectedCodes: { rawValue: string }[]) => {
       if (!detectedCodes || detectedCodes.length === 0) return
@@ -92,9 +77,12 @@ export const QRScanner: React.FC<QRScannerProps> = ({
         paused={paused}
         allowMultiple={true}
         formats={['qr_code']}
+        constraints={{
+          facingMode: { ideal: 'environment' },
+        }}
         components={{
-            torch: torch,
-            finder: true,
+          torch: torch,
+          finder: true,
         }}
         /* Video will fill container */
         styles={{

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import Cookies from 'js-cookie' // Client-side cookie reader
-import { logout } from '@/app/(frontend)/checkin/logout/actions'
+import { logout } from '@/app/(checkin)/checkin/logout/actions'
 import { usePathname } from 'next/navigation'
 
 type AuthContextType = {

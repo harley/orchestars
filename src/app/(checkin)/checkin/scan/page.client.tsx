@@ -219,7 +219,7 @@ export const ScanPageClient: React.FC = () => {
   }, [feedback])
 
   return (
-    <div className="flex flex-col items-center justify-between min-h-screen bg-gray-900 text-white p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
       <input
         type="file"
         ref={fileInputRef}
@@ -227,7 +227,7 @@ export const ScanPageClient: React.FC = () => {
         accept="image/*"
         className="hidden"
       />
-      <div className="w-full max-w-md mx-auto flex flex-col items-center justify-center flex-grow">
+      <div className="w-full max-w-md mx-auto flex flex-col items-center">
         <h1 className="text-2xl font-bold mb-2">Scan QR Code</h1>
         <p className="text-gray-400 mb-6">Position the code within the frame</p>
         <div className="w-full relative aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 border-gray-700">
@@ -250,35 +250,36 @@ export const ScanPageClient: React.FC = () => {
         </div>
 
         <div className="mt-6 flex justify-around items-center w-full max-w-xs">
-            <button
-                onClick={() => setTorchOn(!torchOn)}
-                className={`p-3 rounded-full transition-colors ${torchOn ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-white'}`}
-            >
-                {torchOn ? <LightbulbOff className="w-6 h-6" /> : <Lightbulb className="w-6 h-6" />}
-            </button>
+          <button
+            onClick={() => setTorchOn(!torchOn)}
+            className={`p-3 rounded-full transition-colors ${
+              torchOn ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-white'
+            }`}
+          >
+            {torchOn ? <LightbulbOff className="w-6 h-6" /> : <Lightbulb className="w-6 h-6" />}
+          </button>
         </div>
 
-      </div>
-
-      <div className="w-full max-w-md mx-auto mt-6 space-y-3">
-        <ScanHistory ref={historyRef} />
-        <div className="grid grid-cols-2 gap-3">
-          <Link
-            href="/checkin/validates"
-            className="inline-flex items-center justify-center w-full gap-2 bg-gray-700 px-4 py-3 rounded text-sm font-medium text-white hover:bg-gray-600"
-          >
-            <MapPin className="w-5 h-5" />
-            <span>Manual Entry</span>
-          </Link>
-          <button
-            type="button"
-            onClick={handleUploadClick}
-            disabled={isProcessing}
-            className="inline-flex items-center justify-center w-full gap-2 bg-gray-700 px-4 py-3 rounded text-sm font-medium text-white hover:bg-gray-600 disabled:opacity-50"
-          >
-            <Upload className="w-5 h-5" />
-            <span>Upload QR</span>
-          </button>
+        <div className="w-full mt-6 space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <Link
+              href="/checkin/validates"
+              className="inline-flex items-center justify-center w-full gap-2 bg-gray-700 px-4 py-3 rounded text-sm font-medium text-white hover:bg-gray-600"
+            >
+              <MapPin className="w-5 h-5" />
+              <span>Manual Entry</span>
+            </Link>
+            <button
+              type="button"
+              onClick={handleUploadClick}
+              disabled={isProcessing}
+              className="inline-flex items-center justify-center w-full gap-2 bg-gray-700 px-4 py-3 rounded text-sm font-medium text-white hover:bg-gray-600 disabled:opacity-50"
+            >
+              <Upload className="w-5 h-5" />
+              <span>Upload QR</span>
+            </button>
+          </div>
+          <ScanHistory ref={historyRef} />
         </div>
       </div>
     </div>
