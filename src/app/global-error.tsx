@@ -9,6 +9,7 @@ import { useEffect } from 'react'
 import * as Sentry from '@sentry/nextjs'
 import { DEFAULT_FALLBACK_LOCALE, SupportedLocale } from '@/config/app'
 import Component from '@/components/GlobalError/Component'
+import './(frontend)/globals.css'
 
 const getLocaleFromCookie = (): SupportedLocale => {
   if (typeof document === 'undefined') {
