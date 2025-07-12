@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import CryptoJS from 'crypto-js'
 import { ZALO_PAYMENT } from '@/config/payment'
-import payload from 'payload'
+import payload, { BasePayload } from 'payload'
 import config from '@/payload.config'
 import { logError } from '@/collections/Logs/utils'
 import { Order, Payment } from '@/payload-types'
+import { sendMailAndWriteLog } from '@/collections/Emails/utils'
+import { getZalopayCallbackErrorHtml } from '@/mail/templates/ZalopayCalllbackError'
 // import { Event } from '@/payload-types'
+import { toZonedTime, format as tzFormat } from 'date-fns-tz'
+import { EMAIL_ADMIN_CC, EMAIL_DEFAULT_FROM_ADDRESS } from '@/config/email'
 
 export async function POST(request: NextRequest) {
   let body: any = null
@@ -60,7 +64,49 @@ export async function POST(request: NextRequest) {
     } catch (error: any) {
       await payload.db.rollbackTransaction(transactionID)
 
-      await logError({
+      await Promise.all([
+        sendPaymentCallbackErrorMail({
+          payload,
+          error,
+          body,
+          callbackData,
+          payment,
+        }),
+        logError({
+          payload,
+          action: 'PAYMENT_CALLBACK_ERROR',
+          description: `Error processing payment callback: ${error instanceof Error ? error.message : 'An unknown error occurred'}`,
+          data: {
+            error: {
+              error,
+              stack: error?.stack,
+              errorMessage:
+                error instanceof Error ? error.message : error || 'An unknown error occurred',
+            },
+            data: { requestBody: body, callbackData },
+          },
+          req: request,
+          payment: payment?.id || null,
+          order: (payment?.order as Order)?.id || null,
+        }).catch((err) => {
+          console.error('Error logging PAYMENT_CALLBACK_ERROR ', err)
+        }),
+      ])
+
+      return jsonResponse(0, error instanceof Error ? error.message : 'An unknown error occurred')
+    }
+  } catch (error: any) {
+    console.error('Error processing payment:', error)
+
+    await Promise.all([
+      sendPaymentCallbackErrorMail({
+        payload,
+        error,
+        body,
+        callbackData,
+        payment,
+      }),
+      logError({
         payload,
         action: 'PAYMENT_CALLBACK_ERROR',
         description: `Error processing payment callback: ${error instanceof Error ? error.message : 'An unknown error occurred'}`,
@@ -76,28 +122,10 @@ export async function POST(request: NextRequest) {
         req: request,
         payment: payment?.id || null,
         order: (payment?.order as Order)?.id || null,
-      })
-      return jsonResponse(0, error instanceof Error ? error.message : 'An unknown error occurred')
-    }
-  } catch (error: any) {
-    console.error('Error processing payment:', error)
-    await logError({
-      payload,
-      action: 'PAYMENT_CALLBACK_ERROR',
-      description: `Error processing payment callback: ${error instanceof Error ? error.message : 'An unknown error occurred'}`,
-      data: {
-        error: {
-          error,
-          stack: error?.stack,
-          errorMessage:
-            error instanceof Error ? error.message : error || 'An unknown error occurred',
-        },
-        data: { requestBody: body, callbackData },
-      },
-      req: request,
-      payment: payment?.id || null,
-      order: (payment?.order as Order)?.id || null,
-    })
+      }).catch((err) => {
+        console.error('Error logging PAYMENT_CALLBACK_ERROR ', err)
+      }),
+    ])
 
     return jsonResponse(0, 'An unknown error occurred')
   }
@@ -196,5 +224,56 @@ const initPayload = async () => {
       }
       await new Promise((resolve) => setTimeout(resolve, 1000)) // Wait for 1 second before retrying
     }
+  }
+}
+
+const sendPaymentCallbackErrorMail = async ({
+  payload,
+  error,
+  body,
+  callbackData,
+  payment,
+}: {
+  payload: BasePayload
+  error: any
+  body: any
+  callbackData: any
+  payment: Payment | null
+}) => {
+  try {
+    const html = getZalopayCallbackErrorHtml({
+      timestamp: tzFormat(toZonedTime(new Date(), 'Asia/Ho_Chi_Minh'), 'dd/MM/yyyy HH:mm:ss') + ' (GMT+7)',
+      source: 'PAYMENT_CALLBACK_ERROR',
+      errorMessage: `Error processing payment callback: ${error instanceof Error ? error.message : 'An unknown error occurred'}`,
+      payload: JSON.stringify(
+        {
+          body: body || {},
+          callbackData: callbackData || {},
+          error: {
+            error,
+            stack: error?.stack,
+            errorMessage:
+              error instanceof Error ? error.message : error || 'An unknown error occurred',
+          },
+          payment: payment?.id || null,
+          order: (payment?.order as Order)?.id || null,
+        },
+        null,
+        2,
+      ),
+    })
+
+    await sendMailAndWriteLog({
+      payload,
+      emailData: {},
+      resendMailData: {
+        html,
+        subject: '[ALERT] OrcheStars Payment Callback Failed',
+        to: EMAIL_DEFAULT_FROM_ADDRESS,
+        cc: EMAIL_ADMIN_CC,
+      },
+    })
+  } catch (err) {
+    console.error('Error sending PAYMENT_CALLBACK_ERROR mail:', err)
   }
 }
