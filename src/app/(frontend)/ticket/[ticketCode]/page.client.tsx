@@ -27,7 +27,7 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
         },
       }).then(canvas => {
         const link = document.createElement('a')
-        link.download = `ticket-${DOMPurify.sanitize(ticket.ticketCode || '')}.png`
+        link.download = `ticket-${(ticket.ticketCode || '').replace(/[^a-zA-Z0-9_-]/g, '')}.png`
         link.href = canvas.toDataURL('image/png')
         link.click()
       })
@@ -102,10 +102,7 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
       {/* QR Section */}
       <section className="flex justify-center p-6 border-b border-gray-100">
         {isBooked ? (
-          <QRCodeComponent
-            payload={DOMPurify.sanitize(ticket.ticketCode || '')}
-            className="w-56 h-56"
-          />
+          <QRCodeComponent payload={ticket.ticketCode || ''} className="w-56 h-56" />
         ) : (
           <div className="w-56 h-56 bg-gray-100 flex items-center justify-center rounded-lg">
             <p className="text-gray-500 text-center">QR code available for booked tickets only.</p>
