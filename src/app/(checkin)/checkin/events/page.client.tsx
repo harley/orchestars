@@ -1,5 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { useTranslate } from '@/providers/I18n/client'
 import { format } from 'date-fns'
@@ -18,6 +20,8 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
   const router = useRouter()
   const { t } = useTranslate()
   const { toast } = useToast()
+
+  const pathname = usePathname()
 
   useEffect(() => {
     const storedEventId = localStorage.getItem('selectedEventId')
@@ -69,6 +73,29 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="w-full max-w-md mx-auto">
+        {/* Navigation Toggle */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <Link
+            href="/checkin/scan"
+            className={`text-center py-2 px-4 rounded font-semibold ${
+              pathname === '/checkin/scan'
+                ? 'bg-gray-900 text-white'
+                : 'bg-gray-300 text-gray-800 hover:bg-gray-400'
+            }`}
+          >
+            Checkin via QR
+          </Link>
+          <Link
+            href="/checkin/events"
+            className={`text-center py-2 px-4 rounded font-semibold ${
+              pathname === '/checkin/events'
+                ? 'bg-gray-900 text-white'
+                : 'bg-gray-300 text-gray-800 hover:bg-gray-400'
+            }`}
+          >
+            Checkin via Search
+          </Link>
+        </div>
         <div className="space-y-6">
           {publicEvents?.map((event) => (
             <div key={event.id} className="bg-white rounded-lg shadow p-4">

@@ -9,7 +9,8 @@ import React, {
   useImperativeHandle,
 } from 'react'
 import { QRScanner } from '@/components/QRScanner'
-import { MapPin, History, ChevronDown, Lightbulb, LightbulbOff, Upload } from 'lucide-react'
+import { History, ChevronDown, Upload } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import type { CheckinRecord, User } from '@/payload-types'
 import jsQR from 'jsqr'
@@ -96,7 +97,7 @@ export const ScanPageClient: React.FC = () => {
     null,
   )
   const [isProcessing, setIsProcessing] = useState(false)
-  const [torchOn, setTorchOn] = useState(false)
+  const pathname = usePathname()
   const historyRef = useRef<{ fetchHistory: () => void }>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -228,13 +229,36 @@ export const ScanPageClient: React.FC = () => {
         className="hidden"
       />
       <div className="w-full max-w-md mx-auto flex flex-col items-center">
+        {/* Navigation Toggle */}
+        <div className="grid grid-cols-2 gap-3 mb-6 w-full">
+          <Link
+            href="/checkin/scan"
+            className={`text-center py-2 px-4 rounded font-semibold ${
+              pathname === '/checkin/scan'
+                ? 'bg-white text-gray-900'
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            Checkin via QR
+          </Link>
+          <Link
+            href="/checkin/events"
+            className={`text-center py-2 px-4 rounded font-semibold ${
+              pathname === '/checkin/events'
+                ? 'bg-white text-gray-900'
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            Checkin via Search
+          </Link>
+        </div>
+
         <h1 className="text-2xl font-bold mb-2">Scan QR Code</h1>
         <p className="text-gray-400 mb-6">Position the code within the frame</p>
         <div className="w-full relative aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 border-gray-700">
           <QRScanner
             onScan={validateAndCheckIn}
             paused={isProcessing || !!feedback}
-            torch={torchOn}
             className="absolute inset-0"
           />
           {/* Feedback overlay */}
@@ -249,26 +273,11 @@ export const ScanPageClient: React.FC = () => {
           )}
         </div>
 
-        <div className="mt-6 flex justify-around items-center w-full max-w-xs">
-          <button
-            onClick={() => setTorchOn(!torchOn)}
-            className={`p-3 rounded-full transition-colors ${
-              torchOn ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-white'
-            }`}
-          >
-            {torchOn ? <LightbulbOff className="w-6 h-6" /> : <Lightbulb className="w-6 h-6" />}
-          </button>
-        </div>
+        {/* Removed flashlight toggle as it's not needed */}
 
         <div className="w-full mt-6 space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <Link
-              href="/checkin/validates"
-              className="inline-flex items-center justify-center w-full gap-2 bg-gray-700 px-4 py-3 rounded text-sm font-medium text-white hover:bg-gray-600"
-            >
-              <MapPin className="w-5 h-5" />
-              <span>Manual Entry</span>
-            </Link>
+          {/* Extra actions */}
+          <div className="grid grid-cols-1 gap-3">
             <button
               type="button"
               onClick={handleUploadClick}
