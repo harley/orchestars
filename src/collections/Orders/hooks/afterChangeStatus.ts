@@ -85,40 +85,40 @@ const updateTicketsAndSendEmail = async (originalDoc: Order, req: FieldHookArgs[
   return { tickets, event, user }
 }
 
-const updateTicketStatusesBasedOnOrder = async (
-  orderStatus: string,
-  originalDoc: Order,
-  req: FieldHookArgs['req'],
-) => {
-  // Determine new ticket status based on order status
-  const statusMap: Record<string, 'pending_payment' | 'cancelled' | 'booked' | null> = {
-    processing: 'pending_payment',
-    cancelled: 'cancelled',
-    failed: 'cancelled',
-    completed: 'booked',
-  }
+// const updateTicketStatusesBasedOnOrder = async (
+//   orderStatus: string,
+//   originalDoc: Order,
+//   req: FieldHookArgs['req'],
+// ) => {
+//   // Determine new ticket status based on order status
+//   const statusMap: Record<string, 'pending_payment' | 'cancelled' | 'booked' | null> = {
+//     processing: 'pending_payment',
+//     cancelled: 'cancelled',
+//     failed: 'cancelled',
+//     completed: 'booked',
+//   }
 
-  const newTicketStatus = statusMap[orderStatus] || null
+//   const newTicketStatus = statusMap[orderStatus] || null
 
-  if (!newTicketStatus) return
+//   if (!newTicketStatus) return
 
-  // Update only tickets in 'pending' status
-  const updatedTickets = await req.payload.update({
-    collection: 'tickets',
-    where: {
-      order: { equals: originalDoc.id },
-      status: { equals: 'pending_payment' },
-    },
-    data: {
-      status: newTicketStatus,
-    },
-    req: {
-      transactionID: req.transactionID,
-    },
-  })
+//   // Update only tickets in 'pending' status
+//   const updatedTickets = await req.payload.update({
+//     collection: 'tickets',
+//     where: {
+//       order: { equals: originalDoc.id },
+//       status: { equals: 'pending_payment' },
+//     },
+//     data: {
+//       status: newTicketStatus,
+//     },
+//     req: {
+//       transactionID: req.transactionID,
+//     },
+//   })
 
-  console.log(`Updated ${updatedTickets.docs?.length || 0} tickets to ${newTicketStatus}`)
-}
+//   console.log(`Updated ${updatedTickets.docs?.length || 0} tickets to ${newTicketStatus}`)
+// }
 
 const getAffiliateOrderWhereClause = (affiliateUserId: number, orderId: string | number) => {
   return sql`WHERE (
@@ -514,9 +514,9 @@ export const afterChangeStatus = async ({
     return value
   }
   // Update ticket status based on order status
-  if (value !== previousValue && originalDoc) {
-    await updateTicketStatusesBasedOnOrder(value, originalDoc, req)
-  }
+  // if (value !== previousValue && originalDoc) {
+  //   await updateTicketStatusesBasedOnOrder(value, originalDoc, req)
+  // }
   // When an order's status is updated to 'completed'
   if (value === 'completed' && previousValue !== 'completed' && originalDoc) {
     await handleCompletedOrder(originalDoc, req)

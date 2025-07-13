@@ -38,9 +38,7 @@ export async function GET(req: NextRequest) {
         user: {
           equals: userId,
         },
-        status: {
-          equals: ticketStatus,
-        },
+        ...(ticketStatus ? { status: { equals: ticketStatus } } : {}),
         ...(eventIds.length > 0
           ? {
               event: {
