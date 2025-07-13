@@ -39,7 +39,7 @@ export const sendMailAndWriteLog = async ({
   }
 }
 
-const sendMail = async ({
+export const sendMail = async ({
   payload,
   mailData,
 }: {
@@ -50,7 +50,13 @@ const sendMail = async ({
     if (IS_LOCAL_DEVELOPMENT && EMAIL_PROVIDER === 'RESEND') {
       return { id: `mock-id-${Math.random()}` }
     }
-    return await payload.sendEmail(mailData)
+
+    let cc: string | string[] | undefined = undefined;
+    if(mailData?.cc) {
+      cc = mailData.cc.split(',').filter((email) => !!email)
+    }
+
+    return await payload.sendEmail({...mailData, cc})
   } catch (error: any) {
     console.error('Error while sending mail: ', error)
 
