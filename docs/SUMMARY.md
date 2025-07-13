@@ -41,6 +41,11 @@
   - Resend Integration
   - Nodemailer with Inbucket
   - Email Templates
+- [Payment System](payment-system.md)
+  - ZaloPay Integration
+  - Payment Callback System
+  - Security & Validation
+  - Error Handling & Monitoring
 - [Supabase Setup](supabase-setup.md)
   - Local Development
   - PostgreSQL Database
