@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { Ticket } from '@/types/Ticket'
+import { TicketStatus } from '@/collections/Tickets/constants'
 
 interface TicketsResponse {
   data: {
@@ -12,11 +13,10 @@ interface TicketsResponse {
 }
 
 interface UseTicketsProps {
-  eventType: 'upcoming' | 'finished'
-  ticketType: 'booked' | 'cancelled' | 'pending_payment' | 'gifted'
+  ticketStatus: TicketStatus | 'gifted'
 }
 
-export function useTickets({ eventType, ticketType }: UseTicketsProps) {
+export function useTickets({ ticketStatus }: UseTicketsProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [tickets, setTickets] = useState<Ticket[]>([])
@@ -26,7 +26,7 @@ export function useTickets({ eventType, ticketType }: UseTicketsProps) {
 
   const fetchTickets = useCallback(
     async (page: number) => {
-      const cacheKey = `${eventType}-${ticketType}-${page}`
+      const cacheKey = `${ticketStatus}-${page}`
 
       // Check cache first
       const cachedData = cache.current.get(cacheKey)
@@ -43,7 +43,7 @@ export function useTickets({ eventType, ticketType }: UseTicketsProps) {
 
       try {
         const response = await fetch(
-          `/api/user/tickets?timeStatus=${eventType}&ticketType=${ticketType}&page=${page}&limit=10`,
+          `/api/user/tickets?ticketStatus=${ticketStatus}&page=${page}&limit=10`,
         )
         const data: TicketsResponse = await response.json()
 
@@ -65,11 +65,12 @@ export function useTickets({ eventType, ticketType }: UseTicketsProps) {
         setIsLoading(false)
       }
     },
-    [eventType, ticketType],
+    [ticketStatus],
   )
   useEffect(() => {
     fetchTickets(1)
-  }, [eventType, ticketType, fetchTickets])
+  }, [ticketStatus, fetchTickets])
+
   const nextPage = useCallback(() => {
     if (currentPage < totalPages) {
       fetchTickets(currentPage + 1)

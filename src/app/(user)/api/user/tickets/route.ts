@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { authorizeApiRequest } from '@/app/(user)/utils/authorizeApiRequest'
+import { TICKET_STATUS } from '@/collections/Tickets/constants'
 
 export async function GET(req: NextRequest) {
   try {
@@ -13,26 +14,16 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams
     const page = parseInt(searchParams.get('page') || '1', 10) || 1
     const limit = parseInt(searchParams.get('limit') || '10', 10) || 10
-    const timeStatus = searchParams.get('timeStatus') // 'upcoming', 'past', or undefined for all
-    const ticketType = searchParams.get('ticketType')
+    let ticketStatus = searchParams.get('ticketStatus')
 
-    // Get current date for comparison
-    const now = new Date()
+    if (ticketStatus === 'canceled') {
+      ticketStatus = TICKET_STATUS.cancelled.value
+    }
 
     // First find relevant events based on date filter
     const eventsQuery = await payload.find({
       collection: 'events',
-      where: {
-        ...(timeStatus === 'upcoming'
-          ? {
-              startDatetime: { greater_than: now.toISOString() },
-            }
-          : timeStatus === ''
-            ? {
-                endDatetime: { less_than: now.toISOString() },
-              }
-            : {}),
-      },
+      where: {},
       select: {},
       depth: 0,
       limit: 1000,
@@ -48,7 +39,7 @@ export async function GET(req: NextRequest) {
           equals: userId,
         },
         status: {
-          equals: ticketType,
+          equals: ticketStatus,
         },
         ...(eventIds.length > 0
           ? {

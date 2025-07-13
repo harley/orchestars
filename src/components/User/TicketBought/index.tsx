@@ -5,6 +5,7 @@ import { useTranslate } from '@/providers/I18n/client'
 import TicketsList from './TicketsList'
 import { useTickets } from '@/components/User/hooks/useTickets'
 import { TicketTypeFilterTab } from './TicketTypeFilterTab'
+import { TicketStatus } from '@/collections/Tickets/constants'
 
 const TicketBought = ({ className }: { className?: string }) => {
   const { t } = useTranslate()
@@ -16,10 +17,9 @@ const TicketBought = ({ className }: { className?: string }) => {
 
   const containerClass = `max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 mt-8 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className || ''}`
 
-  const [timeFilter, setTimeFilter] = useState<'upcoming' | 'finished'>('finished')
 
-  const [ticketType, setTicketType] = useState<
-    'booked' | 'cancelled' | 'pending_payment' | 'gifted'
+  const [ticketStatus, setTicketStatus] = useState<
+    TicketStatus | 'gifted'
   >('booked')
 
   const {
@@ -32,7 +32,7 @@ const TicketBought = ({ className }: { className?: string }) => {
     hasPrevPage,
     nextPage,
     prevPage,
-  } = useTickets({ eventType: timeFilter, ticketType: ticketType })
+  } = useTickets({ ticketStatus })
 
   return (
     <div className={containerClass}>
@@ -40,8 +40,8 @@ const TicketBought = ({ className }: { className?: string }) => {
 
       {/* <TimeFilterTabs timeFilter={timeFilter} setTimeFilter={setTimeFilter} t={t} /> */}
       <TicketTypeFilterTab
-        typeFilter={ticketType}
-        setTypeFilter={setTicketType}
+        typeFilter={ticketStatus}
+        setTypeFilter={setTicketStatus}
         t={t}
       ></TicketTypeFilterTab>
 

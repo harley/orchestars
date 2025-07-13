@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { TicketCard } from './TicketCard'
-import { useTickets } from '@/components/User/hooks/useTickets'
 import { Loader2 } from 'lucide-react'
 import {
   Pagination,
@@ -36,12 +35,6 @@ const TicketsList = ({
   prevPage,
 }: TicketProps) => {
   const { t } = useTranslate()
-
-  useEffect(() => {
-    void nextPage()
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   if (error) {
     return <div className="text-center py-8 text-red-500">{error}</div>

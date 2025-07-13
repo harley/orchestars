@@ -411,6 +411,7 @@
     "success": "Success",
     "processing": "Processing",
     "cancelled": "Cancelled",
+    "canceled": "Canceled",
     "booked": "Booked",
     "gifted": "Gifted",
     "pending_payment": "Pending Payment",

@@ -1033,7 +1033,7 @@ export interface Order {
   orderCode?: string | null;
   user?: (number | null) | User;
   category?: string | null;
-  status?: ('processing' | 'cancelled' | 'completed' | 'failed') | null;
+  status?: ('processing' | 'canceled' | 'completed' | 'failed') | null;
   currency?: string | null;
   /**
    * Legacy field for a single promotion. Use "promotionsApplied" instead.

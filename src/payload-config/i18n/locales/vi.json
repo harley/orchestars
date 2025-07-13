@@ -411,6 +411,7 @@
     "success": "Thành Công",
     "processing": "Đang Xử Lý",
     "cancelled": "Đã Hủy",
+    "canceled": "Đã Hủy",
     "booked": "Đã Mua",
     "gifted": "Được Tặng",
     "pending_payment": "Chờ thanh toán",
