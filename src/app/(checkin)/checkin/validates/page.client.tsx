@@ -262,21 +262,46 @@ export default function ValidatePageClient() {
       const data = await response.json()
 
       if (response.ok) {
-        // Handle different response types
-        if (response.status === 300) {
-          // Multiple tickets found (searched by seat)
-          setMultipleTickets(data.tickets || [])
-          setValidatedTicket(null)
-          const ticketCount = data.tickets?.length || 0
-          if (ticketCount > 0) {
+        if (activeTab === 'seat') {
+          if (data.tickets && data.tickets.length > 1) {
+            // Multiple tickets found for the seat
+            setMultipleTickets(data.tickets)
+            setValidatedTicket(null)
             toast({
               title: 'MULTIPLE FOUND',
-              description: `Found ${ticketCount} tickets`,
+              description: `Found ${data.tickets.length} tickets for this seat.`,
               variant: 'success',
             })
+          } else if (data.tickets && data.tickets.length === 1) {
+            // Single ticket found for the seat
+            const ticket = data.tickets[0]
+            setValidatedTicket(ticket)
+            setMultipleTickets([])
+            if (ticket.isCheckedIn) {
+              toast({
+                title: 'ALREADY CHECKED IN',
+                description: 'This visitor has already been checked in.',
+                variant: 'destructive',
+              })
+            } else {
+              toast({
+                title: 'TICKET FOUND',
+                description: 'Ready for check-in.',
+                variant: 'success',
+              })
+            }
+          } else {
+            // No tickets found
+            setValidatedTicket(null)
+            setMultipleTickets([])
+            toast({
+              title: 'Seat Not Found',
+              description: 'No ticket found for that seat.',
+              variant: 'destructive',
+            })
           }
-        } else if (response.status === 200) {
-          // Single ticket found
+        } else {
+          // Ticket code validation logic (assuming it returns a single ticket object)
           setValidatedTicket(data.ticket)
           setMultipleTickets([])
           if (data.ticket?.isCheckedIn) {
@@ -286,7 +311,6 @@ export default function ValidatePageClient() {
               variant: 'destructive',
             })
           } else {
-            // Simple validation toast
             toast({
               title: 'TICKET FOUND',
               description: 'Ready for check-in',
@@ -295,13 +319,15 @@ export default function ValidatePageClient() {
           }
         }
       } else {
+        const errorData = await response.json().catch(() => ({}))
         // Simple error toast
         toast({
           title: activeTab === 'ticket' ? 'Ticket Not Found' : 'Seat Not Found',
           description:
-            activeTab === 'ticket'
+            errorData.message ||
+            (activeTab === 'ticket'
               ? 'No ticket found with that code.'
-              : 'No ticket found for that seat.',
+              : 'No ticket found for that seat.'),
           variant: 'destructive',
         })
       }

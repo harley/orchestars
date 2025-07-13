@@ -30,14 +30,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Ticket not found' }, { status: 404 })
     }
 
-    // A specific seat in a schedule should be unique, but handle case of multiple just in case
-    if (tickets.length > 1) {
-      return NextResponse.json({ tickets }, { status: 300 })
-    }
-
-    const ticket = tickets[0]!
-
-    return NextResponse.json({ ticket }, { status: 200 })
+    return NextResponse.json({ tickets }, { status: 200 })
   } catch (error) {
     console.error('Error validating seat:', error)
     return NextResponse.json({ message: await handleNextErrorMsgResponse(error) }, { status: 500 })
