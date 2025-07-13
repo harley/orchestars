@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
 import { toast } from '@/hooks/use-toast'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { AlertTriangle } from 'lucide-react'; // Add for warning icon
 
 export default function ValidatePageClient() {
   const [ticketCode, setTicketCode] = useState('')
@@ -29,6 +30,9 @@ export default function ValidatePageClient() {
   const scheduleId = searchParams?.get('scheduleId')
   const [eventTitle, setEventTitle] = useState('')
   const [scheduleDate, setScheduleDate] = useState('')
+  const [showDateWarning, setShowDateWarning] = useState(false);
+  const [eventLocation, setEventLocation] = useState('');
+  const [eventTime] = useState('TBA'); // Placeholder; adjust if time is available in data
 
   // Component initialization
 
@@ -41,9 +45,18 @@ export default function ValidatePageClient() {
       if (storedTitle) setEventTitle(storedTitle)
       if (storedDate) setScheduleDate(storedDate)
     }
+    const storedLocation = localStorage.getItem('eventLocation');
+    if (storedLocation) setEventLocation(storedLocation);
+    
+    // Date mismatch check
+    if (scheduleDate) {
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      const selectedDate = new Date(scheduleDate).toISOString().split('T')[0];
+      setShowDateWarning(today !== selectedDate);
+    }
     // Auto-focus on initial load
     ticketInputRef.current?.focus()
-  }, [])
+  }, [scheduleDate])
 
   useEffect(() => {
     if (activeTab === 'ticket') {
@@ -250,287 +263,272 @@ export default function ValidatePageClient() {
     }, 0)
   }
 
+  // Compute button className
+  const validateButtonClass = `w-full py-4 px-4 rounded-lg font-bold text-white transition-colors uppercase tracking-wide ${
+    (isLoading ||
+    (activeTab === 'ticket' && !ticketCode.trim()) ||
+    (activeTab === 'seat' && !seatNumber.trim()) ||
+    validatedTicket ||
+    multipleTickets.length > 0)
+      ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
+      : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:shadow-lg'
+  }`;
+
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-      <div className="max-w-2xl mx-auto p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <button
-            type="button"
-            onClick={() => router.replace('/checkin/events')}
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-          >
-            ← Back to Events
-          </button>
-        </div>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center p-6">
+      <div className="max-w-lg w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
+        {/* Back Button */}
+        <button
+          type="button"
+          onClick={() => router.replace('/checkin/events')}
+          className="mb-6 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+        >
+          ← Back to Events
+        </button>
 
-        {/* Main Content Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-          {/* Title Section */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Visitor Check-In
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              {activeTab === 'ticket'
-                ? 'Enter a ticket code to look up and check-in visitors'
-                : 'Enter a seat number to look up and check-in visitors'}
-            </p>
+        {/* Title - More prominent */}
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+          Visitor Check-In
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mb-6 text-center">
+          Enter a ticket code or seat to look up and check-in visitors
+        </p>
+
+        {/* Event Info - Formatted, no IDs */}
+        {eventTitle && (
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              {eventTitle}
+            </h2>
+            <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+              <div>Date: {scheduleDate}</div>
+              <div>Time: {eventTime}</div>
+              <div>Location: {eventLocation}</div>
+            </div>
           </div>
+        )}
 
-          {/* Event Info */}
-          {eventTitle && (
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                {eventTitle}
-              </h2>
-              <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
-                <div>Event ID: <span className="font-mono">{eventId}</span></div>
-                <div>Schedule ID: <span className="font-mono">{scheduleId}</span></div>
-                {scheduleDate && <div>Date: {scheduleDate}</div>}
+        {/* Date Warning */}
+        {showDateWarning && (
+          <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-6 flex items-center">
+            <AlertTriangle className="w-5 h-5 mr-2" />
+            <p>Warning: Selected event date is not today. Double-check before proceeding.</p>
+          </div>
+        )}
+
+        {/* Tabs - Improved styling */}
+        <Tabs defaultValue="ticket" onValueChange={onTabChange} className="w-full mb-6">
+          <TabsList className="grid w-full grid-cols-2 bg-gray-200 dark:bg-gray-700 rounded-lg p-1">
+            <TabsTrigger value="ticket" className="rounded-md py-2">By Ticket Code</TabsTrigger>
+            <TabsTrigger value="seat" className="rounded-md py-2">By Seat</TabsTrigger>
+          </TabsList>
+          <TabsContent value="ticket">
+            <div className="mt-4">
+              <input
+                id="ticketCode"
+                ref={ticketInputRef}
+                type="text"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow hover:shadow-md"
+                placeholder="Enter ticket code (e.g., TKT-123456)"
+                value={ticketCode}
+                onChange={e => setTicketCode(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+          </TabsContent>
+          <TabsContent value="seat">
+            <div className="mt-4">
+              <input
+                id="seat"
+                ref={seatInputRef}
+                type="text"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow hover:shadow-md"
+                placeholder="Enter seat number (e.g., A-12)"
+                value={seatNumber}
+                onChange={e => setSeatNumber(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Validate Button - More prominent */}
+        <button
+          onClick={handleValidate}
+          disabled={
+            isLoading ||
+            (activeTab === 'ticket' && !ticketCode.trim()) ||
+            (activeTab === 'seat' && !seatNumber.trim()) ||
+            validatedTicket ||
+            multipleTickets.length > 0
+          }
+          className={validateButtonClass}
+        >
+          {isLoading ? (
+            <span className="flex items-center justify-center">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Looking up visitor...
+            </span>
+          ) : validatedTicket || multipleTickets.length > 0 ? (
+            'Visitor Found'
+          ) : (
+            'Look Up Visitor'
+          )}
+        </button>
+
+        {/* Results - Improved card styling */}
+        {validatedTicket && (
+          <div className="mt-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-6 shadow-md">
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                Visitor Information
+              </h3>
+              <span
+                className={`px-4 py-1 text-sm font-semibold rounded-full ${
+                  validatedTicket.isCheckedIn
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+                }`}
+              >
+                {validatedTicket.isCheckedIn ? 'Checked In' : 'Ready for Check-in'}
+              </span>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                <div className="col-span-1 sm:col-span-2">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Attendee Name</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    {validatedTicket.attendeeName}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Seat</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-200">
+                    {validatedTicket.seat}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Ticket Code</p>
+                  <p className="font-mono text-sm text-gray-900 dark:text-gray-200">
+                    {validatedTicket.ticketCode}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-200">
+                    {validatedTicket.email || 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-200">
+                    {validatedTicket.phoneNumber || 'N/A'}
+                  </p>
+                </div>
               </div>
             </div>
-          )}
 
-          {/* Input Section */}
-          <Tabs defaultValue="ticket" onValueChange={onTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="ticket">By Ticket Code</TabsTrigger>
-              <TabsTrigger value="seat">By Seat</TabsTrigger>
-            </TabsList>
-            <TabsContent value="ticket">
-              <div className="space-y-4 pt-4">
-                <div>
-                  <label
-                    htmlFor="ticketCode"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Ticket Code
-                  </label>
-                  <input
-                    id="ticketCode"
-                    ref={ticketInputRef}
-                    type="text"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                    placeholder="Enter ticket code (e.g., TKT-123456)"
-                    value={ticketCode}
-                    onChange={e => setTicketCode(e.target.value)}
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="seat">
-              <div className="space-y-4 pt-4">
-                <div>
-                  <label
-                    htmlFor="seat"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Seat Number
-                  </label>
-                  <input
-                    id="seat"
-                    ref={seatInputRef}
-                    type="text"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                    placeholder="Enter seat number (e.g., A-12)"
-                    value={seatNumber}
-                    onChange={e => setSeatNumber(e.target.value)}
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-
-          <div className="mt-6">
-            <button
-              onClick={handleValidate}
-              disabled={
-                isLoading ||
-                (activeTab === 'ticket' && !ticketCode.trim()) ||
-                (activeTab === 'seat' && !seatNumber.trim()) ||
-                validatedTicket ||
-                multipleTickets.length > 0
-              }
-              className={`w-full py-3 px-4 rounded-lg font-semibold text-white transition-colors ${
-                isLoading ||
-                (activeTab === 'ticket' && !ticketCode.trim()) ||
-                (activeTab === 'seat' && !seatNumber.trim()) ||
-                validatedTicket ||
-                multipleTickets.length > 0
-                  ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
-              }`}
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Looking up visitor...
-                </span>
-              ) : validatedTicket || multipleTickets.length > 0 ? (
-                'Visitor Found'
-              ) : (
-                'Look Up Visitor'
-              )}
-            </button>
-          </div>
-
-          {/* Validated Ticket Details */}
-          {validatedTicket && (
-            <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  Visitor Information
-                </h3>
-                <span
-                  className={`px-4 py-1 text-sm font-semibold rounded-full ${
-                    validatedTicket.isCheckedIn
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                      : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              {!validatedTicket.isCheckedIn && (
+                <button
+                  onClick={() => handleCheckIn(validatedTicket)}
+                  disabled={isCheckingIn}
+                  className={`flex-grow py-3 px-4 rounded-lg font-semibold text-white transition-colors ${
+                    isCheckingIn
+                      ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
+                      : 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
                   }`}
                 >
-                  {validatedTicket.isCheckedIn ? 'Checked In' : 'Ready for Check-in'}
-                </span>
-              </div>
-
-              <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                  <div className="col-span-1 sm:col-span-2">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Attendee Name</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                      {validatedTicket.attendeeName}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Seat</p>
-                    <p className="font-semibold text-gray-900 dark:text-gray-200">
-                      {validatedTicket.seat}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Ticket Code</p>
-                    <p className="font-mono text-sm text-gray-900 dark:text-gray-200">
-                      {validatedTicket.ticketCode}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
-                    <p className="font-semibold text-gray-900 dark:text-gray-200">
-                      {validatedTicket.email || 'N/A'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
-                    <p className="font-semibold text-gray-900 dark:text-gray-200">
-                      {validatedTicket.phoneNumber || 'N/A'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                {!validatedTicket.isCheckedIn && (
-                  <button
-                    onClick={() => handleCheckIn(validatedTicket)}
-                    disabled={isCheckingIn}
-                    className={`flex-grow py-3 px-4 rounded-lg font-semibold text-white transition-colors ${
-                      isCheckingIn
-                        ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
-                        : 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
-                    }`}
-                  >
-                    {isCheckingIn ? 'Checking In...' : `Check In ${validatedTicket.attendeeName}`}
-                  </button>
-                )}
-                <button
-                  onClick={resetValidation}
-                  className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Scan Next
+                  {isCheckingIn ? 'Checking In...' : `Check In ${validatedTicket.attendeeName}`}
                 </button>
-              </div>
+              )}
+              <button
+                onClick={resetValidation}
+                className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                Scan Next
+              </button>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Multiple Tickets */}
-          {multipleTickets.length > 0 && (
-            <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Multiple Visitors Found - Choose One to Check In
-              </h3>
-              <div className="space-y-4">
-                {multipleTickets.map((ticket, index) => (
-                  <div
-                    key={index}
-                    className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 transition-shadow hover:shadow-md"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex-1 mb-4 sm:mb-0">
-                        <div className="flex items-center mb-2">
-                          <p className="font-bold text-lg text-gray-900 dark:text-gray-100 mr-3">
-                            {ticket.attendeeName}
-                          </p>
-                          <span
-                            className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${
-                              ticket.isCheckedIn
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300'
-                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300'
-                            }`}
-                          >
-                            {ticket.isCheckedIn ? 'Checked In' : 'Ready'}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          <span className="font-medium">Seat:</span> {ticket.seat}
+        {/* Multiple Tickets */}
+        {multipleTickets.length > 0 && (
+          <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Multiple Visitors Found - Choose One to Check In
+            </h3>
+            <div className="space-y-4">
+              {multipleTickets.map((ticket, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 transition-shadow hover:shadow-md"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex-1 mb-4 sm:mb-0">
+                      <div className="flex items-center mb-2">
+                        <p className="font-bold text-lg text-gray-900 dark:text-gray-100 mr-3">
+                          {ticket.attendeeName}
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
-                          {ticket.ticketCode}
-                        </p>
+                        <span
+                          className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${
+                            ticket.isCheckedIn
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300'
+                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300'
+                          }`}
+                        >
+                          {ticket.isCheckedIn ? 'Checked In' : 'Ready'}
+                        </span>
                       </div>
-                      <div className="flex-shrink-0">
-                        {!ticket.isCheckedIn && (
-                          <button
-                            onClick={() => handleCheckIn(ticket)}
-                            disabled={isCheckingIn}
-                            className={`w-full sm:w-auto px-5 py-2 rounded-md font-semibold text-white transition-colors ${
-                              isCheckingIn
-                                ? 'bg-gray-400 cursor-not-allowed'
-                                : 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
-                            }`}
-                          >
-                            {isCheckingIn ? 'Checking...' : 'Check In'}
-                          </button>
-                        )}
-                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <span className="font-medium">Seat:</span> {ticket.seat}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
+                        {ticket.ticketCode}
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0">
+                      {!ticket.isCheckedIn && (
+                        <button
+                          onClick={() => handleCheckIn(ticket)}
+                          disabled={isCheckingIn}
+                          className={`w-full sm:w-auto px-5 py-2 rounded-md font-semibold text-white transition-colors ${
+                            isCheckingIn
+                              ? 'bg-gray-400 cursor-not-allowed'
+                              : 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
+                          }`}
+                        >
+                          {isCheckingIn ? 'Checking...' : 'Check In'}
+                        </button>
+                      )}
                     </div>
                   </div>
-                ))}
-              </div>
-              <div className="mt-6">
-                <button
-                  onClick={resetValidation}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Start Over
-                </button>
-              </div>
+                </div>
+              ))}
             </div>
-          )}
+            <div className="mt-6">
+              <button
+                onClick={resetValidation}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Start Over
+              </button>
+            </div>
+          </div>
+        )}
 
-          {/* Help Text */}
-          {!validatedTicket && multipleTickets.length === 0 && (
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Need help? Contact support if you are having trouble finding visitor tickets.
-              </p>
-            </div>
-          )}
-        </div>
+        {/* Help Text */}
+        {!validatedTicket && multipleTickets.length === 0 && (
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Need help? Contact support if you are having trouble finding visitor tickets.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )

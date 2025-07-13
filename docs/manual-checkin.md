@@ -107,3 +107,87 @@ No outstanding tasks for v1; future work is tracked in the *Future Enhancements*
 * **Offline Mode** – mirror QR-scanner roadmap to enable offline manual entry.
 * **Search Suggestions** – auto-complete seat numbers based on partial input.
 * **Voice Entry** – explore microphone input for hands-free seat entry. 
+
+---
+
+## 5. UI/UX Improvements (Dashboard Enhancement)
+
+### 5.1. Overview
+Recent improvements to the manual check-in dashboard focus on creating a more prominent, user-friendly interface that reduces errors and enhances the admin experience.
+
+### 5.2. Key Improvements
+
+#### Prominent Layout
+- **Centered Card Design**: The dashboard now uses a centered, shadowed card layout (`max-w-lg`, `shadow-2xl`) for better focus
+- **Enhanced Typography**: Larger title (`text-3xl`), better spacing, and centered alignment for improved hierarchy
+- **Responsive Design**: Maintains functionality across different screen sizes while emphasizing key elements
+
+#### Date Safety Features
+- **Date Mismatch Warning**: Automatic detection when selected event date differs from today's date
+- **Visual Warning Banner**: Red banner with alert triangle icon warns admins before proceeding with wrong-date check-ins
+- **Smart Comparison**: Uses ISO date strings for accurate date comparison regardless of timezone
+
+#### Information Display
+- **Hidden Technical IDs**: Event ID and Schedule ID are no longer visible to reduce clutter
+- **Formatted Event Details**: Clean display of:
+  - Event title
+  - Date (from schedule)
+  - Time (placeholder: "TBA" - can be enhanced with actual time data)
+  - Location (pulled from localStorage)
+
+#### Enhanced Input Experience
+- **Modern Tab Design**: Rounded tabs with better visual feedback for active state
+- **Improved Input Fields**: Enhanced with:
+  - Hover shadows (`hover:shadow-md`)
+  - Better transitions
+  - Consistent styling across ticket code and seat number inputs
+- **Prominent Action Button**: 
+  - Larger size (`py-4`)
+  - Uppercase text with letter spacing
+  - Enhanced hover effects
+
+### 5.3. Technical Implementation
+
+#### State Management
+```typescript
+const [showDateWarning, setShowDateWarning] = useState(false);
+const [eventLocation, setEventLocation] = useState('');
+const [eventTime] = useState('TBA');
+```
+
+#### Date Validation Logic
+```typescript
+// Date mismatch check
+if (scheduleDate) {
+  const today = new Date().toISOString().split('T')[0];
+  const selectedDate = new Date(scheduleDate).toISOString().split('T')[0];
+  setShowDateWarning(today !== selectedDate);
+}
+```
+
+#### Warning Component
+```jsx
+{showDateWarning && (
+  <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-6 flex items-center">
+    <AlertTriangle className="w-5 h-5 mr-2" />
+    <p>Warning: Selected event date is not today. Double-check before proceeding.</p>
+  </div>
+)}
+```
+
+### 5.4. User Experience Benefits
+
+1. **Error Prevention**: Date warnings help prevent accidental check-ins to wrong events
+2. **Reduced Cognitive Load**: Hidden technical IDs focus attention on relevant information
+3. **Improved Accessibility**: Better contrast, larger interactive elements, clear visual hierarchy
+4. **Professional Appearance**: Modern styling reduces the "ugly" appearance of previous iteration
+5. **Consistent Branding**: Maintains dark/light theme support throughout
+
+### 5.5. Future Enhancements
+
+- **Time Integration**: Replace "TBA" placeholder with actual event schedule times
+- **Location Validation**: Add location mismatch warnings for multi-venue events
+- **Quick Actions**: Add keyboard shortcuts for power users
+- **Offline Indicators**: Visual feedback for network status during check-ins
+
+--- 
