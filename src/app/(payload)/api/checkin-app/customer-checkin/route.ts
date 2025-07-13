@@ -92,6 +92,7 @@ export async function POST(request: Request) {
         ticketCode: ticket.ticketCode as string,
         eventScheduleId: ticket.eventScheduleId,
         checkInTime: new Date().toISOString(),
+        manual: true,
       },
     })
     revalidateTag('checkin-history')

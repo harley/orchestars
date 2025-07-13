@@ -7,8 +7,11 @@ import { toast } from '@/hooks/use-toast'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AlertTriangle, History, ChevronDown, X } from 'lucide-react'
 import type { CheckinRecord, User } from '@/payload-types'
+import { type TicketDTO } from '@/lib/checkin/findTickets'
 
-const CheckinHistory = forwardRef((props: {}, ref) => {
+interface CheckinHistoryProps {}
+
+const CheckinHistory = forwardRef((props: CheckinHistoryProps, ref) => {
   const [history, setHistory] = useState<CheckinRecord[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -113,8 +116,8 @@ export default function ValidatePageClient() {
   const [seatNumber, setSeatNumber] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isCheckingIn, setIsCheckingIn] = useState(false)
-  const [validatedTicket, setValidatedTicket] = useState<any>(null)
-  const [multipleTickets, setMultipleTickets] = useState<any[]>([])
+  const [validatedTicket, setValidatedTicket] = useState<TicketDTO | null>(null)
+  const [multipleTickets, setMultipleTickets] = useState<TicketDTO[]>([])
   const [activeTab, setActiveTab] = useState('ticket')
   const router = useRouter()
   const { isHydrated, token } = useAuth()
@@ -314,7 +317,7 @@ export default function ValidatePageClient() {
     }
   }
 
-  const handleCheckIn = async (ticket: any) => {
+  const handleCheckIn = async (ticket: TicketDTO) => {
     // Throttle duplicate check-in clicks
     const now = Date.now()
     if (now - lastCheckInRef.current < 2000) return
@@ -459,20 +462,25 @@ export default function ValidatePageClient() {
                 value={ticketCode}
                 onChange={e => setTicketCode(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleValidate()}
-                disabled={isLoading}
+                disabled={
+                  isLoading ||
+                  !ticketCode.trim() ||
+                  !!validatedTicket ||
+                  multipleTickets.length > 0
+                }
               />
               <button
                 onClick={handleValidate}
                 disabled={
                   isLoading ||
                   !ticketCode.trim() ||
-                  validatedTicket ||
+                  !!validatedTicket ||
                   multipleTickets.length > 0
                 }
                 className={`px-6 py-3 rounded-lg font-bold text-white transition-colors ${
                   (isLoading ||
                   !ticketCode.trim() ||
-                  validatedTicket ||
+                  !!validatedTicket ||
                   multipleTickets.length > 0)
                     ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
                     : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:shadow-lg'
@@ -500,20 +508,25 @@ export default function ValidatePageClient() {
                 value={seatNumber}
                 onChange={e => setSeatNumber(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleValidate()}
-                disabled={isLoading}
+                disabled={
+                  isLoading ||
+                  !seatNumber.trim() ||
+                  !!validatedTicket ||
+                  multipleTickets.length > 0
+                }
               />
               <button
                 onClick={handleValidate}
                 disabled={
                   isLoading ||
                   !seatNumber.trim() ||
-                  validatedTicket ||
+                  !!validatedTicket ||
                   multipleTickets.length > 0
                 }
                 className={`px-6 py-3 rounded-lg font-bold text-white transition-colors ${
                   (isLoading ||
                   !seatNumber.trim() ||
-                  validatedTicket ||
+                  !!validatedTicket ||
                   multipleTickets.length > 0)
                     ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
                     : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:shadow-lg'
