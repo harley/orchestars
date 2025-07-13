@@ -183,7 +183,7 @@ export const ScanPageClient: React.FC = () => {
       const checkinRes = await fetch(`/api/checkin-app/checkin/${ticketCode}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventDate: null }), // Assuming eventDate is not strictly needed for QR checkin
+        body: JSON.stringify({ eventDate: null, manual: false }), // Server will determine eventDate from ticket
       })
 
       if (checkinRes.status === 200) {
@@ -193,18 +193,20 @@ export const ScanPageClient: React.FC = () => {
       } else {
         let msg = 'Check-in failed'
         try {
-          const data = (await checkinRes.json()) as { errorCode?: string; message?: string }
-          msg = data.message || data.errorCode || msg
-        } catch (e) {
-          console.error('Failed to parse check-in error response:', e)
+          const errData = await checkinRes.json()
+          msg = errData.message || msg
+        } catch (_) {
+          // Ignore JSON parse errors
         }
         setFeedback({ type: 'error', message: msg })
         if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
       }
-    } catch (err) {
-      console.error(err)
+    } catch (error) {
+      console.error('Check-in error:', error)
       setFeedback({ type: 'error', message: 'Network error' })
       if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
+    } finally {
+      setIsProcessing(false)
     }
   }, [isProcessing])
 

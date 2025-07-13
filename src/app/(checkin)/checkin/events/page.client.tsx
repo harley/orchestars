@@ -61,6 +61,14 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     if (selectedSchedule.date) {
       localStorage.setItem('eventScheduleDate', format(selectedSchedule.date, 'dd-MM-yyyy'))
     }
+    
+    // Store schedule time details
+    if (selectedSchedule.details && selectedSchedule.details.length > 0) {
+      const timeDetails = selectedSchedule.details.map((detail: any) => detail.time).filter(Boolean)
+      if (timeDetails.length > 0) {
+        localStorage.setItem('eventScheduleTime', timeDetails.join(' - '))
+      }
+    }
 
     const params = new URLSearchParams({
       eventId: selectedEvent.id,

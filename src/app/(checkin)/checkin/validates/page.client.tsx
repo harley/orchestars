@@ -1,11 +1,112 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback, forwardRef, useImperativeHandle } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
 import { toast } from '@/hooks/use-toast'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { AlertTriangle } from 'lucide-react'; // Add for warning icon
+import { AlertTriangle, History, ChevronDown, X } from 'lucide-react'
+import type { CheckinRecord, User } from '@/payload-types'
+
+const CheckinHistory = forwardRef((props: {}, ref) => {
+  const [history, setHistory] = useState<CheckinRecord[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const hasFetched = useRef(false)
+
+  const fetchHistory = useCallback(async () => {
+    if (isLoading) return
+    setIsLoading(true)
+    try {
+      const res = await fetch('/api/checkin-app/scan-history')
+      if (res.ok) {
+        const data = await res.json()
+        setHistory(data.records || [])
+        hasFetched.current = true
+      }
+    } catch (err) {
+      console.error('Failed to fetch checkin history:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [isLoading])
+
+  useImperativeHandle(ref, () => ({
+    fetchHistory,
+  }))
+
+  useEffect(() => {
+    if (isOpen && !hasFetched.current) {
+      fetchHistory()
+    }
+  }, [isOpen, fetchHistory])
+
+  return (
+    <div className="w-full flex flex-col items-center">
+      {isOpen && (
+        <div className="w-full bg-gray-50 dark:bg-gray-700 p-4 rounded-t overflow-y-auto max-h-48 mb-2 relative">
+          <button
+            onClick={() => setIsOpen(false)}
+            className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            aria-label="Close history"
+          >
+            <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+          </button>
+          {isLoading && <p className="text-gray-600 dark:text-gray-300">Loading history...</p>}
+          {!isLoading && history.length === 0 && <p className="text-gray-600 dark:text-gray-300">No recent check-ins.</p>}
+          <ul className="space-y-2 pr-8">
+            {history.map(record => (
+              <li key={record.id} className="text-sm text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600 pb-2">
+                <p>
+                  <strong>Ticket:</strong> {record.ticketCode}
+                </p>
+                <p>
+                  <strong>Attendee:</strong>{' '}
+                  {`${(record.user as User)?.firstName || ''} ${
+                    (record.user as User)?.lastName || ''
+                  }`.trim() || 'N/A'}
+                </p>
+                <p>
+                  <strong>Time:</strong>{' '}
+                  {record.checkInTime
+                    ? new Date(record.checkInTime).toLocaleTimeString()
+                    : 'N/A'}
+                </p>
+                <p>
+                  <strong>Method:</strong>{' '}
+                  <span className={`px-2 py-1 rounded text-xs ${
+                    record.manual 
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' 
+                      : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                  }`}>
+                    {record.manual ? 'Manual' : 'QR Scan'}
+                  </span>
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <button
+        onClick={() => {
+          if (isOpen) {
+            // If expanded, refetch history instead of collapsing
+            fetchHistory()
+          } else {
+            // If collapsed, expand
+            setIsOpen(true)
+          }
+        }}
+        className="inline-flex items-center justify-center w-full gap-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors"
+      >
+        <History className="w-5 h-5" />
+        <span>{isOpen ? 'Refresh History' : 'Checkin History'}</span>
+        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+    </div>
+  )
+})
+CheckinHistory.displayName = 'CheckinHistory'
 
 export default function ValidatePageClient() {
   const [ticketCode, setTicketCode] = useState('')
@@ -22,6 +123,7 @@ export default function ValidatePageClient() {
 
   const ticketInputRef = useRef<HTMLInputElement>(null)
   const seatInputRef = useRef<HTMLInputElement>(null)
+  const historyRef = useRef<{ fetchHistory: () => void }>(null)
   // Track last action timestamps to prevent rapid duplicate submissions
   const lastValidateRef = useRef<number>(0)
   const lastCheckInRef = useRef<number>(0)
@@ -32,7 +134,7 @@ export default function ValidatePageClient() {
   const [scheduleDate, setScheduleDate] = useState('')
   const [showDateWarning, setShowDateWarning] = useState(false);
   const [eventLocation, setEventLocation] = useState('');
-  const [eventTime] = useState('TBA'); // Placeholder; adjust if time is available in data
+  const [eventTime, setEventTime] = useState('TBA'); // Placeholder; adjust if time is available in data
 
   // Component initialization
 
@@ -41,9 +143,11 @@ export default function ValidatePageClient() {
     if (typeof window !== 'undefined') {
       const storedTitle = localStorage.getItem('eventTitle')
       const storedDate = localStorage.getItem('eventScheduleDate')
+      const storedTime = localStorage.getItem('eventScheduleTime')
       
       if (storedTitle) setEventTitle(storedTitle)
       if (storedDate) setScheduleDate(storedDate)
+      if (storedTime) setEventTime(storedTime)
     }
     const storedLocation = localStorage.getItem('eventLocation');
     if (storedLocation) setEventLocation(storedLocation);
@@ -51,8 +155,32 @@ export default function ValidatePageClient() {
     // Date mismatch check
     if (scheduleDate) {
       const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-      const selectedDate = new Date(scheduleDate).toISOString().split('T')[0];
-      setShowDateWarning(today !== selectedDate);
+      
+      // Parse DD-MM-YYYY format to create a valid Date object
+      let selectedDateObj;
+      if (scheduleDate.includes('-')) {
+        const parts = scheduleDate.split('-');
+        if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
+          const [day, month, year] = parts;
+          // Create date with proper format (year, month-1, day) since months are 0-indexed
+          selectedDateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        } else {
+          // Fallback to direct parsing
+          selectedDateObj = new Date(scheduleDate);
+        }
+      } else {
+        // Fallback to direct parsing
+        selectedDateObj = new Date(scheduleDate);
+      }
+      
+      // Check if the date is valid before calling toISOString
+      if (!isNaN(selectedDateObj.getTime())) {
+        const selectedDate = selectedDateObj.toISOString().split('T')[0];
+        setShowDateWarning(today !== selectedDate);
+      } else {
+        // If invalid date, don't show warning
+        setShowDateWarning(false);
+      }
     }
     // Auto-focus on initial load
     ticketInputRef.current?.focus()
@@ -225,6 +353,8 @@ export default function ValidatePageClient() {
             ),
           )
         }
+        // Refresh checkin history
+        historyRef.current?.fetchHistory()
       } else {
         toast({
           title: 'CHECK-IN FAILED',
@@ -263,44 +393,40 @@ export default function ValidatePageClient() {
     }, 0)
   }
 
-  // Compute button className
-  const validateButtonClass = `w-full py-4 px-4 rounded-lg font-bold text-white transition-colors uppercase tracking-wide ${
-    (isLoading ||
-    (activeTab === 'ticket' && !ticketCode.trim()) ||
-    (activeTab === 'seat' && !seatNumber.trim()) ||
-    validatedTicket ||
-    multipleTickets.length > 0)
-      ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
-      : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:shadow-lg'
-  }`;
-
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center p-6">
-      <div className="max-w-lg w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
+    <>
+      <style jsx global>{`
+        [data-radix-toast-viewport] {
+          top: 1rem !important;
+          bottom: auto !important;
+        }
+      `}</style>
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-start justify-center p-4 pt-8">
+        <div className="max-w-lg w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6">
         {/* Back Button */}
         <button
           type="button"
           onClick={() => router.replace('/checkin/events')}
-          className="mb-6 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+          className="mb-4 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
         >
           ← Back to Events
         </button>
 
         {/* Title - More prominent */}
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
           Visitor Check-In
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-6 text-center">
+        <p className="text-gray-600 dark:text-gray-400 mb-4 text-center text-sm">
           Enter a ticket code or seat to look up and check-in visitors
         </p>
 
         {/* Event Info - Formatted, no IDs */}
         {eventTitle && (
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-4">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
               {eventTitle}
             </h2>
-            <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+            <div className="space-y-0.5 text-xs text-gray-600 dark:text-gray-300">
               <div>Date: {scheduleDate}</div>
               <div>Time: {eventTime}</div>
               <div>Location: {eventLocation}</div>
@@ -310,84 +436,109 @@ export default function ValidatePageClient() {
 
         {/* Date Warning */}
         {showDateWarning && (
-          <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-6 flex items-center">
-            <AlertTriangle className="w-5 h-5 mr-2" />
-            <p>Warning: Selected event date is not today. Double-check before proceeding.</p>
+          <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 px-3 py-2 rounded mb-4 flex items-center">
+            <AlertTriangle className="w-4 h-4 mr-2" />
+            <p className="text-sm">Warning: Selected event date is not today. Double-check before proceeding.</p>
           </div>
         )}
 
         {/* Tabs - Improved styling */}
-        <Tabs defaultValue="ticket" onValueChange={onTabChange} className="w-full mb-6">
+        <Tabs defaultValue="ticket" onValueChange={onTabChange} className="w-full mb-4">
           <TabsList className="grid w-full grid-cols-2 bg-gray-200 dark:bg-gray-700 rounded-lg p-1">
             <TabsTrigger value="ticket" className="rounded-md py-2">By Ticket Code</TabsTrigger>
             <TabsTrigger value="seat" className="rounded-md py-2">By Seat</TabsTrigger>
           </TabsList>
           <TabsContent value="ticket">
-            <div className="mt-4">
+            <div className="mt-4 flex gap-3">
               <input
                 id="ticketCode"
                 ref={ticketInputRef}
                 type="text"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow hover:shadow-md"
+                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow hover:shadow-md"
                 placeholder="Enter ticket code (e.g., TKT-123456)"
                 value={ticketCode}
                 onChange={e => setTicketCode(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleValidate()}
                 disabled={isLoading}
               />
+              <button
+                onClick={handleValidate}
+                disabled={
+                  isLoading ||
+                  !ticketCode.trim() ||
+                  validatedTicket ||
+                  multipleTickets.length > 0
+                }
+                className={`px-6 py-3 rounded-lg font-bold text-white transition-colors ${
+                  (isLoading ||
+                  !ticketCode.trim() ||
+                  validatedTicket ||
+                  multipleTickets.length > 0)
+                    ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:shadow-lg'
+                }`}
+              >
+                {isLoading ? (
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  'Find'
+                )}
+              </button>
             </div>
           </TabsContent>
           <TabsContent value="seat">
-            <div className="mt-4">
+            <div className="mt-4 flex gap-3">
               <input
                 id="seat"
                 ref={seatInputRef}
                 type="text"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow hover:shadow-md"
+                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow hover:shadow-md"
                 placeholder="Enter seat number (e.g., A-12)"
                 value={seatNumber}
                 onChange={e => setSeatNumber(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleValidate()}
                 disabled={isLoading}
               />
+              <button
+                onClick={handleValidate}
+                disabled={
+                  isLoading ||
+                  !seatNumber.trim() ||
+                  validatedTicket ||
+                  multipleTickets.length > 0
+                }
+                className={`px-6 py-3 rounded-lg font-bold text-white transition-colors ${
+                  (isLoading ||
+                  !seatNumber.trim() ||
+                  validatedTicket ||
+                  multipleTickets.length > 0)
+                    ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:shadow-lg'
+                }`}
+              >
+                {isLoading ? (
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  'Find'
+                )}
+              </button>
             </div>
           </TabsContent>
         </Tabs>
 
-        {/* Validate Button - More prominent */}
-        <button
-          onClick={handleValidate}
-          disabled={
-            isLoading ||
-            (activeTab === 'ticket' && !ticketCode.trim()) ||
-            (activeTab === 'seat' && !seatNumber.trim()) ||
-            validatedTicket ||
-            multipleTickets.length > 0
-          }
-          className={validateButtonClass}
-        >
-          {isLoading ? (
-            <span className="flex items-center justify-center">
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Looking up visitor...
-            </span>
-          ) : validatedTicket || multipleTickets.length > 0 ? (
-            'Visitor Found'
-          ) : (
-            'Look Up Visitor'
-          )}
-        </button>
-
-        {/* Results - Improved card styling */}
+        {/* Results - Compact layout with prominent check-in button */}
         {validatedTicket && (
-          <div className="mt-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-6 shadow-md">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                Visitor Information
-              </h3>
+          <div className="mt-6 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 shadow-md">
+            {/* Status and Check-in Button Row */}
+            <div className="flex justify-between items-center mb-4">
               <span
-                className={`px-4 py-1 text-sm font-semibold rounded-full ${
+                className={`px-3 py-1 text-sm font-semibold rounded-full ${
                   validatedTicket.isCheckedIn
                     ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
                     : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
@@ -395,62 +546,80 @@ export default function ValidatePageClient() {
               >
                 {validatedTicket.isCheckedIn ? 'Checked In' : 'Ready for Check-in'}
               </span>
-            </div>
-
-            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                <div className="col-span-1 sm:col-span-2">
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Attendee Name</p>
-                  <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    {validatedTicket.attendeeName}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Seat</p>
-                  <p className="font-semibold text-gray-900 dark:text-gray-200">
-                    {validatedTicket.seat}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Ticket Code</p>
-                  <p className="font-mono text-sm text-gray-900 dark:text-gray-200">
-                    {validatedTicket.ticketCode}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
-                  <p className="font-semibold text-gray-900 dark:text-gray-200">
-                    {validatedTicket.email || 'N/A'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
-                  <p className="font-semibold text-gray-900 dark:text-gray-200">
-                    {validatedTicket.phoneNumber || 'N/A'}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              
               {!validatedTicket.isCheckedIn && (
                 <button
                   onClick={() => handleCheckIn(validatedTicket)}
                   disabled={isCheckingIn}
-                  className={`flex-grow py-3 px-4 rounded-lg font-semibold text-white transition-colors ${
+                  className={`px-6 py-2 rounded-lg font-semibold text-white transition-colors ${
                     isCheckingIn
                       ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
                       : 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
                   }`}
                 >
-                  {isCheckingIn ? 'Checking In...' : `Check In ${validatedTicket.attendeeName}`}
+                  {isCheckingIn ? 'Checking In...' : 'Check In'}
                 </button>
               )}
+            </div>
+
+            {/* Visitor Information - Compact Grid */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                {validatedTicket.attendeeName}
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                <div>
+                  <span className="text-gray-500 dark:text-gray-400">Seat:</span>
+                  <span className="ml-2 font-semibold text-gray-900 dark:text-gray-200">
+                    {validatedTicket.seat}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-500 dark:text-gray-400">Ticket:</span>
+                  <span className="ml-2 font-mono text-gray-900 dark:text-gray-200">
+                    {validatedTicket.ticketCode}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-500 dark:text-gray-400">Type:</span>
+                  <span className="ml-2 font-semibold text-gray-900 dark:text-gray-200">
+                    {validatedTicket.ticketPriceName || 'N/A'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-500 dark:text-gray-400">Order:</span>
+                  <span className="ml-2 font-mono text-gray-900 dark:text-gray-200">
+                    {validatedTicket.orderCode || 'N/A'}
+                  </span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-gray-500 dark:text-gray-400">Email:</span>
+                  <span className="ml-2 font-semibold text-gray-900 dark:text-gray-200 break-words">
+                    {validatedTicket.email || 'N/A'}
+                  </span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-gray-500 dark:text-gray-400">Phone:</span>
+                  <span className="ml-2 font-semibold text-gray-900 dark:text-gray-200">
+                    {validatedTicket.phoneNumber || 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Search Another Ticket Button */}
+            <div className="mt-4">
               <button
-                onClick={resetValidation}
-                className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                onClick={() => {
+                  setValidatedTicket(null);
+                  setMultipleTickets([]);
+                  setTicketCode('');
+                  setSeatNumber('');
+                }}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
-                Scan Next
+                Search Another Ticket
               </button>
             </div>
           </div>
@@ -529,7 +698,13 @@ export default function ValidatePageClient() {
             </p>
           </div>
         )}
+
+        {/* Checkin History */}
+        <div className="mt-6">
+          <CheckinHistory ref={historyRef} />
+        </div>
       </div>
     </div>
+    </>
   )
 } 

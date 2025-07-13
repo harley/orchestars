@@ -10,6 +10,8 @@ export interface TicketDTO {
   seat: string
   status: string
   ticketPriceInfo: any
+  ticketPriceName: string | null
+  orderCode: string | null
   isCheckedIn: boolean
   checkinRecord: {
     checkInTime: string | null
@@ -46,10 +48,12 @@ export const findTickets = async (opts: {
       t.attendee_name,
       t.seat,
       t.ticket_price_info,
+      t.ticket_price_name,
       t.event_schedule_id,
       t.status,
       u.email,
       u.phone_number,
+      o.order_code,
       CASE WHEN cr.id IS NOT NULL THEN true ELSE false END as is_checked_in,
       cr.check_in_time,
       cr.checked_in_by_id,
@@ -58,6 +62,7 @@ export const findTickets = async (opts: {
       a.email as checked_in_by_email
     FROM tickets t
     LEFT JOIN users u ON t.user_id = u.id
+    LEFT JOIN orders o ON t.order_id = o.id
     LEFT JOIN checkin_records cr ON cr.ticket_code = t.ticket_code AND cr.deleted_at IS NULL
     LEFT JOIN admins a ON cr.checked_in_by_id = a.id
     WHERE
@@ -81,6 +86,8 @@ export const findTickets = async (opts: {
     seat: r.seat,
     status: r.status,
     ticketPriceInfo: r.ticket_price_info,
+    ticketPriceName: r.ticket_price_name,
+    orderCode: r.order_code,
     isCheckedIn: r.is_checked_in,
     checkinRecord: r.is_checked_in
       ? {
