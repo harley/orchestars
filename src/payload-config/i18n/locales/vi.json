@@ -336,7 +336,34 @@
     "used": "Đã sử dụng",
     "valid": "Hợp lệ",
     "success": "Thành công",
-    "byUsher": "Bởi Usher"
+    "byUsher": "Bởi Usher",
+    "nav": {
+      "qr": "Checkin bằng QR",
+      "search": "Checkin thủ công"
+    },
+    "scan": {
+      "title": "Scan mã QR",
+      "instruction": "Đặt mã QR vào khung quét",
+      "upload": "Tải lên mã QR",
+      "history": "Lịch sử checkin",
+      "loadingHistory": "Đang tải lịch sử...",
+      "noRecentScans": "Chưa có lượt checkin nào gần đây.",
+      "ticket": "Vé:",
+      "attendee": "Khách:",
+      "time": "Thời gian:",
+      "error": {
+        "canvasNotSupported": "Trình duyệt không hỗ trợ Canvas",
+        "noQrFound": "Không tìm thấy mã QR",
+        "failedToLoadImage": "Không tải được hình ảnh",
+        "processingImage": "Lỗi xử lý hình ảnh",
+        "failed": "Checkin thất bại",
+        "network": "Lỗi kết nối mạng"
+      },
+      "success": "Soát vé"
+    },
+    "event": {
+      "dateTBA": "Ngày diễn ra: Đang cập nhật"
+    }
   },
   "customerCheckinTicket": {
     "ticketCheckIn": "Tự Check In",

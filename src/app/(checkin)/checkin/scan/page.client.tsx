@@ -14,12 +14,14 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import type { CheckinRecord, User } from '@/payload-types'
 import jsQR from 'jsqr'
+import { useTranslate } from '@/providers/I18n/client'
 
 const ScanHistory = forwardRef((props: {}, ref) => {
   const [history, setHistory] = useState<CheckinRecord[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const hasFetched = useRef(false)
+  const { t } = useTranslate()
 
   const fetchHistory = useCallback(async () => {
     if (isLoading) return
@@ -52,22 +54,20 @@ const ScanHistory = forwardRef((props: {}, ref) => {
     <div className="w-full flex flex-col items-center">
       {isOpen && (
         <div className="w-full bg-white/90 p-4 rounded-t overflow-y-auto max-h-48 text-black mb-2">
-          {isLoading && <p>Loading history...</p>}
-          {!isLoading && history.length === 0 && <p>No recent scans.</p>}
+          {isLoading && <p>{t('checkin.scan.loadingHistory')}</p>}
+          {!isLoading && history.length === 0 && <p>{t('checkin.scan.noRecentScans')}</p>}
           <ul className="space-y-2">
             {history.map(record => (
               <li key={record.id} className="text-sm text-gray-800 border-b pb-1">
                 <p>
-                  <strong>Ticket:</strong> {record.ticketCode}
+                  <strong>{t('checkin.scan.ticket')}</strong> {record.ticketCode}
                 </p>
                 <p>
-                  <strong>Attendee:</strong>{' '}
-                  {`${(record.user as User)?.firstName || ''} ${
-                    (record.user as User)?.lastName || ''
-                  }`.trim() || 'N/A'}
+                  <strong>{t('checkin.scan.attendee')}</strong>{' '}
+                  {`${(record.user as User)?.firstName || ''} ${(record.user as User)?.lastName || ''}`.trim() || 'N/A'}
                 </p>
                 <p>
-                  <strong>Time:</strong>{' '}
+                  <strong>{t('checkin.scan.time')}</strong>{' '}
                   {record.checkInTime
                     ? new Date(record.checkInTime).toLocaleTimeString()
                     : 'N/A'}
@@ -84,7 +84,7 @@ const ScanHistory = forwardRef((props: {}, ref) => {
         className="inline-flex items-center justify-center w-full gap-1 bg-white/10 backdrop-blur px-4 py-3 rounded text-sm font-medium text-white"
       >
         <History className="w-5 h-5" />
-        <span>Scan History</span>
+        <span>{t('checkin.scan.history')}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
     </div>
@@ -100,6 +100,7 @@ export const ScanPageClient: React.FC = () => {
   const pathname = usePathname()
   const historyRef = useRef<{ fetchHistory: () => void }>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { t } = useTranslate()
 
   const handleUploadClick = () => {
     fileInputRef.current?.click()
@@ -120,7 +121,7 @@ export const ScanPageClient: React.FC = () => {
         const canvas = document.createElement('canvas')
         const ctx = canvas.getContext('2d')
         if (!ctx) {
-          setFeedback({ type: 'error', message: 'Canvas not supported' })
+          setFeedback({ type: 'error', message: t('checkin.scan.error.canvasNotSupported') })
           return
         }
 
@@ -134,7 +135,7 @@ export const ScanPageClient: React.FC = () => {
         if (code) {
           validateAndCheckIn(code.data)
         } else {
-          setFeedback({ type: 'error', message: 'No QR code found.' })
+          setFeedback({ type: 'error', message: t('checkin.scan.error.noQrFound') })
           if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
         }
 
@@ -142,13 +143,13 @@ export const ScanPageClient: React.FC = () => {
       }
 
       image.onerror = () => {
-        setFeedback({ type: 'error', message: 'Failed to load image.' })
+        setFeedback({ type: 'error', message: t('checkin.scan.error.failedToLoadImage') })
         if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
         URL.revokeObjectURL(imageUrl)
       }
     } catch (err) {
       console.error(err)
-      setFeedback({ type: 'error', message: 'Error processing image.' })
+      setFeedback({ type: 'error', message: t('checkin.scan.error.processingImage') })
       if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
     }
 
@@ -173,7 +174,7 @@ export const ScanPageClient: React.FC = () => {
         const data = (await validateRes.json()) as { errorCode?: string; message?: string }
         setFeedback({
           type: 'error',
-          message: data.message || data.errorCode || `Validation failed (${validateRes.status})`,
+          message: data.message || data.errorCode || t('checkin.scan.error.failed'),
         })
         if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
         return
@@ -187,11 +188,11 @@ export const ScanPageClient: React.FC = () => {
       })
 
       if (checkinRes.status === 200) {
-        setFeedback({ type: 'success', message: 'Checked In' })
+        setFeedback({ type: 'success', message: t('checkin.scan.success') })
         if (window.navigator.vibrate) window.navigator.vibrate(200)
         historyRef.current?.fetchHistory();
       } else {
-        let msg = 'Check-in failed'
+        let msg = t('checkin.scan.error.failed')
         try {
           const errData = await checkinRes.json()
           msg = errData.message || msg
@@ -203,12 +204,12 @@ export const ScanPageClient: React.FC = () => {
       }
     } catch (error) {
       console.error('Check-in error:', error)
-      setFeedback({ type: 'error', message: 'Network error' })
+      setFeedback({ type: 'error', message: t('checkin.scan.error.network') })
       if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
     } finally {
       setIsProcessing(false)
     }
-  }, [isProcessing])
+  }, [isProcessing, t])
 
   // Auto-clear feedback overlay and re-enable scanning
   useEffect(() => {
@@ -241,7 +242,7 @@ export const ScanPageClient: React.FC = () => {
                 : 'bg-white/20 text-white hover:bg-white/30'
             }`}
           >
-            Checkin via QR
+            {t('checkin.nav.qr')}
           </Link>
           <Link
             href="/checkin/events"
@@ -251,12 +252,11 @@ export const ScanPageClient: React.FC = () => {
                 : 'bg-white/20 text-white hover:bg-white/30'
             }`}
           >
-            Checkin via Search
+            {t('checkin.nav.search')}
           </Link>
         </div>
-
-        <h1 className="text-2xl font-bold mb-2">Scan QR Code</h1>
-        <p className="text-gray-400 mb-6">Position the code within the frame</p>
+        <h1 className="text-2xl font-bold mb-2">{t('checkin.scan.title')}</h1>
+        <p className="text-gray-400 mb-6">{t('checkin.scan.instruction')}</p>
         <div className="w-full relative aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 border-gray-700">
           <QRScanner
             onScan={validateAndCheckIn}
@@ -274,9 +274,7 @@ export const ScanPageClient: React.FC = () => {
             </div>
           )}
         </div>
-
         {/* Removed flashlight toggle as it's not needed */}
-
         <div className="w-full mt-6 space-y-3">
           {/* Extra actions */}
           <div className="grid grid-cols-1 gap-3">
@@ -287,7 +285,7 @@ export const ScanPageClient: React.FC = () => {
               className="inline-flex items-center justify-center w-full gap-2 bg-gray-700 px-4 py-3 rounded text-sm font-medium text-white hover:bg-gray-600 disabled:opacity-50"
             >
               <Upload className="w-5 h-5" />
-              <span>Upload QR</span>
+              <span>{t('checkin.scan.upload')}</span>
             </button>
           </div>
           <ScanHistory ref={historyRef} />

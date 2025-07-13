@@ -91,7 +91,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
                 : 'bg-gray-300 text-gray-800 hover:bg-gray-400'
             }`}
           >
-            Checkin via QR
+            {t('checkin.nav.qr')}
           </Link>
           <Link
             href="/checkin/events"
@@ -101,7 +101,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
                 : 'bg-gray-300 text-gray-800 hover:bg-gray-400'
             }`}
           >
-            Checkin via Search
+            {t('checkin.nav.search')}
           </Link>
         </div>
         <div className="space-y-6">
@@ -174,7 +174,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
                               toZonedTime(new Date(schedule.date), 'Asia/Ho_Chi_Minh'),
                               'dd/MM/yyyy',
                             )
-                          : 'Ngày diễn ra: TBA'}
+                          : t('checkin.event.dateTBA')}
                       </button>
                     ))
                   ) : (

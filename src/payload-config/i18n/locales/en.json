@@ -336,7 +336,34 @@
     "used": "Used",
     "valid": "Valid",
     "success": "Success",
-    "byUsher": "By Usher"
+    "byUsher": "By Usher",
+    "nav": {
+      "qr": "Checkin via QR",
+      "search": "Checkin via Search"
+    },
+    "scan": {
+      "title": "Scan QR Code",
+      "instruction": "Position the code within the frame",
+      "upload": "Upload QR",
+      "history": "Checkin History",
+      "loadingHistory": "Loading history...",
+      "noRecentScans": "No recent checkins.",
+      "ticket": "Ticket:",
+      "attendee": "Attendee:",
+      "time": "Time:",
+      "error": {
+        "canvasNotSupported": "Canvas not supported",
+        "noQrFound": "No QR code found.",
+        "failedToLoadImage": "Failed to load image.",
+        "processingImage": "Error processing image.",
+        "failed": "Check-in failed",
+        "network": "Network error"
+      },
+      "success": "Checked In"
+    },
+    "event": {
+      "dateTBA": "Date: TBA"
+    }
   },
   "customerCheckinTicket": {
     "ticketCheckIn": "Self Check-In",
