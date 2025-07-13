@@ -9,30 +9,30 @@ import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { revalidateTag } from 'next/cache'
 import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
-import { checkAuthenticated } from '@/utilities/checkAuthenticated'
+import { getAdminUser } from '@/utilities/getAdminUser'
 // import { getClientSideURL } from '@/utilities/getURL'
 
 export async function POST(req: NextRequest) {
   try {
-    // Get authorization header
+    // Get admin user for authentication
     const payload = await getPayload()
 
-    const authData = await checkAuthenticated()
+    const adminUser = await getAdminUser()
 
     if (
-      !authData?.user ||
+      !adminUser ||
       !isAdminOrSuperAdminOrEventAdmin({
-        req: { user: authData.user },
+        req: { user: adminUser },
       })
     ) {
       throw new Error('CHECKIN005')
     }
 
-    const user = authData.user
+    const admin = adminUser
 
     // Get ticket code from URL parameter
     const ticketCode = req.nextUrl.pathname.split('/').pop()
-    const { eventDate } = await req.json()
+    const { eventDate, manual } = await req.json()
 
     // Find ticket by code
     const ticket = await payload.find({
@@ -90,8 +90,9 @@ export async function POST(req: NextRequest) {
         eventScheduleId: ticketDoc.eventScheduleId || null,
         eventDate: eventDate || null,
         checkInTime: new Date().toISOString(),
-        checkedInBy: user.id, // Use the admin's ID who performed check-in
+        checkedInBy: admin.id, // Admin who performed check-in
         ticketGivenTime: new Date().toISOString(),
+        manual: Boolean(manual),
       },
     })
 

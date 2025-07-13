@@ -53,6 +53,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     localStorage.setItem('selectedEventId', selectedEvent.id)
     localStorage.setItem('selectedScheduleId', selectedSchedule.id)
     localStorage.setItem('eventTitle', String(selectedEvent.title))
+    localStorage.setItem('eventLocation', String(selectedEvent.eventLocation))
     if (selectedSchedule.date) {
       localStorage.setItem('eventScheduleDate', format(selectedSchedule.date, 'dd-MM-yyyy'))
     }
@@ -60,9 +61,6 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     const params = new URLSearchParams({
       eventId: selectedEvent.id,
       scheduleId: selectedSchedule.id,
-      eventLocation: selectedEvent.eventLocation,
-      eventTitle: selectedEvent.title,
-      eventScheduleDate: selectedSchedule.date,
     })
 
     router.push(`/checkin/validates?${params.toString()}`)

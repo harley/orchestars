@@ -6,16 +6,16 @@ export const getAdminUser = async (): Promise<Admin | null> => {
   noStore()
 
   const cookieStore = await cookies()
-  const token = cookieStore.get('payload-token')?.value
+  const adminToken = cookieStore.get('payload-token')?.value
 
-  if (!token) {
+  if (!adminToken) {
     return null
   }
 
   try {
     const meRes = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admins/me`, {
       headers: {
-        Authorization: `JWT ${token}`,
+        Authorization: `JWT ${adminToken}`,
       },
       cache: 'no-store',
     })

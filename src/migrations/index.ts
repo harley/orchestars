@@ -74,6 +74,7 @@ import * as migration_20250703_154624_add_name_affiliate_links from './20250703_
 import * as migration_20250706_140853_create_membership_collections from './20250706_140853_create_membership_collections';
 import * as migration_20250709_051135_remove_default_user_affiliate_status from './20250709_051135_remove_default_user_affiliate_status';
 import * as migration_20250709_051424_add_affiliate_link_slug from './20250709_051424_add_affiliate_link_slug';
+import * as migration_20250713_044021_add_manual_column_to_checkin_records from './20250713_044021_add_manual_column_to_checkin_records';
 
 export const migrations = [
   {
@@ -454,6 +455,11 @@ export const migrations = [
   {
     up: migration_20250709_051424_add_affiliate_link_slug.up,
     down: migration_20250709_051424_add_affiliate_link_slug.down,
-    name: '20250709_051424_add_affiliate_link_slug'
+    name: '20250709_051424_add_affiliate_link_slug',
+  },
+  {
+    up: migration_20250713_044021_add_manual_column_to_checkin_records.up,
+    down: migration_20250713_044021_add_manual_column_to_checkin_records.down,
+    name: '20250713_044021_add_manual_column_to_checkin_records'
   },
 ];
