@@ -18,7 +18,6 @@ The QR Code Check-in feature provides event staff with a fast, reliable, and sec
 *   **As an Event Admin, I want to:**
     *   Quickly scan a QR code on an attendee's ticket to validate it.
     *   Receive immediate, clear feedback on whether a ticket is valid, already used, or invalid.
-    *   Use the device's flashlight to scan tickets in low-light environments.
     *   See a history of my recent scans during my session.
     *   Have a fallback option for manual ticket code entry if a QR code is unreadable.
     *   Be automatically redirected back to the scanner page if my session expires and I have to log in again.
@@ -45,7 +44,6 @@ The QR Code Check-in feature provides event staff with a fast, reliable, and sec
 *   **Feedback & UI:**
     *   The UI must provide clear visual feedback for success (e.g., green overlay, "Checked In" message) and failure (e.g., red overlay, error message).
     *   The device should vibrate to provide haptic feedback.
-    *   A button to toggle the device's flashlight must be available.
     *   A collapsible section should display a history of recent scans performed by the admin.
 *   **Data & Tracking:**
     *   Each check-in must be recorded in a `checkinRecords` collection.
@@ -61,13 +59,13 @@ The QR Code Check-in feature provides event staff with a fast, reliable, and sec
 
 *   **`src/app/(frontend)/checkin/scan/page.client.tsx`**
     *   This is the main client component for the scanner page.
-    *   It manages the overall layout, state (feedback overlays, processing state, flashlight), and orchestrates the check-in flow.
+    *   It manages the overall layout, handling feedback overlays and processing state, and orchestrates the check-in flow.
 
 *   **`src/components/QRScanner/index.tsx`**
     *   A wrapper around the `@yudiel/react-qr-scanner` library.
     *   Handles debouncing of scans to prevent false positives.
     *   Pre-requests camera permissions on mount to improve UX.
-    *   Integrates the library's built-in `Torch` and `Finder` components for flashlight control and the visual scanning guide.
+    *   Integrates the library's built-in `Finder` component for the visual scanning guide.
 
 *   **`src/components/QRCode/index.tsx`**
     *   A reusable component for generating QR codes. Used on the public ticket page.
@@ -129,7 +127,6 @@ The core QR code check-in functionality has been implemented and is operational.
 - **Ticket Validation & Check-in:** Backend APIs are in place to validate tickets and record check-ins, preventing duplicate scans.
 - **Admin Tracking:** All check-ins are associated with the admin who performed the scan.
 - **Scanner UI/UX:**
-    - Flashlight/torch control for low-light environments.
     - Lazy-loaded scan history for the current admin.
     - Haptic feedback on scan success/failure.
     - A clean, modern UI with clear user feedback.

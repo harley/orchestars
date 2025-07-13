@@ -50,14 +50,17 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
         <Globe size={16} className="" />
         <span className="text-sm inline mt-1">{currentLanguage.code.toUpperCase()}</span>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-white backdrop-blur-md border-white/10">
+      <DropdownMenuContent align="end" className="bg-gray-900 text-white p-1 rounded-lg shadow-lg">
         {languages.map((language) => (
           <DropdownMenuItem
             key={language.code}
             onClick={() => handleLanguageChange(language)}
             className={cn(
-              'flex items-center gap-2 text-sm cursor-pointer hover:bg-white/10',
-              currentLanguage.code === language.code ? 'bg-black/20' : '',
+              'flex items-center gap-2 text-sm cursor-pointer rounded-md transition-colors',
+              currentLanguage.code === language.code
+                ? 'bg-gray-800'
+                : 'hover:bg-gray-700',
+              'px-3 py-2'
             )}
           >
             <span className="mr-1">{language.flag}</span>

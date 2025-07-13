@@ -122,6 +122,8 @@ export async function POST(request: Request) {
               checkInTime: new Date().toISOString(),
               ticketGivenTime: new Date().toISOString(),
               ticketGivenBy: adminId,
+              // Indicate this record was created manually, not via QR scan
+              manual: true,
             },
           }),
         )
