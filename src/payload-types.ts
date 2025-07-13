@@ -1318,6 +1318,10 @@ export interface CheckinRecord {
   checkedInBy?: (number | null) | Admin;
   ticketGivenTime?: string | null;
   ticketGivenBy?: string | null;
+  /**
+   * True if this record was created from manual entry, false if via QR scan
+   */
+  manual: boolean;
   deletedAt?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -2962,6 +2966,7 @@ export interface CheckinRecordsSelect<T extends boolean = true> {
   checkedInBy?: T;
   ticketGivenTime?: T;
   ticketGivenBy?: T;
+  manual?: T;
   deletedAt?: T;
   updatedAt?: T;
   createdAt?: T;

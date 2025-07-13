@@ -9,35 +9,35 @@ import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { revalidateTag } from 'next/cache'
 import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
-import { checkAuthenticated } from '@/utilities/checkAuthenticated'
+import { getAdminUser } from '@/utilities/getAdminUser'
 // import { getClientSideURL } from '@/utilities/getURL'
 
 export async function POST(req: NextRequest) {
   try {
-    // Get authorization header
+    // Get admin user for authentication
     const payload = await getPayload()
 
-    const authData = await checkAuthenticated()
+    const adminUser = await getAdminUser()
 
     if (
-      !authData?.user ||
+      !adminUser ||
       !isAdminOrSuperAdminOrEventAdmin({
-        req: { user: authData.user },
+        req: { user: adminUser },
       })
     ) {
       throw new Error('CHECKIN005')
     }
 
-    const user = authData.user
+    const admin = adminUser
 
     // Get ticket code from URL parameter
     const ticketCode = req.nextUrl.pathname.split('/').pop()
-    const { eventDate } = await req.json()
+    const { eventDate, manual } = await req.json()
 
-    // Find ticket by code
+    // Find ticket by code with event data for eventDate determination
     const ticket = await payload.find({
       collection: 'tickets',
-      depth: 0,
+      depth: 1,
       limit: 1,
       where: {
         ticketCode: {
@@ -59,6 +59,24 @@ export async function POST(req: NextRequest) {
       !ticketDoc.seat
     ) {
       throw new Error('CHECKIN002')
+    }
+
+    // Determine eventDate if not provided (for QR scans)
+    let finalEventDate = eventDate
+    if (!finalEventDate && ticketDoc.eventScheduleId) {
+      const eventRecord = ticketDoc.event as any
+      if (eventRecord?.schedules) {
+        const schedule = eventRecord.schedules.find(
+          (sch: any) => sch.id === ticketDoc.eventScheduleId,
+        )
+        if (schedule?.date) {
+          // Format the date to match the format used in manual check-in (DD-MM-YYYY)
+          const scheduleDate = new Date(schedule.date)
+          if (!isNaN(scheduleDate.getTime())) {
+            finalEventDate = scheduleDate.toLocaleDateString('en-GB').replace(/\//g, '-')
+          }
+        }
+      }
     }
 
     // Check if ticket has already been used
@@ -88,10 +106,11 @@ export async function POST(req: NextRequest) {
         ticket: ticketDoc,
         ticketCode: ticketDoc.ticketCode,
         eventScheduleId: ticketDoc.eventScheduleId || null,
-        eventDate: eventDate || null,
+        eventDate: finalEventDate || null,
         checkInTime: new Date().toISOString(),
-        checkedInBy: user.id, // Use the admin's ID who performed check-in
+        checkedInBy: admin.id, // Admin who performed check-in
         ticketGivenTime: new Date().toISOString(),
+        manual: Boolean(manual),
       },
     })
 

@@ -83,6 +83,15 @@ export const CheckInRecords: CollectionConfig = {
       required: false,
     },
     {
+      name: 'manual',
+      type: 'checkbox',
+      required: true,
+      defaultValue: false,
+      admin: {
+        description: 'True if this record was created from manual entry, false if via QR scan',
+      },
+    },
+    {
       name: 'deletedAt',
       type: 'date',
       required: false,
