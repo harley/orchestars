@@ -35,11 +35,11 @@ The **Manual Check-in** feature allows event staff to verify and check in attend
 
 * **UI & Flow:**
   * A **“Manual Entry”** button sits on the scanner page (`/checkin/scan`).
-  * Clicking the button opens a modal (or navigates to `/checkin/events`) with these steps:
-    1. **Event & Schedule Selection** – required when checking in by *seat number*.
-    2. **Input Field** – accepts *ticket code* **or** *seat number*.
-    3. **Search** – queries the backend to fetch matching ticket & attendee details.
-    4. **Confirmation Screen** – displays the attendee info with a **“Check-in”** button.
+  * Clicking the button navigates to `/checkin/validates` (or, if no event is selected yet, first to `/checkin/events`) where staff complete these steps:
+    1. **Event & Schedule Selection** – required when checking in by *seat number* (the page reads `eventId` and `scheduleId` from the URL and caches them in `localStorage`).
+    2. **Tab Selector & Input** – choose **“By Ticket Code”** or **“By Seat”** and type the value.
+    3. **Look Up** – triggers a backend validation request; a 2-second client-side throttle prevents accidental double submissions.
+    4. **Confirmation Screen / Multi-match List** – shows the visitor details (or a list when multiple tickets share the seat) with a **“Check-in”** button.
   * Clear success (green) or failure (red) feedback overlays similar to the QR flow.
   * The interface re-focuses the input field after each action to streamline multiple entries.
 
@@ -63,13 +63,13 @@ The **Manual Check-in** feature allows event staff to verify and check in attend
 ### 2.1. Frontend
 
 * **Route / Component Structure**
-  * `src/app/(checkin)/manual/page.client.tsx` – dedicated manual check-in page (lazy-loaded from the scanner).
+  * `src/app/(checkin)/checkin/validates/page.client.tsx` – dedicated manual check-in page (linked from the scanner).
   * Re-uses shared **feedback** & **history** components from the QR scanner.
-  * Uses a **debounced** input for seat/ticket searches to minimise server load.
+  * Employs a 2-second client-side **throttle** to prevent duplicate submissions.
 
 * **Event & Schedule Context**
-  * The selected event & schedule are stored in React context (or URL params) and reused across successive searches.
-  * If the admin switches schedule, the context resets to avoid cross-event mistakes.
+  * The selected event and schedule are passed via URL query parameters (`eventId`, `scheduleId`) and cached in `localStorage` for subsequent searches.
+  * Changing the event or schedule clears the cached values to avoid cross-event mistakes.
 
 * **Error Handling**
   * 404 → *Invalid seat/ticket*.
@@ -90,12 +90,14 @@ The **Manual Check-in** feature allows event staff to verify and check in attend
 
 ## 3. Current Status
 
-*Manual Check-in* exists in the codebase but requires a regression pass to ensure parity with the new QR Check-in flow (v2 scanner).  Known tasks:
+The manual check-in flow is fully functional and aligned with the v2 QR scanner:
 
-1. **UI polish** – align styling with the new scanner page.
-2. **Seat lookup API** – confirm it still resolves correctly after recent schema changes.
-3. **Duplicate prevention** – ensure the debounce window is enforced on manual submits.
-4. **Analytics flag** – add `manual: true` on `checkinRecords` if missing.
+* UI parity with the scanner page (responsive dark/light themes) is complete.
+* `validate-seat` endpoint and related migration are active in production.
+* Duplicate prevention is implemented via a 2-second throttle on both **validate** and **check-in** actions.
+* `checkinRecords` now includes a `manual` boolean flag (see migration `20250713_044021_add_manual_column_to_checkin_records.*`) and records `eventDate` and `checkedInBy` for every manual action.
+
+No outstanding tasks for v1; future work is tracked in the *Future Enhancements* section.
 
 ---
 
