@@ -34,8 +34,9 @@ The **Manual Check-in** feature allows event staff to verify and check in attend
   * Unauthenticated users are redirected to `/admin/login` and back after login (`?redirect=/checkin/events`).
 
 * **UI & Flow:**
-  * A **“Manual Entry”** button sits on the scanner page (`/checkin/scan`).
-  * Clicking the button navigates to `/checkin/validates` (or, if no event is selected yet, first to `/checkin/events`) where staff complete these steps:
+  * A **navigation toggle** is present on all check-in pages (`/checkin/scan`, `/checkin/events`, and `/checkin/validates`), allowing admins to seamlessly switch between QR and manual entry modes.
+  * Clicking the **“Manual Entry”** toggle navigates to `/checkin/events` for event/schedule selection, and then to `/checkin/validates`.
+  * The manual validation flow (`/checkin/validates`) proceeds as follows:
     1. **Event & Schedule Selection** – required when checking in by *seat number* (the page reads `eventId` and `scheduleId` from the URL and caches them in `localStorage`).
     2. **Tab Selector & Input** – choose **“By Ticket Code”** or **“By Seat”** and type the value.
     3. **Look Up** – triggers a backend validation request; a 2-second client-side throttle prevents accidental double submissions.
@@ -121,6 +122,10 @@ Recent improvements to the manual check-in dashboard focus on creating a more pr
 - **Centered Card Design**: The dashboard now uses a centered, shadowed card layout (`max-w-lg`, `shadow-2xl`) for better focus
 - **Enhanced Typography**: Larger title (`text-3xl`), better spacing, and centered alignment for improved hierarchy
 - **Responsive Design**: Maintains functionality across different screen sizes while emphasizing key elements
+
+#### Unified Navigation Toggle
+- **Seamless Switching**: A persistent navigation toggle is now present across all check-in pages.
+- **Improved Workflow**: Admins can instantly switch from manual look-up back to QR scanning (or vice-versa) without navigating back through multiple pages, significantly improving efficiency.
 
 #### Date Safety Features
 - **Date Mismatch Warning**: Automatic detection when selected event date differs from today's date
