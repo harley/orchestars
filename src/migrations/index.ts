@@ -75,7 +75,6 @@ import * as migration_20250706_140853_create_membership_collections from './2025
 import * as migration_20250709_051135_remove_default_user_affiliate_status from './20250709_051135_remove_default_user_affiliate_status';
 import * as migration_20250709_051424_add_affiliate_link_slug from './20250709_051424_add_affiliate_link_slug';
 import * as migration_20250713_044021_add_manual_column_to_checkin_records from './20250713_044021_add_manual_column_to_checkin_records';
-import * as migration_20250714_073228_add_index_in_phone_numbers from './20250714_073228_add_index_in_phone_numbers';
 
 export const migrations = [
   {
@@ -462,10 +461,5 @@ export const migrations = [
     up: migration_20250713_044021_add_manual_column_to_checkin_records.up,
     down: migration_20250713_044021_add_manual_column_to_checkin_records.down,
     name: '20250713_044021_add_manual_column_to_checkin_records',
-  },
-  {
-    up: migration_20250714_073228_add_index_in_phone_numbers.up,
-    down: migration_20250714_073228_add_index_in_phone_numbers.down,
-    name: '20250714_073228_add_index_in_phone_numbers'
   },
 ];
