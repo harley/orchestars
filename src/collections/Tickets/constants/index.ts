@@ -1,4 +1,7 @@
-export const TICKET_STATUS = {
+export type TicketStatus = 'booked' | 'cancelled' | 'pending_payment' | 'hold'
+
+
+export const TICKET_STATUS: Record<TicketStatus, { label: string; value: TicketStatus }> = {
   booked: {
     label: 'Booked', //  The seat has been paid for and confirmed
     value: 'booked',
@@ -12,7 +15,7 @@ export const TICKET_STATUS = {
     value: 'hold',
   },
   cancelled: {
-    label: 'Cancelled', // The seat has been cancelled by user: eg user has not paid for this ticket
+    label: 'Canceled', // The seat has been cancelled by user: eg user has not paid for this ticket
     value: 'cancelled',
   },
 }

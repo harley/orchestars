@@ -39,22 +39,22 @@ export const TicketCard: React.FC<{ ticket: Ticket }> = ({ ticket }) => {
 
         <div className="flex gap-2 items-center mb-2">
           {ticket.status === 'booked' && (
-            <span className="inline-block bg-green-600 text-xs px-2 py-1 rounded">
+            <span className="inline-block bg-green-600 text-white text-xs px-2 py-1 rounded">
               {t('userprofile.statusSuccess')}
             </span>
           )}
           {ticket.status === 'pending_payment' && (
-            <span className="inline-block bg-yellow-500 text-xs px-2 py-1 rounded">
-              {t('userprofile.statusProcessing')}
+            <span className="inline-block bg-yellow-500 text-white text-xs px-2 py-1 rounded">
+              {t('userprofile.statusPendingPayment')}
             </span>
           )}
           {ticket.status === 'hold' && (
-            <span className="inline-block bg-orange-500 text-xs px-2 py-1 rounded">
+            <span className="inline-block bg-orange-500 text-white text-xs px-2 py-1 rounded">
               {t('userprofile.statusHold')}
             </span>
           )}
           {ticket.status === 'cancelled' && (
-            <span className="inline-block bg-red-600 text-xs px-2 py-1 rounded">
+            <span className="inline-block bg-red-600 text-white text-xs px-2 py-1 rounded">
               {t('userprofile.statusCancelled')}
             </span>
           )}
