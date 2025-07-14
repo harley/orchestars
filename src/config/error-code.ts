@@ -61,6 +61,13 @@ export const ORDER_ERROR_CODE = {
   ORD005: 'Vui lòng chọn ghế và thực hiện lại thao tác',
 }
 
+export const CHECKIN_ERROR_CODE = {
+  CHECKIN001: 'Ticket not found',
+  CHECKIN004: 'Failed to create checkin record',
+  CHECKIN005: 'Unauthorized',
+  CHECKIN013: 'Ticket code missing',
+}
+
 export const ERROR_CODES = {
   ...PROMOTION_ERROR_CODE,
   ...EVENT_ERROR_CODE,
@@ -69,4 +76,5 @@ export const ERROR_CODES = {
   ...BOOKING_ERROR_CODE,
   ...SYSTEM_ERROR_CODE,
   ...ORDER_ERROR_CODE,
+  ...CHECKIN_ERROR_CODE,
 }

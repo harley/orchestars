@@ -10,9 +10,29 @@ import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { revalidateTag } from 'next/cache'
 import { withConnectionMonitoring } from '@/utilities/dbConnectionMonitor'
+import { CHECKIN_ERROR_CODE } from '@/config/error-code'
 
-export async function POST(req: NextRequest) {
-  const ticketCode = req.nextUrl.pathname.split('/').pop()
+interface TicketRow {
+  ticket_id: string
+  ticket_code: string
+  attendee_name: string
+  seat: string
+  ticket_price_info: any
+  ticket_price_name: string
+  event_id: string
+  user_id: string
+  event_schedule_id: string | null
+  status: string
+  existing_checkin_id?: string
+  existing_checkin_time?: string
+}
+
+export async function POST(
+  req: NextRequest,
+  context: { params: { 'ticket-code': string } }
+) {
+  const { params } = await context;
+  const ticketCode = params['ticket-code']
   
   return await withConnectionMonitoring(async () => {
     try {
@@ -24,16 +44,16 @@ export async function POST(req: NextRequest) {
           req: { user: adminUser },
         })
       ) {
-        throw new Error('CHECKIN005')
+        throw new Error(`${CHECKIN_ERROR_CODE.CHECKIN005}: Unauthorized access attempt by user ${adminUser?.id || 'unknown'}`)
       }
 
       if (!ticketCode) {
-        throw new Error('CHECKIN013')
+        throw new Error(`${CHECKIN_ERROR_CODE.CHECKIN013}: Ticket code missing in request params`)
       }
 
     const payload = await getPayload()
 
-    // Single optimized query to check ticket status and get all needed data
+    // Single optimized query to check ticket status and get all needed data, including event date
     const checkQuery = sql`
       SELECT
         t.id as ticket_id,
@@ -47,9 +67,11 @@ export async function POST(req: NextRequest) {
         t.event_schedule_id,
         t.status,
         cr.id as existing_checkin_id,
-        cr.check_in_time as existing_checkin_time
+        cr.check_in_time as existing_checkin_time,
+        es.date as event_schedule_date
       FROM tickets t
       LEFT JOIN checkin_records cr ON cr.ticket_code = t.ticket_code AND cr.deleted_at IS NULL
+      LEFT JOIN events_schedules es ON es.id = t.event_schedule_id
       WHERE 
         t.ticket_code = ${ticketCode.toUpperCase()}
         AND t.status = 'booked'
@@ -57,41 +79,19 @@ export async function POST(req: NextRequest) {
     `
 
     const result = await payload.db.drizzle.execute(checkQuery)
-    const rows = (result as { rows: any[] }).rows || []
+    const rows = (result as { rows: TicketRow[] }).rows || []
     
     if (!rows.length) {
-      throw new Error('CHECKIN001') // Ticket not found
+      throw new Error(`${CHECKIN_ERROR_CODE.CHECKIN001}: Ticket not found for code ${ticketCode}`)
     }
 
-    const ticket = rows[0]
-    
-    // Determine event date from schedule data (only when event_schedule_id exists)
+    const ticket = rows[0] as TicketRow & { event_schedule_date?: string }
+    // Use event_schedule_date if available
     let eventDate: string | null = null
-    if (ticket.event_schedule_id) {
-      try {
-        // Fetch event with schedules using Payload (minimal query)
-        const eventResult = await payload.find({
-          collection: 'events',
-          where: { id: { equals: ticket.event_id } },
-          limit: 1,
-          depth: 0,
-          select: { schedules: true }
-        })
-        
-        const eventRecord = eventResult.docs?.[0]
-        if (eventRecord?.schedules) {
-          const schedule = eventRecord.schedules.find(
-            (sch: any) => sch.id === ticket.event_schedule_id
-          )
-          if (schedule?.date) {
-            const scheduleDate = new Date(schedule.date)
-            if (!isNaN(scheduleDate.getTime())) {
-              eventDate = scheduleDate.toLocaleDateString('en-GB').replace(/\//g, '-')
-            }
-          }
-        }
-      } catch (e) {
-        console.warn('Failed to fetch event schedules:', e)
+    if (ticket.event_schedule_date) {
+      const scheduleDate = new Date(ticket.event_schedule_date)
+      if (!isNaN(scheduleDate.getTime())) {
+        eventDate = scheduleDate.toLocaleDateString('en-GB').replace(/\//g, '-')
       }
     }
     
@@ -148,11 +148,12 @@ export async function POST(req: NextRequest) {
     `
 
     const insertResult = await payload.db.drizzle.execute(insertQuery)
-    const checkinRows = (insertResult as { rows: any[] }).rows || []
+    const checkinRows = (insertResult as { rows: { id: string; check_in_time: string }[] }).rows || []
     
     if (!checkinRows.length) {
-      throw new Error('CHECKIN004') // Failed to create checkin record
+      throw new Error(`${CHECKIN_ERROR_CODE.CHECKIN004}: Failed to create checkin record for ticket ${ticketCode} by admin ${adminUser.id}`)
     }
+    const checkinRow = checkinRows[0]!
 
     // Revalidate cache
     revalidateTag('checkin-history')
@@ -168,7 +169,7 @@ export async function POST(req: NextRequest) {
         ticketPriceName: ticket.ticket_price_name,
         ticketPriceInfo: ticket.ticket_price_info,
         isCheckedIn: true,
-        checkedInAt: checkinRows[0].check_in_time
+        checkedInAt: checkinRow.check_in_time
       }
     })
 

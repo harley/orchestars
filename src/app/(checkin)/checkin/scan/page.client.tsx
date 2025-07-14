@@ -273,10 +273,13 @@ export const ScanPageClient: React.FC = () => {
       const scanData = await scanRes.json()
 
       // Cache the result
-      scanCacheRef.current.set(normalizedCode, {
-        result: scanData,
-        timestamp: now
-      })
+      // Only cache 'Already Checked In' (warning) and error results
+      if (scanRes.status !== 200 || (scanData.success && scanData.alreadyCheckedIn)) {
+        scanCacheRef.current.set(normalizedCode, {
+          result: scanData,
+          timestamp: now
+        })
+      }
 
       // Clean old cache entries (keep cache size manageable)
       if (scanCacheRef.current.size > 50) {
@@ -310,7 +313,7 @@ export const ScanPageClient: React.FC = () => {
         }
         historyRef.current?.fetchHistory();
       } else {
-        const msg = scanData.message || t('checkin.scan.error.failed')
+        const msg = !scanRes.ok ? scanData.message || t('checkin.scan.error.failed') : t('checkin.scan.error.failed')
         setFeedback({ type: 'error', message: msg })
         if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
       }
