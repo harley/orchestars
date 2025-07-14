@@ -27,11 +27,8 @@ interface TicketRow {
   existing_checkin_time?: string
 }
 
-export async function POST(
-  req: NextRequest,
-  context: { params: { 'ticket-code': string } }
-) {
-  const { params } = await context;
+export async function POST(req: Request, context: { params: { 'ticket-code': string } }) {
+  const { params } = context;
   const ticketCode = params['ticket-code']
   
   return await withConnectionMonitoring(async () => {
