@@ -346,6 +346,7 @@
       "instruction": "Position the code within the frame",
       "upload": "Upload QR",
       "history": "Checkin History",
+      "refreshHistory": "Refresh History",
       "loadingHistory": "Loading history...",
       "noRecentScans": "No recent checkins.",
       "ticket": "Ticket:",
@@ -363,6 +364,19 @@
     },
     "event": {
       "dateTBA": "Date: TBA"
+    },
+    "manual": {
+      "byTicketCode": "By Ticket Code",
+      "bySeat": "By Seat",
+      "byEmail": "By Email",
+      "byPhone": "By Phone",
+      "enterTicketCode": "Enter Ticket Code",
+      "enterSeatNumber": "Enter Seat Number",
+      "enterEmail": "Enter email address",
+      "enterPhone": "Enter phone number",
+      "lookingUp": "Looking up...",
+      "lookUp": "Look Up",
+      "clearAndStartNew": "Clear and Start New"
     }
   },
   "customerCheckinTicket": {

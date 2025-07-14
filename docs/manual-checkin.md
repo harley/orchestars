@@ -18,7 +18,7 @@ The **Manual Check-in** feature allows event staff to verify and check in attend
 * **As an Event Admin, I want to:**
   * Open a *Manual Entry* form from the `/checkin/scan` page.
   * Select the **Event** and **Schedule/Date** I am working on.
-  * Enter either a **Ticket Code** *or* a **Seat Number** to locate an attendee.
+  * Enter either a **Ticket Code**, a **Seat Number**, **Phone Number**, or **Email** to locate an attendee.
   * See the attendee’s name, ticket status, and seat details before final confirmation.
   * Confirm the check-in manually and receive immediate feedback (success, already checked in, invalid).
   * Fall back to QR scanning at any time.
@@ -34,12 +34,13 @@ The **Manual Check-in** feature allows event staff to verify and check in attend
   * Unauthenticated users are redirected to `/admin/login` and back after login (`?redirect=/checkin/events`).
 
 * **UI & Flow:**
-  * A **“Manual Entry”** button sits on the scanner page (`/checkin/scan`).
-  * Clicking the button navigates to `/checkin/validates` (or, if no event is selected yet, first to `/checkin/events`) where staff complete these steps:
-    1. **Event & Schedule Selection** – required when checking in by *seat number* (the page reads `eventId` and `scheduleId` from the URL and caches them in `localStorage`).
-    2. **Tab Selector & Input** – choose **“By Ticket Code”** or **“By Seat”** and type the value.
+  * A **navigation toggle** is present on all check-in pages (`/checkin/scan`, `/checkin/events`, and `/checkin/validates`), allowing admins to seamlessly switch between QR and manual entry modes.
+  * Clicking the **“Manual Entry”** toggle navigates to `/checkin/events` for event/schedule selection, and then to `/checkin/validates`.
+  * The manual validation flow (`/checkin/validates`) proceeds as follows:
+    1. **Event & Schedule Selection** – required when checking in by *seat number*, *phone*, or *email* (the page reads `eventId` and `scheduleId` from the URL and caches them in `localStorage`).
+    2. **Tab Selector & Input** – choose **“By Ticket Code”**, **“By Seat”**, **“By Email”**, or **“By Phone”** and type the value.
     3. **Look Up** – triggers a backend validation request; a 2-second client-side throttle prevents accidental double submissions.
-    4. **Confirmation Screen / Multi-match List** – shows the visitor details (or a list when multiple tickets share the seat) with a **“Check-in”** button.
+    4. **Confirmation Screen / Multi-match List** – shows the visitor details (or a list when multiple tickets are found) with a **“Check-in”** button.
   * Clear success (green) or failure (red) feedback overlays similar to the QR flow.
   * The interface re-focuses the input field after each action to streamline multiple entries.
 
@@ -49,7 +50,8 @@ The **Manual Check-in** feature allows event staff to verify and check in attend
 
 * **API Endpoints:**
   * `POST /api/checkin-app/validate/<ticket-code>` – unchanged; used when the input looks like a ticket code.
-  * `POST /api/checkin-app/validate-seat` – **new**; payload `{ eventId, scheduleId, seatNumber }` returns the corresponding ticket code if found.
+  * `POST /api/checkin-app/validate-seat` – unchanged; payload `{ eventId, scheduleId, seatNumber }` returns the corresponding ticket code if found.
+  * `POST /api/checkin-app/validate-contact` – **new**; payload `{ eventId, scheduleId, email?, phoneNumber? }` returns tickets matching the contact info for that event.
   * `POST /api/checkin-app/checkin/<ticket-code>` – performs the actual check-in.
 
 * **Data & Tracking:**
@@ -82,6 +84,11 @@ The **Manual Check-in** feature allows event staff to verify and check in attend
   * Finds the ticket for the given seat within that schedule.
   * Returns `404` if not found.
   * Otherwise delegates to the existing **validate** logic for consistent responses.
+
+* **Contact Lookup Endpoint (`validate-contact`)**
+  * Accepts `{ eventId, scheduleId, email?, phoneNumber? }`.
+  * Finds all tickets matching the exact email or phone number for that event schedule.
+  * Returns `404` if not found.
 
 * **Middleware**
   * Existing `src/middleware.ts` covers `/checkin/*`; no changes required.
@@ -121,6 +128,10 @@ Recent improvements to the manual check-in dashboard focus on creating a more pr
 - **Centered Card Design**: The dashboard now uses a centered, shadowed card layout (`max-w-lg`, `shadow-2xl`) for better focus
 - **Enhanced Typography**: Larger title (`text-3xl`), better spacing, and centered alignment for improved hierarchy
 - **Responsive Design**: Maintains functionality across different screen sizes while emphasizing key elements
+
+#### Unified Navigation Toggle
+- **Seamless Switching**: A persistent navigation toggle is now present across all check-in pages.
+- **Improved Workflow**: Admins can instantly switch from manual look-up back to QR scanning (or vice-versa) without navigating back through multiple pages, significantly improving efficiency.
 
 #### Date Safety Features
 - **Date Mismatch Warning**: Automatic detection when selected event date differs from today's date

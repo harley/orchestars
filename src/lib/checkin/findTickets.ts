@@ -30,13 +30,15 @@ export interface TicketDTO {
 export const findTickets = async (opts: {
   ticketCode?: string
   seatNumber?: string
+  email?: string
+  phoneNumber?: string
   eventId?: string
   scheduleId?: string
 }): Promise<TicketDTO[]> => {
-  const { ticketCode, seatNumber, eventId, scheduleId } = opts
+  const { ticketCode, seatNumber, eventId, scheduleId, email, phoneNumber } = opts
 
-  if (!ticketCode && !seatNumber) {
-    throw new Error('findTickets requires ticketCode or seatNumber')
+  if (!ticketCode && !seatNumber && !email && !phoneNumber) {
+    throw new Error('findTickets requires ticketCode, seatNumber, email, or phoneNumber')
   }
 
   const payload = await getPayload()
@@ -68,6 +70,12 @@ export const findTickets = async (opts: {
     WHERE
       ${ticketCode ? sql`t.ticket_code = ${ticketCode.toUpperCase()}` : sql`TRUE`}
       ${seatNumber ? sql`AND UPPER(t.seat) = ${seatNumber.toUpperCase()}` : sql``}
+      ${email ? sql`AND u.email = ${email}` : sql``}
+      ${
+        phoneNumber
+          ? sql`AND EXISTS (SELECT 1 FROM users_phone_numbers upn WHERE upn._parent_id = u.id AND upn.phone = ${phoneNumber})`
+          : sql``
+      }
       ${eventId ? sql`AND t.event_id = ${eventId}` : sql``}
       ${scheduleId ? sql`AND t.event_schedule_id = ${scheduleId}` : sql``}
       AND t.status = 'booked'
