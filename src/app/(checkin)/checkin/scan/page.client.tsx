@@ -264,7 +264,7 @@ export const ScanPageClient: React.FC = () => {
 
     try {
       // Single optimized API call for validation + check-in
-      const scanRes = await fetch(`/api/checkin-app/scan/${normalizedCode}`, {
+      const scanRes = await fetch(`/api/checkin-app/scan?ticketCode=${normalizedCode}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
