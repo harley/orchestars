@@ -5,19 +5,15 @@ import { cache } from 'react'
 import type { Ticket, CheckinRecord } from '@/payload-types'
 import { Gutter } from '@payloadcms/ui'
 import { TicketDetails } from './page.client'
+import { categories } from '@/components/EventDetail/data/seat-maps/categories'
 
-// Utility function to get ticket class color (duplicated from client helper)
+// Utility function to get ticket class color
 const getTicketClassColor = (ticketPriceInfo: any) => {
   if (!ticketPriceInfo || typeof ticketPriceInfo !== 'object') {
     return { color: '#6B7280', textColor: '#fff' }
   }
 
   const ticketKey = ticketPriceInfo.key
-  // categories data is only available on client, use fallback gray when server side
-  const categories = [
-    /* minimal fallback; customise if needed */
-  ] as { id: string; color: string; textColor: string }[]
-
   const category = categories.find((cat) => cat.id === ticketKey)
 
   return category
