@@ -75,6 +75,12 @@ const ScanHistory = forwardRef((props: {}, ref) => {
               // Future: Add support for 'printed' method
               const checkinMethod = (record as any).manual ? 'Manual' : 'QR'
               
+              // Memoize style object to prevent unnecessary re-renders
+              const ticketStyle = {
+                backgroundColor: ticketColors.color,
+                color: ticketColors.textColor,
+              }
+              
               return (
                 <li key={record.id} className="text-sm text-gray-800 border-b pb-2">
                   <div className="flex justify-between items-center font-medium mb-1">
@@ -84,10 +90,7 @@ const ScanHistory = forwardRef((props: {}, ref) => {
                       </span>
                       <span 
                         className="px-2 py-1 rounded text-xs font-medium"
-                        style={{
-                          backgroundColor: ticketColors.color,
-                          color: ticketColors.textColor,
-                        }}
+                        style={ticketStyle}
                       >
                         {ticketType}
                       </span>

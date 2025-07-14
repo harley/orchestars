@@ -42,22 +42,22 @@ export async function GET(req: NextRequest) {
       baseWhere.eventScheduleId = { equals: scheduleId }
     }
 
-    // Get total checkins for this event/schedule
-    const totalCheckins = await payload.find({
-      collection: 'checkinRecords',
-      where: baseWhere,
-      limit: 0, // We only want the count
-    })
-
-    // Get checkins by current admin for this event/schedule
-    const adminCheckins = await payload.find({
-      collection: 'checkinRecords',
-      where: {
-        ...baseWhere,
-        checkedInBy: { equals: adminUser.id },
-      },
-      limit: 0, // We only want the count
-    })
+    // Get total checkins and admin checkins concurrently
+    const [totalCheckins, adminCheckins] = await Promise.all([
+      payload.find({
+        collection: 'checkinRecords',
+        where: baseWhere,
+        limit: 0, // We only want the count
+      }),
+      payload.find({
+        collection: 'checkinRecords',
+        where: {
+          ...baseWhere,
+          checkedInBy: { equals: adminUser.id },
+        },
+        limit: 0, // We only want the count
+      })
+    ])
 
     return NextResponse.json({
       eventId,

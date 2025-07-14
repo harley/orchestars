@@ -93,42 +93,61 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     })
     setEventStats(initialStats)
 
-    // Fetch stats for each schedule
-    for (const schedule of event.schedules) {
+    // Fetch stats for all schedules concurrently
+    const fetchPromises = event.schedules.map(async (schedule: any) => {
       try {
         const res = await fetch(`/api/checkin-app/event-stats?eventId=${event.id}&scheduleId=${schedule.id}`)
         if (res.ok) {
           const data = await res.json()
-          setEventStats(prev => ({
-            ...prev,
-            [schedule.id]: {
+          return {
+            scheduleId: schedule.id,
+            success: true,
+            data: {
               scheduleId: schedule.id,
               totalCheckins: data.stats.totalCheckins,
               adminCheckins: data.stats.adminCheckins,
               loading: false,
             }
-          }))
+          }
         } else {
-          // Handle error - set loading to false but keep zeros
-          setEventStats(prev => ({
-            ...prev,
-            [schedule.id]: {
-              ...prev[schedule.id],
-              loading: false,
-            }
-          }))
+          return {
+            scheduleId: schedule.id,
+            success: false,
+            error: `HTTP ${res.status}`
+          }
         }
       } catch (error) {
         console.error('Failed to fetch stats for schedule:', schedule.id, error)
-        setEventStats(prev => ({
-          ...prev,
-          [schedule.id]: {
-            ...prev[schedule.id],
+        return {
+          scheduleId: schedule.id,
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        }
+      }
+    })
+
+    // Wait for all requests to complete
+    const results = await Promise.all(fetchPromises)
+    
+    // Update state based on results
+    setEventStats(prev => {
+      const updatedStats = { ...prev }
+      results.forEach(result => {
+        if (result.success) {
+          updatedStats[result.scheduleId] = result.data
+        } else {
+          // Handle error - set loading to false but keep zeros
+          const existingStats = prev[result.scheduleId]
+          updatedStats[result.scheduleId] = {
+            scheduleId: existingStats?.scheduleId || result.scheduleId,
+            totalCheckins: existingStats?.totalCheckins || 0,
+            adminCheckins: existingStats?.adminCheckins || 0,
             loading: false,
           }
-        }))
-      }
-    }
+        }
+      })
+      return updatedStats
+    })
 
     if (showRefreshing) {
       setIsRefreshing(false)
@@ -274,7 +293,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
 
               {selectedEvent?.id === event.id && (
                 <div className="mt-4 space-y-3">
-                  {!!event.schedules?.length ? (
+                  {event.schedules?.length ? (
                     event.schedules.map((schedule: any) => {
                       const stats = eventStats[schedule.id]
                       return (
