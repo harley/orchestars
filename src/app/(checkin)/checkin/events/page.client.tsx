@@ -21,9 +21,21 @@ interface EventStats {
   loading: boolean
 }
 
+type Schedule = {
+  id: string
+  date: string
+  scheduleImage: string
+  details: Array<{
+    id: string
+    time: string
+    name: string
+    description: string
+  }>
+}
+
 export default function ChooseEventClientPage({ publicEvents }: ChooseEventClientPageProps) {
-  const [selectedEvent, setSelectedEvent] = useState<any>(null)
-  const [selectedSchedule, setSelectedSchedule] = useState<any>(null)
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null)
   const [eventStats, setEventStats] = useState<Record<string, EventStats>>({})
   const [isRefreshing, setIsRefreshing] = useState(false)
   const router = useRouter()
@@ -39,7 +51,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     if (storedEventId && storedScheduleId) {
       const foundEvent = publicEvents.find((event) => event.id === parseInt(storedEventId))
       const foundSchedule = foundEvent?.schedules?.find(
-        (s: any) => s.id === parseInt(storedScheduleId),
+        (s) => s.id === storedScheduleId,
       )
 
       if (foundEvent && foundSchedule) {
@@ -74,7 +86,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     }
   }, [selectedEvent])
 
-  const fetchEventStats = async (event: any, showRefreshing = false) => {
+  const fetchEventStats = async (event: Event, showRefreshing = false) => {
     if (!event?.schedules?.length) return
 
     if (showRefreshing) {
@@ -83,7 +95,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
 
     // Initialize loading states for all schedules
     const initialStats: Record<string, EventStats> = {}
-    event.schedules.forEach((schedule: any) => {
+    event.schedules.forEach((schedule) => {
       initialStats[schedule.id] = {
         scheduleId: schedule.id,
         totalCheckins: 0,
@@ -94,7 +106,15 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     setEventStats(initialStats)
 
     // Fetch stats for all schedules concurrently
-    const fetchPromises = event.schedules.map(async (schedule: any) => {
+    const fetchPromises = event.schedules.map(async (schedule): Promise<{
+      scheduleId: string;
+      success: true;
+      data: EventStats;
+    } | {
+      scheduleId: string;
+      success: false;
+      error: string;
+    }> => {
       try {
         const res = await fetch(`/api/checkin-app/event-stats?eventId=${event.id}&scheduleId=${schedule.id}`)
         if (res.ok) {
@@ -104,8 +124,8 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
             success: true,
             data: {
               scheduleId: schedule.id,
-              totalCheckins: data.stats.totalCheckins,
-              adminCheckins: data.stats.adminCheckins,
+              totalCheckins: data.stats.totalCheckins as number,
+              adminCheckins: data.stats.adminCheckins as number,
               loading: false,
             }
           }
@@ -154,7 +174,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     }
   }
 
-  const handleSelectEvent = (event: any) => {
+  const handleSelectEvent = (event: Event) => {
     setSelectedEvent(event)
     setSelectedSchedule(null)
     setEventStats({}) // Clear previous stats
@@ -163,7 +183,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     fetchEventStats(event)
   }
 
-  const handleSelectSchedule = (schedule: any) => {
+  const handleSelectSchedule = (schedule: Schedule) => {
     setSelectedSchedule(schedule)
   }
 
@@ -178,7 +198,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
       toast({ title: t('checkin.pleaseSelectEventAndSchedule'), variant: 'destructive' })
       return
     }
-    localStorage.setItem('selectedEventId', selectedEvent.id)
+    localStorage.setItem('selectedEventId', selectedEvent.id.toString())
     localStorage.setItem('selectedScheduleId', selectedSchedule.id)
     localStorage.setItem('eventTitle', String(selectedEvent.title))
     localStorage.setItem('eventLocation', String(selectedEvent.eventLocation))
@@ -188,14 +208,14 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     
     // Store schedule time details
     if (selectedSchedule.details && selectedSchedule.details.length > 0) {
-      const timeDetails = selectedSchedule.details.map((detail: any) => detail.time).filter(Boolean)
+              const timeDetails = selectedSchedule.details.map((detail) => detail.time).filter(Boolean)
       if (timeDetails.length > 0) {
         localStorage.setItem('eventScheduleTime', timeDetails.join(' - '))
       }
     }
 
     const params = new URLSearchParams({
-      eventId: selectedEvent.id,
+      eventId: selectedEvent.id.toString(),
       scheduleId: selectedSchedule.id,
     })
 
@@ -238,7 +258,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
               className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              Refresh Stats
+              {t('checkin.refreshStats')}
             </button>
           </div>
         )}
@@ -294,7 +314,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
               {selectedEvent?.id === event.id && (
                 <div className="mt-4 space-y-3">
                   {event.schedules?.length ? (
-                    event.schedules.map((schedule: any) => {
+                    event.schedules.map((schedule) => {
                       const stats = eventStats[schedule.id]
                       return (
                         <div
