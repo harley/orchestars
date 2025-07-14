@@ -361,7 +361,8 @@
         "failed": "Check-in failed",
         "network": "Network error"
       },
-      "success": "Checked In"
+      "success": "Checked In",
+      "alreadyCheckedIn": "Already checked in"
     },
     "event": {
       "dateTBA": "Date: TBA",

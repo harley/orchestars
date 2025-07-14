@@ -130,7 +130,7 @@ const ScanHistory = forwardRef((props: {}, ref) => {
 ScanHistory.displayName = 'ScanHistory'
 
 export const ScanPageClient: React.FC = () => {
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'warning' | 'error'; message: string } | null>(
     null,
   )
   const [isProcessing, setIsProcessing] = useState(false)
@@ -236,17 +236,25 @@ export const ScanPageClient: React.FC = () => {
       })
 
       if (checkinRes.status === 200) {
-        // Store the ticket information for display
-        setLastScannedTicket({
-          seat: ticketInfo.seat,
-          ticketPriceName: ticketInfo.ticketPriceName,
-          attendeeName: ticketInfo.attendeeName,
-          ticketCode: ticketCode,
-          ticketPriceInfo: ticketInfo.ticketPriceInfo,
-        })
+        const checkinData = await checkinRes.json()
         
-        setFeedback({ type: 'success', message: t('checkin.scan.success') })
-        if (window.navigator.vibrate) window.navigator.vibrate(200)
+        // Check if ticket was already checked in
+        if (checkinData.alreadyCheckedIn) {
+          setFeedback({ type: 'warning', message: t('checkin.scan.alreadyCheckedIn') })
+          if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200])
+        } else {
+          // Store the ticket information for display
+          setLastScannedTicket({
+            seat: ticketInfo.seat,
+            ticketPriceName: ticketInfo.ticketPriceName,
+            attendeeName: ticketInfo.attendeeName,
+            ticketCode: ticketCode,
+            ticketPriceInfo: ticketInfo.ticketPriceInfo,
+          })
+          
+          setFeedback({ type: 'success', message: t('checkin.scan.success') })
+          if (window.navigator.vibrate) window.navigator.vibrate(200)
+        }
         historyRef.current?.fetchHistory();
       } else {
         let msg = t('checkin.scan.error.failed')
@@ -271,10 +279,12 @@ export const ScanPageClient: React.FC = () => {
   // Auto-clear feedback overlay and re-enable scanning
   useEffect(() => {
     if (feedback) {
+      // Different timeout durations based on feedback type
+      const timeout = feedback.type === 'warning' ? 2500 : 1500 // Warning: 2.5s, Success/Error: 1.5s
       const id = setTimeout(() => {
         setFeedback(null)
         setIsProcessing(false)
-      }, 1500) // Show feedback for 1.5s
+      }, timeout)
       return () => clearTimeout(id)
     }
   }, [feedback])
@@ -362,7 +372,11 @@ export const ScanPageClient: React.FC = () => {
           {feedback && (
             <div
               className={`absolute inset-0 flex items-center justify-center p-4 text-center text-white text-4xl font-bold transition-opacity duration-200 ${
-                feedback.type === 'success' ? 'bg-emerald-600/90' : 'bg-red-600/90'
+                feedback.type === 'success' 
+                  ? 'bg-emerald-600/90' 
+                  : feedback.type === 'warning' 
+                  ? 'bg-orange-500/90' 
+                  : 'bg-red-600/90'
               }`}
             >
               {feedback.message}

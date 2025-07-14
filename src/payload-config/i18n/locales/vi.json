@@ -361,7 +361,8 @@
         "failed": "Checkin thất bại",
         "network": "Lỗi kết nối mạng"
       },
-      "success": "Soát vé thành công"
+      "success": "Soát vé thành công",
+      "alreadyCheckedIn": "Đã soát vé rồi"
     },
     "event": {
       "dateTBA": "Date: TBA",

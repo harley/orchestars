@@ -422,29 +422,38 @@ export default function ValidatePageClient() {
         body: JSON.stringify({ eventDate: scheduleDate, manual: true }),
       })
       
-      // Consume the response body to avoid memory leaks, even though we don't presently need the data
-      await response.json()
+      const responseData = await response.json()
       
       if (response.ok) {
         const attendeeName = ticket.attendeeName || 'Guest'
-        // Show success toast including attendee's name
-        toast({
-          title: 'CHECK-IN COMPLETE',
-          description: `Visitor ${attendeeName} successfully checked in`,
-          variant: 'success',
-        })
-        // Update the ticket state to show as checked in
-        if (validatedTicket) {
-          setValidatedTicket({ ...ticket, isCheckedIn: true })
+        
+        // Check if ticket was already checked in
+        if (responseData.alreadyCheckedIn) {
+          toast({
+            title: 'ALREADY CHECKED IN',
+            description: `Visitor ${attendeeName} was already checked in`,
+            variant: 'default', // Using default variant for warning-like messages
+          })
+        } else {
+          // Show success toast for new check-in
+          toast({
+            title: 'CHECK-IN COMPLETE',
+            description: `Visitor ${attendeeName} successfully checked in`,
+            variant: 'success',
+          })
+          // Update the ticket state to show as checked in
+          if (validatedTicket) {
+            setValidatedTicket({ ...ticket, isCheckedIn: true })
+          }
+          if (multipleTickets.length > 0) {
+            setMultipleTickets(prevTickets =>
+              prevTickets.map(t =>
+                t.ticketCode === ticket.ticketCode ? { ...t, isCheckedIn: true } : t,
+              ),
+            )
+          }
         }
-        if (multipleTickets.length > 0) {
-          setMultipleTickets(prevTickets =>
-            prevTickets.map(t =>
-              t.ticketCode === ticket.ticketCode ? { ...t, isCheckedIn: true } : t,
-            ),
-          )
-        }
-        // Refresh checkin history
+        // Refresh checkin history in both cases
         historyRef.current?.fetchHistory()
       } else {
         toast({
