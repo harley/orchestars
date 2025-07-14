@@ -51,7 +51,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     if (storedEventId && storedScheduleId) {
       const foundEvent = publicEvents.find((event) => event.id === parseInt(storedEventId))
       const foundSchedule = foundEvent?.schedules?.find(
-        (s) => s.id === storedScheduleId,
+        (s) => String(s.id) === storedScheduleId,
       )
 
       if (foundEvent && foundSchedule) {
@@ -199,7 +199,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
       return
     }
     localStorage.setItem('selectedEventId', selectedEvent.id.toString())
-    localStorage.setItem('selectedScheduleId', selectedSchedule.id)
+    localStorage.setItem('selectedScheduleId', selectedSchedule.id.toString())
     localStorage.setItem('eventTitle', String(selectedEvent.title))
     localStorage.setItem('eventLocation', String(selectedEvent.eventLocation))
     if (selectedSchedule.date) {
@@ -216,7 +216,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
 
     const params = new URLSearchParams({
       eventId: selectedEvent.id.toString(),
-      scheduleId: selectedSchedule.id,
+      scheduleId: selectedSchedule.id.toString(),
     })
 
     router.push(`/checkin/validates?${params.toString()}`)
