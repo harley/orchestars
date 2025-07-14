@@ -364,6 +364,19 @@
     },
     "event": {
       "dateTBA": "Ngày diễn ra: Đang cập nhật"
+    },
+    "manual": {
+      "byTicketCode": "Theo Mã vé",
+      "bySeat": "Theo Ghế",
+      "byEmail": "Theo Email",
+      "byPhone": "Theo SĐT",
+      "enterTicketCode": "Nhập mã vé",
+      "enterSeatNumber": "Nhập số ghế",
+      "enterEmail": "Nhập địa chỉ email",
+      "enterPhone": "Nhập số điện thoại",
+      "lookingUp": "Đang tìm...",
+      "lookUp": "Tìm kiếm",
+      "clearAndStartNew": "Xóa và tìm lại"
     }
   },
   "customerCheckinTicket": {
@@ -558,16 +571,5 @@
   },
   "forgotPassword": {
     "title": "Quên mật khẩu"
-  },
-  "byTicketCode": "Theo Mã vé",
-  "bySeat": "Theo Ghế",
-  "byEmail": "Theo Email",
-  "byPhone": "Theo SĐT",
-  "enterTicketCode": "Nhập mã vé",
-  "enterSeatNumber": "Nhập số ghế",
-  "enterEmail": "Nhập địa chỉ email",
-  "enterPhone": "Nhập số điện thoại",
-  "lookingUp": "Đang tìm...",
-  "lookUp": "Tìm kiếm",
-  "clearAndStartNew": "Xóa và tìm lại"
+  }
 }

@@ -560,10 +560,10 @@ export default function ValidatePageClient() {
         {/* Tabs - Improved styling */}
         <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="ticket">{t('byTicketCode')}</TabsTrigger>
-            <TabsTrigger value="seat">{t('bySeat')}</TabsTrigger>
-            <TabsTrigger value="email">{t('byEmail')}</TabsTrigger>
-            <TabsTrigger value="phone">{t('byPhone')}</TabsTrigger>
+            <TabsTrigger value="ticket">{t('checkin.manual.byTicketCode')}</TabsTrigger>
+            <TabsTrigger value="seat">{t('checkin.manual.bySeat')}</TabsTrigger>
+            <TabsTrigger value="email">{t('checkin.manual.byEmail')}</TabsTrigger>
+            <TabsTrigger value="phone">{t('checkin.manual.byPhone')}</TabsTrigger>
           </TabsList>
           <TabsContent value="ticket">
             <div className="mt-4">
@@ -573,7 +573,7 @@ export default function ValidatePageClient() {
                 value={ticketCode}
                 onChange={e => setTicketCode(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleValidate()}
-                placeholder={t('enterTicketCode')}
+                placeholder={t('checkin.manual.enterTicketCode')}
                 className="w-full p-4 border border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-lg shadow-sm dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition"
               />
             </div>
@@ -586,7 +586,7 @@ export default function ValidatePageClient() {
                 value={seatNumber}
                 onChange={e => setSeatNumber(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleValidate()}
-                placeholder={t('enterSeatNumber')}
+                placeholder={t('checkin.manual.enterSeatNumber')}
                 className="w-full p-4 border border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-lg shadow-sm dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition"
               />
             </div>
@@ -599,7 +599,7 @@ export default function ValidatePageClient() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleValidate()}
-                placeholder={t('enterEmail')}
+                placeholder={t('checkin.manual.enterEmail')}
                 className="w-full p-4 border border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-lg shadow-sm dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition"
               />
             </div>
@@ -612,7 +612,7 @@ export default function ValidatePageClient() {
                 value={phoneNumber}
                 onChange={e => setPhoneNumber(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleValidate()}
-                placeholder={t('enterPhone')}
+                placeholder={t('checkin.manual.enterPhone')}
                 className="w-full p-4 border border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-lg shadow-sm dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition"
               />
             </div>
@@ -665,10 +665,10 @@ export default function ValidatePageClient() {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                <span>{t('lookingUp')}</span>
+                <span>{t('checkin.manual.lookingUp')}</span>
               </div>
             ) : (
-              t('lookUp')
+              t('checkin.manual.lookUp')
             )}
           </button>
         </div>
@@ -679,7 +679,7 @@ export default function ValidatePageClient() {
               onClick={resetValidation}
               className="text-blue-600 dark:text-blue-400 hover:underline"
             >
-              {t('clearAndStartNew')}
+              {t('checkin.manual.clearAndStartNew')}
             </button>
           </div>
         )}
