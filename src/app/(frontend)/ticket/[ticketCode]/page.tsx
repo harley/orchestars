@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { cache } from 'react'
-import type { Ticket } from '@/payload-types'
+import type { Ticket, CheckinRecord } from '@/payload-types'
 import { Gutter } from '@payloadcms/ui'
 import { TicketDetails } from './page.client'
 
@@ -31,6 +31,16 @@ function isTicket(data: unknown): data is Ticket {
     data !== null &&
     'ticketCode' in data &&
     typeof (data as Ticket).ticketCode === 'string'
+  )
+}
+
+// Type guard to validate CheckinRecord objects
+function isCheckinRecord(data: unknown): data is CheckinRecord {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'ticketCode' in data &&
+    typeof (data as CheckinRecord).ticketCode === 'string'
   )
 }
 
@@ -77,8 +87,10 @@ const getTicketAndCheckinStatus = cache(
         },
       },
     })
-    const checkinRecord = checkinRes?.docs?.[0] as { checkInTime?: string; createdAt?: string } | undefined
-    const checkedInAt = checkinRecord?.checkInTime || checkinRecord?.createdAt || null
+
+    const potentialRecord = checkinRes?.docs?.[0]
+    const checkinRecord = isCheckinRecord(potentialRecord) ? potentialRecord : null
+    const checkedInAt = checkinRecord?.checkInTime ?? checkinRecord?.createdAt ?? null
 
     const isCheckedIn = Boolean(checkinRecord)
 
