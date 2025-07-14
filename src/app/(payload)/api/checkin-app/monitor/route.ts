@@ -8,7 +8,7 @@ import { dbConnectionMonitor } from '@/utilities/dbConnectionMonitor'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { sql } from '@payloadcms/db-postgres'
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const adminUser = await getAdminUser()
 
