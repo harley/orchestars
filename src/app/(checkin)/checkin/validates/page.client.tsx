@@ -10,6 +10,7 @@ import type { CheckinRecord, User } from '@/payload-types'
 import { type TicketDTO } from '@/lib/checkin/findTickets'
 import Link from 'next/link'
 import { useTranslate } from '@/providers/I18n/client'
+import { getTicketClassColor } from '@/utilities/getTicketClassColor'
 
 interface CheckinHistoryProps {}
 
@@ -18,6 +19,7 @@ const CheckinHistory = forwardRef((props: CheckinHistoryProps, ref) => {
   const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const hasFetched = useRef(false)
+  const { t } = useTranslate()
 
   const fetchHistory = useCallback(async () => {
     if (isLoading) return
@@ -57,38 +59,48 @@ const CheckinHistory = forwardRef((props: CheckinHistoryProps, ref) => {
           >
             <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           </button>
-          {isLoading && <p className="text-gray-600 dark:text-gray-300">Loading history...</p>}
-          {!isLoading && history.length === 0 && <p className="text-gray-600 dark:text-gray-300">No recent check-ins.</p>}
-          <ul className="space-y-2 pr-8">
-            {history.map(record => (
-              <li key={record.id} className="text-sm text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600 pb-2">
-                <p>
-                  <strong>Ticket:</strong> {record.ticketCode}
-                </p>
-                <p>
-                  <strong>Attendee:</strong>{' '}
-                  {`${(record.user as User)?.firstName || ''} ${
-                    (record.user as User)?.lastName || ''
-                  }`.trim() || 'N/A'}
-                </p>
-                <p>
-                  <strong>Time:</strong>{' '}
-                  {record.checkInTime
-                    ? new Date(record.checkInTime).toLocaleTimeString()
-                    : 'N/A'}
-                </p>
-                <p>
-                  <strong>Method:</strong>{' '}
-                  <span className={`px-2 py-1 rounded text-xs ${
-                    record.manual 
-                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' 
-                      : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                  }`}>
-                    {record.manual ? 'Manual' : 'QR Scan'}
-                  </span>
-                </p>
-              </li>
-            ))}
+          {isLoading && <p className="text-gray-600 dark:text-gray-300">{t('checkin.scan.loadingHistory')}</p>}
+          {!isLoading && history.length === 0 && <p className="text-gray-600 dark:text-gray-300">{t('checkin.scan.noRecentScans')}</p>}
+          <ul className="space-y-3 pr-8">
+            {history.map(record => {
+              const attendeeName = `${(record.user as User)?.firstName || ''} ${(record.user as User)?.lastName || ''}`.trim() || 'N/A'
+              const ticketType = (record.ticket as any)?.ticketPriceName || (record.ticket as any)?.ticketPriceInfo?.name || 'N/A'
+              const ticketPriceInfo = (record.ticket as any)?.ticketPriceInfo
+              const ticketColors = getTicketClassColor(ticketPriceInfo)
+              
+              // Determine checkin method based on the manual field
+              const checkinMethod = (record as any).manual ? 'Manual' : 'QR'
+              
+              return (
+                <li key={record.id} className="text-sm text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600 pb-2">
+                  <div className="flex justify-between items-center font-medium mb-1">
+                    <div className="flex items-center gap-2">
+                      <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">
+                        {record.seat}
+                      </span>
+                      <span 
+                        className="px-2 py-1 rounded text-xs font-medium"
+                        style={{
+                          backgroundColor: ticketColors.color,
+                          color: ticketColors.textColor,
+                        }}
+                      >
+                        {ticketType}
+                      </span>
+                    </div>
+                    <span>{attendeeName}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs text-gray-600 dark:text-gray-400">
+                    <span>{record.ticketCode} <span className="text-blue-600 dark:text-blue-400 font-medium">[{checkinMethod}]</span></span>
+                    <span>
+                      {record.checkInTime
+                        ? new Date(record.checkInTime).toLocaleTimeString()
+                        : 'N/A'}
+                    </span>
+                  </div>
+                </li>
+              )
+            })}
           </ul>
         </div>
       )}
@@ -105,7 +117,7 @@ const CheckinHistory = forwardRef((props: CheckinHistoryProps, ref) => {
         className="inline-flex items-center justify-center w-full gap-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors"
       >
         <History className="w-5 h-5" />
-        <span>{isOpen ? 'Refresh History' : 'Checkin History'}</span>
+        <span>{isOpen ? t('checkin.scan.refreshHistory') : t('checkin.scan.history')}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
     </div>
