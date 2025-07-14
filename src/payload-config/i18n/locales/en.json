@@ -346,6 +346,7 @@
       "instruction": "Position the code within the frame",
       "upload": "Upload QR",
       "history": "Checkin History",
+      "refreshHistory": "Refresh History",
       "loadingHistory": "Loading history...",
       "noRecentScans": "No recent checkins.",
       "ticket": "Ticket:",

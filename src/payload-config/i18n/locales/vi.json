@@ -346,6 +346,7 @@
       "instruction": "Đặt mã QR vào khung quét",
       "upload": "Tải lên mã QR",
       "history": "Lịch sử checkin",
+      "refreshHistory": "Làm mới lịch sử",
       "loadingHistory": "Đang tải lịch sử...",
       "noRecentScans": "Chưa có lượt checkin nào gần đây.",
       "ticket": "Vé:",

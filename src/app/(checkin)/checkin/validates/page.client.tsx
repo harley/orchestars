@@ -1,13 +1,15 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback, forwardRef, useImperativeHandle } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
 import { toast } from '@/hooks/use-toast'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AlertTriangle, History, ChevronDown, X } from 'lucide-react'
 import type { CheckinRecord, User } from '@/payload-types'
 import { type TicketDTO } from '@/lib/checkin/findTickets'
+import Link from 'next/link'
+import { useTranslate } from '@/providers/I18n/client'
 
 interface CheckinHistoryProps {}
 
@@ -120,8 +122,10 @@ export default function ValidatePageClient() {
   const [multipleTickets, setMultipleTickets] = useState<TicketDTO[]>([])
   const [activeTab, setActiveTab] = useState('ticket')
   const router = useRouter()
+  const pathname = usePathname()
   const { isHydrated, token } = useAuth()
   const searchParams = useSearchParams()
+  const { t } = useTranslate()
   // Translation hook and additional toast hook removed as they were unused
 
   const ticketInputRef = useRef<HTMLInputElement>(null)
@@ -440,6 +444,30 @@ export default function ValidatePageClient() {
         >
           ← Back to Events
         </button>
+
+        {/* Navigation Toggle */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <Link
+            href="/checkin/scan"
+            className={`text-center py-2 px-4 rounded font-semibold ${
+              pathname === '/checkin/scan'
+                ? 'bg-gray-900 dark:bg-gray-700 text-white'
+                : 'bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500'
+            }`}
+          >
+            {t('checkin.nav.qr')}
+          </Link>
+          <Link
+            href="/checkin/events"
+            className={`text-center py-2 px-4 rounded font-semibold ${
+              pathname === '/checkin/events' || pathname.includes('/checkin/validates')
+                ? 'bg-gray-900 dark:bg-gray-700 text-white'
+                : 'bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500'
+            }`}
+          >
+            {t('checkin.nav.search')}
+          </Link>
+        </div>
 
         {/* Title - More prominent */}
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
