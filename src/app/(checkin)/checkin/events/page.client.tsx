@@ -8,15 +8,24 @@ import { format } from 'date-fns'
 import { Event } from '@/types/Event'
 import { useToast } from '@/hooks/use-toast'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
-import { Check } from 'lucide-react'
+import { Check, Users, User, RefreshCw } from 'lucide-react'
 
 interface ChooseEventClientPageProps {
   publicEvents: Event[]
 }
 
+interface EventStats {
+  scheduleId: string
+  totalCheckins: number
+  adminCheckins: number
+  loading: boolean
+}
+
 export default function ChooseEventClientPage({ publicEvents }: ChooseEventClientPageProps) {
   const [selectedEvent, setSelectedEvent] = useState<any>(null)
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null)
+  const [eventStats, setEventStats] = useState<Record<string, EventStats>>({})
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const router = useRouter()
   const { t } = useTranslate()
   const { toast } = useToast()
@@ -36,17 +45,113 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
       if (foundEvent && foundSchedule) {
         setSelectedEvent(foundEvent)
         setSelectedSchedule(foundSchedule)
+        // Fetch stats for this event
+        fetchEventStats(foundEvent)
       }
     }
   }, [router, publicEvents])
 
+  // Auto-refresh stats when page comes into focus (user returns from checkin)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && selectedEvent) {
+        fetchEventStats(selectedEvent)
+      }
+    }
+
+    const handleFocus = () => {
+      if (selectedEvent) {
+        fetchEventStats(selectedEvent)
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('focus', handleFocus)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('focus', handleFocus)
+    }
+  }, [selectedEvent])
+
+  const fetchEventStats = async (event: any, showRefreshing = false) => {
+    if (!event?.schedules?.length) return
+
+    if (showRefreshing) {
+      setIsRefreshing(true)
+    }
+
+    // Initialize loading states for all schedules
+    const initialStats: Record<string, EventStats> = {}
+    event.schedules.forEach((schedule: any) => {
+      initialStats[schedule.id] = {
+        scheduleId: schedule.id,
+        totalCheckins: 0,
+        adminCheckins: 0,
+        loading: true,
+      }
+    })
+    setEventStats(initialStats)
+
+    // Fetch stats for each schedule
+    for (const schedule of event.schedules) {
+      try {
+        const res = await fetch(`/api/checkin-app/event-stats?eventId=${event.id}&scheduleId=${schedule.id}`)
+        if (res.ok) {
+          const data = await res.json()
+          setEventStats(prev => ({
+            ...prev,
+            [schedule.id]: {
+              scheduleId: schedule.id,
+              totalCheckins: data.stats.totalCheckins,
+              adminCheckins: data.stats.adminCheckins,
+              loading: false,
+            }
+          }))
+        } else {
+          // Handle error - set loading to false but keep zeros
+          setEventStats(prev => ({
+            ...prev,
+            [schedule.id]: {
+              ...prev[schedule.id],
+              loading: false,
+            }
+          }))
+        }
+      } catch (error) {
+        console.error('Failed to fetch stats for schedule:', schedule.id, error)
+        setEventStats(prev => ({
+          ...prev,
+          [schedule.id]: {
+            ...prev[schedule.id],
+            loading: false,
+          }
+        }))
+      }
+    }
+
+    if (showRefreshing) {
+      setIsRefreshing(false)
+    }
+  }
+
   const handleSelectEvent = (event: any) => {
     setSelectedEvent(event)
     setSelectedSchedule(null)
+    setEventStats({}) // Clear previous stats
+    
+    // Fetch stats for the newly selected event
+    fetchEventStats(event)
   }
 
   const handleSelectSchedule = (schedule: any) => {
     setSelectedSchedule(schedule)
+  }
+
+  const handleRefreshStats = () => {
+    if (selectedEvent) {
+      fetchEventStats(selectedEvent, true)
+    }
   }
 
   const handleConfirm = () => {
@@ -104,6 +209,21 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
             {t('checkin.nav.search')}
           </Link>
         </div>
+        
+        {/* Refresh Button - only show when event is selected and has stats */}
+        {selectedEvent && Object.keys(eventStats).length > 0 && (
+          <div className="mb-4 flex justify-end">
+            <button
+              onClick={handleRefreshStats}
+              disabled={isRefreshing}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Refresh Stats
+            </button>
+          </div>
+        )}
+        
         <div className="space-y-6">
           {publicEvents?.map((event) => (
             <div key={event.id} className="bg-white rounded-lg shadow p-4">
@@ -153,30 +273,61 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
               </button>
 
               {selectedEvent?.id === event.id && (
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-4 space-y-3">
                   {!!event.schedules?.length ? (
-                    event.schedules.map((schedule: any) => (
-                      <button
-                        id={`select-schedule-${schedule.id}`}
-                        key={schedule.id}
-                        onClick={() => handleSelectSchedule(schedule)}
-                        className={`px-3 py-2 rounded text-white text-sm ${
-                          selectedSchedule?.id === schedule.id
-                            ? 'bg-orange-700'
-                            : 'bg-gray-900 hover:bg-black'
-                        }`}
-                      >
-                        {selectedSchedule?.id === schedule.id && (
-                          <Check className="inline-block w-4 h-4 mr-2" aria-label="Selected" />
-                        )}
-                        {schedule.date
-                          ? tzFormat(
-                              toZonedTime(new Date(schedule.date), 'Asia/Ho_Chi_Minh'),
-                              'dd/MM/yyyy',
-                            )
-                          : t('checkin.event.dateTBA')}
-                      </button>
-                    ))
+                    event.schedules.map((schedule: any) => {
+                      const stats = eventStats[schedule.id]
+                      return (
+                        <div
+                          key={schedule.id}
+                          onClick={() => handleSelectSchedule(schedule)}
+                          className={`cursor-pointer p-4 rounded-lg border-2 transition-all ${
+                            selectedSchedule?.id === schedule.id
+                              ? 'border-orange-500 bg-orange-50'
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center">
+                              <h3 className="text-lg font-semibold text-gray-900">
+                                {schedule.date
+                                  ? tzFormat(
+                                      toZonedTime(new Date(schedule.date), 'Asia/Ho_Chi_Minh'),
+                                      'dd/MM/yyyy',
+                                    )
+                                  : t('checkin.event.dateTBA')}
+                              </h3>
+                              {selectedSchedule?.id === schedule.id && (
+                                <Check className="ml-2 w-5 h-5 text-orange-600" />
+                              )}
+                            </div>
+                          </div>
+                          
+                          {stats ? (
+                            <div className="grid grid-cols-2 gap-3 text-sm">
+                              <div className="flex items-center text-blue-600">
+                                <User className="w-4 h-4 mr-1" />
+                                <span className="font-medium">{t('checkin.event.checkedInByMe')}</span>
+                                <span className="ml-1 font-bold">
+                                  {stats.loading ? '...' : stats.adminCheckins}
+                                </span>
+                              </div>
+                              <div className="flex items-center text-green-600">
+                                <Users className="w-4 h-4 mr-1" />
+                                <span className="font-medium">{t('checkin.event.totalCheckedIn')}</span>
+                                <span className="ml-1 font-bold">
+                                  {stats.loading ? '...' : stats.totalCheckins}
+                                </span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-sm text-gray-500">
+                              {t('checkin.event.loadingStats')}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })
                   ) : (
                     <p className="text-sm text-gray-600">{t('checkin.noSchedulesAvailable')}</p>
                   )}

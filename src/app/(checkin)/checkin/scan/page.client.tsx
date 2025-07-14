@@ -110,6 +110,11 @@ export const ScanPageClient: React.FC = () => {
     null,
   )
   const [isProcessing, setIsProcessing] = useState(false)
+  const [lastScannedTicket, setLastScannedTicket] = useState<{
+    seat: string
+    ticketPriceName: string | null
+    attendeeName: string
+  } | null>(null)
   const pathname = usePathname()
   const historyRef = useRef<{ fetchHistory: () => void }>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -193,6 +198,10 @@ export const ScanPageClient: React.FC = () => {
         return
       }
 
+      // Get ticket data from validation response
+      const validateData = await validateRes.json()
+      const ticketInfo = validateData.ticket
+
       // 2. Perform Check-in
       const checkinRes = await fetch(`/api/checkin-app/checkin/${ticketCode}`, {
         method: 'POST',
@@ -201,6 +210,13 @@ export const ScanPageClient: React.FC = () => {
       })
 
       if (checkinRes.status === 200) {
+        // Store the ticket information for display
+        setLastScannedTicket({
+          seat: ticketInfo.seat,
+          ticketPriceName: ticketInfo.ticketPriceName,
+          attendeeName: ticketInfo.attendeeName,
+        })
+        
         setFeedback({ type: 'success', message: t('checkin.scan.success') })
         if (window.navigator.vibrate) window.navigator.vibrate(200)
         historyRef.current?.fetchHistory();
@@ -234,6 +250,16 @@ export const ScanPageClient: React.FC = () => {
       return () => clearTimeout(id)
     }
   }, [feedback])
+
+  // Auto-clear last scanned ticket info after 10 seconds
+  useEffect(() => {
+    if (lastScannedTicket) {
+      const id = setTimeout(() => {
+        setLastScannedTicket(null)
+      }, 10000) // Clear after 10 seconds
+      return () => clearTimeout(id)
+    }
+  }, [lastScannedTicket])
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
@@ -269,7 +295,19 @@ export const ScanPageClient: React.FC = () => {
           </Link>
         </div>
         <h1 className="text-2xl font-bold mb-2">{t('checkin.scan.title')}</h1>
-        <p className="text-gray-400 mb-6">{t('checkin.scan.instruction')}</p>
+        
+        {/* Dynamic instruction/last scan info area */}
+        {lastScannedTicket ? (
+          <div className="text-center mb-6 p-4 bg-green-500/20 rounded-lg border border-green-500/30">
+            <p className="text-green-400 text-sm font-medium mb-1">{t('checkin.scan.lastCheckIn')}</p>
+            <p className="text-white font-semibold">
+              Seat {lastScannedTicket.seat} - {lastScannedTicket.ticketPriceName || 'N/A'} - {lastScannedTicket.attendeeName}
+            </p>
+          </div>
+        ) : (
+          <p className="text-gray-400 mb-6">{t('checkin.scan.instruction')}</p>
+        )}
+        
         <div className="w-full relative aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 border-gray-700">
           <QRScanner
             onScan={validateAndCheckIn}
