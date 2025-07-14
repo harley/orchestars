@@ -1,6 +1,8 @@
 import { MigrateUpArgs, MigrateDownArgs } from '@payloadcms/db-postgres'
 import { sql } from '@payloadcms/db-postgres'
 
+export const transaction = false
+
 export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
     -- Optimized partial index for QR code lookups (booked tickets only) 
