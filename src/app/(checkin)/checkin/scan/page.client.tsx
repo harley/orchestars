@@ -210,39 +210,20 @@ export const ScanPageClient: React.FC = () => {
     setIsProcessing(true)
 
     try {
-      // 1. Validate Ticket
-      const validateRes = await fetch(`/api/checkin-app/validate/${ticketCode}`, {
+      // Single optimized API call for validation + check-in
+      const scanRes = await fetch(`/api/checkin-app/scan/${ticketCode}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
       })
 
-      if (validateRes.status !== 200) {
-        const data = (await validateRes.json()) as { errorCode?: string; message?: string }
-        setFeedback({
-          type: 'error',
-          message: data.message || data.errorCode || t('checkin.scan.error.failed'),
-        })
-        if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
-        return
-      }
+      const scanData = await scanRes.json()
 
-      // Get ticket data from validation response
-      const validateData = await validateRes.json()
-      const ticketInfo = validateData.ticket
-
-      // 2. Perform Check-in
-      const checkinRes = await fetch(`/api/checkin-app/checkin/${ticketCode}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventDate: null, manual: false }), // Server will determine eventDate from ticket
-      })
-
-      if (checkinRes.status === 200) {
-        const checkinData = await checkinRes.json()
+      if (scanRes.status === 200 && scanData.success) {
+        const ticketInfo = scanData.ticket
         
         // Check if ticket was already checked in
-        if (checkinData.alreadyCheckedIn) {
+        if (scanData.alreadyCheckedIn) {
           setFeedback({ type: 'warning', message: t('checkin.scan.alreadyCheckedIn') })
           if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200])
         } else {
@@ -260,13 +241,7 @@ export const ScanPageClient: React.FC = () => {
         }
         historyRef.current?.fetchHistory();
       } else {
-        let msg = t('checkin.scan.error.failed')
-        try {
-          const errData = await checkinRes.json()
-          msg = errData.message || msg
-        } catch (_) {
-          // Ignore JSON parse errors
-        }
+        const msg = scanData.message || t('checkin.scan.error.failed')
         setFeedback({ type: 'error', message: msg })
         if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
       }
