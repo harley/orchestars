@@ -9,7 +9,7 @@ import React, {
   useImperativeHandle,
 } from 'react'
 import { QRScanner } from '@/components/QRScanner'
-import { History, ChevronDown, Upload } from 'lucide-react'
+import { History, ChevronDown, Upload, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import type { CheckinRecord, User } from '@/payload-types'
@@ -53,10 +53,17 @@ const ScanHistory = forwardRef((props: {}, ref) => {
   return (
     <div className="w-full flex flex-col items-center">
       {isOpen && (
-        <div className="w-full bg-white/90 p-4 rounded-t overflow-y-auto max-h-48 text-black mb-2">
+        <div className="w-full bg-white/90 p-4 rounded-t overflow-y-auto max-h-48 text-black mb-2 relative">
+          <button
+            onClick={() => setIsOpen(false)}
+            className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-200 transition-colors"
+            aria-label="Close history"
+          >
+            <X className="w-4 h-4 text-gray-500" />
+          </button>
           {isLoading && <p>{t('checkin.scan.loadingHistory')}</p>}
           {!isLoading && history.length === 0 && <p>{t('checkin.scan.noRecentScans')}</p>}
-          <ul className="space-y-2">
+          <ul className="space-y-2 pr-8">
             {history.map(record => (
               <li key={record.id} className="text-sm text-gray-800 border-b pb-1">
                 <p>
@@ -79,12 +86,18 @@ const ScanHistory = forwardRef((props: {}, ref) => {
       )}
       <button
         onClick={() => {
-          setIsOpen(!isOpen)
+          if (isOpen) {
+            // If expanded, refetch history instead of collapsing
+            fetchHistory()
+          } else {
+            // If collapsed, expand
+            setIsOpen(true)
+          }
         }}
         className="inline-flex items-center justify-center w-full gap-1 bg-white/10 backdrop-blur px-4 py-3 rounded text-sm font-medium text-white"
       >
         <History className="w-5 h-5" />
-        <span>{t('checkin.scan.history')}</span>
+        <span>{isOpen ? t('checkin.scan.refreshHistory') : t('checkin.scan.history')}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
     </div>
