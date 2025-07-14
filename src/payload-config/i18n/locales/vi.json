@@ -245,7 +245,8 @@
     "checkedIn": "Đã Check In",
     "booked": "Đã đặt",
     "qrCodeNotAvailable": "Mã QR chỉ có sẵn cho vé đã đặt.",
-    "termsAndConditions": "Điều khoản & Điều kiện"
+    "termsAndConditions": "Điều khoản & Điều kiện",
+    "details": "Chi tiết vé"
   },
   "checkout": {
     "personalInfo": "Thông tin cá nhân",

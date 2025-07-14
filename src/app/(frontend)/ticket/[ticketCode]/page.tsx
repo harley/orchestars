@@ -6,6 +6,25 @@ import type { Ticket } from '@/payload-types'
 import { Gutter } from '@payloadcms/ui'
 import { TicketDetails } from './page.client'
 
+// Utility function to get ticket class color (duplicated from client helper)
+const getTicketClassColor = (ticketPriceInfo: any) => {
+  if (!ticketPriceInfo || typeof ticketPriceInfo !== 'object') {
+    return { color: '#6B7280', textColor: '#fff' }
+  }
+
+  const ticketKey = ticketPriceInfo.key
+  // categories data is only available on client, use fallback gray when server side
+  const categories = [
+    /* minimal fallback; customise if needed */
+  ] as { id: string; color: string; textColor: string }[]
+
+  const category = categories.find((cat) => cat.id === ticketKey)
+
+  return category
+    ? { color: category.color, textColor: category.textColor }
+    : { color: '#6B7280', textColor: '#fff' }
+}
+
 function isTicket(data: unknown): data is Ticket {
   return (
     typeof data === 'object' &&
@@ -23,6 +42,7 @@ const getTicketAndCheckinStatus = cache(
   }): Promise<{
     ticket: Ticket | null
     isCheckedIn: boolean
+    checkedInAt: string | null
   }> => {
     const payload = await getPayload({ config: configPromise })
 
@@ -44,7 +64,7 @@ const getTicketAndCheckinStatus = cache(
 
 
     if (!ticket) {
-      return { ticket: null, isCheckedIn: false }
+      return { ticket: null, isCheckedIn: false, checkedInAt: null }
     }
 
     const checkinRes = await payload.find({
@@ -57,9 +77,12 @@ const getTicketAndCheckinStatus = cache(
         },
       },
     })
-    const isCheckedIn = Boolean(checkinRes?.docs?.[0])
+    const checkinRecord = checkinRes?.docs?.[0] as { checkInTime?: string; createdAt?: string } | undefined
+    const checkedInAt = checkinRecord?.checkInTime || checkinRecord?.createdAt || null
 
-    return { ticket, isCheckedIn }
+    const isCheckedIn = Boolean(checkinRecord)
+
+    return { ticket, isCheckedIn, checkedInAt }
   },
 )
 
@@ -85,7 +108,7 @@ export default async function TicketPage({
 }) {
   const resolvedParams = await params
   const { ticketCode } = resolvedParams
-  const { ticket, isCheckedIn } = await getTicketAndCheckinStatus({ ticketCode })
+  const { ticket, isCheckedIn, checkedInAt } = await getTicketAndCheckinStatus({ ticketCode })
 
   if (!ticket) {
     return (
@@ -95,9 +118,13 @@ export default async function TicketPage({
     )
   }
 
+  const ticketClassColor = getTicketClassColor(ticket.ticketPriceInfo)
+
   return (
-    <Gutter className="flex justify-center py-10">
-      <TicketDetails ticket={ticket} isCheckedIn={isCheckedIn} />
-    </Gutter>
+    <div style={{ background: ticketClassColor ? ticketClassColor.color : undefined }}>
+      <Gutter className="flex justify-center py-10">
+        <TicketDetails ticket={ticket} isCheckedIn={isCheckedIn} checkedInAt={checkedInAt} />
+      </Gutter>
+    </div>
   )
 } 
