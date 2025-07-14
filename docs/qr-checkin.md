@@ -30,7 +30,7 @@ The QR Code Check-in feature provides event staff with a fast, reliable, and sec
 *   **Scanner Page (`/checkin/scan`):**
     *   Must be accessible only to authenticated users with the `admin` role.
     *   If an unauthenticated user attempts to access the page, they must be redirected to the admin login page.
-    *   After successful login, the user must be redirected back to the `/checkin/scan` page.
+    *   After successful login, the user must be redirected directly back to the `/checkin/scan` page.
     *   The page must display a live camera feed with a designated scanning area.
     *   An overlay/finder guide must be present to help the user position the QR code.
 *   **Scanning & Validation:**
@@ -44,7 +44,8 @@ The QR Code Check-in feature provides event staff with a fast, reliable, and sec
 *   **Feedback & UI:**
     *   The UI must provide clear visual feedback for success (e.g., green overlay, "Checked In" message) and failure (e.g., red overlay, error message).
     *   The device should vibrate to provide haptic feedback.
-    *   A collapsible section should display a history of recent scans performed by the admin.
+    *   A collapsible section should display a history of recent scans. The history view can be refreshed on demand from the UI.
+    *   The UI includes a navigation toggle to easily switch to the manual check-in flow.
 *   **Data & Tracking:**
     *   Each check-in must be recorded in a `checkinRecords` collection.
     *   The record must include a reference to the ticket, the user (attendee), the event, and the `admin` who performed the check-in.
@@ -127,9 +128,9 @@ The core QR code check-in functionality has been implemented and is operational.
 - **Ticket Validation & Check-in:** Backend APIs are in place to validate tickets and record check-ins, preventing duplicate scans.
 - **Admin Tracking:** All check-ins are associated with the admin who performed the scan.
 - **Scanner UI/UX:**
-    - Lazy-loaded scan history for the current admin.
+    - Lazy-loaded and refreshable scan history for the current admin.
     - Haptic feedback on scan success/failure.
-    - A clean, modern UI with clear user feedback.
+    - A clean, modern UI with clear user feedback and a toggle to switch to manual entry.
 
 ---
 
