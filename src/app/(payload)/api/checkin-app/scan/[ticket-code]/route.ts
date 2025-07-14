@@ -9,24 +9,27 @@ import { getAdminUser } from '@/utilities/getAdminUser'
 import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { revalidateTag } from 'next/cache'
+import { withConnectionMonitoring } from '@/utilities/dbConnectionMonitor'
 
 export async function POST(req: NextRequest) {
-  try {
-    const adminUser = await getAdminUser()
+  const ticketCode = req.nextUrl.pathname.split('/').pop()
+  
+  return await withConnectionMonitoring(async () => {
+    try {
+      const adminUser = await getAdminUser()
 
-    if (
-      !adminUser ||
-      !isAdminOrSuperAdminOrEventAdmin({
-        req: { user: adminUser },
-      })
-    ) {
-      throw new Error('CHECKIN005')
-    }
+      if (
+        !adminUser ||
+        !isAdminOrSuperAdminOrEventAdmin({
+          req: { user: adminUser },
+        })
+      ) {
+        throw new Error('CHECKIN005')
+      }
 
-    const ticketCode = req.nextUrl.pathname.split('/').pop()
-    if (!ticketCode) {
-      throw new Error('CHECKIN013')
-    }
+      if (!ticketCode) {
+        throw new Error('CHECKIN013')
+      }
 
     const payload = await getPayload()
 
@@ -169,11 +172,12 @@ export async function POST(req: NextRequest) {
       }
     })
 
-  } catch (error) {
-    console.error('Scan error:', error)
-    return NextResponse.json({ 
-      success: false,
-      message: await handleNextErrorMsgResponse(error) 
-    }, { status: 400 })
-  }
+    } catch (error) {
+      console.error('Scan error:', error)
+      return NextResponse.json({ 
+        success: false,
+        message: await handleNextErrorMsgResponse(error) 
+      }, { status: 400 })
+    }
+  }, `qr-scan-${ticketCode}`)
 } 
