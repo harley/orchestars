@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import type { Ticket } from '@/payload-types'
 import { QRCodeComponent } from '@/components/QRCode'
 import { Calendar, Download, MapPin } from 'lucide-react'
@@ -34,6 +34,15 @@ export function TicketDetails({
 }) {
   const ticketRef = useRef<HTMLElement>(null)
   const { t, locale } = useTranslate()
+
+  // Hide global navbar for this page
+  useEffect(() => {
+    const nav = document.querySelector('nav') as HTMLElement | null
+    if (nav) nav.style.display = 'none'
+    return () => {
+      if (nav) nav.style.display = ''
+    }
+  }, [])
   const isBooked = ticket.status === 'booked'
   const event = typeof ticket.event === 'object' ? ticket.event : null
 
@@ -52,7 +61,7 @@ export function TicketDetails({
       if (Math.abs(hours) >= 1) return rtf.format(-hours, 'hour')
       if (Math.abs(minutes) >= 1) return rtf.format(-minutes, 'minute')
       return rtf.format(-seconds, 'second')
-    } catch (e) {
+    } catch (_error) {
       return ''
     }
   }
@@ -132,8 +141,8 @@ export function TicketDetails({
       >
         {/* Header */}
         <header className="p-6 pb-4 border-b border-gray-100">
-          <div className="flex justify-between items-center">
-            <img src="/images/ticket.svg" alt="Ticket" className="h-16" />
+          <div className="flex justify-between items-start">
+            <img src="/images/ticket.svg" alt="Ticket" className="h-20 -mt-4" />
             {ticket.ticketPriceName && (
               <span
                 className="px-4 py-2 rounded-lg text-lg font-bold shadow-sm"
@@ -148,7 +157,7 @@ export function TicketDetails({
           </div>
 
           {event?.title && (
-            <div className="flex items-center gap-3 mt-2">
+            <div className="flex items-center gap-3">
               <h2 className="text-2xl font-bold">{event.title}</h2>
               {/* removed small price badge */}
             </div>
@@ -175,7 +184,7 @@ export function TicketDetails({
             <div className="relative">
               <QRCodeComponent
                 payload={ticket.ticketCode || ''}
-                className={`w-56 h-56 ${isCheckedIn ? 'filter grayscale' : ''}`}
+                className="w-56 h-56"
                 options={{
                   color: {
                     dark: ticketClassColor.color,

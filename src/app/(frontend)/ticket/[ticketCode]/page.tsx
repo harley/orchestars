@@ -121,7 +121,10 @@ export default async function TicketPage({
   const ticketClassColor = getTicketClassColor(ticket.ticketPriceInfo)
 
   return (
-    <div style={{ background: ticketClassColor ? ticketClassColor.color : undefined }}>
+    <div
+      style={{ background: ticketClassColor ? ticketClassColor.color : undefined }}
+      className="-mt-[72px]"
+    >
       <Gutter className="flex justify-center py-10">
         <TicketDetails ticket={ticket} isCheckedIn={isCheckedIn} checkedInAt={checkedInAt} />
       </Gutter>
