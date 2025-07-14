@@ -116,6 +116,8 @@ CheckinHistory.displayName = 'CheckinHistory'
 export default function ValidatePageClient() {
   const [ticketCode, setTicketCode] = useState('')
   const [seatNumber, setSeatNumber] = useState('')
+  const [email, setEmail] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isCheckingIn, setIsCheckingIn] = useState(false)
   const [validatedTicket, setValidatedTicket] = useState<TicketDTO | null>(null)
@@ -130,6 +132,8 @@ export default function ValidatePageClient() {
 
   const ticketInputRef = useRef<HTMLInputElement>(null)
   const seatInputRef = useRef<HTMLInputElement>(null)
+  const emailInputRef = useRef<HTMLInputElement>(null)
+  const phoneInputRef = useRef<HTMLInputElement>(null)
   const historyRef = useRef<{ fetchHistory: () => void }>(null)
   // Track last action timestamps to prevent rapid duplicate submissions
   const lastValidateRef = useRef<number>(0)
@@ -196,8 +200,12 @@ export default function ValidatePageClient() {
   useEffect(() => {
     if (activeTab === 'ticket') {
       ticketInputRef.current?.focus()
-    } else {
+    } else if (activeTab === 'seat') {
       seatInputRef.current?.focus()
+    } else if (activeTab === 'email') {
+      emailInputRef.current?.focus()
+    } else if (activeTab === 'phone') {
+      phoneInputRef.current?.focus()
     }
   }, [activeTab])
 
@@ -218,13 +226,34 @@ export default function ValidatePageClient() {
     if (now - lastValidateRef.current < 2000) return
     lastValidateRef.current = now
 
-    const value = activeTab === 'ticket' ? ticketCode.trim() : seatNumber.trim()
+    let value
+    let description
+    switch (activeTab) {
+      case 'ticket':
+        value = ticketCode.trim()
+        description = 'ticket code'
+        break
+      case 'seat':
+        value = seatNumber.trim()
+        description = 'seat number'
+        break
+      case 'email':
+        value = email.trim()
+        description = 'email address'
+        break
+      case 'phone':
+        value = phoneNumber.trim()
+        description = 'phone number'
+        break
+      default:
+        value = ''
+        description = ''
+    }
+
     if (!value) {
       toast({
         title: 'Input Required',
-        description: `Please enter a ${
-          activeTab === 'ticket' ? 'ticket code' : 'seat number'
-        } to look up.`,
+        description: `Please enter a ${description} to look up.`,
         variant: 'destructive',
       })
       return
@@ -236,6 +265,7 @@ export default function ValidatePageClient() {
 
     try {
       let response
+      let body
 
       if (activeTab === 'seat') {
         // Seat validation logic
@@ -250,6 +280,21 @@ export default function ValidatePageClient() {
             scheduleId,
             seatNumber: value,
           }),
+        })
+      } else if (activeTab === 'email' || activeTab === 'phone') {
+        body = { eventId, scheduleId }
+        if (activeTab === 'email') {
+          body.email = value
+        } else {
+          body.phoneNumber = value
+        }
+        response = await fetch(`/api/checkin-app/validate-contact`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `JWT ${token}`,
+          },
+          body: JSON.stringify(body),
         })
       } else {
         // Ticket code validation logic
@@ -266,14 +311,14 @@ export default function ValidatePageClient() {
       const data = await response.json()
 
       if (response.ok) {
-        if (activeTab === 'seat') {
+        if (activeTab === 'seat' || activeTab === 'email' || activeTab === 'phone') {
           if (data.tickets && data.tickets.length > 1) {
             // Multiple tickets found for the seat
             setMultipleTickets(data.tickets)
             setValidatedTicket(null)
             toast({
               title: 'MULTIPLE FOUND',
-              description: `Found ${data.tickets.length} tickets for this seat.`,
+              description: `Found ${data.tickets.length} tickets for this criteria.`,
               variant: 'success',
             })
           } else if (data.tickets && data.tickets.length === 1) {
@@ -299,16 +344,17 @@ export default function ValidatePageClient() {
             setValidatedTicket(null)
             setMultipleTickets([])
             toast({
-              title: 'Seat Not Found',
-              description: 'No ticket found for that seat.',
+              title: 'Not Found',
+              description: 'No ticket found for that criteria.',
               variant: 'destructive',
             })
           }
         } else {
-          // Ticket code validation logic (assuming it returns a single ticket object)
-          setValidatedTicket(data.ticket)
+          // This handles the 'ticket' tab case
+          const ticket = data.ticket
+          setValidatedTicket(ticket)
           setMultipleTickets([])
-          if (data.ticket?.isCheckedIn) {
+          if (ticket?.isCheckedIn) {
             toast({
               title: 'ALREADY CHECKED IN',
               description: 'This visitor has already been checked in',
@@ -412,16 +458,28 @@ export default function ValidatePageClient() {
     setMultipleTickets([])
     setTicketCode('')
     setSeatNumber('')
+    setEmail('')
+    setPhoneNumber('')
   }
 
   const onTabChange = (value: string) => {
     setActiveTab(value)
-    resetValidation()
+    // Reset inputs when tab changes
+    setTicketCode('')
+    setSeatNumber('')
+    setEmail('')
+    setPhoneNumber('')
+
+    // Set focus to the input of the newly selected tab
     setTimeout(() => {
       if (value === 'ticket') {
         ticketInputRef.current?.focus()
-      } else {
+      } else if (value === 'seat') {
         seatInputRef.current?.focus()
+      } else if (value === 'email') {
+        emailInputRef.current?.focus()
+      } else if (value === 'phone') {
+        phoneInputRef.current?.focus()
       }
     }, 0)
   }
@@ -500,102 +558,131 @@ export default function ValidatePageClient() {
         )}
 
         {/* Tabs - Improved styling */}
-        <Tabs defaultValue="ticket" onValueChange={onTabChange} className="w-full mb-4">
-          <TabsList className="grid w-full grid-cols-2 bg-gray-200 dark:bg-gray-700 rounded-lg p-1">
-            <TabsTrigger value="ticket" className="rounded-md py-2">By Ticket Code</TabsTrigger>
-            <TabsTrigger value="seat" className="rounded-md py-2">By Seat</TabsTrigger>
+        <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="ticket">{t('byTicketCode')}</TabsTrigger>
+            <TabsTrigger value="seat">{t('bySeat')}</TabsTrigger>
+            <TabsTrigger value="email">{t('byEmail')}</TabsTrigger>
+            <TabsTrigger value="phone">{t('byPhone')}</TabsTrigger>
           </TabsList>
           <TabsContent value="ticket">
-            <div className="mt-4 flex gap-3">
+            <div className="mt-4">
               <input
-                id="ticketCode"
                 ref={ticketInputRef}
                 type="text"
-                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow hover:shadow-md"
-                placeholder="Enter ticket code (e.g., TKT-123456)"
                 value={ticketCode}
                 onChange={e => setTicketCode(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleValidate()}
-                disabled={
-                  isLoading ||
-                  !!validatedTicket ||
-                  multipleTickets.length > 0
-                }
+                placeholder={t('enterTicketCode')}
+                className="w-full p-4 border border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-lg shadow-sm dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition"
               />
-              <button
-                onClick={handleValidate}
-                disabled={
-                  isLoading ||
-                  !ticketCode.trim() ||
-                  !!validatedTicket ||
-                  multipleTickets.length > 0
-                }
-                className={`px-6 py-3 rounded-lg font-bold text-white transition-colors ${
-                  (isLoading ||
-                  !ticketCode.trim() ||
-                  !!validatedTicket ||
-                  multipleTickets.length > 0)
-                    ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:shadow-lg'
-                }`}
-              >
-                {isLoading ? (
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : (
-                  'Find'
-                )}
-              </button>
             </div>
           </TabsContent>
           <TabsContent value="seat">
-            <div className="mt-4 flex gap-3">
+            <div className="mt-4">
               <input
-                id="seat"
                 ref={seatInputRef}
                 type="text"
-                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow hover:shadow-md"
-                placeholder="Enter seat number (e.g., A-12)"
                 value={seatNumber}
                 onChange={e => setSeatNumber(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleValidate()}
-                disabled={
-                  isLoading ||
-                  !!validatedTicket ||
-                  multipleTickets.length > 0
-                }
+                placeholder={t('enterSeatNumber')}
+                className="w-full p-4 border border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-lg shadow-sm dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition"
               />
-              <button
-                onClick={handleValidate}
-                disabled={
-                  isLoading ||
-                  !seatNumber.trim() ||
-                  !!validatedTicket ||
-                  multipleTickets.length > 0
-                }
-                className={`px-6 py-3 rounded-lg font-bold text-white transition-colors ${
-                  (isLoading ||
-                  !seatNumber.trim() ||
-                  !!validatedTicket ||
-                  multipleTickets.length > 0)
-                    ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:shadow-lg'
-                }`}
-              >
-                {isLoading ? (
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : (
-                  'Find'
-                )}
-              </button>
+            </div>
+          </TabsContent>
+          <TabsContent value="email">
+            <div className="mt-4">
+              <input
+                ref={emailInputRef}
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleValidate()}
+                placeholder={t('enterEmail')}
+                className="w-full p-4 border border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-lg shadow-sm dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition"
+              />
+            </div>
+          </TabsContent>
+          <TabsContent value="phone">
+            <div className="mt-4">
+              <input
+                ref={phoneInputRef}
+                type="tel"
+                value={phoneNumber}
+                onChange={e => setPhoneNumber(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleValidate()}
+                placeholder={t('enterPhone')}
+                className="w-full p-4 border border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-lg shadow-sm dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition"
+              />
             </div>
           </TabsContent>
         </Tabs>
+
+        <div className="mt-6 w-full">
+          <button
+            onClick={handleValidate}
+            disabled={
+              isLoading ||
+              (activeTab === 'ticket' && !ticketCode.trim()) ||
+              (activeTab === 'seat' && !seatNumber.trim()) ||
+              (activeTab === 'email' && !email.trim()) ||
+              (activeTab === 'phone' && !phoneNumber.trim()) ||
+              !!validatedTicket ||
+              multipleTickets.length > 0
+            }
+            className={`w-full py-4 rounded-lg font-bold text-white uppercase tracking-wider transition-all duration-300 ${
+              isLoading ||
+              (activeTab === 'ticket' && !ticketCode.trim()) ||
+              (activeTab === 'seat' && !seatNumber.trim()) ||
+              (activeTab === 'email' && !email.trim()) ||
+              (activeTab === 'phone' && !phoneNumber.trim()) ||
+              !!validatedTicket ||
+              multipleTickets.length > 0
+                ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
+            }`}
+          >
+            {isLoading ? (
+              <div className="flex justify-center items-center">
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                <span>{t('lookingUp')}</span>
+              </div>
+            ) : (
+              t('lookUp')
+            )}
+          </button>
+        </div>
+
+        {(validatedTicket || multipleTickets.length > 0) && (
+          <div className="mt-4 w-full text-center">
+            <button
+              onClick={resetValidation}
+              className="text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              {t('clearAndStartNew')}
+            </button>
+          </div>
+        )}
 
         {/* Results - Compact layout with prominent check-in button */}
         {validatedTicket && (
@@ -681,6 +768,8 @@ export default function ValidatePageClient() {
                   setMultipleTickets([]);
                   setTicketCode('');
                   setSeatNumber('');
+                  setEmail('');
+                  setPhoneNumber('');
                 }}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >

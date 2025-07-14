@@ -554,5 +554,16 @@
     "tryAgain": "Try Again",
     "ticketsSent": "🎫 Your tickets have been sent to your email address. You can also view them in your account dashboard.",
     "goToUpcomingEvents": "Go to upcoming events"
-  }
+  },
+  "byTicketCode": "By Ticket Code",
+  "bySeat": "By Seat",
+  "byEmail": "By Email",
+  "byPhone": "By Phone",
+  "enterTicketCode": "Enter Ticket Code",
+  "enterSeatNumber": "Enter Seat Number",
+  "enterEmail": "Enter email address",
+  "enterPhone": "Enter phone number",
+  "lookingUp": "Looking up...",
+  "lookUp": "Look Up",
+  "clearAndStartNew": "Clear and Start New"
 }
