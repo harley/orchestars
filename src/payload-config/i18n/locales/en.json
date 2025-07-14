@@ -307,7 +307,6 @@
     "validTicket": "VALID TICKET",
     "ticketDetails": "TICKET DETAILS",
     "name": "Name:",
-    "event": "Event:",
     "date": "Date:",
     "emailLabel": "Email:",
     "phoneNumber": "Phone Number:",
@@ -353,6 +352,7 @@
       "ticket": "Ticket:",
       "attendee": "Attendee:",
       "time": "Time:",
+      "lastCheckIn": "Last Check-In:",
       "error": {
         "canvasNotSupported": "Canvas not supported",
         "noQrFound": "No QR code found.",
@@ -361,10 +361,14 @@
         "failed": "Check-in failed",
         "network": "Network error"
       },
-      "success": "Checked In"
+      "success": "Checked In",
+      "alreadyCheckedIn": "Already checked in"
     },
     "event": {
-      "dateTBA": "Date: TBA"
+      "dateTBA": "Date: TBA",
+      "checkedInByMe": "Checked in by me:",
+      "totalCheckedIn": "Total checked in:",
+      "loadingStats": "Loading stats..."
     },
     "manual": {
       "byTicketCode": "By Ticket Code",

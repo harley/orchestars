@@ -93,7 +93,16 @@ export async function POST(req: NextRequest) {
     })
 
     if (existingCheckIn.docs?.length > 0) {
-      throw new Error('CHECKIN003')
+      // Return success response with already checked status instead of throwing error
+      return NextResponse.json(
+        { 
+          success: true, 
+          alreadyCheckedIn: true,
+          message: 'Ticket already checked in',
+          checkInRecord: existingCheckIn.docs[0]
+        }, 
+        { status: 200 }
+      )
     }
 
     // Create check-in record
