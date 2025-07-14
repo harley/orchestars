@@ -4,6 +4,7 @@ import { TICKET_STATUSES } from './constants'
 import { afterChangeSeat } from './hooks/afterChangeSeat'
 import { getBookedSeat } from './handler/getBookedSeat'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
+import QrLinkCell from '@/components/Tickets/Actions/QrLinkCell'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
@@ -236,6 +237,25 @@ export const Tickets: CollectionConfig = {
             }
 
             return null
+          },
+        ],
+      },
+    },
+    {
+      name: 'qr_link',
+      type: 'text',
+      virtual: true,
+      admin: {
+        readOnly: true,
+        components: {
+          Cell: QrLinkCell,
+        },
+      },
+      hooks: {
+        afterRead: [
+          async ({ data }) => {
+            if (!data?.ticketCode) return null;
+            return `/ticket/${data.ticketCode}`;
           },
         ],
       },
