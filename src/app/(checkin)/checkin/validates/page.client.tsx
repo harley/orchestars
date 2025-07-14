@@ -490,7 +490,6 @@ export default function ValidatePageClient() {
                 onKeyDown={e => e.key === 'Enter' && handleValidate()}
                 disabled={
                   isLoading ||
-                  !ticketCode.trim() ||
                   !!validatedTicket ||
                   multipleTickets.length > 0
                 }
@@ -536,7 +535,6 @@ export default function ValidatePageClient() {
                 onKeyDown={e => e.key === 'Enter' && handleValidate()}
                 disabled={
                   isLoading ||
-                  !seatNumber.trim() ||
                   !!validatedTicket ||
                   multipleTickets.length > 0
                 }
