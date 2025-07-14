@@ -28,7 +28,7 @@ interface SidebarProps {
 
 const menuItems = [
   { icon: Settings, label: 'Account Settings', href: '/user/profile' },
-  { icon: CreditCard, label: 'Purchased Tickets', href: '/user/my-tickets', active: true },
+  { icon: CreditCard, label: 'Manage Tickets', href: '/user/my-tickets', active: true },
   { icon: Calendar, label: 'My Events', href: '/user/my-events' },
 ]
 
