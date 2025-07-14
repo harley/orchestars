@@ -5,6 +5,7 @@ import { afterChangeSeat } from './hooks/afterChangeSeat'
 import { getBookedSeat } from './handler/getBookedSeat'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 
+
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
   access: {
@@ -236,6 +237,22 @@ export const Tickets: CollectionConfig = {
             }
 
             return null
+          },
+        ],
+      },
+    },
+    {
+      name: 'qr_link',
+      type: 'text',
+      virtual: true,
+      admin: {
+        readOnly: true,
+      },
+      hooks: {
+        afterRead: [
+          async ({ data }) => {
+            if (!data?.ticketCode) return null;
+            return `/ticket/${data.ticketCode}`;
           },
         ],
       },

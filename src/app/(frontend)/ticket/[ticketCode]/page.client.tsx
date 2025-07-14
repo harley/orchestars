@@ -1,9 +1,9 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import type { Ticket } from '@/payload-types'
 import { QRCodeComponent } from '@/components/QRCode'
-import { Calendar, Download, MapPin, CheckCircle } from 'lucide-react'
+import { Calendar, Download, MapPin } from 'lucide-react'
 import html2canvas from 'html2canvas'
 import { useTranslate } from '@/providers/I18n/client'
 import { TermsAndConditionsModal } from '@/components/Tickets/TermsAndConditionsModal'
@@ -23,37 +23,101 @@ const getTicketClassColor = (ticketPriceInfo: any) => {
     : { color: '#6B7280', textColor: '#fff' } // Default gray color
 }
 
-export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheckedIn: boolean }) {
+export function TicketDetails({
+  ticket,
+  isCheckedIn,
+  checkedInAt,
+}: {
+  ticket: Ticket
+  isCheckedIn: boolean
+  checkedInAt?: string | null
+}) {
   const ticketRef = useRef<HTMLElement>(null)
   const { t, locale } = useTranslate()
+
+  // Hide global navbar for this page
+  useEffect(() => {
+    const nav = document.querySelector('nav') as HTMLElement | null
+    if (nav) nav.style.display = 'none'
+    return () => {
+      if (nav) nav.style.display = ''
+    }
+  }, [])
   const isBooked = ticket.status === 'booked'
   const event = typeof ticket.event === 'object' ? ticket.event : null
+
+  // Helper to format relative time (e.g., "2 hours ago")
+  const getRelativeTime = (dateString: string) => {
+    try {
+      const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
+      const date = new Date(dateString)
+      const diff = Date.now() - date.getTime()
+      const seconds = Math.floor(diff / 1000)
+      const minutes = Math.floor(seconds / 60)
+      const hours = Math.floor(minutes / 60)
+      const days = Math.floor(hours / 24)
+
+      if (Math.abs(days) >= 1) return rtf.format(-days, 'day')
+      if (Math.abs(hours) >= 1) return rtf.format(-hours, 'hour')
+      if (Math.abs(minutes) >= 1) return rtf.format(-minutes, 'minute')
+      return rtf.format(-seconds, 'second')
+    } catch (_error) {
+      return ''
+    }
+  }
 
   // Get ticket class color
   const ticketClassColor = getTicketClassColor(ticket.ticketPriceInfo)
 
   const handleDownload = () => {
-    if (ticketRef.current) {
-      html2canvas(ticketRef.current, {
-        scale: 2, // Improves quality/sharpness
-        onclone: (document) => {
-          // Hide buttons from the clone before capture
-          const footer = document.querySelector('footer')
-          if (footer) {
-            footer.style.display = 'none'
+    if (!ticketRef.current) return
+
+    html2canvas(ticketRef.current, {
+      scale: 2,
+      onclone: (document) => {
+        const footer = document.querySelector('footer')
+        if (footer) footer.style.display = 'none'
+      },
+    })
+      .then((canvas) => {
+        canvas.toBlob(async (blob) => {
+          if (!blob) return
+
+          const fileName = `ticket-${(ticket.ticketCode || '').replace(/[^a-zA-Z0-9_-]/g, '')}.png`
+          const file = new File([blob], fileName, { type: 'image/png' })
+
+          // Prefer Web Share API with files (iOS/Android) so user can save directly to photos
+          // iOS Safari will show the "Save Image" option which saves to gallery
+          if (
+            typeof navigator !== 'undefined' &&
+            (navigator as any).canShare &&
+            (navigator as any).canShare({ files: [file] })
+          ) {
+            try {
+              await (navigator as any).share({
+                files: [file],
+                title: 'Ticket QR',
+                text: 'Your event ticket',
+              })
+              return
+            } catch (e) {
+              // fall through to fallback download
+              console.error('Share failed, falling back to download', e)
+            }
           }
-        },
-      })
-        .then((canvas) => {
+
+          // Fallback: trigger standard download
+          const url = URL.createObjectURL(blob)
           const link = document.createElement('a')
-          link.download = `ticket-${(ticket.ticketCode || '').replace(/[^a-zA-Z0-9_-]/g, '')}.png`
-          link.href = canvas.toDataURL('image/png')
+          link.download = fileName
+          link.href = url
           link.click()
-        })
-        .catch((error) => {
-          console.error('Error generating ticket image:', error)
-        })
-    }
+          URL.revokeObjectURL(url)
+        }, 'image/png')
+      })
+      .catch((error) => {
+        console.error('Error generating ticket image:', error)
+      })
   }
 
   // Format date/time & location if available
@@ -77,51 +141,32 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
       >
         {/* Header */}
         <header className="p-6 pb-4 border-b border-gray-100">
-          <div className="flex justify-between items-center">
-            <img src="/images/ticket.svg" alt="Ticket" className="h-16" />
-            <div className="text-right flex-shrink-0">
-              <p
-                className={
-                  isCheckedIn
-                    ? 'flex items-center gap-1.5 font-bold text-lg text-emerald-600'
-                    : ticket.status === 'booked'
-                      ? 'font-medium text-blue-600'
-                      : 'font-medium text-gray-800'
-                }
+          <div className="flex justify-between items-start">
+            <img src="/images/ticket.svg" alt="Ticket" className="h-20 -mt-4" />
+            {ticket.ticketPriceName && (
+              <span
+                className="px-4 py-2 rounded-lg text-lg font-bold shadow-sm"
+                style={{
+                  backgroundColor: ticketClassColor.color,
+                  color: ticketClassColor.textColor,
+                }}
               >
-                {isCheckedIn && <CheckCircle className="w-5 h-5" />}
-                {isCheckedIn
-                  ? t('ticket.checkedIn')
-                  : ticket.status === 'booked'
-                    ? t('ticket.readyToCheckIn')
-                    : ticket.status
-                      ? ticket.status.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
-                      : t('ticket.booked')}
-              </p>
-            </div>
+                {ticket.ticketPriceName}
+              </span>
+            )}
           </div>
 
           {event?.title && (
             <div className="flex items-center gap-3">
               <h2 className="text-2xl font-bold">{event.title}</h2>
-              {ticket.ticketPriceName && (
-                <span
-                  className="px-3 py-1 rounded-full text-sm font-medium shadow-sm"
-                  style={{
-                    backgroundColor: ticketClassColor.color,
-                    color: ticketClassColor.textColor,
-                  }}
-                >
-                  {ticket.ticketPriceName}
-                </span>
-              )}
+              {/* removed small price badge */}
             </div>
           )}
 
           {formattedDateTime && (
             <p className="mt-2 flex items-start text-sm text-gray-600">
               <Calendar className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />{' '}
-              <span>{formattedDateTime}</span>
+              <span className="font-semibold">{formattedDateTime}</span>
             </p>
           )}
 
@@ -134,22 +179,23 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
         </header>
 
         {/* QR Section */}
-        <section
-          style={{
-            background: ticketClassColor ? ticketClassColor.color : undefined,
-          }}
-          className={`flex justify-center p-6 border-b border-gray-100 `}
-        >
+        <section className="flex justify-center">
           {isBooked ? (
             <div className="relative">
               <QRCodeComponent
                 payload={ticket.ticketCode || ''}
-                className={`w-56 h-56 ${isCheckedIn ? 'filter grayscale' : ''}`}
+                className="w-56 h-56"
+                options={{
+                  color: {
+                    dark: ticketClassColor.color,
+                    light: '#FFFFFF',
+                  },
+                }}
               />
               {isCheckedIn && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70">
                   <span className="text-2xl font-bold text-gray-800 transform -rotate-12 border-4 border-gray-800 px-4 py-2 rounded-lg">
-                    USED
+                    CHECKED IN
                   </span>
                 </div>
               )}
@@ -162,6 +208,22 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
         </section>
 
         {/* Info Section */}
+        <section className="border-b border-gray-100">
+          {ticket.seat && (
+            <div className="flex justify-center items-baseline gap-2">
+              <span className="text-gray-500">{t('checkin.seat')}</span>
+              <span className="font-bold text-2xl text-gray-800">{ticket.seat}</span>
+            </div>
+          )}
+        </section>
+
+        {/* Terms & Conditions (moved under QR) */}
+        {event?.eventTermsAndConditions && (
+          <div className="pt-4 px-6 text-center">
+            <TermsAndConditionsModal terms={event.eventTermsAndConditions} />
+          </div>
+        )}
+
         <section className="p-6 space-y-4 text-sm border-b border-gray-100">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -171,24 +233,21 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
               </p>
             </div>
             <div>
-              <p className="text-gray-500">Ticket</p>
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-gray-800">
-                  {ticket.ticketPriceName ? `1× ${ticket.ticketPriceName}` : '1× Standard'}
-                </span>
-                {ticket.ticketPriceName && (
-                  <span
-                    className="px-2 py-1 rounded-md text-xs font-medium shadow-sm"
-                    style={{
-                      backgroundColor: ticketClassColor.color,
-                      color: ticketClassColor.textColor,
-                    }}
-                  >
-                    {ticket.ticketPriceName}
-                  </span>
-                )}
-              </div>
+              <p className="text-gray-500">Order Code</p>
+              <p className="font-medium text-gray-800">{ticket.orderCode ?? '—'}</p>
             </div>
+            <div>
+              <p className="text-gray-500">Ticket Code</p>
+              <p className="font-medium text-gray-800">{ticket.ticketCode ?? '—'}</p>
+            </div>
+            {isCheckedIn && checkedInAt && (
+              <div>
+                <p className="text-gray-500">Checked&nbsp;In&nbsp;Time</p>
+                <p className="font-medium text-gray-800">
+                  {new Date(checkedInAt).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' })}
+                </p>
+              </div>
+            )}
           </div>
         </section>
 
@@ -215,13 +274,14 @@ export function TicketDetails({ ticket, isCheckedIn }: { ticket: Ticket; isCheck
             <Download className="w-4 h-4" /> {t('ticket.saveQRCode')}
           </button>
         </footer>
-      </article>
+        {/* Checked-in relative time message */}
+        {isCheckedIn && checkedInAt && (
+          <div className="px-6 pb-4 pt-2 text-center text-sm text-gray-600">
+            {t('ticket.checkedIn')} {getRelativeTime(checkedInAt)}
+          </div>
+        )}
 
-      {event?.eventTermsAndConditions && (
-        <div className="mt-4 text-center">
-          <TermsAndConditionsModal terms={event.eventTermsAndConditions} />
-        </div>
-      )}
+      </article>
     </div>
   )
 }
