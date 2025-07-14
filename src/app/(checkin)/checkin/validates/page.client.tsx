@@ -803,56 +803,68 @@ export default function ValidatePageClient() {
         {/* Multiple Tickets */}
         {multipleTickets.length > 0 && (
           <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Multiple Visitors Found - Choose One to Check In
+            {/* Header: Checked in X of Y tickets */}
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
+              Checked in {multipleTickets.filter(t => t.isCheckedIn).length} of {multipleTickets.length} tickets
             </h3>
             <div className="space-y-4">
-              {multipleTickets.map((ticket, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 transition-shadow hover:shadow-md"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex-1 mb-4 sm:mb-0">
-                      <div className="flex items-center mb-2">
-                        <p className="font-bold text-lg text-gray-900 dark:text-gray-100 mr-3">
-                          {ticket.attendeeName}
-                        </p>
+              {multipleTickets.map((ticket) => {
+                const ticketColors = getTicketClassColor(ticket.ticketPriceInfo)
+                const isThisChecking = isCheckingIn && ticketCode === ticket.ticketCode
+                return (
+                  <div
+                    key={ticket.ticketCode}
+                    className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 transition-shadow hover:shadow-md"
+                  >
+                    <div className="flex flex-row items-start justify-between gap-4">
+                      {/* Left: Seat, Price, Ticket Code */}
+                      <div className="flex flex-wrap items-center gap-2 min-w-0">
+                        <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">
+                          Seat: {ticket.seat}
+                        </span>
                         <span
-                          className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${
-                            ticket.isCheckedIn
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300'
-                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300'
-                          }`}
+                          className="px-2 py-1 rounded text-xs font-medium"
+                          style={{ backgroundColor: ticketColors.color, color: ticketColors.textColor }}
                         >
-                          {ticket.isCheckedIn ? 'Checked In' : 'Ready'}
+                          {ticket.ticketPriceName || 'N/A'}
+                        </span>
+                        <span className="font-mono text-gray-700 dark:text-gray-200 truncate">
+                          {ticket.ticketCode}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        <span className="font-medium">Seat:</span> {ticket.seat}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
-                        {ticket.ticketCode}
-                      </p>
+                      {/* Right: Button or Checked In badge */}
+                      <div className="flex-shrink-0 flex items-center">
+                        {ticket.isCheckedIn ? (
+                          <span className="inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">
+                            Checked In{ticket.checkinRecord?.checkInTime ? (
+                              <span className="ml-2 text-xs text-gray-500 dark:text-gray-300">{new Date(ticket.checkinRecord.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            ) : null}
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => handleCheckIn(ticket)}
+                            disabled={isThisChecking}
+                            className={`w-full sm:w-auto px-5 py-2 rounded-md font-semibold text-white transition-colors ${
+                              isThisChecking
+                                ? 'bg-gray-400 cursor-not-allowed'
+                                : 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
+                            }`}
+                          >
+                            {isThisChecking ? 'Checking...' : 'Check In'}
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex-shrink-0">
-                      {!ticket.isCheckedIn && (
-                        <button
-                          onClick={() => handleCheckIn(ticket)}
-                          disabled={isCheckingIn}
-                          className={`w-full sm:w-auto px-5 py-2 rounded-md font-semibold text-white transition-colors ${
-                            isCheckingIn
-                              ? 'bg-gray-400 cursor-not-allowed'
-                              : 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
-                          }`}
-                        >
-                          {isCheckingIn ? 'Checking...' : 'Check In'}
-                        </button>
+                    {/* Attendee Name and Order Code below */}
+                    <div className="mt-2 flex flex-row items-center justify-between w-full">
+                      <span className="text-base font-medium text-gray-900 dark:text-gray-100 truncate">{ticket.attendeeName}</span>
+                      {ticket.orderCode && (
+                        <span className="text-xs font-normal text-gray-500 dark:text-gray-400 ml-2 truncate text-right min-w-0">{ticket.orderCode}</span>
                       )}
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
             <div className="mt-6">
               <button
