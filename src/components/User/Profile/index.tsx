@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Coins, Target, TrendingUp } from 'lucide-react'
+import { Coins, Target, } from 'lucide-react'
 import { ProgressBar } from '@/components/User/Profile/ProgressBar'
 import { OrderHistory } from '@/components/User/Profile/OrderHistory'
 import { RewardsGallery } from '@/components/User/Profile/RewardsGallery'
-import { useToast } from '@/components/ui/use-toast'
-import { TicketZoneLabel } from '@/collections/Events/constants'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { MembershipTier } from '@/components/User/Profile/MembershipTier'
 import { User } from '@/payload-types'

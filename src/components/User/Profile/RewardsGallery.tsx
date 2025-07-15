@@ -1,4 +1,4 @@
-import { Gift, Calendar, Check } from "lucide-react";
+import { Gift } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TicketZoneLabel } from '@/collections/Events/constants'
@@ -9,16 +9,6 @@ interface Reward {
   type: "giftTicket"
   expiresAt: string
 }
-
-// interface Reward {
-//   id: string;
-//   name: string;
-//   description: string;
-//   imageUrl: string;
-//   category: "product" | "ticket" | "discount";
-//   pointsCost: number;
-//   dateReceived: string;
-// }
 
 interface RewardsGalleryProps {
   rewards: Reward[];

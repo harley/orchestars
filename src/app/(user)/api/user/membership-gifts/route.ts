@@ -3,7 +3,7 @@ import { getPayload } from '@/payload-config/getPayloadConfig'
 import { authorizeApiRequest } from '@/app/(user)/utils/authorizeApiRequest'
 import { TICKET_ZONES } from '@/collections/Events/constants'
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     // Verify the JWT token
     const userRequest = await authorizeApiRequest()
@@ -48,10 +48,10 @@ export async function GET(req: NextRequest) {
     )
   } catch (err) {
     const error = err as Error
-    console.error('Error while fetching user tickets:', error)
+    console.error('Error while fetching membership gifts:', error)
     return NextResponse.json(
       {
-        message: 'Failed to fetch tickets',
+        message: 'Failed to fetch membership gifts',
         details: error.message,
       },
       { status: 500 },

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { TicketZoneLabel } from '@/collections/Events/constants'
 
 type MembershipPoint = {
@@ -43,7 +43,6 @@ interface ApiResponse {
 export function useUserProfile() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const cache = useRef<Map<string, ApiResponse>>(new Map())
 
   const [membershipPoint, setMembershipPoint] = useState<MembershipPoint | null>(null);
   const [histories, setHistories] = useState<RewardsTimeline | null>(null);
@@ -100,18 +99,18 @@ export function useUserProfile() {
     }
   }
 
-  const fetchInitialData = async () => {
+  const fetchInitialData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    await fetchMembershipPoint(),
-    await fetchRewardsTimeline(),
-    await fetchRewardsGallery()
+    await fetchMembershipPoint();
+    await fetchRewardsTimeline();
+    await fetchRewardsGallery();
     setIsLoading(false);
-  }
+  }, [fetchMembershipPoint, fetchRewardsTimeline, fetchRewardsGallery]);
 
   useEffect(() => {
     fetchInitialData();
-  }, [])
+  }, [fetchInitialData])
 
   return {
     isLoading,

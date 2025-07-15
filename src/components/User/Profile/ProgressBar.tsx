@@ -28,7 +28,6 @@ export function ProgressBar({
   const percentage = Math.min((current / target) * 100, 100);
 
   useEffect(() => {
-    console.log(`Setting progress to ${percentage}% for tier ${tier}`);
     if (animated) {
       const timer = setTimeout(() => {
         setProgress(percentage);
