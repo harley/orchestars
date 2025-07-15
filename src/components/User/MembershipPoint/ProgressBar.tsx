@@ -12,9 +12,9 @@ interface ProgressBarProps {
 
 const tierColors = {
   Standard: "bg-gradient-bronze",
-  silver: "bg-gradient-silver", 
-  gold: "bg-gradient-gold",
-  platinum: "bg-gradient-platinum"
+  Silver: "bg-gradient-silver", 
+  Gold: "bg-gradient-gold",
+  Platinum: "bg-gradient-platinum"
 };
 
 export function ProgressBar({ 
@@ -29,14 +29,14 @@ export function ProgressBar({
 
   useEffect(() => {
     console.log(`Setting progress to ${percentage}% for tier ${tier}`);
-    // if (animated) {
-    //   const timer = setTimeout(() => {
-    //     setProgress(percentage);
-    //   }, 500);
-    //   return () => clearTimeout(timer);
-    // } else {
-    //   setProgress(percentage);
-    // }
+    if (animated) {
+      const timer = setTimeout(() => {
+        setProgress(percentage);
+      }, 500);
+      return () => clearTimeout(timer);
+    } else {
+      setProgress(percentage);
+    }
     setProgress(percentage);
   }, [percentage, animated]);
 

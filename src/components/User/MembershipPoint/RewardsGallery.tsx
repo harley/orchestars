@@ -1,30 +1,38 @@
 import { Gift, Calendar, Check } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { TicketZoneLabel } from '@/collections/Events/constants'
 
 interface Reward {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string;
-  dateReceived: string;
-  pointsCost: number;
-  category: "product" | "experience" | "discount";
+  id: string
+  label: TicketZoneLabel
+  type: "giftTicket"
+  expiresAt: string
 }
+
+// interface Reward {
+//   id: string;
+//   name: string;
+//   description: string;
+//   imageUrl: string;
+//   category: "product" | "ticket" | "discount";
+//   pointsCost: number;
+//   dateReceived: string;
+// }
 
 interface RewardsGalleryProps {
   rewards: Reward[];
   className: string;
 }
 
-const categoryConfig = {
+const typeConfig = {
   product: {
     color: "bg-blue-500/10 text-blue-700 border-blue-200",
     label: "Product"
   },
-  experience: {
+  giftTicket: {
     color: "bg-purple-500/10 text-purple-700 border-purple-200",
-    label: "Experience"
+    label: "Ticket"
   },
   discount: {
     color: "bg-green-500/10 text-green-700 border-green-200", 
@@ -45,7 +53,10 @@ export function RewardsGallery({ rewards, className }: RewardsGalleryProps) {
       <CardContent>
         <div className="space-y-8">
           {rewards.map((reward, index) => {
-            const config = categoryConfig[reward.category];
+            console.log(`Rendering reward: ${reward}`)
+            const config = typeConfig[reward.type];
+            console.log(`Rendering reward: ${reward.label} (${reward.type})`, config);
+            const imageUrl = `https://placehold.co/200x200?text=${reward.label}&font=roboto`;
             
             return (
               <div 
@@ -53,42 +64,38 @@ export function RewardsGallery({ rewards, className }: RewardsGalleryProps) {
                 className="h-64 group relative overflow-hidden rounded-lg border bg-gradient-subtle hover:shadow-md transition-all duration-300"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
-                <div className="h-36 bg-muted relative overflow-hidden">
+                <div className="h-40 bg-muted relative overflow-hidden">
                   <img 
-                    src={reward.imageUrl} 
-                    alt={reward.name}
+                    src={imageUrl} 
+                    alt={reward.label}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute top-2 right-2">
+                  {/* <div className="absolute top-2 right-2">
                     <Badge variant="outline" className="bg-white/90 border-white/50">
                       <Check className="w-3 h-3 mr-1 text-green-600" />
                       Claimed
                     </Badge>
-                  </div>
+                  </div> */}
                 </div>
                 
                 <div className="p-4 space-y-3">
                   <div className="flex items-start justify-between">
                     <h3 className="font-semibold text-sm group-hover:text-primary transition-colors">
-                      {reward.name}
+                      {reward.label}
                     </h3>
                     <Badge variant="outline" className={config.color}>
                       {config.label}
                     </Badge>
                   </div>
                   
-                  <p className="text-sm text-muted-foreground truncate">
+                  {/* <p className="text-sm text-muted-foreground truncate">
                     {reward.description}
-                  </p>
+                  </p> */}
                   
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {reward.dateReceived}
+                      Expires at: {reward.expiresAt}
                     </div>
-                    <span className="font-medium text-primary">
-                      {reward.pointsCost} pts
-                    </span>
                   </div>
                 </div>
               </div>

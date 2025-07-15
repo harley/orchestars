@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { authorizeApiRequest } from '@/app/(user)/utils/authorizeApiRequest'
+import { TICKET_ZONES } from '@/collections/Events/constants'
 
 export async function GET(req: NextRequest) {
   try {
@@ -27,10 +28,13 @@ export async function GET(req: NextRequest) {
           year: 'numeric',
         });
       }
+
+      const label = TICKET_ZONES.find(zone => zone.value === gift.ticketGift)?.label || 'Unknown Zone';
       
       return {
-        ticketGift: gift.ticketGift,
-        giftType: gift.giftType,
+        id: gift.id,
+        label,
+        type: gift.giftType,
         expiresAt
       }
     })

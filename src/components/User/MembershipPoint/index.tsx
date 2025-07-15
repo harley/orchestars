@@ -6,6 +6,7 @@ import { ProgressBar } from '@/components/User/MembershipPoint/ProgressBar'
 import { OrderHistory } from '@/components/User/MembershipPoint/OrderHistory'
 import { RewardsGallery } from '@/components/User/MembershipPoint/RewardsGallery'
 import { useToast } from '@/components/ui/use-toast'
+import { TicketZoneLabel } from '@/collections/Events/constants'
 
 // Mock data - in real app this would come from API
 const mockUserData = {
@@ -94,8 +95,20 @@ type MembershipPoint = {
 }
 
 type RewardsTimeline = {
-  
-}
+  id: number
+  description: string
+  date: string
+  pointsEarned: number
+  amount: number
+  type: "purchase" | "bonus"
+}[]
+
+type MembershipGifts = {
+  id: string
+  label: TicketZoneLabel
+  type: "giftTicket"
+  expiresAt: string
+}[]
 
 type PaginationInfo = {
   page: number
@@ -108,7 +121,7 @@ type PaginationInfo = {
 
 interface ApiResponse {
   success: boolean
-  data: MembershipPoint
+  data: MembershipPoint | RewardsTimeline | MembershipGifts
   pagination?: PaginationInfo
   error?: string
 }
@@ -119,7 +132,8 @@ const MembershipPoint = ({ className } : { className?: string }) => {
   const { toast } = useToast()
 
   const [membershipPoint, setMembershipPoint] = useState<MembershipPoint | null>(null);
-  const [rewards, setRewards] = useState<RewardsTimeline | null>(null);
+  const [histories, setHistories] = useState<RewardsTimeline | null>(null);
+  const [rewards, setRewards] = useState<MembershipGifts | null>(null);
 
   const fetchMembershipPoint = async () => {
     const response = await fetch('/api/user/membership-point');
@@ -140,7 +154,23 @@ const MembershipPoint = ({ className } : { className?: string }) => {
     const response = await fetch('/api/user/reward-timeline');
     const result: ApiResponse = await response.json();
     if (result.success) {
-      setRewards(result.data as RewardsTimeline);
+      setHistories(result.data as RewardsTimeline);
+    } else {
+      setHistories(null);
+      toast({
+        title: "Error",
+        description: "Failed to fetch some data",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const fetchRewardsGallery = async () => {
+    const response = await fetch('/api/user/membership-gifts');
+    const result: ApiResponse = await response.json();
+    if (result.success) {
+      setRewards(result.data as MembershipGifts);
+      console.log('Fetched rewards:', result.data);
     } else {
       setRewards(null);
       toast({
@@ -155,11 +185,14 @@ const MembershipPoint = ({ className } : { className?: string }) => {
     setLoading(true);
     await Promise.all([
       fetchMembershipPoint(),
+      fetchRewardsTimeline(),
+      fetchRewardsGallery()
     ])
     setLoading(false);
   }
 
   useEffect(() => {
+    setMounted(true)
     fetchInitialData();
   }, [])
 
@@ -183,11 +216,15 @@ const MembershipPoint = ({ className } : { className?: string }) => {
     return () => cancelAnimationFrame(animationFrameId);
   }, [membershipPoint]);
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
   const containerClass = `border-white/20 bg-white rounded-2xl shadow-xl p-8 mt-8 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className || ''}`
+
+  if (membershipPoint === null || histories === null || rewards === null) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-lg text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-col space-y-8 max-w-4xl mx-auto">
@@ -252,8 +289,8 @@ const MembershipPoint = ({ className } : { className?: string }) => {
 
       {/* Detail Membership Point Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <OrderHistory orders={mockOrders} className={containerClass}/>
-        <RewardsGallery rewards={mockRewards} className={containerClass}/>
+        <OrderHistory orders={histories} className={containerClass}/>
+        <RewardsGallery rewards={rewards} className={containerClass}/>
       </div>
     </div>
   )

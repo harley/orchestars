@@ -21,9 +21,9 @@ export async function GET(req: NextRequest) {
     console.log('Membership histories:', membershipHistories)
 
     const rewardHistories = membershipHistories?.docs?.map((history) => {
-      let price = 0;
+      let amount = 0;
       if (history.order && typeof history.order === "object" && "total" in history.order) {
-        price = history.order.total as number;
+        amount = history.order.total as number;
       }
 
       const date = new Date(history.updatedAt).toLocaleDateString('en-US', {
@@ -32,14 +32,15 @@ export async function GET(req: NextRequest) {
         year: 'numeric',
       });
 
-      let rewardType = price > 0 ? 'Bonus' : 'Purchase';
+      let type = amount > 0 ? 'bonus' : 'purchase';
 
       return {
+        id: history.id,
         description: history.description,
         date,
-        points: history.pointsChange,
-        price,
-        rewardType
+        pointsEarned: history.pointsChange,
+        amount,
+        type
       }
     })
 

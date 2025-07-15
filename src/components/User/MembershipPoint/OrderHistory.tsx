@@ -1,30 +1,31 @@
 import { Calendar, ShoppingBag, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { formatMoney } from '@/utilities/formatMoney'
 
-interface Order {
-  id: string;
-  date: string;
-  description: string;
-  amount: number;
-  pointsEarned: number;
-  type: "purchase" | "bonus";
-}
+type RewardsTimeline = {
+  id: number
+  description: string
+  date: string
+  pointsEarned: number
+  amount: number
+  type: "purchase" | "bonus"
+}[]
 
 interface OrderHistoryProps {
-  orders: Order[];
+  orders: RewardsTimeline;
   className: string;
 }
 
 const typeConfig = {
   purchase: {
     icon: ShoppingBag,
-    label: "Purchase",
+    label: "purchase",
     color: "bg-blue-500/10 text-blue-700 border-blue-200"
   },
   bonus: {
     icon: TrendingUp,
-    label: "Bonus",
+    label: "bonus",
     color: "bg-green-500/10 text-green-700 border-green-200"
   },
 };
@@ -48,7 +49,7 @@ export function OrderHistory({ orders, className }: OrderHistoryProps) {
             return (
               <div 
                 key={order.id}
-                className="h-28 flex items-center gap-2 justify-between p-4 rounded-lg border hover:shadow-md transition-all duration-300 animate-fade-in"
+                className="h-28 flex items-center gap-1 justify-between p-4 rounded-lg border hover:shadow-md transition-all duration-300 animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="flex items-center gap-3">
@@ -67,7 +68,7 @@ export function OrderHistory({ orders, className }: OrderHistoryProps) {
                   </Badge>
                   <div className="flex flex-col items-end">
                     <span className="text-lg font-bold">+{order.pointsEarned}</span>
-                    <span className="text-sm text-muted-foreground">${order.amount}</span>
+                    <span className="text-sm text-muted-foreground">{formatMoney(order.amount)}</span>
                   </div>
                 </div>
               </div>
