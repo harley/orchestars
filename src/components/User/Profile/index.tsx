@@ -10,193 +10,22 @@ import { TicketZoneLabel } from '@/collections/Events/constants'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { MembershipTier } from '@/components/User/Profile/MembershipTier'
 import { User } from '@/payload-types'
-
-// Mock data - in real app this would come from API
-const mockUserData = {
-  id: "1",
-  name: "Sarah Johnson",
-  email: "sarah@example.com",
-  // avatar: userAvatar,
-  currentTier: "gold" as const,
-  nextTier: "platinum" as const,
-  currentPoints: 8750,
-  pointsToNextTier: 10000,
-  totalLifetimePoints: 25600,
-  memberSince: "January 2022"
-};
-
-const mockOrders = [
-  {
-    id: "1",
-    date: "Dec 15, 2024",
-    description: "Premium Coffee Subscription",
-    amount: 89.99,
-    pointsEarned: 450,
-    type: "purchase" as const
-  },
-  {
-    id: "2", 
-    date: "Dec 10, 2024",
-    description: "Holiday Bonus Points",
-    amount: 0,
-    pointsEarned: 1000,
-    type: "bonus" as const
-  },
-  {
-    id: "3",
-    date: "Dec 5, 2024", 
-    description: "Friend Referral Bonus",
-    amount: 0,
-    pointsEarned: 500,
-    type: "bonus" as const
-  },
-  {
-    id: "4",
-    date: "Nov 28, 2024",
-    description: "Black Friday Purchase",
-    amount: 156.50,
-    pointsEarned: 780,
-    type: "purchase" as const
-  }
-];
-
-const mockRewards = [
-  {
-    id: "1",
-    name: "Premium Coffee Tumbler",
-    description: "Insulated stainless steel tumbler with premium branding",
-    imageUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300&h=200&fit=crop",
-    dateReceived: "Nov 15, 2024",
-    pointsCost: 2500,
-    category: "product" as const
-  },
-  // {
-  //   id: "2",
-  //   name: "VIP Tasting Experience",
-  //   description: "Exclusive coffee tasting session with our master roaster",
-  //   imageUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300&h=200&fit=crop",
-  //   dateReceived: "Oct 20, 2024",
-  //   pointsCost: 5000,
-  //   category: "experience" as const
-  // },
-  {
-    id: "3",
-    name: "20% Off Next Order",
-    description: "Special discount for loyal members",
-    imageUrl: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=300&h=200&fit=crop",
-    dateReceived: "Sep 30, 2024", 
-    pointsCost: 1000,
-    category: "discount" as const
-  }
-];
-
-type MembershipPoint = {
-  totalPoints: number,
-  membershipRank: "Standard" | "Silver" | "Gold" | "Platinum",
-  nextRank: "Standard" | "Silver" | "Gold" | "Platinum",
-  pointsToNextRank: number
-}
-
-type RewardsTimeline = {
-  id: number
-  description: string
-  date: string
-  pointsEarned: number
-  amount: number
-  type: "purchase" | "bonus"
-}[]
-
-type MembershipGifts = {
-  id: string
-  label: TicketZoneLabel
-  type: "giftTicket"
-  expiresAt: string
-}[]
-
-type PaginationInfo = {
-  page: number
-  limit: number
-  totalPages: number
-  totalDocs: number
-  hasNextPage: boolean
-  hasPrevPage: boolean
-}
-
-interface ApiResponse {
-  success: boolean
-  data: MembershipPoint | RewardsTimeline | MembershipGifts
-  pagination?: PaginationInfo
-  error?: string
-}
+import { useUserProfile } from '@/components/User/hooks/useUserProfile'
+import { Loader2 } from 'lucide-react'
 
 const UserProfile = ({ userData, className } : { className?: string, userData?: User }) => {
   const [mounted, setMounted] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const { toast } = useToast()
 
-  const [membershipPoint, setMembershipPoint] = useState<MembershipPoint | null>(null);
-  const [histories, setHistories] = useState<RewardsTimeline | null>(null);
-  const [rewards, setRewards] = useState<MembershipGifts | null>(null);
-
-  const fetchMembershipPoint = async () => {
-    const response = await fetch('/api/user/membership-point');
-    const result: ApiResponse = await response.json();
-    if (result.success) {
-      setMembershipPoint(result.data as MembershipPoint);
-    } else {
-      setMembershipPoint(null);
-      toast({
-        title: "Error",
-        description: "Failed to fetch some data",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const fetchRewardsTimeline = async() => {
-    const response = await fetch('/api/user/reward-timeline');
-    const result: ApiResponse = await response.json();
-    if (result.success) {
-      setHistories(result.data as RewardsTimeline);
-    } else {
-      setHistories(null);
-      toast({
-        title: "Error",
-        description: "Failed to fetch some data",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const fetchRewardsGallery = async () => {
-    const response = await fetch('/api/user/membership-gifts');
-    const result: ApiResponse = await response.json();
-    if (result.success) {
-      setRewards(result.data as MembershipGifts);
-    } else {
-      setRewards(null);
-      toast({
-        title: "Error",
-        description: "Failed to fetch some data",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const fetchInitialData = async () => {
-    setLoading(true);
-    await Promise.all([
-      fetchMembershipPoint(),
-      fetchRewardsTimeline(),
-      fetchRewardsGallery()
-    ])
-    setLoading(false);
-  }
+  const {
+    isLoading,
+    error,
+    membershipPoint,
+    histories,
+    rewards,
+  } = useUserProfile()
 
   useEffect(() => {
-    console.log('User data:', userData);
     setMounted(true)
-    fetchInitialData();
   }, [])
 
   const [pointsCounter, setPointsCounter] = useState(0);
@@ -221,10 +50,26 @@ const UserProfile = ({ userData, className } : { className?: string, userData?: 
 
   const containerClass = `border-white/20 bg-white rounded-2xl shadow-xl p-8 mt-8 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className || ''}`
 
-  if (membershipPoint === null || histories === null || rewards === null) {
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-lg text-muted-foreground">Loading...</p>
+      <div className="flex-col space-y-8 max-w-4xl mx-auto">
+        <div className={containerClass}>
+          <div className="flex justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex-col space-y-8 max-w-4xl mx-auto">
+        <div className={containerClass}>
+          <div className="flex justify-center py-16">
+            <p className="text-lg text-red-500">Failed to load user profile data.</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -251,10 +96,10 @@ const UserProfile = ({ userData, className } : { className?: string, userData?: 
                   <h1 className="text-3xl font-bold animate-slide-up">
                     {userData?.firstName || ''} {userData?.lastName || ''}
                   </h1>
-                  <MembershipTier tier={membershipPoint.membershipRank} />
+                  <MembershipTier tier={membershipPoint?.membershipRank ?? 'Standard'} />
                 </div>
                 <p className="text-muted-foreground animate-slide-up" style={{ animationDelay: "100ms" }}>
-                  Member since {mockUserData.memberSince}
+                  Member since {new Date(userData?.createdAt ?? '').toLocaleString('en-US', { month: 'long', year: 'numeric' })}
                 </p>
               </div>
 
@@ -316,8 +161,8 @@ const UserProfile = ({ userData, className } : { className?: string, userData?: 
 
       {/* Detail Membership Point Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <OrderHistory orders={histories} className={containerClass}/>
-        <RewardsGallery rewards={rewards} className={containerClass}/>
+        <OrderHistory orders={histories ?? []} className={containerClass}/>
+        <RewardsGallery rewards={rewards ?? []} className={containerClass}/>
       </div>
     </div>
   )

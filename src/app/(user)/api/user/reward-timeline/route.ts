@@ -18,8 +18,6 @@ export async function GET(req: NextRequest) {
       }
     })
 
-    console.log('Membership histories:', membershipHistories)
-
     const rewardHistories = membershipHistories?.docs?.map((history) => {
       let amount = 0;
       if (history.order && typeof history.order === "object" && "total" in history.order) {
