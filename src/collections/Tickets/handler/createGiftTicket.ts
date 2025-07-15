@@ -66,7 +66,7 @@ async function createOrFindRecipientUser(
     const newUser = await payload.create({
       collection: 'users',
       data: {
-        email,
+        email: String(email).toLowerCase().trim(),
         firstName,
         lastName,
         phoneNumber: phone || '',
@@ -291,9 +291,6 @@ export const createGiftTicket = async (req: PayloadRequest): Promise<Response> =
         throw new Error(transferResult.errors.join('; '))
       }
 
-      // Commit the transaction
-      await payload.db.commitTransaction(transactionID)
-
       let setupLink = ''
 
       if (!userResult.user?.salt) {
@@ -305,6 +302,9 @@ export const createGiftTicket = async (req: PayloadRequest): Promise<Response> =
         // Build user setup link
         setupLink = `${getServerSideURL()}/user/reset-password?token=${setupToken}`
       }
+
+      // Commit the transaction
+      await payload.db.commitTransaction(transactionID)
 
       const ticketData = validation.tickets.map((ticket: any) => {
         const event = ticket?.event
