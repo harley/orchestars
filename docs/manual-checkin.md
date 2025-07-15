@@ -157,6 +157,16 @@ Recent improvements to the manual check-in dashboard focus on creating a more pr
   - Uppercase text with letter spacing
   - Enhanced hover effects
 
+#### Multi-Ticket Selection UI
+- **Clear Ticket List**: When multiple tickets match a search (e.g., by email or phone), a list is shown for the admin to select which ticket to check in.
+- **Row Layout**:
+  - **Left (top row):** `[Seat]` (blue badge), `[Ticket Class]` (colored badge using `getTicketClassColor(ticket.ticketPriceInfo)`), `[Ticket Code]` (monospace)
+  - **Right (top row):** `[Check In]` button (if not checked in) or `[Checked In]` badge (with check-in time if available)
+  - **Below:** Attendee name (left), order code (right-aligned, thin/small font)
+- **Visual Feedback:** Only the button for the ticket being checked in is disabled and shows "Checking..."; other buttons remain active.
+- **Badges:** The "Ready" badge is removed. Only the "Checked In" badge is shown, right-aligned, and displays the check-in time if available.
+- **Color Consistency:** The ticket class badge uses the correct color and text color from `getTicketClassColor(ticket.ticketPriceInfo)`, matching the rest of the app.
+
 ### 5.3. Technical Implementation
 
 #### State Management

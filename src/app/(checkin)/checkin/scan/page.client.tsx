@@ -149,6 +149,13 @@ export const ScanPageClient: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { t } = useTranslate()
 
+  // Client-side caching and debouncing for better performance
+  const lastScanTimeRef = useRef<number>(0)
+  const lastScanCodeRef = useRef<string>('')
+  const scanCacheRef = useRef<Map<string, { result: any; timestamp: number }>>(new Map())
+  const SCAN_DEBOUNCE_MS = 2000 // Prevent duplicate scans within 2 seconds
+  const CACHE_DURATION_MS = 30000 // Cache results for 30 seconds
+
   const handleUploadClick = () => {
     fileInputRef.current?.click()
   }
@@ -207,42 +214,88 @@ export const ScanPageClient: React.FC = () => {
 
   const validateAndCheckIn = useCallback(async (ticketCode: string) => {
     if (isProcessing) return
+
+    const now = Date.now()
+    const normalizedCode = ticketCode.toUpperCase()
+
+    // Client-side debouncing: prevent duplicate scans
+    if (normalizedCode === lastScanCodeRef.current && 
+        now - lastScanTimeRef.current < SCAN_DEBOUNCE_MS) {
+      console.log('Scan debounced - duplicate within 2 seconds')
+      return
+    }
+
+    // Check cache first for recent scans
+    const cached = scanCacheRef.current.get(normalizedCode)
+    if (cached && now - cached.timestamp < CACHE_DURATION_MS) {
+      console.log('Using cached scan result')
+      const scanData = cached.result
+      
+      // Display cached result
+      if (scanData.success) {
+        const ticketInfo = scanData.ticket
+        
+        if (scanData.alreadyCheckedIn) {
+          setFeedback({ type: 'warning', message: t('checkin.scan.alreadyCheckedIn') })
+          if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200])
+        } else {
+          setLastScannedTicket({
+            seat: ticketInfo.seat,
+            ticketPriceName: ticketInfo.ticketPriceName,
+            attendeeName: ticketInfo.attendeeName,
+            ticketCode: normalizedCode,
+            ticketPriceInfo: ticketInfo.ticketPriceInfo,
+          })
+          
+          setFeedback({ type: 'success', message: t('checkin.scan.success') })
+          if (window.navigator.vibrate) window.navigator.vibrate(200)
+        }
+      } else {
+        setFeedback({ type: 'error', message: scanData.message || t('checkin.scan.error.failed') })
+        if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
+      }
+      return
+    }
+
+    // Update tracking variables
+    lastScanTimeRef.current = now
+    lastScanCodeRef.current = normalizedCode
     setIsProcessing(true)
 
     try {
-      // 1. Validate Ticket
-      const validateRes = await fetch(`/api/checkin-app/validate/${ticketCode}`, {
+      // Single optimized API call for validation + check-in
+      const scanRes = await fetch(`/api/checkin-app/scan?ticketCode=${normalizedCode}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
       })
 
-      if (validateRes.status !== 200) {
-        const data = (await validateRes.json()) as { errorCode?: string; message?: string }
-        setFeedback({
-          type: 'error',
-          message: data.message || data.errorCode || t('checkin.scan.error.failed'),
+      const scanData = await scanRes.json()
+
+      // Cache the result
+      // Only cache 'Already Checked In' (warning) and error results
+      if (scanRes.status !== 200 || (scanData.success && scanData.alreadyCheckedIn)) {
+        scanCacheRef.current.set(normalizedCode, {
+          result: scanData,
+          timestamp: now
         })
-        if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
-        return
       }
 
-      // Get ticket data from validation response
-      const validateData = await validateRes.json()
-      const ticketInfo = validateData.ticket
+      // Clean old cache entries (keep cache size manageable)
+      if (scanCacheRef.current.size > 50) {
+        const entries = Array.from(scanCacheRef.current.entries())
+        entries.sort((a, b) => b[1].timestamp - a[1].timestamp)
+        scanCacheRef.current.clear()
+        entries.slice(0, 25).forEach(([key, value]) => {
+          scanCacheRef.current.set(key, value)
+        })
+      }
 
-      // 2. Perform Check-in
-      const checkinRes = await fetch(`/api/checkin-app/checkin/${ticketCode}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventDate: null, manual: false }), // Server will determine eventDate from ticket
-      })
-
-      if (checkinRes.status === 200) {
-        const checkinData = await checkinRes.json()
+      if (scanRes.status === 200 && scanData.success) {
+        const ticketInfo = scanData.ticket
         
         // Check if ticket was already checked in
-        if (checkinData.alreadyCheckedIn) {
+        if (scanData.alreadyCheckedIn) {
           setFeedback({ type: 'warning', message: t('checkin.scan.alreadyCheckedIn') })
           if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200])
         } else {
@@ -251,7 +304,7 @@ export const ScanPageClient: React.FC = () => {
             seat: ticketInfo.seat,
             ticketPriceName: ticketInfo.ticketPriceName,
             attendeeName: ticketInfo.attendeeName,
-            ticketCode: ticketCode,
+            ticketCode: normalizedCode,
             ticketPriceInfo: ticketInfo.ticketPriceInfo,
           })
           
@@ -260,13 +313,7 @@ export const ScanPageClient: React.FC = () => {
         }
         historyRef.current?.fetchHistory();
       } else {
-        let msg = t('checkin.scan.error.failed')
-        try {
-          const errData = await checkinRes.json()
-          msg = errData.message || msg
-        } catch (_) {
-          // Ignore JSON parse errors
-        }
+        const msg = !scanRes.ok ? scanData.message || t('checkin.scan.error.failed') : t('checkin.scan.error.failed')
         setFeedback({ type: 'error', message: msg })
         if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
       }
@@ -274,10 +321,13 @@ export const ScanPageClient: React.FC = () => {
       console.error('Check-in error:', error)
       setFeedback({ type: 'error', message: t('checkin.scan.error.network') })
       if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
+      
+      // Remove failed cache entry
+      scanCacheRef.current.delete(normalizedCode)
     } finally {
       setIsProcessing(false)
     }
-  }, [isProcessing, t])
+  }, [isProcessing, t, SCAN_DEBOUNCE_MS, CACHE_DURATION_MS])
 
   // Auto-clear feedback overlay and re-enable scanning
   useEffect(() => {
@@ -369,6 +419,7 @@ export const ScanPageClient: React.FC = () => {
           <QRScanner
             onScan={validateAndCheckIn}
             paused={isProcessing || !!feedback}
+            scanDelay={1500} // Increase scan delay to reduce duplicate detections
             className="absolute inset-0"
           />
           {/* Feedback overlay */}
