@@ -425,7 +425,7 @@
   },
   "userprofile": {
     "userProfile": "User Profile",
-    "title": "My Tickets",
+    "title": "Manage Tickets",
     "all": "All",
     "success": "Success",
     "processing": "Processing",
@@ -470,7 +470,7 @@
       "accountOf": "Account of",
       "accountSettings": "Account Settings",
       "accountInfo": "Account Info",
-      "purchasedTickets": "Purchased Tickets",
+      "manageTickets": "Manage Tickets",
       "myEvents": "My Events",
       "becomeAmbassador": "Become Ambassador",
       "affiliateTerms": "Read Affiliate Terms & Conditions",
