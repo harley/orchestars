@@ -1356,6 +1356,24 @@ export interface Ticket {
   status?: ('booked' | 'pending_payment' | 'hold' | 'cancelled') | null;
   'CheckedIn Time'?: string | null;
   qr_link?: string | null;
+  /**
+   * Thông tin liên quan người được tặng vé
+   */
+  giftInfo?: {
+    /**
+     * Đánh dấu vé có phải là vé tặng hay không
+     */
+    isGifted?: boolean | null;
+    attendeeName?: string | null;
+    /**
+     * Người nhận vé tặng
+     */
+    giftRecipient?: (number | null) | User;
+    /**
+     * Ngày tặng vé
+     */
+    giftDate?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -3228,6 +3246,14 @@ export interface TicketsSelect<T extends boolean = true> {
   status?: T;
   'CheckedIn Time'?: T;
   qr_link?: T;
+  giftInfo?:
+    | T
+    | {
+        isGifted?: T;
+        attendeeName?: T;
+        giftRecipient?: T;
+        giftDate?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

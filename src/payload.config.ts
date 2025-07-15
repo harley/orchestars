@@ -75,6 +75,13 @@ export default buildConfig({
       },
       views: {
         // custom page should be put before the default payloadcms pages
+        createTicketGift: {
+          Component: '@/components/AdminViews/Tickets/TicketGift/CreateTicketGift',
+          path: '/create-ticket-gift',
+          exact: true,
+          strict: true,
+          sensitive: true,
+        },
         managementAffiliate: {
           Component: '@/components/AdminViews/ManagementAffiliate/Page',
           path: '/management-affiliate',

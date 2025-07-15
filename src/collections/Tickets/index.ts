@@ -5,6 +5,7 @@ import { afterChangeSeat } from './hooks/afterChangeSeat'
 import { getBookedSeat } from './handler/getBookedSeat'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 
+import { createGiftTicket } from './handler/createGiftTicket'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
@@ -257,6 +258,59 @@ export const Tickets: CollectionConfig = {
         ],
       },
     },
+    {
+      name: 'giftInfo',
+      type: 'group',
+      admin: {
+        description: 'Thông tin liên quan người được tặng vé',
+      },
+      fields: [
+        {
+          name: 'isGifted',
+          type: 'checkbox',
+          defaultValue: false,
+          admin: {
+            readOnly: true,
+            description: 'Đánh dấu vé có phải là vé tặng hay không',
+          },
+        },
+        {
+          name: 'attendeeName',
+          type: 'text',
+          admin: {
+            readOnly: true,
+          },
+        },
+        {
+          name: 'giftRecipient',
+          type: 'relationship',
+          relationTo: 'users',
+          required: false,
+          index: true,
+          admin: {
+            readOnly: true,
+            description: 'Người nhận vé tặng',
+            condition: (data) => data.giftInfo?.isGifted,
+          },
+        },
+        {
+          name: 'giftDate',
+          type: 'date',
+          required: false,
+          admin: {
+            readOnly: true,
+            description: 'Ngày tặng vé',
+            condition: (data) => data.giftInfo?.isGifted,
+            date: {
+              pickerAppearance: 'dayAndTime',
+              timeFormat: 'HH:mm a',
+            },
+          },
+        },
+      ],
+    },
+
+    // todo: can add log for logging the transfer history
   ],
   indexes: [
     {
@@ -280,6 +334,11 @@ export const Tickets: CollectionConfig = {
       path: '/booked-seats',
       method: 'get',
       handler: getBookedSeat,
+    },
+    {
+      path: '/gift-ticket',
+      method: 'post',
+      handler: createGiftTicket,
     },
   ],
 }

@@ -50,6 +50,7 @@ import { Logo as Logo_9bcae99938dc292be0063ce32055e14c } from '../../../componen
 import { ImportExportProvider as ImportExportProvider_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { VercelBlobClientUploadHandler as VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e } from '@payloadcms/storage-vercel-blob/client'
+import { default as default_1b7a9a3b66f5060c89edc672403d6cf6 } from '@/components/AdminViews/Tickets/TicketGift/CreateTicketGift'
 import { default as default_3efec95bcc976db851def6c50766ac0b } from '@/components/AdminViews/ManagementAffiliate/Page'
 import { default as default_8e5de8afbbc6bbe41b4747de1145e709 } from '@/components/AdminViews/Order/CreateOrder'
 import { default as default_cedb957be856ec83a6d609901bda3c39 } from '@/components/AdminViews/Dashboard/Component'
@@ -108,6 +109,7 @@ export const importMap = {
   "@payloadcms/plugin-import-export/rsc#ImportExportProvider": ImportExportProvider_cdf7e044479f899a31f804427d568b36,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "@payloadcms/storage-vercel-blob/client#VercelBlobClientUploadHandler": VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e,
+  "@/components/AdminViews/Tickets/TicketGift/CreateTicketGift#default": default_1b7a9a3b66f5060c89edc672403d6cf6,
   "@/components/AdminViews/ManagementAffiliate/Page#default": default_3efec95bcc976db851def6c50766ac0b,
   "@/components/AdminViews/Order/CreateOrder#default": default_8e5de8afbbc6bbe41b4747de1145e709,
   "@/components/AdminViews/Dashboard/Component#default": default_cedb957be856ec83a6d609901bda3c39,
