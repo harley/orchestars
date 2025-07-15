@@ -53,9 +53,7 @@ export function RewardsGallery({ rewards, className }: RewardsGalleryProps) {
       <CardContent>
         <div className="space-y-8">
           {rewards.map((reward, index) => {
-            console.log(`Rendering reward: ${reward}`)
             const config = typeConfig[reward.type];
-            console.log(`Rendering reward: ${reward.label} (${reward.type})`, config);
             const imageUrl = `https://placehold.co/200x200?text=${reward.label}&font=roboto`;
             
             return (

@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Coins, Target, TrendingUp } from 'lucide-react'
-import { ProgressBar } from '@/components/User/MembershipPoint/ProgressBar'
-import { OrderHistory } from '@/components/User/MembershipPoint/OrderHistory'
-import { RewardsGallery } from '@/components/User/MembershipPoint/RewardsGallery'
+import { ProgressBar } from '@/components/User/Profile/ProgressBar'
+import { OrderHistory } from '@/components/User/Profile/OrderHistory'
+import { RewardsGallery } from '@/components/User/Profile/RewardsGallery'
 import { useToast } from '@/components/ui/use-toast'
 import { TicketZoneLabel } from '@/collections/Events/constants'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { MembershipTier } from '@/components/User/Profile/MembershipTier'
+import { User } from '@/payload-types'
 
 // Mock data - in real app this would come from API
 const mockUserData = {
@@ -126,7 +129,7 @@ interface ApiResponse {
   error?: string
 }
 
-const MembershipPoint = ({ className } : { className?: string }) => {
+const UserProfile = ({ userData, className } : { className?: string, userData?: User }) => {
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
@@ -170,7 +173,6 @@ const MembershipPoint = ({ className } : { className?: string }) => {
     const result: ApiResponse = await response.json();
     if (result.success) {
       setRewards(result.data as MembershipGifts);
-      console.log('Fetched rewards:', result.data);
     } else {
       setRewards(null);
       toast({
@@ -192,6 +194,7 @@ const MembershipPoint = ({ className } : { className?: string }) => {
   }
 
   useEffect(() => {
+    console.log('User data:', userData);
     setMounted(true)
     fetchInitialData();
   }, [])
@@ -228,29 +231,52 @@ const MembershipPoint = ({ className } : { className?: string }) => {
 
   return (
     <div className="flex-col space-y-8 max-w-4xl mx-auto">
-      {/* Membership Point Header */}
+      {/* Profile Header */}
       <Card className={containerClass}>
         <CardContent className="relative p-6 md:p-8">
-          <div className="flex-1 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+            <div className="relative">
+              <Avatar className="h-24 w-24 border-4 border-blue-200 shadow-md">
+                <AvatarImage src="" alt="avatar" />
+                <AvatarFallback className="text-[50px]">👤</AvatarFallback>
+              </Avatar>
+              <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                ★
+              </div>
+            </div>
+
+            <div className="flex-1 space-y-4">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Coins className="w-4 h-4" />
-                  <span className="text-sm">Current Points</span>
+                <div className="flex flex-col md:flex-row md:items-center gap-3">
+                  <h1 className="text-3xl font-bold animate-slide-up">
+                    {userData?.firstName || ''} {userData?.lastName || ''}
+                  </h1>
+                  <MembershipTier tier={membershipPoint.membershipRank} />
                 </div>
-                <p className="text-3xl font-bold">
-                  {pointsCounter.toLocaleString()}
+                <p className="text-muted-foreground animate-slide-up" style={{ animationDelay: "100ms" }}>
+                  Member since {mockUserData.memberSince}
                 </p>
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Target className="w-4 h-4" />
-                  <span className="text-sm">Points to {membershipPoint?.nextRank || 'Standard'}</span>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Coins className="w-4 h-4" />
+                    <span className="text-sm">Current Points</span>
+                  </div>
+                  <p className="text-3xl font-bold">
+                    {pointsCounter.toLocaleString()}
+                  </p>
                 </div>
-                <p className="text-2xl font-bold">
-                  {((membershipPoint?.pointsToNextRank ?? 0) - (membershipPoint?.totalPoints ?? 0)).toLocaleString()}
-                </p>
-              </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Target className="w-4 h-4" />
+                    <span className="text-sm">Points to {membershipPoint?.nextRank || 'Standard'}</span>
+                  </div>
+                  <p className="text-2xl font-bold">
+                    {((membershipPoint?.pointsToNextRank ?? 0) - (membershipPoint?.totalPoints ?? 0)).toLocaleString()}
+                  </p>
+                </div>
 
               {/* <div className="space-y-2">
                 <div className="flex items-center gap-2 text-muted-foreground">
@@ -261,6 +287,7 @@ const MembershipPoint = ({ className } : { className?: string }) => {
                   {mockUserData.totalLifetimePoints.toLocaleString()}
                 </p>
               </div> */}
+              </div>
             </div>
           </div>
         </CardContent>
@@ -296,4 +323,4 @@ const MembershipPoint = ({ className } : { className?: string }) => {
   )
 }
 
-export default MembershipPoint
+export default UserProfile
