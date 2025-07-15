@@ -307,7 +307,6 @@
     "validTicket": "VÉ HỢP LỆ",
     "ticketDetails": "CHI TIẾT VÉ",
     "name": "Tên:",
-    "event": "Sự kiện:",
     "date": "Ngày:",
     "emailLabel": "Email:",
     "phoneNumber": "Số điện thoại:",
@@ -353,6 +352,7 @@
       "ticket": "Vé:",
       "attendee": "Khách:",
       "time": "Thời gian:",
+      "lastCheckIn": "Lần soát vé cuối:",
       "error": {
         "canvasNotSupported": "Trình duyệt không hỗ trợ Canvas",
         "noQrFound": "Không tìm thấy mã QR",
@@ -361,10 +361,14 @@
         "failed": "Checkin thất bại",
         "network": "Lỗi kết nối mạng"
       },
-      "success": "Soát vé thành công"
+      "success": "Soát vé thành công",
+      "alreadyCheckedIn": "Đã soát vé rồi"
     },
     "event": {
-      "dateTBA": "Ngày diễn ra: Đang cập nhật"
+      "dateTBA": "Date: TBA",
+      "checkedInByMe": "Tôi đã soát:",
+      "totalCheckedIn": "Tổng đã soát:",
+      "loadingStats": "Đang tải số liệu..."
     },
     "manual": {
       "byTicketCode": "Theo Mã vé",
