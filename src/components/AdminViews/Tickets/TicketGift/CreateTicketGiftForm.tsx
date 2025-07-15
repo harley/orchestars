@@ -203,8 +203,6 @@ const CreateTicketGiftForm: React.FC = () => {
   }
 
   const onSubmit = async (data: FormValues) => {
-    console.log('data', data)
-
     try {
       const response = await fetch('/api/tickets/gift-ticket', {
         method: 'POST',

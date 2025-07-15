@@ -112,19 +112,16 @@ async function validateTicketsForGifting(
         status: { equals: TICKET_STATUS.booked.value },
       },
       depth: 1,
+      limit: ticketIds.length,
     })
 
     if (tickets.docs.length !== ticketIds.length) {
       errors.push('Some tickets are not found, not owned by user, or not in booked status')
     }
 
-    console.log('tickets', tickets.docs)
-
     // Check if any tickets are from past events
     const now = new Date()
     for (const ticket of tickets.docs) {
-      console.log('ticket?.event?.startDatetime', ticket?.event?.startDatetime)
-
       if (ticket?.event?.startDatetime && new Date(ticket?.event?.startDatetime) < now) {
         errors.push(`Ticket ${ticket.ticketCode} is for a past event and cannot be gifted`)
       }
@@ -177,21 +174,21 @@ async function transferTicketsToRecipient(
 ): Promise<{ success: boolean; errors: string[] }> {
   try {
     // Update each ticket
-    for (const ticketId of ticketIds) {
-      await payload.update({
-        collection: 'tickets',
-        id: ticketId,
-        data: {
-          giftInfo: {
-            isGifted: true,
-            attendeeName: recipientName,
-            giftRecipient: recipientUserId,
-            giftDate: new Date().toISOString(),
-          },
+    await payload.update({
+      collection: 'tickets',
+      where: {
+        id: { in: ticketIds },
+      },
+      data: {
+        giftInfo: {
+          isGifted: true,
+          attendeeName: recipientName,
+          giftRecipient: recipientUserId,
+          giftDate: new Date().toISOString(),
         },
-        req: transactionID ? { transactionID } : undefined,
-      })
-    }
+      },
+      req: transactionID ? { transactionID } : undefined,
+    })
 
     return { success: true, errors: [] }
   } catch (error) {
@@ -205,6 +202,10 @@ async function transferTicketsToRecipient(
 
 export const createGiftTicket = async (req: PayloadRequest): Promise<Response> => {
   try {
+    if (!req.user || !['admin', 'super-admin'].includes(req.user.role)) {
+      throw new Error('UNAUTHORIZED')
+    }
+
     const body = ((await req.json?.()) || {}) as CreateGiftTicketRequest
 
     const {
