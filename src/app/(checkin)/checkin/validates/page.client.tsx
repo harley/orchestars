@@ -11,7 +11,7 @@ import { type TicketDTO } from '@/lib/checkin/findTickets'
 import { CheckinNav } from '@/components/CheckinNav'
 import { useTranslate } from '@/providers/I18n/client'
 import { getTicketClassColor } from '@/utilities/getTicketClassColor'
-import EventInfo from '@/components/EventInfo'
+import ScheduleStatsInfo from '@/components/ScheduleStatsInfo'
 
 interface CheckinHistoryProps {}
 
@@ -534,8 +534,8 @@ export default function ValidatePageClient() {
           Enter a ticket code or seat to look up and check-in visitors
         </p>
 
-        {/* Event Info */}
-        <EventInfo title={eventTitle} date={scheduleDate} time={eventTime} location={eventLocation} />
+        {/* Event & Stats */}
+        <ScheduleStatsInfo eventId={eventId} scheduleId={scheduleId} />
 
         {/* Date Warning */}
         {showDateWarning && (

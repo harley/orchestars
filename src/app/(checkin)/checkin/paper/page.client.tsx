@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { CheckinNav } from '@/components/CheckinNav'
 import { useTranslate } from '@/providers/I18n/client'
 import { type TicketDTO } from '@/lib/checkin/findTickets'
-import EventInfo from '@/components/EventInfo'
+import ScheduleStatsInfo from '@/components/ScheduleStatsInfo'
 
 
 interface FeedbackState {
@@ -217,7 +217,7 @@ const PaperPageClient = () => {
         <div className="max-w-lg mx-auto">
           {/* Selected Event Info */}
           {!missingContext && (
-            <EventInfo title={eventTitle} date={scheduleDate} time={eventTime} location={eventLocation} />
+            <ScheduleStatsInfo eventId={eventId} scheduleId={scheduleId} />
           )}
           
           {/* Paper Check-in Content */}

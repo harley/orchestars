@@ -43,7 +43,7 @@ export const CheckinNav: React.FC<CheckinNavProps> = ({ dark = false }) => {
     `text-center py-2 px-4 rounded font-semibold ${active ? baseActive : baseInactive}`
 
   return (
-    <div className="text-center mb-4">
+    <div className="text-center mb-4 w-full max-w-md mx-auto">
       <h2 className={`text-lg font-semibold mb-3${dark ? ' text-white' : ' text-gray-900'}`}>{
         t('Check-in by')
       }</h2>
