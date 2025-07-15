@@ -355,27 +355,40 @@ export const ScanPageClient: React.FC = () => {
       />
       <div className="w-full max-w-md mx-auto flex flex-col items-center">
         {/* Navigation Toggle */}
-        <div className="grid grid-cols-2 gap-3 mb-6 w-full">
-          <Link
-            href="/checkin/scan"
-            className={`text-center py-2 px-4 rounded font-semibold ${
-              pathname === '/checkin/scan'
-                ? 'bg-white text-gray-900'
-                : 'bg-white/20 text-white hover:bg-white/30'
-            }`}
-          >
-            {t('checkin.nav.qr')}
-          </Link>
-          <Link
-            href="/checkin/events"
-            className={`text-center py-2 px-4 rounded font-semibold ${
-              pathname === '/checkin/events'
-                ? 'bg-white text-gray-900'
-                : 'bg-white/20 text-white hover:bg-white/30'
-            }`}
-          >
-            {t('checkin.nav.search')}
-          </Link>
+        <div className="text-center mb-4">
+          <h2 className="text-lg font-semibold mb-3 text-white">{t('Check-in by')}</h2>
+          <div className="grid grid-cols-3 gap-2 w-full">
+            <Link
+              href="/checkin/scan"
+              className={`text-center py-2 px-4 rounded font-semibold ${
+                pathname === '/checkin/scan'
+                  ? 'bg-white text-gray-900'
+                  : 'bg-white/20 text-white hover:bg-white/30'
+              }`}
+            >
+              {t('QR')}
+            </Link>
+            <Link
+              href="/checkin/paper"
+              className={`text-center py-2 px-4 rounded font-semibold ${
+                pathname === '/checkin/paper'
+                  ? 'bg-white text-gray-900'
+                  : 'bg-white/20 text-white hover:bg-white/30'
+              }`}
+            >
+              {t('Paper')}
+            </Link>
+            <Link
+              href="/checkin/events"
+              className={`text-center py-2 px-4 rounded font-semibold ${
+                pathname === '/checkin/events'
+                  ? 'bg-white text-gray-900'
+                  : 'bg-white/20 text-white hover:bg-white/30'
+              }`}
+            >
+              {t('Search')}
+            </Link>
+          </div>
         </div>
         <h1 className="text-2xl font-bold mb-2">{t('checkin.scan.title')}</h1>
         

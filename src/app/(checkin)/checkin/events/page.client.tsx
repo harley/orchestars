@@ -226,27 +226,40 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="w-full max-w-md mx-auto">
         {/* Navigation Toggle */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Link
-            href="/checkin/scan"
-            className={`text-center py-2 px-4 rounded font-semibold ${
-              pathname === '/checkin/scan'
-                ? 'bg-gray-900 text-white'
-                : 'bg-gray-300 text-gray-800 hover:bg-gray-400'
-            }`}
-          >
-            {t('checkin.nav.qr')}
-          </Link>
-          <Link
-            href="/checkin/events"
-            className={`text-center py-2 px-4 rounded font-semibold ${
-              pathname === '/checkin/events'
-                ? 'bg-gray-900 text-white'
-                : 'bg-gray-300 text-gray-800 hover:bg-gray-400'
-            }`}
-          >
-            {t('checkin.nav.search')}
-          </Link>
+        <div className="text-center mb-4">
+          <h2 className="text-lg font-semibold mb-3">{t('Check-in by')}</h2>
+          <div className="grid grid-cols-3 gap-2">
+            <Link
+              href="/checkin/scan"
+              className={`text-center py-2 px-4 rounded font-semibold ${
+                pathname === '/checkin/scan'
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-gray-300 text-gray-800 hover:bg-gray-400'
+              }`}
+            >
+              {t('QR')}
+            </Link>
+            <Link
+              href="/checkin/paper"
+              className={`text-center py-2 px-4 rounded font-semibold ${
+                pathname === '/checkin/paper'
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-gray-300 text-gray-800 hover:bg-gray-400'
+              }`}
+            >
+              {t('Paper')}
+            </Link>
+            <Link
+              href="/checkin/events"
+              className={`text-center py-2 px-4 rounded font-semibold ${
+                pathname === '/checkin/events'
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-gray-300 text-gray-800 hover:bg-gray-400'
+              }`}
+            >
+              {t('Search')}
+            </Link>
+          </div>
         </div>
         
         {/* Refresh Button - only show when event is selected and has stats */}

@@ -525,27 +525,40 @@ export default function ValidatePageClient() {
         </button>
 
         {/* Navigation Toggle */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Link
-            href="/checkin/scan"
-            className={`text-center py-2 px-4 rounded font-semibold ${
-              pathname === '/checkin/scan'
-                ? 'bg-gray-900 dark:bg-gray-700 text-white'
-                : 'bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500'
-            }`}
-          >
-            {t('checkin.nav.qr')}
-          </Link>
-          <Link
-            href="/checkin/events"
-            className={`text-center py-2 px-4 rounded font-semibold ${
-              pathname === '/checkin/events' || pathname.includes('/checkin/validates')
-                ? 'bg-gray-900 dark:bg-gray-700 text-white'
-                : 'bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500'
-            }`}
-          >
-            {t('checkin.nav.search')}
-          </Link>
+        <div className="text-center mb-4">
+          <h2 className="text-lg font-semibold mb-3">{t('Check-in by')}</h2>
+          <div className="grid grid-cols-3 gap-2">
+            <Link
+              href="/checkin/scan"
+              className={`text-center py-2 px-4 rounded font-semibold ${
+                pathname === '/checkin/scan'
+                  ? 'bg-gray-900 dark:bg-gray-700 text-white'
+                  : 'bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500'
+              }`}
+            >
+              {t('QR')}
+            </Link>
+            <Link
+              href="/checkin/paper"
+              className={`text-center py-2 px-4 rounded font-semibold ${
+                pathname === '/checkin/paper'
+                  ? 'bg-gray-900 dark:bg-gray-700 text-white'
+                  : 'bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500'
+              }`}
+            >
+              {t('Paper')}
+            </Link>
+            <Link
+              href="/checkin/events"
+              className={`text-center py-2 px-4 rounded font-semibold ${
+                pathname === '/checkin/events' || pathname.includes('/checkin/validates')
+                  ? 'bg-gray-900 dark:bg-gray-700 text-white'
+                  : 'bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500'
+              }`}
+            >
+              {t('Search')}
+            </Link>
+          </div>
         </div>
 
         {/* Title - More prominent */}

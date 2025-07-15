@@ -96,7 +96,7 @@ const PaperPageClient = () => {
       } else {
         setError(data.error || data.message || 'Seat not found for this event')
       }
-    } catch (err) {
+    } catch (_) {
       setError('Connection failed. Please try again.')
     } finally {
       setIsValidating(false)
@@ -164,7 +164,7 @@ const PaperPageClient = () => {
       } else {
         setError(data.message || 'Check-in failed')
       }
-    } catch (err) {
+    } catch (_) {
       setError('Connection failed. Please try again.')
     } finally {
       setIsCheckingIn(false)
