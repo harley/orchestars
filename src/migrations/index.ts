@@ -76,6 +76,7 @@ import * as migration_20250709_051135_remove_default_user_affiliate_status from 
 import * as migration_20250709_051424_add_affiliate_link_slug from './20250709_051424_add_affiliate_link_slug';
 import * as migration_20250713_044021_add_manual_column_to_checkin_records from './20250713_044021_add_manual_column_to_checkin_records';
 import * as migration_20250714_080211_add_phone_number_index from './20250714_080211_add_phone_number_index';
+import * as migration_20250715_013630_add_gift_ticket_fields from './20250715_013630_add_gift_ticket_fields';
 
 export const migrations = [
   {
@@ -466,6 +467,11 @@ export const migrations = [
   {
     up: migration_20250714_080211_add_phone_number_index.up,
     down: migration_20250714_080211_add_phone_number_index.down,
-    name: '20250714_080211_add_phone_number_index'
+    name: '20250714_080211_add_phone_number_index',
+  },
+  {
+    up: migration_20250715_013630_add_gift_ticket_fields.up,
+    down: migration_20250715_013630_add_gift_ticket_fields.down,
+    name: '20250715_013630_add_gift_ticket_fields'
   },
 ];
