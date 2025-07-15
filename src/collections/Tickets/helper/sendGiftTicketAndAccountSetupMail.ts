@@ -28,33 +28,35 @@ export const sendGiftTicketAndAccountSetupMail = async ({
   setupLink?: string
   transactionID?: TransactionID
 }) => {
-  for (const data of ticketData) {
-    const html = getGiftTicketAndAccountSetupEmailHtml({
-      ticketCode: data.ticketCode,
-      seat: data.seat,
-      eventName: event.title || '',
-      eventDate: data.eventDate,
-      eventLocation: data.eventLocation,
-      giftedByName: giftedByName,
-      setupLink: setupLink,
-    })
+  await Promise.all(
+    ticketData.map(async (data) => {
+      const html = getGiftTicketAndAccountSetupEmailHtml({
+        ticketCode: data.ticketCode,
+        seat: data.seat,
+        eventName: event.title || '',
+        eventDate: data.eventDate,
+        eventLocation: data.eventLocation,
+        giftedByName: giftedByName,
+        setupLink: setupLink,
+      })
 
-    const resendMailData = {
-      to: user.email,
-      cc: EMAIL_CC,
-      subject: 'Ticket Gift Confirmation',
-      html,
-    }
+      const resendMailData = {
+        to: user.email,
+        cc: EMAIL_CC,
+        subject: 'Ticket Gift Confirmation',
+        html,
+      }
 
-    await addQueueEmail({
-      payload,
-      resendMailData,
-      emailData: {
-        user: user.id,
-        event: event?.id,
-        ticket: data?.ticketId,
-      },
-      transactionID,
-    })
-  }
+      return await addQueueEmail({
+        payload,
+        resendMailData,
+        emailData: {
+          user: user.id,
+          event: event?.id,
+          ticket: data?.ticketId,
+        },
+        transactionID,
+      })
+    }),
+  )
 }

@@ -7,6 +7,7 @@ import { sendGiftTicketAndAccountSetupMail } from '../helper/sendGiftTicketAndAc
 import { User } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 import { setUserResetPasswordToken } from '@/collections/Users/utils/setUserResetPasswordToken'
+import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 
 interface CreateGiftTicketRequest {
   ownerId: number
@@ -305,11 +306,31 @@ export const createGiftTicket = async (req: PayloadRequest): Promise<Response> =
         setupLink = `${getServerSideURL()}/user/reset-password?token=${setupToken}`
       }
 
+      const ticketData = validation.tickets.map((ticket: any) => {
+        const event = ticket?.event
+        const startTime = event?.startDatetime
+          ? tzFormat(toZonedTime(new Date(event.startDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm')
+          : ''
+        const endTime = event?.endDatetime
+          ? tzFormat(toZonedTime(new Date(event.endDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm')
+          : ''
+        const eventLocation = event?.eventLocation as string
+
+        return {
+          ticketId: ticket.id,
+          ticketCode: ticket.ticketCode,
+          seat: ticket.seat,
+          eventName: event?.title,
+          eventDate: `${startTime || 'N/A'} - ${endTime || 'N/A'}, ${ticket?.eventDate || 'N/A'} (Giờ Việt Nam | Vietnam Time, GMT+7)`,
+          eventLocation,
+        }
+      })
+
       // Send email to recipient
       await sendGiftTicketAndAccountSetupMail({
         event: validation.tickets[0].event,
         user: userResult.user as User,
-        ticketData: validation.tickets,
+        ticketData,
         payload,
         giftedByName: `${owner.firstName || ''} ${owner.lastName || ''}(${owner.email})`.trim(),
         setupLink,
