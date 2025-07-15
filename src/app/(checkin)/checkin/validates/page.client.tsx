@@ -1,16 +1,17 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback, forwardRef, useImperativeHandle } from 'react'
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
 import { toast } from '@/hooks/use-toast'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AlertTriangle, History, ChevronDown, X } from 'lucide-react'
 import type { CheckinRecord, User } from '@/payload-types'
 import { type TicketDTO } from '@/lib/checkin/findTickets'
-import Link from 'next/link'
+import { CheckinNav } from '@/components/CheckinNav'
 import { useTranslate } from '@/providers/I18n/client'
 import { getTicketClassColor } from '@/utilities/getTicketClassColor'
+import EventInfo from '@/components/EventInfo'
 
 interface CheckinHistoryProps {}
 
@@ -136,7 +137,6 @@ export default function ValidatePageClient() {
   const [multipleTickets, setMultipleTickets] = useState<TicketDTO[]>([])
   const [activeTab, setActiveTab] = useState('ticket')
   const router = useRouter()
-  const pathname = usePathname()
   const { isHydrated, token } = useAuth()
   const searchParams = useSearchParams()
   const { t } = useTranslate()
@@ -524,42 +524,7 @@ export default function ValidatePageClient() {
           ← Back to Events
         </button>
 
-        {/* Navigation Toggle */}
-        <div className="text-center mb-4">
-          <h2 className="text-lg font-semibold mb-3">{t('Check-in by')}</h2>
-          <div className="grid grid-cols-3 gap-2">
-            <Link
-              href="/checkin/scan"
-              className={`text-center py-2 px-4 rounded font-semibold ${
-                pathname === '/checkin/scan'
-                  ? 'bg-gray-900 dark:bg-gray-700 text-white'
-                  : 'bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500'
-              }`}
-            >
-              {t('QR')}
-            </Link>
-            <Link
-              href="/checkin/paper"
-              className={`text-center py-2 px-4 rounded font-semibold ${
-                pathname === '/checkin/paper'
-                  ? 'bg-gray-900 dark:bg-gray-700 text-white'
-                  : 'bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500'
-              }`}
-            >
-              {t('Paper')}
-            </Link>
-            <Link
-              href="/checkin/events"
-              className={`text-center py-2 px-4 rounded font-semibold ${
-                pathname === '/checkin/events' || pathname.includes('/checkin/validates')
-                  ? 'bg-gray-900 dark:bg-gray-700 text-white'
-                  : 'bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500'
-              }`}
-            >
-              {t('Search')}
-            </Link>
-          </div>
-        </div>
+        <CheckinNav />
 
         {/* Title - More prominent */}
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
@@ -569,19 +534,8 @@ export default function ValidatePageClient() {
           Enter a ticket code or seat to look up and check-in visitors
         </p>
 
-        {/* Event Info - Formatted, no IDs */}
-        {eventTitle && (
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-4">
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
-              {eventTitle}
-            </h2>
-            <div className="space-y-0.5 text-xs text-gray-600 dark:text-gray-300">
-              <div>Date: {scheduleDate}</div>
-              <div>Time: {eventTime}</div>
-              <div>Location: {eventLocation}</div>
-            </div>
-          </div>
-        )}
+        {/* Event Info */}
+        <EventInfo title={eventTitle} date={scheduleDate} time={eventTime} location={eventLocation} />
 
         {/* Date Warning */}
         {showDateWarning && (
