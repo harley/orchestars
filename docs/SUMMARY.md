@@ -27,6 +27,16 @@
   - Pricing Tiers
   - Seat Management
   - Booking Flow
+- [Ticket Gift System](ticket-gift-system.md)
+  - Overview & Features
+  - User Flow & Admin Interface
+  - Technical Implementation
+  - Security & Validation
+  - API Reference
+- [Ticket Gift Quick Guide](ticket-gift-quick-guide.md)
+  - Step-by-Step Instructions
+  - Troubleshooting Guide
+  - Rules & Best Practices
 
 ## Development
 - [Setup Guide](setup-guide.md) [TBD]
