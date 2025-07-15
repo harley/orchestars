@@ -13,8 +13,8 @@ type RewardsTimeline = {
 }[]
 
 interface OrderHistoryProps {
-  orders: RewardsTimeline;
-  className: string;
+  orders: RewardsTimeline
+  className: string
 }
 
 const typeConfig = {
@@ -42,7 +42,7 @@ export function OrderHistory({ orders, className }: OrderHistoryProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-8">
-          {orders.map((order, index) => {
+          {orders?.map((order, index) => {
             const config = typeConfig[order.type];
             const Icon = config.icon;
             
@@ -74,6 +74,12 @@ export function OrderHistory({ orders, className }: OrderHistoryProps) {
               </div>
             );
           })}
+
+          { orders.length === 0 && (
+            <div className="text-center text-muted-foreground py-8">
+              No rewards history available.
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

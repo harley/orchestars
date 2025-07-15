@@ -28,15 +28,18 @@ interface RewardsGalleryProps {
 const typeConfig = {
   product: {
     color: "bg-blue-500/10 text-blue-700 border-blue-200",
-    label: "Product"
+    label: "Product",
+    imageUrl: "https://via.placeholder.com/400x200/007bff/ffffff?text=Product"
   },
   giftTicket: {
     color: "bg-purple-500/10 text-purple-700 border-purple-200",
-    label: "Ticket"
+    label: "Ticket",
+    imageUrl: "/images/ticket-gift.jpg"
   },
   discount: {
     color: "bg-green-500/10 text-green-700 border-green-200", 
-    label: "Discount"
+    label: "Discount",
+    imageUrl: "https://via.placeholder.com/400x200/28a745/ffffff?text=Discount"
   }
 };
 
@@ -54,7 +57,7 @@ export function RewardsGallery({ rewards, className }: RewardsGalleryProps) {
         <div className="space-y-8">
           {rewards.map((reward, index) => {
             const config = typeConfig[reward.type];
-            const imageUrl = `https://placehold.co/200x200?text=${reward.label}&font=roboto`;
+            const imageUrl = config.imageUrl
             
             return (
               <div 
