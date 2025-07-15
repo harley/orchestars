@@ -245,7 +245,8 @@
     "checkedIn": "Đã Check In",
     "booked": "Đã đặt",
     "qrCodeNotAvailable": "Mã QR chỉ có sẵn cho vé đã đặt.",
-    "termsAndConditions": "Điều khoản & Điều kiện"
+    "termsAndConditions": "Điều khoản & Điều kiện",
+    "details": "Chi tiết vé"
   },
   "checkout": {
     "personalInfo": "Thông tin cá nhân",
@@ -306,7 +307,6 @@
     "validTicket": "VÉ HỢP LỆ",
     "ticketDetails": "CHI TIẾT VÉ",
     "name": "Tên:",
-    "event": "Sự kiện:",
     "date": "Ngày:",
     "emailLabel": "Email:",
     "phoneNumber": "Số điện thoại:",
@@ -346,11 +346,13 @@
       "instruction": "Đặt mã QR vào khung quét",
       "upload": "Tải lên mã QR",
       "history": "Lịch sử checkin",
+      "refreshHistory": "Làm mới lịch sử",
       "loadingHistory": "Đang tải lịch sử...",
       "noRecentScans": "Chưa có lượt checkin nào gần đây.",
       "ticket": "Vé:",
       "attendee": "Khách:",
       "time": "Thời gian:",
+      "lastCheckIn": "Lần soát vé cuối:",
       "error": {
         "canvasNotSupported": "Trình duyệt không hỗ trợ Canvas",
         "noQrFound": "Không tìm thấy mã QR",
@@ -359,10 +361,27 @@
         "failed": "Checkin thất bại",
         "network": "Lỗi kết nối mạng"
       },
-      "success": "Soát vé"
+      "success": "Soát vé thành công",
+      "alreadyCheckedIn": "Đã soát vé rồi"
     },
     "event": {
-      "dateTBA": "Ngày diễn ra: Đang cập nhật"
+      "dateTBA": "Date: TBA",
+      "checkedInByMe": "Tôi đã soát:",
+      "totalCheckedIn": "Tổng đã soát:",
+      "loadingStats": "Đang tải số liệu..."
+    },
+    "manual": {
+      "byTicketCode": "Theo Mã vé",
+      "bySeat": "Theo Ghế",
+      "byEmail": "Theo Email",
+      "byPhone": "Theo SĐT",
+      "enterTicketCode": "Nhập mã vé",
+      "enterSeatNumber": "Nhập số ghế",
+      "enterEmail": "Nhập địa chỉ email",
+      "enterPhone": "Nhập số điện thoại",
+      "lookingUp": "Đang tìm...",
+      "lookUp": "Tìm kiếm",
+      "clearAndStartNew": "Xóa và tìm lại"
     }
   },
   "customerCheckinTicket": {
@@ -554,5 +573,8 @@
     "tryAgain": "Thử Lại",
     "ticketsSent": "🎫 Vé của bạn đã được gửi đến địa chỉ email. Bạn cũng có thể đăng nhập và xem thông tin vé trong tài khoản của mình.",
     "goToUpcomingEvents": "Đi đến các sự kiện sắp tới"
+  },
+  "forgotPassword": {
+    "title": "Quên mật khẩu"
   }
 }

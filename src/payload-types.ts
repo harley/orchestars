@@ -1354,6 +1354,8 @@ export interface Ticket {
   order?: (number | null) | Order;
   orderCode?: string | null;
   status?: ('booked' | 'pending_payment' | 'hold' | 'cancelled') | null;
+  'CheckedIn Time'?: string | null;
+  qr_link?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -3224,6 +3226,8 @@ export interface TicketsSelect<T extends boolean = true> {
   order?: T;
   orderCode?: T;
   status?: T;
+  'CheckedIn Time'?: T;
+  qr_link?: T;
   updatedAt?: T;
   createdAt?: T;
 }

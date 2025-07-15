@@ -3,6 +3,8 @@ import { format as formatDate } from 'date-fns'
 import { TICKET_STATUSES } from './constants'
 import { afterChangeSeat } from './hooks/afterChangeSeat'
 import { getBookedSeat } from './handler/getBookedSeat'
+import { toZonedTime, format as tzFormat } from 'date-fns-tz'
+
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
@@ -201,6 +203,58 @@ export const Tickets: CollectionConfig = {
       },
       hooks: {
         // afterChange: [afterChangeStatus],
+      },
+    },
+    {
+      name: 'CheckedIn Time',
+      type: 'text',
+      virtual: true,
+      admin: {
+        readOnly: true,
+      },
+      hooks: {
+        afterRead: [
+          async ({ req, data }) => {
+            const checkinRecord = await req.payload
+              .find({
+                collection: 'checkinRecords',
+                where: {
+                  ticket: {
+                    equals: data?.id,
+                  },
+                },
+                depth: 0,
+                limit: 1,
+              })
+              .then((res) => res?.docs?.[0])
+              .catch(() => null)
+
+            if (checkinRecord?.checkInTime) {
+              return tzFormat(
+                toZonedTime(new Date(checkinRecord?.checkInTime), 'Asia/Ho_Chi_Minh'),
+                'dd/MM/yyyy HH:mm:ss',
+              )
+            }
+
+            return null
+          },
+        ],
+      },
+    },
+    {
+      name: 'qr_link',
+      type: 'text',
+      virtual: true,
+      admin: {
+        readOnly: true,
+      },
+      hooks: {
+        afterRead: [
+          async ({ data }) => {
+            if (!data?.ticketCode) return null;
+            return `/ticket/${data.ticketCode}`;
+          },
+        ],
       },
     },
   ],

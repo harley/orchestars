@@ -245,7 +245,8 @@
     "checkedIn": "Checked In",
     "booked": "Booked",
     "qrCodeNotAvailable": "QR code available for booked tickets only.",
-    "termsAndConditions": "Terms & Conditions"
+    "termsAndConditions": "Terms & Conditions",
+    "details": "Ticket Details"
   },
   "checkout": {
     "personalInfo": "Personal Information",
@@ -306,7 +307,6 @@
     "validTicket": "VALID TICKET",
     "ticketDetails": "TICKET DETAILS",
     "name": "Name:",
-    "event": "Event:",
     "date": "Date:",
     "emailLabel": "Email:",
     "phoneNumber": "Phone Number:",
@@ -346,11 +346,13 @@
       "instruction": "Position the code within the frame",
       "upload": "Upload QR",
       "history": "Checkin History",
+      "refreshHistory": "Refresh History",
       "loadingHistory": "Loading history...",
       "noRecentScans": "No recent checkins.",
       "ticket": "Ticket:",
       "attendee": "Attendee:",
       "time": "Time:",
+      "lastCheckIn": "Last Check-In:",
       "error": {
         "canvasNotSupported": "Canvas not supported",
         "noQrFound": "No QR code found.",
@@ -359,10 +361,27 @@
         "failed": "Check-in failed",
         "network": "Network error"
       },
-      "success": "Checked In"
+      "success": "Checked In",
+      "alreadyCheckedIn": "Already checked in"
     },
     "event": {
-      "dateTBA": "Date: TBA"
+      "dateTBA": "Date: TBA",
+      "checkedInByMe": "Checked in by me:",
+      "totalCheckedIn": "Total checked in:",
+      "loadingStats": "Loading stats..."
+    },
+    "manual": {
+      "byTicketCode": "By Ticket Code",
+      "bySeat": "By Seat",
+      "byEmail": "By Email",
+      "byPhone": "By Phone",
+      "enterTicketCode": "Enter Ticket Code",
+      "enterSeatNumber": "Enter Seat Number",
+      "enterEmail": "Enter email address",
+      "enterPhone": "Enter phone number",
+      "lookingUp": "Looking up...",
+      "lookUp": "Look Up",
+      "clearAndStartNew": "Clear and Start New"
     }
   },
   "customerCheckinTicket": {

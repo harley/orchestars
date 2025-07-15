@@ -1,13 +1,16 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback, forwardRef, useImperativeHandle } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
 import { toast } from '@/hooks/use-toast'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AlertTriangle, History, ChevronDown, X } from 'lucide-react'
 import type { CheckinRecord, User } from '@/payload-types'
 import { type TicketDTO } from '@/lib/checkin/findTickets'
+import Link from 'next/link'
+import { useTranslate } from '@/providers/I18n/client'
+import { getTicketClassColor } from '@/utilities/getTicketClassColor'
 
 interface CheckinHistoryProps {}
 
@@ -16,6 +19,7 @@ const CheckinHistory = forwardRef((props: CheckinHistoryProps, ref) => {
   const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const hasFetched = useRef(false)
+  const { t } = useTranslate()
 
   const fetchHistory = useCallback(async () => {
     if (isLoading) return
@@ -55,38 +59,48 @@ const CheckinHistory = forwardRef((props: CheckinHistoryProps, ref) => {
           >
             <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           </button>
-          {isLoading && <p className="text-gray-600 dark:text-gray-300">Loading history...</p>}
-          {!isLoading && history.length === 0 && <p className="text-gray-600 dark:text-gray-300">No recent check-ins.</p>}
-          <ul className="space-y-2 pr-8">
-            {history.map(record => (
-              <li key={record.id} className="text-sm text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600 pb-2">
-                <p>
-                  <strong>Ticket:</strong> {record.ticketCode}
-                </p>
-                <p>
-                  <strong>Attendee:</strong>{' '}
-                  {`${(record.user as User)?.firstName || ''} ${
-                    (record.user as User)?.lastName || ''
-                  }`.trim() || 'N/A'}
-                </p>
-                <p>
-                  <strong>Time:</strong>{' '}
-                  {record.checkInTime
-                    ? new Date(record.checkInTime).toLocaleTimeString()
-                    : 'N/A'}
-                </p>
-                <p>
-                  <strong>Method:</strong>{' '}
-                  <span className={`px-2 py-1 rounded text-xs ${
-                    record.manual 
-                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' 
-                      : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                  }`}>
-                    {record.manual ? 'Manual' : 'QR Scan'}
-                  </span>
-                </p>
-              </li>
-            ))}
+          {isLoading && <p className="text-gray-600 dark:text-gray-300">{t('checkin.scan.loadingHistory')}</p>}
+          {!isLoading && history.length === 0 && <p className="text-gray-600 dark:text-gray-300">{t('checkin.scan.noRecentScans')}</p>}
+          <ul className="space-y-3 pr-8">
+            {history.map(record => {
+              const attendeeName = `${(record.user as User)?.firstName || ''} ${(record.user as User)?.lastName || ''}`.trim() || 'N/A'
+              const ticketType = (record.ticket as any)?.ticketPriceName || (record.ticket as any)?.ticketPriceInfo?.name || 'N/A'
+              const ticketPriceInfo = (record.ticket as any)?.ticketPriceInfo
+              const ticketColors = getTicketClassColor(ticketPriceInfo)
+              
+              // Determine checkin method based on the manual field
+              const checkinMethod = (record as any).manual ? 'Manual' : 'QR'
+              
+              return (
+                <li key={record.id} className="text-sm text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600 pb-2">
+                  <div className="flex justify-between items-center font-medium mb-1">
+                    <div className="flex items-center gap-2">
+                      <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">
+                        {record.seat}
+                      </span>
+                      <span 
+                        className="px-2 py-1 rounded text-xs font-medium"
+                        style={{
+                          backgroundColor: ticketColors.color,
+                          color: ticketColors.textColor,
+                        }}
+                      >
+                        {ticketType}
+                      </span>
+                    </div>
+                    <span>{attendeeName}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs text-gray-600 dark:text-gray-400">
+                    <span>{record.ticketCode} <span className="text-blue-600 dark:text-blue-400 font-medium">[{checkinMethod}]</span></span>
+                    <span>
+                      {record.checkInTime
+                        ? new Date(record.checkInTime).toLocaleTimeString()
+                        : 'N/A'}
+                    </span>
+                  </div>
+                </li>
+              )
+            })}
           </ul>
         </div>
       )}
@@ -103,7 +117,7 @@ const CheckinHistory = forwardRef((props: CheckinHistoryProps, ref) => {
         className="inline-flex items-center justify-center w-full gap-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors"
       >
         <History className="w-5 h-5" />
-        <span>{isOpen ? 'Refresh History' : 'Checkin History'}</span>
+        <span>{isOpen ? t('checkin.scan.refreshHistory') : t('checkin.scan.history')}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
     </div>
@@ -114,18 +128,24 @@ CheckinHistory.displayName = 'CheckinHistory'
 export default function ValidatePageClient() {
   const [ticketCode, setTicketCode] = useState('')
   const [seatNumber, setSeatNumber] = useState('')
+  const [email, setEmail] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isCheckingIn, setIsCheckingIn] = useState(false)
   const [validatedTicket, setValidatedTicket] = useState<TicketDTO | null>(null)
   const [multipleTickets, setMultipleTickets] = useState<TicketDTO[]>([])
   const [activeTab, setActiveTab] = useState('ticket')
   const router = useRouter()
+  const pathname = usePathname()
   const { isHydrated, token } = useAuth()
   const searchParams = useSearchParams()
+  const { t } = useTranslate()
   // Translation hook and additional toast hook removed as they were unused
 
   const ticketInputRef = useRef<HTMLInputElement>(null)
   const seatInputRef = useRef<HTMLInputElement>(null)
+  const emailInputRef = useRef<HTMLInputElement>(null)
+  const phoneInputRef = useRef<HTMLInputElement>(null)
   const historyRef = useRef<{ fetchHistory: () => void }>(null)
   // Track last action timestamps to prevent rapid duplicate submissions
   const lastValidateRef = useRef<number>(0)
@@ -192,8 +212,12 @@ export default function ValidatePageClient() {
   useEffect(() => {
     if (activeTab === 'ticket') {
       ticketInputRef.current?.focus()
-    } else {
+    } else if (activeTab === 'seat') {
       seatInputRef.current?.focus()
+    } else if (activeTab === 'email') {
+      emailInputRef.current?.focus()
+    } else if (activeTab === 'phone') {
+      phoneInputRef.current?.focus()
     }
   }, [activeTab])
 
@@ -214,13 +238,34 @@ export default function ValidatePageClient() {
     if (now - lastValidateRef.current < 2000) return
     lastValidateRef.current = now
 
-    const value = activeTab === 'ticket' ? ticketCode.trim() : seatNumber.trim()
+    let value
+    let description
+    switch (activeTab) {
+      case 'ticket':
+        value = ticketCode.trim()
+        description = 'ticket code'
+        break
+      case 'seat':
+        value = seatNumber.trim()
+        description = 'seat number'
+        break
+      case 'email':
+        value = email.trim()
+        description = 'email address'
+        break
+      case 'phone':
+        value = phoneNumber.trim()
+        description = 'phone number'
+        break
+      default:
+        value = ''
+        description = ''
+    }
+
     if (!value) {
       toast({
         title: 'Input Required',
-        description: `Please enter a ${
-          activeTab === 'ticket' ? 'ticket code' : 'seat number'
-        } to look up.`,
+        description: `Please enter a ${description} to look up.`,
         variant: 'destructive',
       })
       return
@@ -232,6 +277,7 @@ export default function ValidatePageClient() {
 
     try {
       let response
+      let body
 
       if (activeTab === 'seat') {
         // Seat validation logic
@@ -246,6 +292,21 @@ export default function ValidatePageClient() {
             scheduleId,
             seatNumber: value,
           }),
+        })
+      } else if (activeTab === 'email' || activeTab === 'phone') {
+        body = { eventId, scheduleId }
+        if (activeTab === 'email') {
+          body.email = value
+        } else {
+          body.phoneNumber = value
+        }
+        response = await fetch(`/api/checkin-app/validate-contact`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `JWT ${token}`,
+          },
+          body: JSON.stringify(body),
         })
       } else {
         // Ticket code validation logic
@@ -262,14 +323,14 @@ export default function ValidatePageClient() {
       const data = await response.json()
 
       if (response.ok) {
-        if (activeTab === 'seat') {
+        if (activeTab === 'seat' || activeTab === 'email' || activeTab === 'phone') {
           if (data.tickets && data.tickets.length > 1) {
             // Multiple tickets found for the seat
             setMultipleTickets(data.tickets)
             setValidatedTicket(null)
             toast({
               title: 'MULTIPLE FOUND',
-              description: `Found ${data.tickets.length} tickets for this seat.`,
+              description: `Found ${data.tickets.length} tickets for this criteria.`,
               variant: 'success',
             })
           } else if (data.tickets && data.tickets.length === 1) {
@@ -295,16 +356,17 @@ export default function ValidatePageClient() {
             setValidatedTicket(null)
             setMultipleTickets([])
             toast({
-              title: 'Seat Not Found',
-              description: 'No ticket found for that seat.',
+              title: 'Not Found',
+              description: 'No ticket found for that criteria.',
               variant: 'destructive',
             })
           }
         } else {
-          // Ticket code validation logic (assuming it returns a single ticket object)
-          setValidatedTicket(data.ticket)
+          // This handles the 'ticket' tab case
+          const ticket = data.ticket
+          setValidatedTicket(ticket)
           setMultipleTickets([])
-          if (data.ticket?.isCheckedIn) {
+          if (ticket?.isCheckedIn) {
             toast({
               title: 'ALREADY CHECKED IN',
               description: 'This visitor has already been checked in',
@@ -360,29 +422,38 @@ export default function ValidatePageClient() {
         body: JSON.stringify({ eventDate: scheduleDate, manual: true }),
       })
       
-      // Consume the response body to avoid memory leaks, even though we don't presently need the data
-      await response.json()
+      const responseData = await response.json()
       
       if (response.ok) {
         const attendeeName = ticket.attendeeName || 'Guest'
-        // Show success toast including attendee's name
-        toast({
-          title: 'CHECK-IN COMPLETE',
-          description: `Visitor ${attendeeName} successfully checked in`,
-          variant: 'success',
-        })
-        // Update the ticket state to show as checked in
-        if (validatedTicket) {
-          setValidatedTicket({ ...ticket, isCheckedIn: true })
+        
+        // Check if ticket was already checked in
+        if (responseData.alreadyCheckedIn) {
+          toast({
+            title: 'ALREADY CHECKED IN',
+            description: `Visitor ${attendeeName} was already checked in`,
+            variant: 'default', // Using default variant for warning-like messages
+          })
+        } else {
+          // Show success toast for new check-in
+          toast({
+            title: 'CHECK-IN COMPLETE',
+            description: `Visitor ${attendeeName} successfully checked in`,
+            variant: 'success',
+          })
+          // Update the ticket state to show as checked in
+          if (validatedTicket) {
+            setValidatedTicket({ ...ticket, isCheckedIn: true })
+          }
+          if (multipleTickets.length > 0) {
+            setMultipleTickets(prevTickets =>
+              prevTickets.map(t =>
+                t.ticketCode === ticket.ticketCode ? { ...t, isCheckedIn: true } : t,
+              ),
+            )
+          }
         }
-        if (multipleTickets.length > 0) {
-          setMultipleTickets(prevTickets =>
-            prevTickets.map(t =>
-              t.ticketCode === ticket.ticketCode ? { ...t, isCheckedIn: true } : t,
-            ),
-          )
-        }
-        // Refresh checkin history
+        // Refresh checkin history in both cases
         historyRef.current?.fetchHistory()
       } else {
         toast({
@@ -408,16 +479,28 @@ export default function ValidatePageClient() {
     setMultipleTickets([])
     setTicketCode('')
     setSeatNumber('')
+    setEmail('')
+    setPhoneNumber('')
   }
 
   const onTabChange = (value: string) => {
     setActiveTab(value)
-    resetValidation()
+    // Reset inputs when tab changes
+    setTicketCode('')
+    setSeatNumber('')
+    setEmail('')
+    setPhoneNumber('')
+
+    // Set focus to the input of the newly selected tab
     setTimeout(() => {
       if (value === 'ticket') {
         ticketInputRef.current?.focus()
-      } else {
+      } else if (value === 'seat') {
         seatInputRef.current?.focus()
+      } else if (value === 'email') {
+        emailInputRef.current?.focus()
+      } else if (value === 'phone') {
+        phoneInputRef.current?.focus()
       }
     }, 0)
   }
@@ -440,6 +523,30 @@ export default function ValidatePageClient() {
         >
           ← Back to Events
         </button>
+
+        {/* Navigation Toggle */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <Link
+            href="/checkin/scan"
+            className={`text-center py-2 px-4 rounded font-semibold ${
+              pathname === '/checkin/scan'
+                ? 'bg-gray-900 dark:bg-gray-700 text-white'
+                : 'bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500'
+            }`}
+          >
+            {t('checkin.nav.qr')}
+          </Link>
+          <Link
+            href="/checkin/events"
+            className={`text-center py-2 px-4 rounded font-semibold ${
+              pathname === '/checkin/events' || pathname.includes('/checkin/validates')
+                ? 'bg-gray-900 dark:bg-gray-700 text-white'
+                : 'bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500'
+            }`}
+          >
+            {t('checkin.nav.search')}
+          </Link>
+        </div>
 
         {/* Title - More prominent */}
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
@@ -472,104 +579,131 @@ export default function ValidatePageClient() {
         )}
 
         {/* Tabs - Improved styling */}
-        <Tabs defaultValue="ticket" onValueChange={onTabChange} className="w-full mb-4">
-          <TabsList className="grid w-full grid-cols-2 bg-gray-200 dark:bg-gray-700 rounded-lg p-1">
-            <TabsTrigger value="ticket" className="rounded-md py-2">By Ticket Code</TabsTrigger>
-            <TabsTrigger value="seat" className="rounded-md py-2">By Seat</TabsTrigger>
+        <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="ticket">{t('checkin.manual.byTicketCode')}</TabsTrigger>
+            <TabsTrigger value="seat">{t('checkin.manual.bySeat')}</TabsTrigger>
+            <TabsTrigger value="email">{t('checkin.manual.byEmail')}</TabsTrigger>
+            <TabsTrigger value="phone">{t('checkin.manual.byPhone')}</TabsTrigger>
           </TabsList>
           <TabsContent value="ticket">
-            <div className="mt-4 flex gap-3">
+            <div className="mt-4">
               <input
-                id="ticketCode"
                 ref={ticketInputRef}
                 type="text"
-                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow hover:shadow-md"
-                placeholder="Enter ticket code (e.g., TKT-123456)"
                 value={ticketCode}
                 onChange={e => setTicketCode(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleValidate()}
-                disabled={
-                  isLoading ||
-                  !ticketCode.trim() ||
-                  !!validatedTicket ||
-                  multipleTickets.length > 0
-                }
+                placeholder={t('checkin.manual.enterTicketCode')}
+                className="w-full p-4 border border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-lg shadow-sm dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition"
               />
-              <button
-                onClick={handleValidate}
-                disabled={
-                  isLoading ||
-                  !ticketCode.trim() ||
-                  !!validatedTicket ||
-                  multipleTickets.length > 0
-                }
-                className={`px-6 py-3 rounded-lg font-bold text-white transition-colors ${
-                  (isLoading ||
-                  !ticketCode.trim() ||
-                  !!validatedTicket ||
-                  multipleTickets.length > 0)
-                    ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:shadow-lg'
-                }`}
-              >
-                {isLoading ? (
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : (
-                  'Find'
-                )}
-              </button>
             </div>
           </TabsContent>
           <TabsContent value="seat">
-            <div className="mt-4 flex gap-3">
+            <div className="mt-4">
               <input
-                id="seat"
                 ref={seatInputRef}
                 type="text"
-                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow hover:shadow-md"
-                placeholder="Enter seat number (e.g., A-12)"
                 value={seatNumber}
                 onChange={e => setSeatNumber(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleValidate()}
-                disabled={
-                  isLoading ||
-                  !seatNumber.trim() ||
-                  !!validatedTicket ||
-                  multipleTickets.length > 0
-                }
+                placeholder={t('checkin.manual.enterSeatNumber')}
+                className="w-full p-4 border border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-lg shadow-sm dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition"
               />
-              <button
-                onClick={handleValidate}
-                disabled={
-                  isLoading ||
-                  !seatNumber.trim() ||
-                  !!validatedTicket ||
-                  multipleTickets.length > 0
-                }
-                className={`px-6 py-3 rounded-lg font-bold text-white transition-colors ${
-                  (isLoading ||
-                  !seatNumber.trim() ||
-                  !!validatedTicket ||
-                  multipleTickets.length > 0)
-                    ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:shadow-lg'
-                }`}
-              >
-                {isLoading ? (
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : (
-                  'Find'
-                )}
-              </button>
+            </div>
+          </TabsContent>
+          <TabsContent value="email">
+            <div className="mt-4">
+              <input
+                ref={emailInputRef}
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleValidate()}
+                placeholder={t('checkin.manual.enterEmail')}
+                className="w-full p-4 border border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-lg shadow-sm dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition"
+              />
+            </div>
+          </TabsContent>
+          <TabsContent value="phone">
+            <div className="mt-4">
+              <input
+                ref={phoneInputRef}
+                type="tel"
+                value={phoneNumber}
+                onChange={e => setPhoneNumber(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleValidate()}
+                placeholder={t('checkin.manual.enterPhone')}
+                className="w-full p-4 border border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-lg shadow-sm dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition"
+              />
             </div>
           </TabsContent>
         </Tabs>
+
+        <div className="mt-6 w-full">
+          <button
+            onClick={handleValidate}
+            disabled={
+              isLoading ||
+              (activeTab === 'ticket' && !ticketCode.trim()) ||
+              (activeTab === 'seat' && !seatNumber.trim()) ||
+              (activeTab === 'email' && !email.trim()) ||
+              (activeTab === 'phone' && !phoneNumber.trim()) ||
+              !!validatedTicket ||
+              multipleTickets.length > 0
+            }
+            className={`w-full py-4 rounded-lg font-bold text-white uppercase tracking-wider transition-all duration-300 ${
+              isLoading ||
+              (activeTab === 'ticket' && !ticketCode.trim()) ||
+              (activeTab === 'seat' && !seatNumber.trim()) ||
+              (activeTab === 'email' && !email.trim()) ||
+              (activeTab === 'phone' && !phoneNumber.trim()) ||
+              !!validatedTicket ||
+              multipleTickets.length > 0
+                ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
+            }`}
+          >
+            {isLoading ? (
+              <div className="flex justify-center items-center">
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                <span>{t('checkin.manual.lookingUp')}</span>
+              </div>
+            ) : (
+              t('checkin.manual.lookUp')
+            )}
+          </button>
+        </div>
+
+        {(validatedTicket || multipleTickets.length > 0) && (
+          <div className="mt-4 w-full text-center">
+            <button
+              onClick={resetValidation}
+              className="text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              {t('checkin.manual.clearAndStartNew')}
+            </button>
+          </div>
+        )}
 
         {/* Results - Compact layout with prominent check-in button */}
         {validatedTicket && (
@@ -655,6 +789,8 @@ export default function ValidatePageClient() {
                   setMultipleTickets([]);
                   setTicketCode('');
                   setSeatNumber('');
+                  setEmail('');
+                  setPhoneNumber('');
                 }}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
