@@ -1,12 +1,12 @@
 # Implementation Plan
 
-- [ ] 1. Database schema enhancement for check-in method tracking
+- [x] 1. Database schema enhancement for check-in method tracking
   - Create migration to add `checkinMethod` enum field to checkinRecords table
   - Write migration to update existing records (manual=true → 'search', manual=false → 'qr')
   - Update TypeScript types in payload-types.ts to include new checkinMethod field
   - _Requirements: 4.1, 4.2, 4.3_
 
-- [ ] 2. Create paper check-in route structure
+- [x] 2. Create paper check-in route structure
   - Create `src/app/(checkin)/checkin/paper/page.tsx` server component with admin authentication
   - Create `src/app/(checkin)/checkin/paper/page.client.tsx` client component for paper check-in interface
   - Implement event/schedule parameter handling from URL query params

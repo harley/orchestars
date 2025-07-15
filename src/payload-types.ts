@@ -1322,6 +1322,10 @@ export interface CheckinRecord {
    * True if this record was created from manual entry, false if via QR scan
    */
   manual: boolean;
+  /**
+   * Method used for check-in: QR scan, paper ticket entry, or search
+   */
+  checkinMethod: 'qr' | 'paper' | 'search';
   deletedAt?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -2987,6 +2991,7 @@ export interface CheckinRecordsSelect<T extends boolean = true> {
   ticketGivenTime?: T;
   ticketGivenBy?: T;
   manual?: T;
+  checkinMethod?: T;
   deletedAt?: T;
   updatedAt?: T;
   createdAt?: T;
