@@ -1,33 +1,15 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { useAuth } from '@/providers/CheckIn/useAuth'
 import { toast } from '@/hooks/use-toast'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Link from 'next/link'
 import { useTranslate } from '@/providers/I18n/client'
+import { type TicketDTO } from '@/lib/checkin/findTickets'
 
-interface TicketData {
-  id: number
-  attendeeName: string
-  email: string | null
-  phoneNumber: string | null
-  ticketCode: string
-  seat: string
-  status: string
-  ticketPriceInfo: any
-  ticketPriceName: string | null
-  orderCode: string | null
-  isCheckedIn: boolean
-  checkinRecord: {
-    checkInTime: string | null
-    checkedInBy: {
-      email: string | null
-    } | null
-    ticketGivenTime: string | null
-    ticketGivenBy: string | null
-  } | null
-}
+
 
 interface FeedbackState {
   type: 'success' | 'error' | 'info'
@@ -36,7 +18,7 @@ interface FeedbackState {
 
 const PaperPageClient = () => {
   const searchParams = useSearchParams()
-  const router = useRouter()
+  const { token } = useAuth()
   const { t } = useTranslate()
   const seatInputRef = useRef<HTMLInputElement>(null)
   
@@ -48,7 +30,7 @@ const PaperPageClient = () => {
   const [seatNumber, setSeatNumber] = useState('')
   const [isValidating, setIsValidating] = useState(false)
   const [isCheckingIn, setIsCheckingIn] = useState(false)
-  const [validatedTicket, setValidatedTicket] = useState<TicketData | null>(null)
+  const [validatedTicket, setValidatedTicket] = useState<TicketDTO | null>(null)
   const [error, setError] = useState('')
   const [feedback, setFeedback] = useState<FeedbackState | null>(null)
   const [lastValidationTime, setLastValidationTime] = useState(0)
@@ -68,6 +50,11 @@ const PaperPageClient = () => {
       return
     }
     
+    if (!token) {
+      setError('Authentication required. Please refresh the page.')
+      return
+    }
+    
     // Implement 2-second throttle
     const now = Date.now()
     if (now - lastValidationTime < 2000) {
@@ -84,6 +71,7 @@ const PaperPageClient = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `JWT ${token}`,
         },
         body: JSON.stringify({
           seatNumber: seatNumber.trim(),
@@ -113,11 +101,16 @@ const PaperPageClient = () => {
     } finally {
       setIsValidating(false)
     }
-  }, [seatNumber, eventId, scheduleId, lastValidationTime])
+  }, [seatNumber, eventId, scheduleId, lastValidationTime, token])
 
   // Handle check-in
   const handleCheckIn = async () => {
     if (!validatedTicket) return
+    
+    if (!token) {
+      setError('Authentication required. Please refresh the page.')
+      return
+    }
     
     setIsCheckingIn(true)
     setError('')
@@ -128,9 +121,11 @@ const PaperPageClient = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `JWT ${token}`,
         },
         body: JSON.stringify({
           manual: true,
+          checkinMethod: 'paper',
         }),
       })
       
@@ -177,7 +172,7 @@ const PaperPageClient = () => {
   }
 
   // Handle keyboard events
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && seatNumber.trim() && !isValidating) {
       validateSeat()
     }
@@ -248,7 +243,7 @@ const PaperPageClient = () => {
                       type="text"
                       value={seatNumber}
                       onChange={handleSeatChange}
-                      onKeyPress={handleKeyPress}
+                      onKeyDown={handleKeyDown}
                       placeholder={t('Enter seat number')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       disabled={isValidating || isCheckingIn}
