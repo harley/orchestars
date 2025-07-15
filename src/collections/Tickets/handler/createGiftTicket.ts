@@ -320,6 +320,7 @@ export const createGiftTicket = async (req: PayloadRequest): Promise<Response> =
           ticketId: ticket.id,
           ticketCode: ticket.ticketCode,
           seat: ticket.seat,
+          eventId: event?.id,
           eventName: event?.title,
           eventDate: `${startTime || 'N/A'} - ${endTime || 'N/A'}, ${ticket?.eventDate || 'N/A'} (Giờ Việt Nam | Vietnam Time, GMT+7)`,
           eventLocation,
@@ -328,7 +329,6 @@ export const createGiftTicket = async (req: PayloadRequest): Promise<Response> =
 
       // Send email to recipient
       await sendGiftTicketAndAccountSetupMail({
-        event: validation.tickets[0].event,
         user: userResult.user as User,
         ticketData,
         payload,

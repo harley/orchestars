@@ -1,12 +1,11 @@
 import { addQueueEmail } from '@/collections/Emails/utils'
 import { EMAIL_CC } from '@/config/email'
 import { getGiftTicketAndAccountSetupEmailHtml } from '@/mail/templates/GiftTicketAndAccountSetup'
-import { Event, User } from '@/payload-types'
+import { User } from '@/payload-types'
 import { TransactionID } from '@/types/TransactionID'
 import { BasePayload } from 'payload'
 
 export const sendGiftTicketAndAccountSetupMail = async ({
-  event,
   user,
   ticketData,
   payload,
@@ -14,12 +13,13 @@ export const sendGiftTicketAndAccountSetupMail = async ({
   giftedByName,
   setupLink,
 }: {
-  event: Event
   user: User
   ticketData: {
     ticketId: number
     ticketCode: string
     seat: string
+    eventId: number
+    eventName: string
     eventDate: string
     eventLocation?: string
   }[]
@@ -33,7 +33,7 @@ export const sendGiftTicketAndAccountSetupMail = async ({
       const html = getGiftTicketAndAccountSetupEmailHtml({
         ticketCode: data.ticketCode,
         seat: data.seat,
-        eventName: event.title || '',
+        eventName: data.eventName || '',
         eventDate: data.eventDate,
         eventLocation: data.eventLocation,
         giftedByName: giftedByName,
@@ -52,7 +52,7 @@ export const sendGiftTicketAndAccountSetupMail = async ({
         resendMailData,
         emailData: {
           user: user.id,
-          event: event?.id,
+          event: data?.eventId,
           ticket: data?.ticketId,
         },
         transactionID,
