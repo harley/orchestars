@@ -2,7 +2,7 @@
 
 import { TicketDetails } from '@/app/(frontend)/ticket/[ticketCode]/page.client'
 import type { Ticket } from '@/payload-types'
-import { Swiper, SwiperSlide } from 'swiper/react'
+import { Swiper, SwiperClass, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import { Navigation, Pagination } from 'swiper/modules'
@@ -19,7 +19,6 @@ export default function TicketsSwipeViewer({
 }) {
   const [current, setCurrent] = useState(0)
   const total = tickets.length
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
 
   // Custom navigation handlers
   const handlePrev = () => {
@@ -30,7 +29,7 @@ export default function TicketsSwipeViewer({
   }
 
   // Swiper ref to control slide programmatically
-  const [swiperInstance, setSwiperInstance] = useState<any>(null)
+  const [swiperInstance, setSwiperInstance] = useState<SwiperClass | null>(null)
   useEffect(() => {
     if (swiperInstance) {
       swiperInstance.slideTo(current)
@@ -92,9 +91,9 @@ export default function TicketsSwipeViewer({
             value={inputValue}
             onChange={handleInputChange}
             onBlur={handleInputCommit}
-            onKeyDown={e => {
+            onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                (e.target as HTMLInputElement).blur()
+                ;(e.target as HTMLInputElement).blur()
               }
             }}
             className="ticket-index-input w-12 text-center border border-gray-300 focus:border-primary outline-none transition-all duration-200 bg-transparent text-lg font-semibold rounded focus:bg-gray-100 mx-1"
@@ -128,7 +127,7 @@ export default function TicketsSwipeViewer({
           speed={300} // Smooth transition
         >
           {tickets.map((ticket, idx) => (
-            <SwiperSlide key={Math.random().toString() + idx}>
+            <SwiperSlide key={ticket.ticket.id + idx}>
               <TicketDetails
                 ticket={ticket.ticket}
                 isCheckedIn={ticket.isCheckedIn}

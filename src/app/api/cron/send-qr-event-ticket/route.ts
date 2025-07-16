@@ -19,10 +19,7 @@ export async function GET(req: NextRequest) {
     console.log('--> executing /api/cron/send-qr-event-ticket\n')
     const authHeader = req.headers.get('authorization')
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Parse request body
@@ -94,58 +91,59 @@ export async function GET(req: NextRequest) {
 
     await Promise.all(
       orders.map(async (order) => {
-        // Get order code from the ticket's order
-        const orderId = order.id
-        const orderCode = order?.orderCode || 'N/A'
-        const ticketUrl = `${baseUrl}/tickets/${orderCode}`
+        try {
+          const orderId = order.id
+          const orderCode = order?.orderCode || 'N/A'
+          const ticketUrl = `${baseUrl}/tickets/${orderCode}`
 
-        const eventDate = order.eventDate
-          ? tzFormat(toZonedTime(new Date(order.eventDate), 'Asia/Ho_Chi_Minh'), 'dd/MM/yyyy')
-          : ''
+          const eventDate = order.eventDate
+            ? tzFormat(toZonedTime(new Date(order.eventDate), 'Asia/Ho_Chi_Minh'), 'dd/MM/yyyy')
+            : ''
 
-        let eventStartTime = ''
-        let eventEndTime = ''
-        if (startTime && eventDate) {
-          const [day, month, year] = eventDate.split('/')
-          eventStartTime = new Date(
-            `${year}-${month}-${day}T${startTime}:00+07:00`,
-          ).toISOString()
+          let eventStartTime = ''
+          let eventEndTime = ''
+          if (startTime && eventDate) {
+            const [day, month, year] = eventDate.split('/')
+            eventStartTime = new Date(`${year}-${month}-${day}T${startTime}:00+07:00`).toISOString()
+          }
+
+          if (endTime && eventDate) {
+            const [day, month, year] = eventDate.split('/')
+            eventEndTime = new Date(`${year}-${month}-${day}T${endTime}:00+07:00`).toISOString()
+          }
+
+          // Generate email HTML
+          const html = generateEventTicketEmailHtml({
+            eventName: event.title || '',
+            eventDate: `${startTime || 'N/A'} - ${endTime || 'N/A'}, ${eventDate || 'N/A'} (Giờ Việt Nam | Vietnam Time, GMT+7)`,
+            eventLocation,
+            ticketUrl,
+            eventStartTimeCalendar: eventStartTime,
+            eventEndTimeCalendar: eventEndTime,
+            orderCode,
+          })
+
+          // Queue email
+          await addQueueEmail({
+            payload,
+            resendMailData: {
+              to: order.userEmail,
+              cc: EMAIL_CC,
+              subject: `Your Tickets for ${event.title}`,
+              html,
+            },
+            emailData: {
+              user: order.userId,
+              event: event.id,
+              order: orderId,
+              type: EMAIL_TYPE.qr_event_ticket.value,
+            },
+          })
+
+          emailsQueued++
+        } catch (error) {
+          console.error(`Failed to queue email for order ${order.orderCode}:`, error)
         }
-
-        if (endTime && eventDate) {
-          const [day, month, year] = eventDate.split('/')
-          eventEndTime = new Date(`${year}-${month}-${day}T${endTime}:00+07:00`).toISOString()
-        }
-
-        // Generate email HTML
-        const html = generateEventTicketEmailHtml({
-          eventName: event.title || '',
-          eventDate: `${startTime || 'N/A'} - ${endTime || 'N/A'}, ${eventDate || 'N/A'} (Giờ Việt Nam | Vietnam Time, GMT+7)`,
-          eventLocation,
-          ticketUrl,
-          eventStartTimeCalendar: eventStartTime,
-          eventEndTimeCalendar: eventEndTime,
-          orderCode,
-        })
-
-        // Queue email
-        await addQueueEmail({
-          payload,
-          resendMailData: {
-            to: order.userEmail,
-            cc: EMAIL_CC,
-            subject: `Your Tickets for ${event.title}`,
-            html,
-          },
-          emailData: {
-            user: order.userId,
-            event: event.id,
-            order: orderId,
-            type: EMAIL_TYPE.qr_event_ticket.value,
-          },
-        })
-
-        emailsQueued++
       }),
     )
 

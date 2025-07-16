@@ -106,6 +106,7 @@ SUMMARY:${title}
 DTSTART:${startDate}
 DTEND:${endDate}
 DTSTAMP:${now}
+UID:${Date.now()}-${Math.random().toString(36).substring(2, 9)}@orchestars.vn
 LOCATION:${location}
 DESCRIPTION:${description.replace(/\n/g, '\\n')}
 STATUS:CONFIRMED
