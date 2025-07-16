@@ -10,6 +10,7 @@ import { CheckinNav } from '@/components/CheckinNav'
 import { useTranslate } from '@/providers/I18n/client'
 import { type TicketDTO } from '@/lib/checkin/findTickets'
 import ScheduleStatsInfo from '@/components/ScheduleStatsInfo'
+import VisitorInfoCard from '@/components/VisitorInfoCard'
 
 
 interface FeedbackState {
@@ -56,6 +57,32 @@ const PaperPageClient = () => {
     if (time) setEventTime(time)
     if (location) setEventLocation(location)
   }, [])
+
+  // State for stats
+  const [myCheckedCount, setMyCheckedCount] = useState(0)
+  const [totalCheckedCount, setTotalCheckedCount] = useState(0)
+
+  // Fetch stats on mount and poll every 20s
+  useEffect(() => {
+    let isMounted = true
+    async function fetchStats() {
+      if (!eventId || !scheduleId) return
+      try {
+        const res = await fetch(`/api/checkin-app/stats?eventId=${eventId}&scheduleId=${scheduleId}`)
+        const data = await res.json()
+        if (isMounted && data) {
+          setMyCheckedCount(data.myCheckedCount || 0)
+          setTotalCheckedCount(data.totalCheckedCount || 0)
+        }
+      } catch (_) {}
+    }
+    fetchStats()
+    const interval = setInterval(fetchStats, 20000)
+    return () => {
+      isMounted = false
+      clearInterval(interval)
+    }
+  }, [eventId, scheduleId])
 
   // Handle seat number input
   const handleSeatChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,6 +181,10 @@ const PaperPageClient = () => {
       const data = await response.json()
       
       if (response.ok) {
+        if (!data.alreadyCheckedIn) {
+          setMyCheckedCount((c) => c + 1)
+          setTotalCheckedCount((c) => c + 1)
+        }
         if (data.alreadyCheckedIn) {
           // Handle already checked in case
           setFeedback({
@@ -214,13 +245,13 @@ const PaperPageClient = () => {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950 dark:to-amber-950">
       <div className="container mx-auto px-4 py-6 sm:py-8">
         <CheckinNav />
-        <div className="max-w-lg mx-auto">
-          {/* Selected Event Info */}
-          {!missingContext && (
-            <ScheduleStatsInfo eventId={eventId} scheduleId={scheduleId} />
-          )}
-          
-          {/* Paper Check-in Content */}
+        <div className="max-w-2xl mx-auto py-8 px-2 sm:px-0">
+          {/* Event info and stats */}
+          <ScheduleStatsInfo eventId={eventId} scheduleId={scheduleId} />
+          <div className="text-right mb-4">
+            <Link href="/checkin/events?mode=paper" className="text-sm text-indigo-700 hover:underline">{t('checkin.paper.changeEvent') || 'Change event'}</Link>
+          </div>
+          {/* Paper Check-in Content (seat input, feedback, VisitorInfoCard, etc.) */}
           <Tabs value="paper" className="w-full">
             <TabsContent value="paper" className="mt-6" role="tabpanel" aria-labelledby="paper-tab">
               <div className="space-y-6">
@@ -382,107 +413,10 @@ const PaperPageClient = () => {
                   </div>
                 )}
                 
-                {/* Ticket Confirmation */}
+                {/* Ticket Confirmation (reuse VisitorInfoCard) */}
                 {validatedTicket && !missingContext && (
-                  <div className="bg-white dark:bg-gray-800 border-2 border-orange-200 dark:border-orange-700 rounded-xl shadow-xl overflow-hidden">
-                    <div className="bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                          <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <h3 className="text-xl font-bold text-white">{t('checkin.paper.ticketFoundTitle')}</h3>
-                      </div>
-                    </div>
-                    
-                    <div className="p-6 sm:p-8">
-                      {/* Attendee Details */}
-                      <div className="mb-6">
-                        <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 text-center">
-                          {validatedTicket.attendeeName}
-                        </h4>
-                        
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" />
-                              </svg>
-                              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">{t('common.seat')}</span>
-                            </div>
-                            <p className="text-xl font-bold text-gray-900 dark:text-white">{validatedTicket.seat}</p>
-                          </div>
-                          
-                          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                              </svg>
-                              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">{t('checkin.ticketCode')}</span>
-                            </div>
-                            <p className="text-lg font-mono text-gray-900 dark:text-white">{validatedTicket.ticketCode}</p>
-                          </div>
-                        </div>
-                        
-                        {/* Additional Details */}
-                        <div className="space-y-3">
-                          {validatedTicket.ticketPriceName && (
-                            <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-600">
-                              <span className="text-gray-600 dark:text-gray-400 font-medium">{t('checkin.paper.ticketClass')}</span>
-                              <span className="text-gray-900 dark:text-white font-semibold">{validatedTicket.ticketPriceName}</span>
-                            </div>
-                          )}
-                          {validatedTicket.email && (
-                            <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-600">
-                              <span className="text-gray-600 dark:text-gray-400 font-medium">{t('common.email')}</span>
-                              <span className="text-gray-900 dark:text-white text-sm break-all">{validatedTicket.email}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {/* Check-in Status */}
-                      {validatedTicket.isCheckedIn ? (
-                        <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border-2 border-amber-200 dark:border-amber-700 rounded-lg p-6">
-                          <div className="flex items-start">
-                            <svg className="w-6 h-6 text-amber-600 dark:text-amber-400 mt-0.5 mr-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                            </svg>
-                            <div>
-                              <h4 className="text-lg font-semibold text-amber-800 dark:text-amber-200 mb-1">
-                                {t('checkin.paper.alreadyCheckedInTitle')}
-                              </h4>
-                              <p className="text-amber-700 dark:text-amber-300">
-                                {t('checkin.paper.alreadyCheckedInMessage')}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={handleCheckIn}
-                          disabled={isCheckingIn}
-                          className="w-full flex items-center justify-center gap-3 px-8 py-5 text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-500/50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none disabled:shadow-none"
-                          aria-describedby={isCheckingIn ? "checkin-status" : undefined}
-                        >
-                          {isCheckingIn ? (
-                            <>
-                              <svg className="animate-spin -ml-1 mr-3 h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                              </svg>
-                              <span id="checkin-status">{t('checkin.paper.checkingIn')}</span>
-                            </>
-                          ) : (
-                            <>
-                              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                              {t('checkin.paper.checkInNow')}
-                            </>
-                          )}
-                        </button>
-                      )}
-                    </div>
+                  <div className="border-t-4 border-indigo-700 mt-8 pt-6">
+                    <VisitorInfoCard ticket={validatedTicket} />
                   </div>
                 )}
               </div>

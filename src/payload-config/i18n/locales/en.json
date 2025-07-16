@@ -24,7 +24,9 @@
     "enterLastName": "Enter your last name",
     "enterFirstName": "Enter your first name",
     "enterPhoneNumber": "Enter your phone number",
-    "enterEmail": "Enter your email"
+    "enterEmail": "Enter your email",
+    "seat": "Seat",
+    "phoneNumber": "Phone number"
   },
   "event": {
     "chooseAttendingDate": "Choose Your Attending Date",
@@ -410,7 +412,16 @@
       "checkInSuccessful": "Check-in successful",
       "alreadyCheckedInStatus": "This ticket was already checked in",
       "hasBeenCheckedIn": "has been checked in successfully"
-    }
+    },
+    "by": "Check-in by",
+    "paper": {
+      "changeEvent": "Change event",
+      "myCheckedCount": "My checked-in",
+      "totalCheckedCount": "Total checked-in"
+    },
+    "ticketCode": "Ticket code",
+    "ticketType": "Type",
+    "orderCode": "Order code"
   },
   "customerCheckinTicket": {
     "ticketCheckIn": "Self Check-In",

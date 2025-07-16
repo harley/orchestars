@@ -24,7 +24,9 @@
     "enterLastName": "Nhập họ của bạn",
     "enterFirstName": "Nhập tên của bạn",
     "enterPhoneNumber": "Nhập số điện thoại",
-    "enterEmail": "Nhập email"
+    "enterEmail": "Nhập email",
+    "seat": "Ghế",
+    "phoneNumber": "Số điện thoại"
   },
   "event": {
     "chooseAttendingDate": "Chọn ngày bạn muốn tham dự",
@@ -410,7 +412,16 @@
       "checkInSuccessful": "Checkin thành công",
       "alreadyCheckedInStatus": "Vé này đã được checkin trước đó",
       "hasBeenCheckedIn": "đã được checkin thành công"
-    }
+    },
+    "by": "Soát vé bằng",
+    "paper": {
+      "changeEvent": "Chọn sự kiện khác",
+      "myCheckedCount": "Tôi đã soát",
+      "totalCheckedCount": "Tổng đã soát"
+    },
+    "ticketCode": "Mã vé",
+    "ticketType": "Loại vé",
+    "orderCode": "Mã đơn hàng"
   },
   "customerCheckinTicket": {
     "ticketCheckIn": "Tự Check In",
