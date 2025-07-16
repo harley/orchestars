@@ -2,6 +2,7 @@ import { Calendar, ShoppingBag, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatMoney } from '@/utilities/formatMoney'
+import { useTranslate } from '@/providers/I18n/client'
 
 type RewardsTimeline = {
   id: number
@@ -17,28 +18,32 @@ interface OrderHistoryProps {
   className: string
 }
 
-const typeConfig = {
-  purchase: {
-    icon: ShoppingBag,
-    label: "purchase",
-    color: "bg-blue-500/10 text-blue-700 border-blue-200"
-  },
-  bonus: {
-    icon: TrendingUp,
-    label: "bonus",
-    color: "bg-green-500/10 text-green-700 border-green-200"
-  },
-};
-
 export function OrderHistory({ orders, className }: OrderHistoryProps) {
+  const { t } = useTranslate();
+
+  const typeConfig = {
+    purchase: {
+      icon: ShoppingBag,
+      label: t("userprofile.purchase"),
+      color: "bg-blue-500/10 text-blue-700 border-blue-200"
+    },
+    bonus: {
+      icon: TrendingUp,
+      label: t("userprofile.bonus"),
+      color: "bg-green-500/10 text-green-700 border-green-200"
+    },
+  };
+
   return (
     <Card className={className}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-xl">
           <Calendar className="w-5 h-5" />
-          Exclusive Rewards Timeline
+          {t("userprofile.exclusiveRewardsTimeline")}
         </CardTitle>
-        <p className="text-sm text-muted-foreground">Your premium earning journey</p>
+        <p className="text-sm text-muted-foreground">
+          {t("userprofile.premiumEarningJourney")}
+        </p>
       </CardHeader>
       <CardContent>
         <div className="space-y-8">

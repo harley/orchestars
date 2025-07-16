@@ -48,7 +48,7 @@ export function useUserProfile() {
   const [histories, setHistories] = useState<RewardsTimeline | null>(null);
   const [rewards, setRewards] = useState<MembershipGifts | null>(null);
 
-  const fetchMembershipPoint = async () => {
+  const fetchMembershipPoint = useCallback(async () => {
     try {
       const response = await fetch('/api/user/membership-point');
       const result: ApiResponse = await response.json();
@@ -63,9 +63,9 @@ export function useUserProfile() {
       setError('Failed to fetch membership point');
       console.error('Error fetching membership point:', err);
     }
-  }
+  }, [])
 
-  const fetchRewardsTimeline = async () => {
+  const fetchRewardsTimeline = useCallback(async () => {
     try {
       const response = await fetch('/api/user/reward-timeline');
       const result: ApiResponse = await response.json();
@@ -80,9 +80,9 @@ export function useUserProfile() {
       setError('Failed to fetch rewards timeline');
       console.error('Error fetching rewards timeline:', err);
     }
-  }
+  }, [])
 
-  const fetchRewardsGallery = async () => {
+  const fetchRewardsGallery = useCallback(async () => {
     try {
       const response = await fetch('/api/user/membership-gifts');
       const result: ApiResponse = await response.json();
@@ -97,7 +97,7 @@ export function useUserProfile() {
       setError('Failed to fetch rewards gallery');
       console.error('Error fetching rewards gallery:', err);
     }
-  }
+  }, [])
 
   const fetchInitialData = useCallback(async () => {
     setIsLoading(true);

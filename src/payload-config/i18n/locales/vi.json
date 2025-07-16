@@ -490,6 +490,11 @@
       "affiliateErrorDesc": "Gửi yêu cầu thất bại. Vui lòng thử lại sau.",
       "successToBecomeAmbassador": "Bạn có thể bắt đầu kiếm tiền bằng cách chia sẻ liên kết của mình."
     },
+    "progressBar": {
+      "progressToNextTier": "Tiến trình lên hạng tiếp theo",
+      "pointsToNextTier": "{{points}} điểm đến hạng tiếp theo",
+      "tierCompleted": "Đã hoàn thành hạng!"
+    },
     "myEvents": "Sự kiện của tôi",
     "noEvents": "Bạn chưa có sự kiện nào",
     "noTickets": "Chưa có vé cho mục này",
@@ -497,7 +502,30 @@
     "pastTickets": "Vé sự kiện đã qua",
     "noUpcomingTickets": "Không có vé sự kiện sắp diễn ra",
     "noPastTickets": "Không có vé sự kiện đã qua",
-    "page": "Trang {{current}} / {{total}}"
+    "page": "Trang {{current}} / {{total}}",
+    "memberSince": "Thành viên từ",
+    "currentPoints": "Điểm hiện tại",
+    "pointsToNextRank": "Điểm đến",
+    "standard": "Tiêu chuẩn",
+    "journeyToTier": "Hành trình đến",
+    "tier": "Hạng",
+    "membershipTierProgression": "Tiến trình hạng thành viên",
+    "failedUserProfileLoad": "Không thể tải thông tin tài khoản",
+    "exclusiveRewardsTimeline": "Lịch trình nhận thưởng",
+    "premiumEarningJourney": "Hành trình tích lũy điểm",
+    "noRewardsHistory": "Chưa có lịch sử thưởng.",
+    "purchase": "mua hàng",
+    "bonus": "thưởng",
+    "vipRewardsCollection": "Bộ sưu tập phần thưởng VIP",
+    "exclusiveBenefitsShowcase": "Đặc quyền dành riêng cho bạn",
+    "noRewardsClaimed": "Chưa có phần thưởng nào",
+    "startEarningPoints": "Hãy tích điểm để mở khóa những phần thưởng hấp dẫn!",
+    "expiresAt": "Hết hạn",
+    "rewardType": {
+      "product": "Sản phẩm",
+      "giftTicket": "Vé",
+      "discount": "Giảm giá"
+    }
   },
   "auth": {
     "signInSuccessfully": "Đăng nhập thành công",
@@ -576,5 +604,6 @@
   },
   "forgotPassword": {
     "title": "Quên mật khẩu"
-  }
+  },
+  "locale": "vi-vn"
 }

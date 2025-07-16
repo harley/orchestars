@@ -489,6 +489,11 @@
       "affiliateErrorDesc": "Failed to send request. Please try again later.",
       "successToBecomeAmbassador": "You can now start earning rewards by sharing your affiliate link."
     },
+    "progressBar": {
+      "progressToNextTier": "Progress to next tier",
+      "pointsToNextTier": "{{points}} points to next tier",
+      "tierCompleted": "Tier completed!"
+    },
     "myEvents": "My Events",
     "noEvents": "You don't have any events",
     "noTickets": "No tickets of this category found",
@@ -496,7 +501,30 @@
     "pastTickets": "Past Event Tickets",
     "noUpcomingTickets": "No upcoming tickets found",
     "noPastTickets": "No past tickets found",
-    "page": "Page {{current}} of {{total}}"
+    "page": "Page {{current}} of {{total}}",
+    "memberSince": "Member since",
+    "currentPoints": "Current Points",
+    "pointsToNextRank": "Points to",
+    "standard": "Standard",
+    "journeyToTier": "Journey to",
+    "tier": "Tier",
+    "membershipTierProgression": "Membership Tier Progression",
+    "failedUserProfileLoad": "Failed to load user profile",
+    "exclusiveRewardsTimeline": "Exclusive Rewards Timeline",
+    "premiumEarningJourney": "Your premium earning journey",
+    "noRewardsHistory": "No rewards history available.",
+    "purchase": "purchase",
+    "bonus": "bonus",
+    "vipRewardsCollection": "VIP Rewards Collection",
+    "exclusiveBenefitsShowcase": "Your exclusive benefits showcase",
+    "noRewardsClaimed": "No rewards claimed yet",
+    "startEarningPoints": "Start earning points to unlock amazing rewards!",
+    "expiresAt": "Expires at",
+    "rewardType": {
+      "product": "Product",
+      "giftTicket": "Ticket",
+      "discount": "Discount"
+    }
   },
   "auth": {
     "signInSuccessfully": "Sign in successfully",
@@ -572,5 +600,6 @@
     "tryAgain": "Try Again",
     "ticketsSent": "🎫 Your tickets have been sent to your email address. You can also view them in your account dashboard.",
     "goToUpcomingEvents": "Go to upcoming events"
-  }
+  },
+  "locale": "en-US"
 }

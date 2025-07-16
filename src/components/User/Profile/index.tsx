@@ -10,9 +10,11 @@ import { MembershipTier } from '@/components/User/Profile/MembershipTier'
 import { User } from '@/payload-types'
 import { useUserProfile } from '@/components/User/hooks/useUserProfile'
 import { Loader2 } from 'lucide-react'
+import { useTranslate } from '@/providers/I18n/client'
 
 const UserProfile = ({ userData, className } : { className?: string, userData?: User }) => {
   const [mounted, setMounted] = useState(false)
+  const { t } = useTranslate()
 
   const {
     isLoading,
@@ -65,7 +67,7 @@ const UserProfile = ({ userData, className } : { className?: string, userData?: 
       <div className="flex-col space-y-8 max-w-4xl mx-auto">
         <div className={containerClass}>
           <div className="flex justify-center py-16">
-            <p className="text-lg text-red-500">Failed to load user profile data.</p>
+            <p className="text-lg text-red-500">{t('userprofile.failedUserProfileLoad')}</p>
           </div>
         </div>
       </div>
@@ -97,7 +99,9 @@ const UserProfile = ({ userData, className } : { className?: string, userData?: 
                   <MembershipTier tier={membershipPoint?.membershipRank ?? 'Standard'} />
                 </div>
                 <p className="text-muted-foreground animate-slide-up" style={{ animationDelay: "100ms" }}>
-                  Member since {new Date(userData?.createdAt ?? '').toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+                  {t('userprofile.memberSince')} {userData?.createdAt
+                  ? new Date(userData.createdAt).toLocaleString(t('locale'), { month: 'long', year: 'numeric' })
+                  : ''}
                 </p>
               </div>
 
@@ -105,7 +109,7 @@ const UserProfile = ({ userData, className } : { className?: string, userData?: 
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Coins className="w-4 h-4" />
-                    <span className="text-sm">Current Points</span>
+                    <span className="text-sm">{t('userprofile.currentPoints')}</span>
                   </div>
                   <p className="text-3xl font-bold">
                     {pointsCounter.toLocaleString()}
@@ -114,7 +118,7 @@ const UserProfile = ({ userData, className } : { className?: string, userData?: 
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Target className="w-4 h-4" />
-                    <span className="text-sm">Points to {membershipPoint?.nextRank || 'Standard'}</span>
+                    <span className="text-sm">{t('userprofile.pointsToNextRank')}  {t('userprofile.tier')} {membershipPoint?.nextRank || 'Standard'}</span>
                   </div>
                   <p className="text-2xl font-bold">
                     {((membershipPoint?.pointsToNextRank ?? 0) - (membershipPoint?.totalPoints ?? 0)).toLocaleString()}
@@ -141,10 +145,10 @@ const UserProfile = ({ userData, className } : { className?: string, userData?: 
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl">
-              Journey to {membershipPoint?.nextRank || 'Standard'} Tier
+               {t('userprofile.journeyToTier')} {t('userprofile.tier')} {membershipPoint?.nextRank || t('userprofile.standard')}
             </CardTitle>
             <div className="text-sm text-muted-foreground text-gray-600">
-              Membership Tier Progression
+              {t('userprofile.membershipTierProgression')}
             </div>
           </div>
         </CardHeader>

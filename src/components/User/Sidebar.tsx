@@ -41,7 +41,7 @@ const ContentSideBar = ({
 }) => {
   const { t } = useTranslate()
   const menuItems = [
-    { icon: Settings, label: t('userprofile.sidebar.accountSettings'), href: '/user/profile' },
+    { icon: Settings, label: t('userprofile.sidebar.accountInfo'), href: '/user/profile' },
     {
       icon: CreditCard,
       label: t('userprofile.sidebar.manageTickets'),
