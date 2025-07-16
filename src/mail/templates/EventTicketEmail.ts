@@ -66,7 +66,7 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
     }
     .order-details {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       flex-wrap: wrap;
       gap: 15px;
@@ -74,6 +74,7 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
     .order-info {
       flex: 1;
       min-width: 200px;
+      text-align: center;
     }
     .order-info h3 {
       margin: 0 0 5px 0;
