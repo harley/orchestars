@@ -311,7 +311,7 @@ export const ScanPageClient: React.FC = () => {
           setFeedback({ type: 'success', message: t('checkin.scan.success') })
           if (window.navigator.vibrate) window.navigator.vibrate(200)
         }
-        historyRef.current?.fetchHistory();
+        // Removed: historyRef.current?.fetchHistory();
       } else {
         const msg = !scanRes.ok ? scanData.message || t('checkin.scan.error.failed') : t('checkin.scan.error.failed')
         setFeedback({ type: 'error', message: msg })
