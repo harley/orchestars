@@ -38,4 +38,17 @@ export const getTicketClassColor = (ticketPriceInfo: any) => {
  */
 export const clearTicketClassColorCache = () => {
   colorCache.clear()
-} 
+}
+
+export const getTicketClassColorNoCached = (ticketPriceInfo: any) => {
+  if (!ticketPriceInfo || typeof ticketPriceInfo !== 'object') {
+    return { color: '#6B7280', textColor: '#fff' } // Default gray color
+  }
+
+  const ticketKey = ticketPriceInfo.key
+  const category = categories.find((cat) => cat.id === ticketKey)
+
+  return category
+    ? { color: category.color, textColor: category.textColor }
+    : { color: '#6B7280', textColor: '#fff' } // Default gray color
+}

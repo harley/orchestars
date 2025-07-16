@@ -1,0 +1,111 @@
+.swiper-wrapper {
+    padding-top: 6px;
+}
+
+/* Responsive padding for the ticket index bar */
+.ticket-index-bar {
+  padding-left: 16px;
+  padding-right: 16px;
+  width: 100vw;
+  box-sizing: border-box;
+  max-width: 100vw;
+}
+
+@media (max-width: 768px) {
+  .ticket-index-bar {
+    top: 0.5rem !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    justify-content: center;
+    padding-left: 16px;
+    padding-right: 16px;
+    width: 100vw;
+    max-width: 100vw;
+  }
+  .ticket-index-bar input {
+    width: 2.5rem !important;
+    font-size: 1.1rem !important;
+  }
+}
+
+.ticket-index-bar input {
+  min-width: 2.2rem;
+  max-width: 3rem;
+}
+
+.ticket-index-bar-ui {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(255,255,255,0.95);
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.06);
+  padding: 0.25rem 0.75rem;
+  min-height: 48px;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.ticket-index-bar-ui .ticket-index-input {
+  min-width: 2.2rem;
+  max-width: 3rem;
+  height: 2.2rem;
+  font-size: 1.1rem;
+  border-radius: 0.5rem;
+  background: #f8fafc;
+  transition: box-shadow 0.2s, border 0.2s;
+}
+
+.nav-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.04);
+  border: 1px solid #e5e7eb;
+  transition: background 0.2s, box-shadow 0.2s, border 0.2s;
+}
+
+.nav-btn:not(:disabled):hover, .nav-btn:not(:disabled):active {
+  background: #e0e7ff;
+  border-color: #6366f1;
+  box-shadow: 0 2px 8px 0 rgba(99,102,241,0.08);
+}
+
+.nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .ticket-index-bar-ui {
+    top: 0.5rem !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    justify-content: center;
+    padding-left: 8px;
+    padding-right: 8px;
+    width: 100vw;
+    max-width: 100vw;
+    min-height: 44px;
+  }
+  .ticket-index-bar-ui .ticket-index-input {
+    width: 2.5rem !important;
+    font-size: 1.1rem !important;
+    height: 2.2rem;
+  }
+  .nav-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+    min-width: 44px;
+    min-height: 44px;
+  }
+}

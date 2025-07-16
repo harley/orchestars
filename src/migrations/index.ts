@@ -79,6 +79,7 @@ import * as migration_20250713_044021_add_manual_column_to_checkin_records from 
 import * as migration_20250714_080211_add_phone_number_index from './20250714_080211_add_phone_number_index';
 import * as migration_20250715_013630_add_gift_ticket_fields from './20250715_013630_add_gift_ticket_fields';
 import * as migration_20250715_140337_add_checkin_method_to_checkin_records from './20250715_140337_add_checkin_method_to_checkin_records';
+import * as migration_20250716_013339_add_order_and_type_to_email_collection from './20250716_013339_add_order_and_type_to_email_collection';
 
 export const migrations = [
   {
@@ -484,6 +485,11 @@ export const migrations = [
   {
     up: migration_20250715_140337_add_checkin_method_to_checkin_records.up,
     down: migration_20250715_140337_add_checkin_method_to_checkin_records.down,
-    name: '20250715_140337_add_checkin_method_to_checkin_records'
+    name: '20250715_140337_add_checkin_method_to_checkin_records',
+  },
+  {
+    up: migration_20250716_013339_add_order_and_type_to_email_collection.up,
+    down: migration_20250716_013339_add_order_and_type_to_email_collection.down,
+    name: '20250716_013339_add_order_and_type_to_email_collection',
   },
 ];

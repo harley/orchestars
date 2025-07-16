@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { EMAIL_STATUSES } from './constant'
+import { EMAIL_STATUSES, EMAIL_TYPES } from './constant'
 // import { executeSendingMailHandler } from './handler/executeSendingMail'
 
 export const Emails: CollectionConfig = {
@@ -26,6 +26,12 @@ export const Emails: CollectionConfig = {
       relationTo: 'tickets',
       required: false,
     },
+    {
+      name: 'order',
+      type: 'relationship',
+      relationTo: 'orders',
+      required: false,
+    },
     { name: 'to', type: 'email', required: true },
     { name: 'from', type: 'email', required: false },
     { name: 'cc', type: 'text', required: false },
@@ -33,6 +39,7 @@ export const Emails: CollectionConfig = {
     { name: 'html', type: 'textarea' },
     { name: 'text', type: 'textarea' },
     { name: 'provider', type: 'text', defaultValue: 'RESEND' },
+    { name: 'type', type: 'select', options: EMAIL_TYPES },
     { name: 'extraData', type: 'json' },
     { name: 'status', type: 'select', options: EMAIL_STATUSES },
     {
