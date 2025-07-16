@@ -131,6 +131,7 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
       gap: 10px;
       justify-content: center;
       flex-wrap: wrap;
+      text-align: center; /* Added for better centering in email clients */
     }
     .calendar-btn {
       display: inline-block;
@@ -141,6 +142,7 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
       font-size: 14px;
       transition: all 0.2s ease;
       border: 2px solid transparent;
+      margin: 0 auto; /* Added for better centering in email clients */
     }
     .google-cal {
       background-color: #4285f4;
