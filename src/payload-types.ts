@@ -1592,6 +1592,7 @@ export interface Email {
   user?: (number | null) | User;
   event?: (number | null) | Event;
   ticket?: (number | null) | Ticket;
+  order?: (number | null) | Order;
   to: string;
   from?: string | null;
   cc?: string | null;
@@ -1599,6 +1600,7 @@ export interface Email {
   html?: string | null;
   text?: string | null;
   provider?: string | null;
+  type?: ('qr_event_ticket' | 'event_ticket_confirmation' | 'reset_password') | null;
   extraData?:
     | {
         [k: string]: unknown;
@@ -3374,6 +3376,7 @@ export interface EmailsSelect<T extends boolean = true> {
   user?: T;
   event?: T;
   ticket?: T;
+  order?: T;
   to?: T;
   from?: T;
   cc?: T;
@@ -3381,6 +3384,7 @@ export interface EmailsSelect<T extends boolean = true> {
   html?: T;
   text?: T;
   provider?: T;
+  type?: T;
   extraData?: T;
   status?: T;
   sentAt?: T;

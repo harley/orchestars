@@ -8,6 +8,7 @@ import html2canvas from 'html2canvas'
 import { useTranslate } from '@/providers/I18n/client'
 import { TermsAndConditionsModal } from '@/components/Tickets/TermsAndConditionsModal'
 import { categories } from '@/components/EventDetail/data/seat-maps/categories'
+import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 
 // Utility function to get ticket class color
 const getTicketClassColor = (ticketPriceInfo: any) => {
@@ -124,10 +125,19 @@ export function TicketDetails({
   let formattedDateTime: string | null = null
   if (event?.startDatetime) {
     try {
-      formattedDateTime = new Date(event.startDatetime).toLocaleString(locale, {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      })
+      const startTime = event.startDatetime
+        ? tzFormat(toZonedTime(new Date(event.startDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm')
+        : ''
+      const endTime = event.endDatetime
+        ? tzFormat(toZonedTime(new Date(event.endDatetime), 'Asia/Ho_Chi_Minh'), 'HH:mm')
+        : ''
+
+      formattedDateTime = ticket.eventDate
+        ? new Date(ticket.eventDate).toLocaleString(locale, {
+            dateStyle: 'medium',
+          })
+        : ''
+      formattedDateTime = `${startTime || 'N/A'} – ${endTime || 'N/A'}, ${formattedDateTime || 'N/A'}`
     } catch (e) {
       console.error('Failed to format event start time:', e)
     }
@@ -244,7 +254,10 @@ export function TicketDetails({
               <div>
                 <p className="text-gray-500">Checked&nbsp;In&nbsp;Time</p>
                 <p className="font-medium text-gray-800">
-                  {new Date(checkedInAt).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' })}
+                  {new Date(checkedInAt).toLocaleString(locale, {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                  })}
                 </p>
               </div>
             )}
@@ -280,7 +293,6 @@ export function TicketDetails({
             {t('ticket.checkedIn')} {getRelativeTime(checkedInAt)}
           </div>
         )}
-
       </article>
     </div>
   )

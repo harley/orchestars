@@ -1,6 +1,10 @@
 {
   "crons": [
     {
+      "path": "/api/cron/send-qr-event-ticket",
+      "schedule": "*/2 * * * *"
+    },
+    {
       "path": "/api/cron/send-email",
       "schedule": "*/2 * * * *"
     },
