@@ -75,6 +75,7 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
       flex: 1;
       min-width: 200px;
       text-align: center;
+      width: 100%;
     }
     .order-info h3 {
       margin: 0 0 5px 0;
@@ -99,7 +100,7 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
     .qr-button {
       display: inline-block;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      color: #fff !important;
       text-decoration: none;
       padding: 15px 30px;
       border-radius: 50px;
@@ -143,7 +144,7 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
     }
     .google-cal {
       background-color: #4285f4;
-      color: white;
+      color: #fff !important;
     }
     .google-cal:hover {
       background-color: #3367d6;
@@ -187,7 +188,6 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
     .detail-icon {
       width: 40px;
       height: 40px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -299,6 +299,15 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
         </div>
       </div>
 
+      <!-- Calendar Integration -->
+      <div class="calendar-section">
+        <h3 class="calendar-title">📅 Thêm vào Lịch | Add to Your Calendar</h3>
+        <div class="calendar-buttons">
+          <a href="${calendarLinks.google}" target="_blank" class="calendar-btn google-cal">
+            📅 Google Calendar
+          </a>
+        </div>
+      </div>
 
       <!-- QR Code Section -->
       <div class="qr-section">
@@ -310,17 +319,6 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
         <a href="${ticketData.ticketUrl}" class="qr-button">
           📱 Xem Vé Của Tôi | View My Ticket
         </a>
-      </div>
-
-      
-      <!-- Calendar Integration -->
-      <div class="calendar-section">
-        <h3 class="calendar-title">📅 Thêm vào Lịch | Add to Your Calendar</h3>
-        <div class="calendar-buttons">
-          <a href="${calendarLinks.google}" target="_blank" class="calendar-btn google-cal">
-            📅 Google Calendar
-          </a>
-        </div>
       </div>
 
       <!-- Important Information -->
