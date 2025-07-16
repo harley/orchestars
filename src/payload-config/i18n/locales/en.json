@@ -290,6 +290,7 @@
     "pleaseEnterEmailAndPassword": "Please enter both email and password",
     "login": "Login",
     "loadingEvents": "Loading events...",
+    "refreshStats": "Refresh Stats",
     "pleaseLoginFirst": "Please login first",
     "pleaseSelectEventAndSchedule": "Please select an event and schedule",
     "noSchedulesAvailable": "No schedules available for this event",
@@ -411,16 +412,12 @@
       "checkInFailed": "Check-in failed",
       "checkInSuccessful": "Check-in successful",
       "alreadyCheckedInStatus": "This ticket was already checked in",
-      "hasBeenCheckedIn": "has been checked in successfully"
-    },
-    "by": "Check-in by",
-    "paper": {
+      "hasBeenCheckedIn": "has been checked in successfully",
       "changeEvent": "Change event",
       "myCheckedCount": "My checked-in",
       "totalCheckedCount": "Total checked-in"
     },
     "ticketCode": "Ticket code",
-    "ticketType": "Type",
     "orderCode": "Order code"
   },
   "customerCheckinTicket": {

@@ -290,6 +290,7 @@
     "pleaseEnterEmailAndPassword": "Vui lòng nhập cả email và mật khẩu",
     "login": "Đăng nhập",
     "loadingEvents": "Đang tải sự kiện...",
+    "refreshStats": "Cập nhật thống ké soát vé",
     "pleaseLoginFirst": "Vui lòng đăng nhập trước",
     "pleaseSelectEventAndSchedule": "Vui lòng chọn một sự kiện và lịch trình",
     "noSchedulesAvailable": "Không có lịch trình nào cho sự kiện này",
@@ -411,16 +412,12 @@
       "checkInFailed": "Checkin thất bại",
       "checkInSuccessful": "Checkin thành công",
       "alreadyCheckedInStatus": "Vé này đã được checkin trước đó",
-      "hasBeenCheckedIn": "đã được checkin thành công"
-    },
-    "by": "Soát vé bằng",
-    "paper": {
+      "hasBeenCheckedIn": "đã được checkin thành công",
       "changeEvent": "Chọn sự kiện khác",
       "myCheckedCount": "Tôi đã soát",
       "totalCheckedCount": "Tổng đã soát"
     },
     "ticketCode": "Mã vé",
-    "ticketType": "Loại vé",
     "orderCode": "Mã đơn hàng"
   },
   "customerCheckinTicket": {
