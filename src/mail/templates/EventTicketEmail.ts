@@ -28,7 +28,7 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Your Ticket - ${ticketData.eventName}</title>
+  <title>✨ Step Into the Story – Your ${ticketData.eventName} Tickets Are Here</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
