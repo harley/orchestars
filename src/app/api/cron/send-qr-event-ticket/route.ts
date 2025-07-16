@@ -129,7 +129,7 @@ export async function GET(req: NextRequest) {
             resendMailData: {
               to: order.userEmail,
               cc: EMAIL_CC,
-              subject: `Your Tickets for ${event.title}`,
+              subject: `✨ Step Into the Story – Your ${event.title} Tickets Are Here`,
               html,
             },
             emailData: {
