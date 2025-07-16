@@ -11,6 +11,7 @@ import { useTranslate } from '@/providers/I18n/client'
 import { type TicketDTO } from '@/lib/checkin/findTickets'
 import ScheduleStatsInfo from '@/components/ScheduleStatsInfo'
 import VisitorInfoCard from '@/components/VisitorInfoCard'
+import { TicketCard } from '@/components/ui/TicketCard'
 
 
 interface FeedbackState {
@@ -195,12 +196,7 @@ const PaperPageClient = () => {
           // Successful check-in
           setFeedback({
             type: 'success',
-            message: `${validatedTicket.attendeeName} ${t('checkin.paper.hasBeenCheckedIn')}`
-          })
-          
-          toast({
-            title: t('checkin.paper.checkInSuccessful'),
-            description: `${validatedTicket.attendeeName} ${t('checkin.paper.hasBeenCheckedIn')}`,
+            message: `Checked in: ${validatedTicket.attendeeName} | Seat: ${validatedTicket.seat} | Code: ${validatedTicket.ticketCode}`
           })
         }
         
@@ -416,7 +412,11 @@ const PaperPageClient = () => {
                 {/* Ticket Confirmation (reuse VisitorInfoCard) */}
                 {validatedTicket && !missingContext && (
                   <div className="border-t-4 border-indigo-700 mt-8 pt-6">
-                    <VisitorInfoCard ticket={validatedTicket} />
+                    <TicketCard
+                      ticket={validatedTicket}
+                      onCheckIn={handleCheckIn}
+                      isCheckingIn={isCheckingIn}
+                    />
                   </div>
                 )}
               </div>
