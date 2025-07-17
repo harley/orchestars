@@ -154,27 +154,16 @@ export default function ValidatePageClient() {
 
   const eventId = searchParams?.get('eventId')
   const scheduleId = searchParams?.get('scheduleId')
-  const [eventTitle, setEventTitle] = useState('')
-  const [scheduleDate, setScheduleDate] = useState('')
+  const [scheduleDate] = useState('')
   const [showDateWarning, setShowDateWarning] = useState(false);
-  const [eventLocation, setEventLocation] = useState('');
-  const [eventTime, setEventTime] = useState('TBA'); // Placeholder; adjust if time is available in data
 
   // Component initialization
 
   useEffect(() => {
     // Get data from localStorage
     if (typeof window !== 'undefined') {
-      const storedTitle = localStorage.getItem('eventTitle')
-      const storedDate = localStorage.getItem('eventScheduleDate')
-      const storedTime = localStorage.getItem('eventScheduleTime')
       
-      if (storedTitle) setEventTitle(storedTitle)
-      if (storedDate) setScheduleDate(storedDate)
-      if (storedTime) setEventTime(storedTime)
     }
-    const storedLocation = localStorage.getItem('eventLocation');
-    if (storedLocation) setEventLocation(storedLocation);
     
     // Date mismatch check
     if (scheduleDate) {

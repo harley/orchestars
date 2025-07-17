@@ -49,6 +49,7 @@ const ScheduleStatsInfo: React.FC<Props> = ({ eventId, scheduleId, className = '
           setStats((prev) => ({ ...prev, loading: false }))
         }
       } catch (_) {
+        console.error('Failed to fetch event stats:', _)
         setStats((prev) => ({ ...prev, loading: false }))
       }
     }

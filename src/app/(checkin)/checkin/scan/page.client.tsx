@@ -10,7 +10,6 @@ import React, {
 } from 'react'
 import { QRScanner } from '@/components/QRScanner'
 import { History, ChevronDown, Upload, X } from 'lucide-react'
-import { usePathname } from 'next/navigation'
 import type { CheckinRecord, User } from '@/payload-types'
 import jsQR from 'jsqr'
 import { useTranslate } from '@/providers/I18n/client'
@@ -144,7 +143,6 @@ export const ScanPageClient: React.FC = () => {
     ticketCode: string
     ticketPriceInfo: any
   } | null>(null)
-  const pathname = usePathname()
   const historyRef = useRef<{ fetchHistory: () => void }>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { t } = useTranslate()

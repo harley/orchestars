@@ -3,14 +3,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
-import { toast } from '@/hooks/use-toast'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
 import Link from 'next/link'
 import { CheckinNav } from '@/components/CheckinNav'
 import { useTranslate } from '@/providers/I18n/client'
 import { type TicketDTO } from '@/lib/checkin/findTickets'
 import ScheduleStatsInfo from '@/components/ScheduleStatsInfo'
-import VisitorInfoCard from '@/components/VisitorInfoCard'
 import { TicketCard } from '@/components/ui/TicketCard'
 
 
@@ -38,49 +36,27 @@ const PaperPageClient = () => {
   const [feedback, setFeedback] = useState<FeedbackState | null>(null)
   const [lastValidationTime, setLastValidationTime] = useState(0)
 
-  // Event info for display
-  const [eventTitle, setEventTitle] = useState('')
-  const [scheduleDate, setScheduleDate] = useState('')
-  const [eventTime, setEventTime] = useState('')
-  const [eventLocation, setEventLocation] = useState('')
+  // Removed unused event info state variables
 
   // Load event info from localStorage on mount
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    const title = localStorage.getItem('eventTitle')
-    const date = localStorage.getItem('eventScheduleDate')
-    const time = localStorage.getItem('eventScheduleTime')
-    const location = localStorage.getItem('eventLocation')
-
-    if (title) setEventTitle(title)
-    if (date) setScheduleDate(date)
-    if (time) setEventTime(time)
-    if (location) setEventLocation(location)
   }, [])
 
-  // State for stats
-  const [myCheckedCount, setMyCheckedCount] = useState(0)
-  const [totalCheckedCount, setTotalCheckedCount] = useState(0)
+  // Removed unused stats state variables
 
   // Fetch stats on mount and poll every 20s
   useEffect(() => {
-    let isMounted = true
     async function fetchStats() {
       if (!eventId || !scheduleId) return
       try {
-        const res = await fetch(`/api/checkin-app/stats?eventId=${eventId}&scheduleId=${scheduleId}`)
-        const data = await res.json()
-        if (isMounted && data) {
-          setMyCheckedCount(data.myCheckedCount || 0)
-          setTotalCheckedCount(data.totalCheckedCount || 0)
-        }
+        await fetch(`/api/checkin-app/stats?eventId=${eventId}&scheduleId=${scheduleId}`)
       } catch (_) {}
     }
     fetchStats()
     const interval = setInterval(fetchStats, 20000)
     return () => {
-      isMounted = false
       clearInterval(interval)
     }
   }, [eventId, scheduleId])
@@ -99,29 +75,22 @@ const PaperPageClient = () => {
       setError(t('checkin.paper.seatValidationError'))
       return
     }
-    
-    if (!token) {
-      setError(t('checkin.paper.authenticationRequired'))
-      return
-    }
-    
+    // Remove client-side token check
     // Implement 2-second throttle
     const now = Date.now()
     if (now - lastValidationTime < 2000) {
       return
     }
     setLastValidationTime(now)
-    
     setIsValidating(true)
     setError('')
     setFeedback(null)
-    
     try {
       const response = await fetch('/api/checkin-app/validate-seat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `JWT ${token}`,
+          ...(token ? { Authorization: `JWT ${token}` } : {}),
         },
         body: JSON.stringify({
           seatNumber: seatNumber.trim(),
@@ -129,13 +98,14 @@ const PaperPageClient = () => {
           scheduleId,
         }),
       })
-      
+      if (response.status === 401) {
+        setError(t('checkin.paper.authenticationRequired'))
+        return
+      }
       const data = await response.json()
-      
       if (response.ok && data.tickets && data.tickets.length > 0) {
         const ticket = data.tickets[0]
         setValidatedTicket(ticket)
-        
         // Show info if already checked in
         if (ticket.isCheckedIn) {
           setFeedback({
@@ -156,36 +126,28 @@ const PaperPageClient = () => {
   // Handle check-in
   const handleCheckIn = async () => {
     if (!validatedTicket) return
-    
-    if (!token) {
-      setError(t('checkin.paper.authenticationRequired'))
-      return
-    }
-    
+    // Remove client-side token check
     setIsCheckingIn(true)
     setError('')
     setFeedback(null)
-    
     try {
       const response = await fetch(`/api/checkin-app/checkin/${validatedTicket.ticketCode}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `JWT ${token}`,
+          ...(token ? { Authorization: `JWT ${token}` } : {}),
         },
         body: JSON.stringify({
           manual: true,
           checkinMethod: 'paper',
         }),
       })
-      
+      if (response.status === 401) {
+        setError(t('checkin.paper.authenticationRequired'))
+        return
+      }
       const data = await response.json()
-      
       if (response.ok) {
-        if (!data.alreadyCheckedIn) {
-          setMyCheckedCount((c) => c + 1)
-          setTotalCheckedCount((c) => c + 1)
-        }
         if (data.alreadyCheckedIn) {
           // Handle already checked in case
           setFeedback({
@@ -199,17 +161,14 @@ const PaperPageClient = () => {
             message: `Checked in: ${validatedTicket.attendeeName} | Seat: ${validatedTicket.seat} | Code: ${validatedTicket.ticketCode}`
           })
         }
-        
         // Reset form and auto-focus for next entry
         setSeatNumber('')
         setValidatedTicket(null)
         setError('')
-        
         // Auto-focus seat input for next entry
         setTimeout(() => {
           seatInputRef.current?.focus()
         }, 100)
-        
       } else {
         setError(data.message || t('checkin.paper.checkInFailed'))
       }
