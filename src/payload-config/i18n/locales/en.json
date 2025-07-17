@@ -24,7 +24,9 @@
     "enterLastName": "Enter your last name",
     "enterFirstName": "Enter your first name",
     "enterPhoneNumber": "Enter your phone number",
-    "enterEmail": "Enter your email"
+    "enterEmail": "Enter your email",
+    "seat": "Seat",
+    "phoneNumber": "Phone number"
   },
   "event": {
     "chooseAttendingDate": "Choose Your Attending Date",
@@ -288,6 +290,7 @@
     "pleaseEnterEmailAndPassword": "Please enter both email and password",
     "login": "Login",
     "loadingEvents": "Loading events...",
+    "refreshStats": "Refresh Stats",
     "pleaseLoginFirst": "Please login first",
     "pleaseSelectEventAndSchedule": "Please select an event and schedule",
     "noSchedulesAvailable": "No schedules available for this event",
@@ -382,7 +385,40 @@
       "lookingUp": "Looking up...",
       "lookUp": "Look Up",
       "clearAndStartNew": "Clear and Start New"
-    }
+    },
+    "paper": {
+      "title": "Paper Check-in",
+      "subtitle": "Quick check-in for paper ticket holders",
+      "tabLabel": "Paper",
+      "eventSelectionRequired": "Event Selection Required",
+      "selectEventMessage": "Please select an event and schedule first to begin checking in paper tickets",
+      "selectEvent": "Select Event",
+      "seatNumberLabel": "Seat Number",
+      "seatNumberInstruction": "Enter the seat number from the paper ticket. No need to check ID.",
+      "seatNumberPlaceholder": "e.g., A1, Z45, AA11, etc.",
+      "seatNumberHelp": "Press Enter or click the Validate Seat button below",
+      "validateSeat": "Validate Seat",
+      "validating": "Validating...",
+      "ticketFoundTitle": "Ticket Found - Confirm Check-in",
+      "ticketClass": "Ticket Class",
+      "alreadyCheckedInTitle": "Already Checked In",
+      "alreadyCheckedInMessage": "This ticket has already been checked in and cannot be processed again",
+      "checkInNow": "Check In Now",
+      "checkingIn": "Checking in...",
+      "seatValidationError": "Please enter a seat number and ensure event/schedule is selected",
+      "authenticationRequired": "Authentication required. Please refresh the page.",
+      "connectionFailed": "Connection failed. Please try again.",
+      "seatNotFound": "Seat not found for this event",
+      "checkInFailed": "Check-in failed",
+      "checkInSuccessful": "Check-in successful",
+      "alreadyCheckedInStatus": "This ticket was already checked in",
+      "hasBeenCheckedIn": "has been checked in successfully",
+      "changeEvent": "Change event",
+      "myCheckedCount": "My checked-in",
+      "totalCheckedCount": "Total checked-in"
+    },
+    "ticketCode": "Ticket code",
+    "orderCode": "Order code"
   },
   "customerCheckinTicket": {
     "ticketCheckIn": "Self Check-In",

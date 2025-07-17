@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
 
     // Get ticket code from URL parameter
     const ticketCode = req.nextUrl.pathname.split('/').pop()
-    const { eventDate, manual } = await req.json()
+    const { eventDate, manual, checkinMethod } = await req.json()
 
     // Find ticket by code with event data for eventDate determination
     const ticket = await payload.find({
@@ -105,6 +105,14 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Determine checkin method - default to 'qr' if not specified
+    let finalCheckinMethod = checkinMethod || 'qr'
+    
+    // If manual is true but no checkinMethod specified, default to 'search' for backward compatibility
+    if (manual && !checkinMethod) {
+      finalCheckinMethod = 'search'
+    }
+
     // Create check-in record
     const checkinRecord = await payload.create({
       collection: 'checkinRecords',
@@ -120,6 +128,7 @@ export async function POST(req: NextRequest) {
         checkedInBy: admin.id, // Admin who performed check-in
         ticketGivenTime: new Date().toISOString(),
         manual: Boolean(manual),
+        checkinMethod: finalCheckinMethod,
       },
     })
 

@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { useTranslate } from '@/providers/I18n/client'
 import { format } from 'date-fns'
@@ -9,6 +8,7 @@ import { Event } from '@/types/Event'
 import { useToast } from '@/hooks/use-toast'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 import { Check, Users, User, RefreshCw } from 'lucide-react'
+import { CheckinNav } from '@/components/CheckinNav'
 
 interface ChooseEventClientPageProps {
   publicEvents: Event[]
@@ -42,7 +42,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
   const { t } = useTranslate()
   const { toast } = useToast()
 
-  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     const storedEventId = localStorage.getItem('selectedEventId')
@@ -219,35 +219,19 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
       scheduleId: selectedSchedule.id.toString(),
     })
 
-    router.push(`/checkin/validates?${params.toString()}`)
+    // Check if we're in paper mode and route accordingly
+    const mode = searchParams.get('mode')
+    if (mode === 'paper') {
+      router.push(`/checkin/paper?${params.toString()}`)
+    } else {
+      router.push(`/checkin/validates?${params.toString()}`)
+    }
   }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="w-full max-w-md mx-auto">
-        {/* Navigation Toggle */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Link
-            href="/checkin/scan"
-            className={`text-center py-2 px-4 rounded font-semibold ${
-              pathname === '/checkin/scan'
-                ? 'bg-gray-900 text-white'
-                : 'bg-gray-300 text-gray-800 hover:bg-gray-400'
-            }`}
-          >
-            {t('checkin.nav.qr')}
-          </Link>
-          <Link
-            href="/checkin/events"
-            className={`text-center py-2 px-4 rounded font-semibold ${
-              pathname === '/checkin/events'
-                ? 'bg-gray-900 text-white'
-                : 'bg-gray-300 text-gray-800 hover:bg-gray-400'
-            }`}
-          >
-            {t('checkin.nav.search')}
-          </Link>
-        </div>
+        <CheckinNav />
         
         {/* Refresh Button - only show when event is selected and has stats */}
         {selectedEvent && Object.keys(eventStats).length > 0 && (

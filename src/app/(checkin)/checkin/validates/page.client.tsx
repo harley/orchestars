@@ -1,16 +1,18 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback, forwardRef, useImperativeHandle } from 'react'
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
 import { toast } from '@/hooks/use-toast'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AlertTriangle, History, ChevronDown, X } from 'lucide-react'
 import type { CheckinRecord, User } from '@/payload-types'
 import { type TicketDTO } from '@/lib/checkin/findTickets'
-import Link from 'next/link'
+import { CheckinNav } from '@/components/CheckinNav'
 import { useTranslate } from '@/providers/I18n/client'
 import { getTicketClassColor } from '@/utilities/getTicketClassColor'
+import ScheduleStatsInfo from '@/components/ScheduleStatsInfo'
+import { TicketCard } from '@/components/ui/TicketCard'
 
 interface CheckinHistoryProps {}
 
@@ -136,7 +138,6 @@ export default function ValidatePageClient() {
   const [multipleTickets, setMultipleTickets] = useState<TicketDTO[]>([])
   const [activeTab, setActiveTab] = useState('ticket')
   const router = useRouter()
-  const pathname = usePathname()
   const { isHydrated, token } = useAuth()
   const searchParams = useSearchParams()
   const { t } = useTranslate()
@@ -153,27 +154,16 @@ export default function ValidatePageClient() {
 
   const eventId = searchParams?.get('eventId')
   const scheduleId = searchParams?.get('scheduleId')
-  const [eventTitle, setEventTitle] = useState('')
-  const [scheduleDate, setScheduleDate] = useState('')
+  const [scheduleDate] = useState('')
   const [showDateWarning, setShowDateWarning] = useState(false);
-  const [eventLocation, setEventLocation] = useState('');
-  const [eventTime, setEventTime] = useState('TBA'); // Placeholder; adjust if time is available in data
 
   // Component initialization
 
   useEffect(() => {
     // Get data from localStorage
     if (typeof window !== 'undefined') {
-      const storedTitle = localStorage.getItem('eventTitle')
-      const storedDate = localStorage.getItem('eventScheduleDate')
-      const storedTime = localStorage.getItem('eventScheduleTime')
       
-      if (storedTitle) setEventTitle(storedTitle)
-      if (storedDate) setScheduleDate(storedDate)
-      if (storedTime) setEventTime(storedTime)
     }
-    const storedLocation = localStorage.getItem('eventLocation');
-    if (storedLocation) setEventLocation(storedLocation);
     
     // Date mismatch check
     if (scheduleDate) {
@@ -524,51 +514,18 @@ export default function ValidatePageClient() {
           ← Back to Events
         </button>
 
-        {/* Navigation Toggle */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Link
-            href="/checkin/scan"
-            className={`text-center py-2 px-4 rounded font-semibold ${
-              pathname === '/checkin/scan'
-                ? 'bg-gray-900 dark:bg-gray-700 text-white'
-                : 'bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500'
-            }`}
-          >
-            {t('checkin.nav.qr')}
-          </Link>
-          <Link
-            href="/checkin/events"
-            className={`text-center py-2 px-4 rounded font-semibold ${
-              pathname === '/checkin/events' || pathname.includes('/checkin/validates')
-                ? 'bg-gray-900 dark:bg-gray-700 text-white'
-                : 'bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500'
-            }`}
-          >
-            {t('checkin.nav.search')}
-          </Link>
-        </div>
+        <CheckinNav />
 
         {/* Title - More prominent */}
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
-          Visitor Check-In
+          Search Tickets
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mb-4 text-center text-sm">
-          Enter a ticket code or seat to look up and check-in visitors
+          Look up tickets for people without QR code or Paper tickets
         </p>
 
-        {/* Event Info - Formatted, no IDs */}
-        {eventTitle && (
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-4">
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
-              {eventTitle}
-            </h2>
-            <div className="space-y-0.5 text-xs text-gray-600 dark:text-gray-300">
-              <div>Date: {scheduleDate}</div>
-              <div>Time: {eventTime}</div>
-              <div>Location: {eventLocation}</div>
-            </div>
-          </div>
-        )}
+        {/* Event & Stats */}
+        <ScheduleStatsInfo eventId={eventId} scheduleId={scheduleId} />
 
         {/* Date Warning */}
         {showDateWarning && (
@@ -707,81 +664,12 @@ export default function ValidatePageClient() {
 
         {/* Results - Compact layout with prominent check-in button */}
         {validatedTicket && (
-          <div className="mt-6 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 shadow-md">
-            {/* Status and Check-in Button Row */}
-            <div className="flex justify-between items-center mb-4">
-              <span
-                className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                  validatedTicket.isCheckedIn
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
-                }`}
-              >
-                {validatedTicket.isCheckedIn ? 'Checked In' : 'Ready for Check-in'}
-              </span>
-              
-              {!validatedTicket.isCheckedIn && (
-                <button
-                  onClick={() => handleCheckIn(validatedTicket)}
-                  disabled={isCheckingIn}
-                  className={`px-6 py-2 rounded-lg font-semibold text-white transition-colors ${
-                    isCheckingIn
-                      ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
-                      : 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
-                  }`}
-                >
-                  {isCheckingIn ? 'Checking In...' : 'Check In'}
-                </button>
-              )}
-            </div>
-
-            {/* Visitor Information - Compact Grid */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
-                {validatedTicket.attendeeName}
-              </h3>
-              
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                <div>
-                  <span className="text-gray-500 dark:text-gray-400">Seat:</span>
-                  <span className="ml-2 font-semibold text-gray-900 dark:text-gray-200">
-                    {validatedTicket.seat}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-500 dark:text-gray-400">Ticket:</span>
-                  <span className="ml-2 font-mono text-gray-900 dark:text-gray-200">
-                    {validatedTicket.ticketCode}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-500 dark:text-gray-400">Type:</span>
-                  <span className="ml-2 font-semibold text-gray-900 dark:text-gray-200">
-                    {validatedTicket.ticketPriceName || 'N/A'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-500 dark:text-gray-400">Order:</span>
-                  <span className="ml-2 font-mono text-gray-900 dark:text-gray-200">
-                    {validatedTicket.orderCode || 'N/A'}
-                  </span>
-                </div>
-                <div className="col-span-2">
-                  <span className="text-gray-500 dark:text-gray-400">Email:</span>
-                  <span className="ml-2 font-semibold text-gray-900 dark:text-gray-200 break-words">
-                    {validatedTicket.email || 'N/A'}
-                  </span>
-                </div>
-                <div className="col-span-2">
-                  <span className="text-gray-500 dark:text-gray-400">Phone:</span>
-                  <span className="ml-2 font-semibold text-gray-900 dark:text-gray-200">
-                    {validatedTicket.phoneNumber || 'N/A'}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Search Another Ticket Button */}
+          <div className="mt-6">
+            <TicketCard
+              ticket={validatedTicket}
+              onCheckIn={handleCheckIn}
+              isCheckingIn={isCheckingIn}
+            />
             <div className="mt-4">
               <button
                 onClick={() => {
@@ -808,63 +696,14 @@ export default function ValidatePageClient() {
               Checked in {multipleTickets.filter(t => t.isCheckedIn).length} of {multipleTickets.length} tickets
             </h3>
             <div className="space-y-4">
-              {multipleTickets.map((ticket) => {
-                const ticketColors = getTicketClassColor(ticket.ticketPriceInfo)
-                const isThisChecking = isCheckingIn && ticketCode === ticket.ticketCode
-                return (
-                  <div
-                    key={ticket.ticketCode}
-                    className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 transition-shadow hover:shadow-md"
-                  >
-                    <div className="flex flex-row items-start justify-between gap-4">
-                      {/* Left: Seat, Price, Ticket Code */}
-                      <div className="flex flex-wrap items-center gap-2 min-w-0">
-                        <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">
-                          Seat: {ticket.seat}
-                        </span>
-                        <span
-                          className="px-2 py-1 rounded text-xs font-medium"
-                          style={{ backgroundColor: ticketColors.color, color: ticketColors.textColor }}
-                        >
-                          {ticket.ticketPriceName || 'N/A'}
-                        </span>
-                        <span className="font-mono text-gray-700 dark:text-gray-200 truncate">
-                          {ticket.ticketCode}
-                        </span>
-                      </div>
-                      {/* Right: Button or Checked In badge */}
-                      <div className="flex-shrink-0 flex items-center">
-                        {ticket.isCheckedIn ? (
-                          <span className="inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">
-                            Checked In{ticket.checkinRecord?.checkInTime ? (
-                              <span className="ml-2 text-xs text-gray-500 dark:text-gray-300">{new Date(ticket.checkinRecord.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                            ) : null}
-                          </span>
-                        ) : (
-                          <button
-                            onClick={() => handleCheckIn(ticket)}
-                            disabled={isThisChecking}
-                            className={`w-full sm:w-auto px-5 py-2 rounded-md font-semibold text-white transition-colors ${
-                              isThisChecking
-                                ? 'bg-gray-400 cursor-not-allowed'
-                                : 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
-                            }`}
-                          >
-                            {isThisChecking ? 'Checking...' : 'Check In'}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    {/* Attendee Name and Order Code below */}
-                    <div className="mt-2 flex flex-row items-center justify-between w-full">
-                      <span className="text-base font-medium text-gray-900 dark:text-gray-100 truncate">{ticket.attendeeName}</span>
-                      {ticket.orderCode && (
-                        <span className="text-xs font-normal text-gray-500 dark:text-gray-400 ml-2 truncate text-right min-w-0">{ticket.orderCode}</span>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
+              {multipleTickets.map((ticket) => (
+                <TicketCard
+                  key={ticket.ticketCode}
+                  ticket={ticket}
+                  onCheckIn={handleCheckIn}
+                  isCheckingIn={isCheckingIn && ticketCode === ticket.ticketCode}
+                />
+              ))}
             </div>
             <div className="mt-6">
               <button

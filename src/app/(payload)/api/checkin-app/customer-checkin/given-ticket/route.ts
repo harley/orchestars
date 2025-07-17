@@ -124,6 +124,7 @@ export async function POST(request: Request) {
               ticketGivenBy: adminId,
               // Indicate this record was created manually, not via QR scan
               manual: true,
+              checkinMethod: 'search', // This is a manual search-based check-in
             },
           }),
         )
