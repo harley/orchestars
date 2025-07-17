@@ -266,6 +266,14 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
         We're excited to confirm your ticket for <strong>${ticketData.eventName}</strong>! Your digital ticket is ready and includes everything you need for entry.
       </p>
 
+      <!-- Quick Access QR Section (Top) -->
+      <div class="qr-section" style="margin-bottom: 30px;">
+        <p style="margin: 0 0 15px 0; color: #495057; font-weight: 600;">Nhấn vào bên dưới để xem vé và mã QR vào cửa | Click below to view your ticket and QR code for entry</p>
+        <a href="${ticketData.ticketUrl}" class="qr-button">
+          📱 Xem Vé Của Tôi | View My Ticket
+        </a>
+      </div>
+
       <!-- Order Card -->
       <div class="order-card">
         <div class="order-header">
@@ -311,18 +319,6 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
         </div>
       </div>
 
-      <!-- QR Code Section -->
-      <div class="qr-section">
-        <h3 style="margin: 0 0 15px 0; color: #495057;">🔗 Xem Vé Điện Tử Của Bạn</h3>
-        <p style="margin: 0 0 20px 0; color: #6c757d;">
-          <em>Nhấp vào nút bên dưới để xem vé của bạn với mã QR để vào cửa</em>
-          <br />Click the button below to view your ticket with QR code for entry
-        </p>
-        <a href="${ticketData.ticketUrl}" class="qr-button">
-          📱 Xem Vé Của Tôi | View My Ticket
-        </a>
-      </div>
-
       <!-- Important Information -->
       <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 20px; margin: 25px 0;">
         <h4 style="margin: 0 0 10px 0; color: #856404;">⚠️ Thông Tin Quan Trọng | Important Information</h4>
@@ -337,6 +333,14 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
         <em>Chúng tôi mong được gặp bạn tại <strong>${ticketData.eventName}</strong>!</em>
         <br />We look forward to seeing you at <strong>${ticketData.eventName}</strong>!
       </p>
+
+      <!-- Quick Access QR Section (Bottom) -->
+      <div class="qr-section" style="margin-top: 30px;">
+        <p style="margin: 0 0 15px 0; color: #495057; font-weight: 600;">Nhấn vào bên dưới để xem vé và mã QR vào cửa | Click below to view your ticket and QR code for entry</p>
+        <a href="${ticketData.ticketUrl}" class="qr-button">
+          📱 Xem Vé Của Tôi | View My Ticket
+        </a>
+      </div>
 
       <p>Trân trọng,<br />
       <em>Best regards,</em></p>
