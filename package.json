@@ -122,6 +122,7 @@
     "recharts": "^2.15.4",
     "require-in-the-middle": "^7.5.2",
     "sharp": "0.32.6",
+    "swiper": "^11.2.10",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.9",
