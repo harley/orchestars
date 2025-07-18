@@ -21,331 +21,576 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
     timezone: 'Asia/Ho_Chi_Minh',
   })
 
-  
   return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>✨ Step Into the Story – Your ${ticketData.eventName} Tickets Are Here</title>
+  <title>🎟️ Vé Điện Tử | Digital Ticket – ${ticketData.eventName}</title>
   <style>
+    /* Gmail-compatible email styles */
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       line-height: 1.6;
-      color: #333;
+      color: #333333;
       margin: 0;
       padding: 0;
       background-color: #f8f9fa;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
     }
+    
+    /* Container styles */
     .container {
       max-width: 600px;
+      width: 100%;
       margin: 0 auto;
       background-color: #ffffff;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      box-sizing: border-box;
     }
-    .content {
-      padding: 30px 20px;
-    }
-    .order-card {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      border-radius: 15px;
-      padding: 25px;
-      margin: 20px 0;
-      color: white;
-      box-shadow: 0 8px 25px rgba(240, 147, 251, 0.3);
-    }
-    .order-header {
+    
+    /* Header styles */
+    .header {
+      background: #ffffff;
+      color: #23272f;
+      padding: 30px 20px 25px 20px;
       text-align: center;
-      margin-bottom: 20px;
+      border-bottom: 1px solid #e9ecef;
     }
-    .order-title {
+    
+    .header h1 {
+      margin: 0 0 15px 0;
       font-size: 24px;
       font-weight: bold;
-      margin: 0 0 10px 0;
+      color: #23272f;
+      line-height: 1.2;
     }
-    .order-details {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-    .order-info {
-      flex: 1;
-      min-width: 200px;
-      text-align: center;
-      width: 100%;
-    }
-    .order-info h3 {
-      margin: 0 0 5px 0;
-      font-size: 14px;
-      opacity: 0.8;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .order-info p {
-      margin: 0;
+    
+    .header .event-name {
       font-size: 18px;
-      font-weight: 600;
-    }
-    .qr-section {
-      text-align: center;
-      margin: 30px 0;
-      padding: 25px;
-      background-color: #f8f9fa;
-      border-radius: 10px;
-      border: 2px dashed #dee2e6;
-    }
-    .qr-button {
-      display: inline-block;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff !important;
-      text-decoration: none;
-      padding: 15px 30px;
-      border-radius: 50px;
-      font-weight: 600;
-      font-size: 16px;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-      transition: transform 0.2s ease;
-    }
-    .qr-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-    }
-    .calendar-section {
-      background-color: #f8f9fa;
-      border-radius: 10px;
-      padding: 25px;
-      margin: 25px 0;
-    }
-    .calendar-title {
-      font-size: 20px;
-      font-weight: 600;
+      font-weight: bold;
       margin: 0 0 15px 0;
-      color: #495057;
-      text-align: center;
+      color: #23272f;
+      line-height: 1.3;
     }
-    .calendar-buttons {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-      text-align: center; /* Added for better centering in email clients */
-    }
-    .calendar-btn {
-      display: inline-block;
-      padding: 12px 20px;
-      text-decoration: none;
-      border-radius: 8px;
+    
+    .header .greeting {
+      margin: 0 0 8px 0;
+      font-size: 16px;
       font-weight: 500;
+      color: #23272f;
+    }
+    
+    .header .greeting .en {
+      font-style: italic;
+      color: #555555;
       font-size: 14px;
-      transition: all 0.2s ease;
-      border: 2px solid transparent;
-      margin: 0 auto; /* Added for better centering in email clients */
+      display: block;
+      margin-top: 2px;
     }
-    .google-cal {
-      background-color: #4285f4;
-      color: #fff !important;
+    
+    .header .intro {
+      margin: 15px 0 0 0;
+      font-size: 15px;
+      color: #23272f;
+      font-weight: normal;
+      line-height: 1.5;
     }
-    .google-cal:hover {
-      background-color: #3367d6;
-      transform: translateY(-1px);
+    
+    .header .intro .en {
+      font-style: italic;
+      color: #555555;
+      font-size: 14px;
+      display: block;
+      margin-top: 2px;
     }
-    .outlook-cal {
-      background-color: #0078d4;
-      color: white;
-    }
-    .outlook-cal:hover {
-      background-color: #106ebe;
-      transform: translateY(-1px);
-    }
-    .ical-cal {
-      background-color: #6c757d;
-      color: white;
-    }
-    .ical-cal:hover {
-      background-color: #5a6268;
-      transform: translateY(-1px);
-    }
-    .event-details {
-      background-color: #ffffff;
-      border: 1px solid #e9ecef;
-      border-radius: 10px;
-      padding: 25px;
-      margin: 25px 0;
-    }
-    .detail-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 15px;
-      padding-bottom: 15px;
+    
+    /* Section styles */
+    .section {
+      padding: 25px 20px 20px 20px;
       border-bottom: 1px solid #f1f3f4;
     }
-    .detail-row:last-child {
-      margin-bottom: 0;
-      padding-bottom: 0;
+    
+    .section:last-child {
       border-bottom: none;
     }
-    .detail-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 15px;
-      flex-shrink: 0;
-    }
-    .detail-content h4 {
-      margin: 0 0 5px 0;
-      font-size: 14px;
-      color: #6c757d;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .detail-content p {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 500;
-      color: #495057;
-    }
-    .footer {
-      background-color: #343a40;
-      color: white;
-      padding: 30px 20px;
+    
+    /* QR Section styles */
+    .qr-section {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 24px 20px;
+      margin: 25px 0 20px 0;
       text-align: center;
     }
-    .footer p {
-      margin: 5px 0;
+    
+    .qr-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #23272f;
+      margin: 0 0 8px 0;
+      line-height: 1.3;
     }
-    .footer a {
-      color: #667eea;
+    
+    .qr-subtitle {
+      font-size: 13px;
+      color: #666666;
+      font-style: italic;
+      margin: 0 0 20px 0;
+      line-height: 1.4;
+    }
+    
+    .qr-btn {
+      display: inline-block;
+      background: #667eea;
+      color: #ffffff !important;
       text-decoration: none;
+      padding: 16px 32px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 15px;
+      margin: 0;
+      min-width: 280px;
+      max-width: 100%;
+      box-sizing: border-box;
+      border: none;
+      word-wrap: break-word;
+      white-space: normal;
+      line-height: 1.3;
     }
-    .footer a:hover {
-      text-decoration: underline;
+    
+    /* Info card styles */
+    .info-cards {
+      margin: 20px 0 0 0;
     }
-    @media (max-width: 600px) {
-      .order-details {
-        flex-direction: column;
-        text-align: center;
+    
+    .info-card {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      display: block;
+    }
+    
+    .info-card:last-child {
+      margin-bottom: 0;
+    }
+    
+    .info-label {
+      color: #6c757d;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+      margin-bottom: 4px;
+      display: block;
+    }
+    
+    .info-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #23272f;
+      line-height: 1.4;
+      display: block;
+    }
+    
+    /* Bilingual row styles */
+    .bilingual-row {
+      margin-bottom: 12px;
+    }
+    
+    .bilingual-row .vn {
+      font-size: 14px;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 2px;
+    }
+    
+    .bilingual-row .en {
+      color: #666666;
+      font-style: italic;
+      font-size: 13px;
+      display: block;
+    }
+    
+    /* Zone map styles */
+    .zone-map {
+      text-align: center;
+      margin: 20px 0 0 0;
+      padding: 20px 0 0 0;
+      border-top: 1px dashed #e9ecef;
+    }
+    
+    .zone-map-image {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid #e9ecef;
+      margin: 0 auto;
+      display: block;
+    }
+    
+    .zone-map-container {
+      text-align: center;
+      margin: 15px 0 0 0;
+    }
+    
+    /* Calendar section styles */
+    .calendar-section {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px 15px;
+      margin: 20px 0 0 0;
+      text-align: center;
+    }
+    
+    .calendar-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      background: #4285f4;
+      color: #ffffff !important;
+      margin: 8px 0 0 0;
+    }
+    
+    /* Reminders styles */
+    .reminders {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 6px;
+      padding: 18px 18px 10px 18px;
+      margin: 20px 0 0 0;
+      color: #856404;
+      font-size: 14px;
+    }
+    
+    .reminders ul {
+      margin: 0 0 0 18px;
+      padding: 0;
+    }
+    
+    .reminders li {
+      margin-bottom: 8px;
+    }
+    
+    /* Guidelines styles */
+    .guidelines {
+      text-align: center;
+      margin: 20px 0 0 0;
+    }
+    
+    .guidelines-link {
+      display: inline-block;
+      background: #f5576c;
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 14px;
+      margin: 10px 0 0 0;
+      word-wrap: break-word;
+      white-space: normal;
+      line-height: 1.3;
+      text-align: center;
+    }
+    
+    /* Mobile responsive styles */
+    @media only screen and (max-width: 600px) {
+      .container {
+        padding: 10px;
+        width: 100% !important;
       }
-      .calendar-buttons {
-        flex-direction: column;
-        align-items: center;
+      
+      .header {
+        padding: 20px 15px 15px 15px;
       }
-      .calendar-btn {
-        width: 200px;
-        text-align: center;
+      
+      .header h1 {
+        font-size: 20px;
       }
-      .detail-row {
-        flex-direction: column;
-        text-align: center;
-      }
-      .detail-icon {
-        margin-right: 0;
+      
+      .header .event-name {
+        font-size: 16px;
         margin-bottom: 10px;
+      }
+      
+      .header .intro {
+        font-size: 14px;
+      }
+      
+      .header .greeting {
+        font-size: 14px;
+      }
+      
+      .section {
+        padding: 20px 15px 15px 15px;
+      }
+      
+      .qr-section {
+        padding: 20px 16px;
+        margin: 20px 0 15px 0;
+        border-radius: 8px;
+      }
+      
+      .qr-title {
+        font-size: 15px;
+        margin-bottom: 6px;
+      }
+      
+      .qr-subtitle {
+        font-size: 12px;
+        margin-bottom: 16px;
+      }
+      
+      .qr-btn {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        padding: 14px 12px;
+        font-size: 13px;
+        border-radius: 6px;
+        margin: 0;
+        box-sizing: border-box;
+        word-wrap: break-word;
+        white-space: normal;
+        line-height: 1.4;
+        text-align: center;
+      }
+      
+      .info-cards {
+        margin: 15px 0 0 0;
+      }
+      
+      .info-card {
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+      }
+      
+      .info-label {
+        font-size: 12px;
+        margin-bottom: 3px;
+      }
+      
+      .info-value {
+        font-size: 15px;
+        font-weight: 700;
+      }
+      
+      .bilingual-row .vn {
+        font-size: 13px;
+      }
+      
+      .bilingual-row .en {
+        font-size: 12px;
+      }
+      
+      .zone-map-image {
+        max-width: 100%;
+        border-radius: 6px;
+      }
+      
+      .zone-map-container {
+        margin: 10px 0 0 0;
+      }
+      
+      .calendar-section {
+        padding: 15px 10px;
+        margin: 15px 0 0 0;
+      }
+      
+      .reminders {
+        padding: 15px 15px 8px 15px;
+        margin: 15px 0 0 0;
+        font-size: 13px;
+      }
+      
+      .guidelines-link {
+        padding: 12px 16px;
+        font-size: 12px;
+        word-wrap: break-word;
+        white-space: normal;
+        line-height: 1.4;
+        text-align: center;
+        border-radius: 20px;
+      }
+    }
+    
+    /* Gmail specific fixes */
+    .gmail-fix {
+      display: none;
+      display: none !important;
+    }
+    
+    /* Email client compatibility */
+    * {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+    
+    /* Prevent text scaling on mobile */
+    * {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+
+    .qr-title-en {
+      display: inline;
+    }
+    @media only screen and (max-width: 600px) {
+      .qr-title-en {
+        display: block;
+        margin-top: 2px;
+      }
+    }
+    
+    /* QR button text responsive */
+    .qr-btn-text-full {
+      display: inline;
+    }
+    .qr-btn-text-compact {
+      display: none;
+    }
+    @media only screen and (max-width: 480px) {
+      .qr-btn-text-full {
+        display: none;
+      }
+      .qr-btn-text-compact {
+        display: inline;
+      }
+    }
+    
+    /* Guidelines button text responsive */
+    .guidelines-text-full {
+      display: inline;
+    }
+    .guidelines-text-compact {
+      display: none;
+    }
+    @media only screen and (max-width: 480px) {
+      .guidelines-text-full {
+        display: none;
+      }
+      .guidelines-text-compact {
+        display: inline;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Content -->
-    <div class="content">
-      <!-- Greeting -->
-      <p style="font-size: 18px; margin-bottom: 20px;">
-        <strong>Xin chào Quý Khách,</strong><br />
-        <em>Dear Valued Guest,</em>
-      </p>
-
-      <p style="margin-bottom: 25px;">
-        <em>Chúng tôi rất vui mừng xác nhận vé của bạn cho <strong>${ticketData.eventName}</strong>! Vé điện tử của bạn đã sẵn sàng và bao gồm mọi thứ bạn cần để vào cửa.</em>
-        <br /><br />
-        We're excited to confirm your ticket for <strong>${ticketData.eventName}</strong>! Your digital ticket is ready and includes everything you need for entry.
-      </p>
-
-      <!-- Quick Access QR Section (Top) -->
-      <div class="qr-section" style="margin-bottom: 30px;">
-        <p style="margin: 0 0 15px 0; color: #495057; font-weight: 600;">Nhấn vào bên dưới để xem vé và mã QR vào cửa | Click below to view your ticket and QR code for entry</p>
-        <a href="${ticketData.ticketUrl}" class="qr-button">
-          📱 Xem Vé Của Tôi | View My Ticket
-        </a>
+    <div class="header">
+      <h1>🎟️ [QR Code] Vé Điện Tử | Digital Ticket</h1>
+      <div class="event-name">${ticketData.eventName} by OrcheStars</div>
+      <div class="greeting">
+        <span class="vn">Xin chào Quý Khách,</span>
+        <span class="en">Dear Valued Guest,</span>
       </div>
-
-      <!-- Order Card -->
-      <div class="order-card">
-        <div class="order-header">
-          <div class="order-title">${ticketData.eventName}</div>
-        </div>
-        <div class="order-details">
-          <div class="order-info">
-            <h3>Mã đơn hàng | Order Code</h3>
-            <p>${ticketData.orderCode}</p>
-          </div>
-        </div>
+      <div class="intro">
+        <span class="vn">Tấm vé điện tử có Mã <b>QR Code</b> để bước vào thế giới cổ tích <strong>${ticketData.eventName}</strong> của bạn đã sẵn sàng!</span>
+        <span class="en">Your digital ticket with QR Code to the magical world of <strong>${ticketData.eventName}</strong> is ready!</span>
       </div>
+    </div>
 
-      <!-- Event Details -->
-      <div class="event-details">
-        <div class="detail-row">
-          <div class="detail-icon">
-            <span style="color: white; font-size: 18px;">📅</span>
-          </div>
-          <div class="detail-content">
-            <h4>Ngày & Giờ | Date & Time</h4>
-            <p>${ticketData.eventDate}</p>
-          </div>
+    <div class="qr-section">
+      <div class="qr-title">
+        ✨ <span class="qr-title-vn">MÃ QR CỦA BẠN</span> <span class="qr-title-en">YOUR QR CODE TICKET</span>
+      </div>
+      <div class="qr-subtitle">You’ll use your QR code on the e-ticket to check in at the entrance.</div>
+      <a href="${ticketData.ticketUrl}" class="qr-btn">
+        <span class="qr-btn-text-full">📱 Xem Mã QR Của Tôi | View My QR Code Ticket</span>
+        <span class="qr-btn-text-compact">📱 Xem QR Code | View QR</span>
+      </a>
+    </div>
+    <div class="info-cards">
+        <div class="info-card">
+          <span class="info-label">Mã đơn hàng | Order Code</span>
+          <span class="info-value">${ticketData.orderCode}</span>
         </div>
-        <div class="detail-row">
-          <div class="detail-icon">
-            <span style="color: white; font-size: 18px;">📍</span>
-          </div>
-          <div class="detail-content">
-            <h4>Địa điểm | Venue</h4>
-            <p>${ticketData.eventLocation}</p>
-          </div>
+        <div class="info-card">
+          <span class="info-label">Thời gian sự kiện | Show-time</span>
+          <span class="info-value">${ticketData.eventDate}</span>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Địa điểm | Venue</span>
+          <span class="info-value">${ticketData.eventLocation}</span>
         </div>
       </div>
+    </div>
 
-      <!-- Calendar Integration -->
-      <div class="calendar-section">
-        <h3 class="calendar-title">📅 Thêm vào Lịch | Add to Your Calendar</h3>
-        <div class="calendar-buttons">
-          <a href="${calendarLinks.google}" target="_blank" class="calendar-btn google-cal">
-            📅 Google Calendar
-          </a>
+    <div class="section">
+      <div class="bilingual-row">
+        <span class="vn">🕔 <b>THỜI GIAN MỞ CỬA CHO CÁC HOẠT ĐỘNG VUI CHƠI, ẨM THỰC & GIẢI KHÁT:</b> lúc 4:00 PM</span>
+        <span class="en">TIME FOR PRE-CONCERT ACTIVITIES (F&B): from <b>4:00 PM</b></span>
+      </div>
+      <div class="bilingual-row">
+        <span class="vn">🕔 <b>THỜI GIAN BẮT ĐẦU CHECK-IN VÀO SÂN KHẤU:</b> từ <b>5:15 PM đến 6:30 PM</b></span>
+        <span class="en">TIME FOR CHECK-IN: from <b>5:15 PM to 6:30 PM</b></span>
+      </div>
+      <div class="bilingual-row">
+        <span class="vn">Sau <b>6:50 PM</b> (20 phút sau giờ diễn), BTC sẽ <b>ngừng tiếp nhận check-in</b>. Vui lòng đến sớm ít nhất 30 phút để check-in và tìm chỗ ngồi.</span>
+        <span class="en">After <b>6:50 PM</b> (20 minutes after the show starts), <b>check-in will be closed.</b> Please arrive at least 30 minutes early to check in and find your seat.</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="bilingual-row">
+        <span class="vn">SƠ ĐỒ KHU VỰC SỰ KIỆN | CONCERT ZONE MAP</span>
+        <span class="en">(See your seat/zone map below)</span>
+      </div>
+      <div class="zone-map">
+        <div class="zone-map-container">
+          <img src="https://www.orchestars.vn/api/media/file/disney-25-map-stage.png" alt="Concert Zone Map - Disney 25 Event" class="zone-map-image" />
         </div>
       </div>
+    </div>
 
-      <!-- Important Information -->
-      <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 20px; margin: 25px 0;">
-        <h4 style="margin: 0 0 10px 0; color: #856404;">⚠️ Thông Tin Quan Trọng | Important Information</h4>
-        <ul style="margin: 0; padding-left: 20px; color: #856404;">
-          <li>Vui lòng đến trước 30 phút | Please arrive 30 minutes before the event starts</li>
-          <li>Mang theo giấy tờ tùy thân hợp lệ | Bring a valid ID for verification</li>
-          <li>Xuất trình mã QR vé điện tử tại lối vào | Show your digital ticket QR code at the entrance</li>
-        </ul>
+    <div class="calendar-section">
+      <div class="bilingual-row">
+        <span class="vn">📅 <b>Thêm vào Lịch</b></span>
+        <span class="en">Add to Your Calendar</span>
       </div>
+      <a href="${calendarLinks.google}" target="_blank" class="calendar-btn">📅 Google Calendar</a>
+    </div>
 
-      <p style="margin-top: 30px;">
-        <em>Chúng tôi mong được gặp bạn tại <strong>${ticketData.eventName}</strong>!</em>
-        <br />We look forward to seeing you at <strong>${ticketData.eventName}</strong>!
-      </p>
-
-      <!-- Quick Access QR Section (Bottom) -->
-      <div class="qr-section" style="margin-top: 30px;">
-        <p style="margin: 0 0 15px 0; color: #495057; font-weight: 600;">Nhấn vào bên dưới để xem vé và mã QR vào cửa | Click below to view your ticket and QR code for entry</p>
-        <a href="${ticketData.ticketUrl}" class="qr-button">
-          📱 Xem Vé Của Tôi | View My Ticket
-        </a>
+    <div class="reminders">
+      <div class="bilingual-row">
+        <span class="vn">⚠️ <b>THÔNG TIN QUAN TRỌNG | IMPORTANT REMINDERS</b></span>
+        <span class="en"></span>
       </div>
+      <ul>
+        <li>🎟 Vé điện tử có Mã QR Code chỉ dùng một lần duy nhất.<br><em>Your QR Code ticket is valid for one-time use only.</em></li>
+        <li>📲 Không chia sẻ Mã QR để tránh mất quyền vào cổng.<br><em>Do not share your QR code to avoid entry issues.</em></li>
+        <li>🪪 Mang theo giấy tờ tùy thân (CMND/CCCD/hộ chiếu) để đối chiếu khi cần thiết. Đặc biệt trẻ em dưới 3 tuổi, phụ huynh cần giấy tờ chứng minh độ tuổi của bé.<br><em>Bring a valid ID (passport or government-issued) for verification just in case. Especially for children under 3 years old, parents are required to provide documents to verify the child's age.</em></li>
+        <li>Quyết định của BTC là quyết định cuối cùng trong mọi trường hợp.<br><em>In all cases, the Organizer’s decision shall be considered final.</em></li>
+      </ul>
+    </div>
 
-      <p>Trân trọng,<br />
-      <em>Best regards,</em></p>
+    <div class="guidelines">
+      <div class="bilingual-row">
+        <span class="vn">⚠️ <b>QUY ĐỊNH CHI TIẾT XIN VUI LÒNG XEM TẠI LINK:</b></span>
+        <span class="en">⚠️ <b>FOR FULL EVENT GUIDELINES, PLEASE VISIT:</b></span>
+      </div>
+      <a href="https://orchestars.vn/check-in-process-rules-at-event-disney-25" class="guidelines-link">
+        <span class="guidelines-text-full">Xem Quy Định Sự Kiện | View Event Guidelines</span>
+        <span class="guidelines-text-compact">Xem Quy Định | Guidelines</span>
+      </a>
+    </div>
 
-      <p>OrcheStars</p>
+    <div class="section" style="text-align:center;">
+      <div class="bilingual-row">
+        <span class="vn">Chúng tôi rất mong được gặp bạn tại đêm nhạc cổ tích <strong>${ticketData.eventName}</strong>.</span>
+        <span class="en">We can’t wait to see you at this enchanted musical night – <strong>${ticketData.eventName}</strong>.</span>
+      </div>
+      <div style="margin-top: 18px; font-weight: 600;">OrcheStars Team</div>
     </div>
   </div>
 </body>
