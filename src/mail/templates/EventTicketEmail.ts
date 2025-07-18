@@ -513,18 +513,17 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
       </a>
     </div>
     <div class="info-cards">
-        <div class="info-card">
-          <span class="info-label">Mã đơn hàng | Order Code</span>
-          <span class="info-value">${ticketData.orderCode}</span>
-        </div>
-        <div class="info-card">
-          <span class="info-label">Thời gian sự kiện | Show-time</span>
-          <span class="info-value">${ticketData.eventDate}</span>
-        </div>
-        <div class="info-card">
-          <span class="info-label">Địa điểm | Venue</span>
-          <span class="info-value">${ticketData.eventLocation}</span>
-        </div>
+      <div class="info-card">
+        <span class="info-label">Mã đơn hàng | Order Code</span>
+        <span class="info-value">${ticketData.orderCode}</span>
+      </div>
+      <div class="info-card">
+        <span class="info-label">Thời gian sự kiện | Show-time</span>
+        <span class="info-value">${ticketData.eventDate}</span>
+      </div>
+      <div class="info-card">
+        <span class="info-label">Địa điểm | Venue</span>
+        <span class="info-value">${ticketData.eventLocation}</span>
       </div>
     </div>
 
