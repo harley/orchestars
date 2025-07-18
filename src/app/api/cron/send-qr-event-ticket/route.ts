@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { addQueueEmail } from '@/collections/Emails/utils'
-import { EMAIL_CC } from '@/config/email'
+import { EMAIL_CC, EMAIL_QR_EVENT_GUIDELINE_URL, EMAIL_QR_EVENT_MAP_STAGE } from '@/config/email'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 import { generateEventTicketEmailHtml } from '@/mail/templates/EventTicketEmail'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -121,6 +121,8 @@ export async function GET(req: NextRequest) {
             eventStartTimeCalendar: eventStartTime,
             eventEndTimeCalendar: eventEndTime,
             orderCode,
+            guidelineUrl: EMAIL_QR_EVENT_GUIDELINE_URL,
+            zoneMapUrl: EMAIL_QR_EVENT_MAP_STAGE,
           })
 
           // Queue email

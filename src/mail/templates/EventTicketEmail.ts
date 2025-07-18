@@ -8,6 +8,8 @@ export interface EventTicketData {
   eventStartTimeCalendar: string
   eventEndTimeCalendar: string
   orderCode: string
+  guidelineUrl?: string
+  zoneMapUrl?: string
 }
 
 export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
@@ -541,6 +543,9 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
       </div>
     </div>
 
+    ${
+      ticketData.zoneMapUrl
+        ? `
     <div class="section">
       <div class="bilingual-row">
         <span class="vn">SƠ ĐỒ KHU VỰC SỰ KIỆN | CONCERT ZONE MAP</span>
@@ -548,10 +553,13 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
       </div>
       <div class="zone-map">
         <div class="zone-map-container">
-          <img src="https://www.orchestars.vn/api/media/file/disney-25-map-stage.png" alt="Concert Zone Map - Disney 25 Event" class="zone-map-image" />
+          <img src="${ticketData.zoneMapUrl}" alt="Concert Zone Map - Disney 25 Event" class="zone-map-image" />
         </div>
       </div>
     </div>
+    `
+        : ''
+    }
 
     <div class="calendar-section">
       <div class="bilingual-row">
@@ -574,16 +582,22 @@ export function generateEventTicketEmailHtml(ticketData: EventTicketData) {
       </ul>
     </div>
 
-    <div class="guidelines">
+    ${
+      ticketData.guidelineUrl
+        ? ` <div class="guidelines">
       <div class="bilingual-row">
         <span class="vn">⚠️ <b>QUY ĐỊNH CHI TIẾT XIN VUI LÒNG XEM TẠI LINK:</b></span>
         <span class="en">⚠️ <b>FOR FULL EVENT GUIDELINES, PLEASE VISIT:</b></span>
       </div>
-      <a href="https://orchestars.vn/check-in-process-rules-at-event-disney-25" class="guidelines-link">
+      <a href="${ticketData.guidelineUrl}" class="guidelines-link">
         <span class="guidelines-text-full">Xem Quy Định Sự Kiện | View Event Guidelines</span>
         <span class="guidelines-text-compact">Xem Quy Định | Guidelines</span>
       </a>
-    </div>
+    </div>`
+        : ''
+    }
+
+   
 
     <div class="section" style="text-align:center;">
       <div class="bilingual-row">
