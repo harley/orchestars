@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { addQueueEmail } from '@/collections/Emails/utils'
-import { EMAIL_CC, EMAIL_QR_EVENT_GUIDELINE_URL, EMAIL_QR_EVENT_MAP_STAGE } from '@/config/email'
+import { EMAIL_QR_EVENT_GUIDELINE_URL, EMAIL_QR_EVENT_MAP_STAGE } from '@/config/email'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 import { generateEventTicketEmailHtml } from '@/mail/templates/EventTicketEmail'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -150,7 +150,7 @@ export async function GET(req: NextRequest) {
             payload,
             resendMailData: {
               to: order.userEmail,
-              cc: EMAIL_CC,
+              // cc: EMAIL_CC,
               subject: `✨ Step Into the Story – Your ${event.title} Tickets Are Here`,
               html,
             },
