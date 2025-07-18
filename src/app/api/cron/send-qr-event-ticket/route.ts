@@ -30,14 +30,14 @@ export async function GET(req: NextRequest) {
 
     // get the event only that will show before 30 hours to event start time
     const now = new Date()
-    const thirtyHoursFromNow = new Date(now.getTime() + 30 * 60 * 60 * 1000)
+    const twoDaysFromNow = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000)
 
     const event = await payload
       .find({
         collection: 'events',
         where: {
           startDatetime: {
-            less_than_equal: thirtyHoursFromNow.toISOString(),
+            less_than_equal: twoDaysFromNow.toISOString(),
           },
           endDatetime: {
             greater_than_equal: now.toISOString(),
@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
           AND em.id IS NULL
           ORDER BY ord.id, es.date ASC
       ) AS completed_orders
-      WHERE completed_orders.full_current_event_date_time <= ${thirtyHoursFromNow.toISOString()} 
+      WHERE completed_orders.full_current_event_date_time <= ${twoDaysFromNow.toISOString()} 
       AND completed_orders.full_current_event_date_time >= ${now.toISOString()}
       ORDER BY completed_orders.event_date ASC
       LIMIT ${batchSize}
