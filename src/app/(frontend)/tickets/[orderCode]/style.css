@@ -40,8 +40,8 @@
   justify-content: center;
   gap: 0.5rem;
   background: rgba(255,255,255,0.95);
-  border-radius: 1.5rem;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.06);
+  /* border-radius: 1.5rem;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.06); */
   padding: 0.25rem 0.75rem;
   min-height: 48px;
   max-width: 320px;

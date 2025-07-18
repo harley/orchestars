@@ -69,13 +69,14 @@ export default function TicketsSwipeViewer({
 
   return (
     <div
-      className="flex flex-col items-center w-full h-full py-10 min-h-screen relative"
+      className="flex flex-col items-center w-full h-full py-6 sm:py-10 min-h-screen relative"
       style={{
         backgroundColor: ticketClassColor?.color,
       }}
     >
-      <div className="relative p-10 bg-white rounded-md">
-        <div className="ticket-index-bar-ui flex items-center justify-center gap-2 absolute top-2 left-1/2 -translate-x-1/2 z-50 w-full max-w-xs mx-auto p-2 rounded-lg bg-white/90 shadow-md">
+      {/* Parent container for index bar and card */}
+      <div className="w-full max-w-md mx-auto bg-white rounded-b-md shadow-md py-4">
+        <div className="ticket-index-bar-ui flex items-center justify-center gap-2 w-full p-1 sm:p-2 rounded-t-lg bg-white text-base sm:text-lg z-10">
           <Button
             onClick={handlePrev}
             disabled={current === 0}
@@ -84,7 +85,7 @@ export default function TicketsSwipeViewer({
             className={`nav-btn ${current === 0 ? 'opacity-40 cursor-not-allowed' : ''}`}
             aria-label="Previous ticket"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
           <input
             type="text"
@@ -96,13 +97,13 @@ export default function TicketsSwipeViewer({
                 ;(e.target as HTMLInputElement).blur()
               }
             }}
-            className="ticket-index-input w-12 text-center border border-gray-300 focus:border-primary outline-none transition-all duration-200 bg-transparent text-lg font-semibold rounded focus:bg-gray-100 mx-1"
+            className="ticket-index-input w-10 sm:w-12 text-center border border-gray-300 focus:border-primary outline-none transition-all duration-200 bg-transparent text-base sm:text-lg font-semibold rounded focus:bg-gray-100 mx-1"
             style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
             aria-label="Go to ticket number"
             inputMode="numeric"
             pattern="[0-9]*"
           />
-          <span className="text-gray-500 text-lg">/ {total}</span>
+          <span className="text-gray-500 text-base sm:text-lg">/ {total}</span>
           <Button
             onClick={handleNext}
             disabled={current === total - 1}
@@ -111,31 +112,34 @@ export default function TicketsSwipeViewer({
             className={`nav-btn ${current === total - 1 ? 'opacity-40 cursor-not-allowed' : ''}`}
             aria-label="Next ticket"
           >
-            <ArrowRight className="w-6 h-6" />
+            <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
         </div>
 
-        <Swiper
-          modules={[Pagination, Navigation]}
-          pagination={{ clickable: true, type: 'progressbar' }}
-          spaceBetween={24}
-          slidesPerView={1}
-          onSlideChange={(swiper) => setCurrent(swiper.activeIndex)}
-          className="w-full max-w-md flex-1 flex items-center justify-center pt-2"
-          navigation={false} // Hide default navigation
-          onSwiper={setSwiperInstance}
-          speed={300} // Smooth transition
-        >
-          {tickets.map((ticket, idx) => (
-            <SwiperSlide key={ticket.ticket.id + idx}>
-              <TicketDetails
-                ticket={ticket.ticket}
-                isCheckedIn={ticket.isCheckedIn}
-                checkedInAt={ticket.checkedInAt}
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        {/* Main card container */}
+        <div className="relative w-full sm:pt-6 sm:px-8 pt-3 px-3 pb-3 bg-white rounded-b-md">
+          <Swiper
+            modules={[Pagination, Navigation]}
+            pagination={{ clickable: true, type: 'progressbar' }}
+            spaceBetween={16}
+            slidesPerView={1}
+            onSlideChange={(swiper) => setCurrent(swiper.activeIndex)}
+            className="w-full flex-1 flex items-center justify-center pt-2"
+            navigation={false} // Hide default navigation
+            onSwiper={setSwiperInstance}
+            speed={300} // Smooth transition
+          >
+            {tickets.map((ticket, idx) => (
+              <SwiperSlide key={ticket.ticket.id + idx} className="w-full flex justify-center">
+                <TicketDetails
+                  ticket={ticket.ticket}
+                  isCheckedIn={ticket.isCheckedIn}
+                  checkedInAt={ticket.checkedInAt}
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
       </div>
       {/* Custom navigation buttons */}
     </div>
