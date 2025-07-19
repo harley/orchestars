@@ -1,4 +1,3 @@
-import { toZonedTime } from 'date-fns-tz'
 import { getTodayInVietnam } from './autoEventSelection'
 
 export interface CachedEventSelection {

@@ -243,11 +243,14 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
       scheduleId: selectedSchedule.id.toString(),
     })
 
-    // Check if we're in paper mode and route accordingly
+    // Route based on mode parameter
     const mode = searchParams.get('mode')
     if (mode === 'paper') {
       router.push(`/checkin/paper?${params.toString()}`)
+    } else if (mode === 'search') {
+      router.push(`/checkin/validates?${params.toString()}`)
     } else {
+      // Default to search mode for backward compatibility
       router.push(`/checkin/validates?${params.toString()}`)
     }
   }

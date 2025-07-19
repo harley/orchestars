@@ -174,6 +174,21 @@ export default function ValidatePageClient() {
   const [currentScheduleId, setCurrentScheduleId] = useState<string | null>(
     searchParams.get('scheduleId') || searchParams.get('schedule')
   )
+
+  // Too Many Matches state
+  interface TooManyMatchesState {
+    show: boolean
+    matchCount: number
+    searchTerm: string
+    searchType: 'email' | 'phone'
+  }
+
+  const [tooManyMatches, setTooManyMatches] = useState<TooManyMatchesState>({
+    show: false,
+    matchCount: 0,
+    searchTerm: '',
+    searchType: 'email'
+  })
   // Translation hook and additional toast hook removed as they were unused
 
   const ticketInputRef = useRef<HTMLInputElement>(null)
@@ -426,6 +441,19 @@ export default function ValidatePageClient() {
       }
 
       const data = await response.json()
+
+      // Handle too many matches response
+      if (data.tooManyMatches) {
+        setTooManyMatches({
+          show: true,
+          matchCount: data.matchCount,
+          searchTerm: data.searchTerm,
+          searchType: data.searchType
+        })
+        setValidatedTicket(null)
+        setMultipleTickets([])
+        return
+      }
 
       if (response.ok) {
         if (activeTab === 'seat' || activeTab === 'email' || activeTab === 'phone') {
@@ -680,6 +708,39 @@ export default function ValidatePageClient() {
             >
               Change event
             </button>
+          </div>
+        )}
+
+        {/* Too Many Matches Banner */}
+        {tooManyMatches.show && (
+          <div className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start">
+                <svg className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <div>
+                  <h3 className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                    Too Many Matches Found
+                  </h3>
+                  <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
+                    Found {tooManyMatches.matchCount} {tooManyMatches.searchType === 'email' ? 'email addresses' : 'phone numbers'} matching &ldquo;{tooManyMatches.searchTerm}&rdquo;. 
+                    Please be more specific to see results (showing max 3 matches).
+                  </p>
+                  <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                    Try searching with more characters or the full {tooManyMatches.searchType === 'email' ? 'email address' : 'phone number'}.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setTooManyMatches(prev => ({ ...prev, show: false }))}
+                className="ml-4 text-amber-400 hover:text-amber-600 dark:text-amber-300 dark:hover:text-amber-100"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
           </div>
         )}
 
