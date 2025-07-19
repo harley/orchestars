@@ -333,6 +333,10 @@ export default function ValidatePageClient() {
           router.push(`/checkin/events?mode=search&reason=${reason}`)
         }
       } catch (error) {
+        if (controller.signal.aborted) {
+          // Request was aborted due to unmount, don't log or update state
+          return
+        }
         console.error('Auto-selection failed:', error)
         // Graceful fallback - allow manual search without auto-selection
         setAutoSelection({ isAutoSelected: false, isLoading: false, attempted: true, error: 'fetch_error' })
@@ -793,8 +797,8 @@ export default function ValidatePageClient() {
                   disabled={validatedTicket !== null || multipleTickets.length > 0}
                   title={validatedTicket !== null || multipleTickets.length > 0 ? 'Click "Clear and Start New" to search again' : ''}
                   className={`w-full p-4 border rounded-lg shadow-sm transition-colors ${validatedTicket !== null || multipleTickets.length > 0
-                      ? 'border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                      : 'border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                    ? 'border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                    : 'border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                     }`}
                 />
               </div>
@@ -811,8 +815,8 @@ export default function ValidatePageClient() {
                   disabled={validatedTicket !== null || multipleTickets.length > 0}
                   title={validatedTicket !== null || multipleTickets.length > 0 ? 'Click "Clear and Start New" to search again' : ''}
                   className={`w-full p-4 border rounded-lg shadow-sm transition-colors ${validatedTicket !== null || multipleTickets.length > 0
-                      ? 'border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                      : 'border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                    ? 'border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                    : 'border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                     }`}
                 />
               </div>
@@ -829,8 +833,8 @@ export default function ValidatePageClient() {
                   disabled={validatedTicket !== null || multipleTickets.length > 0}
                   title={validatedTicket !== null || multipleTickets.length > 0 ? 'Click "Clear and Start New" to search again' : ''}
                   className={`w-full p-4 border rounded-lg shadow-sm transition-colors ${validatedTicket !== null || multipleTickets.length > 0
-                      ? 'border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                      : 'border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                    ? 'border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                    : 'border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                     }`}
                 />
               </div>
@@ -847,8 +851,8 @@ export default function ValidatePageClient() {
                   disabled={validatedTicket !== null || multipleTickets.length > 0}
                   title={validatedTicket !== null || multipleTickets.length > 0 ? 'Click "Clear and Start New" to search again' : ''}
                   className={`w-full p-4 border rounded-lg shadow-sm transition-colors ${validatedTicket !== null || multipleTickets.length > 0
-                      ? 'border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                      : 'border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                    ? 'border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                    : 'border-gray-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                     }`}
                 />
               </div>
@@ -868,14 +872,14 @@ export default function ValidatePageClient() {
                 multipleTickets.length > 0
               }
               className={`w-full py-4 rounded-lg font-bold text-white uppercase tracking-wider transition-all duration-300 ${isLoading ||
-                  (activeTab === 'ticket' && !ticketCode.trim()) ||
-                  (activeTab === 'seat' && !seatNumber.trim()) ||
-                  (activeTab === 'email' && !email.trim()) ||
-                  (activeTab === 'phone' && !phoneNumber.trim()) ||
-                  !!validatedTicket ||
-                  multipleTickets.length > 0
-                  ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
+                (activeTab === 'ticket' && !ticketCode.trim()) ||
+                (activeTab === 'seat' && !seatNumber.trim()) ||
+                (activeTab === 'email' && !email.trim()) ||
+                (activeTab === 'phone' && !phoneNumber.trim()) ||
+                !!validatedTicket ||
+                multipleTickets.length > 0
+                ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
                 }`}
             >
               {isLoading ? (
