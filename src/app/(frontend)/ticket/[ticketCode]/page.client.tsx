@@ -9,6 +9,7 @@ import { useTranslate } from '@/providers/I18n/client'
 import { TermsAndConditionsModal } from '@/components/Tickets/TermsAndConditionsModal'
 import { categories } from '@/components/EventDetail/data/seat-maps/categories'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 
 // Utility function to get ticket class color
 const getTicketClassColor = (ticketPriceInfo: any) => {
@@ -227,12 +228,17 @@ export function TicketDetails({
           )}
         </section>
 
-        {/* Terms & Conditions (moved under QR) */}
-        {event?.eventTermsAndConditions && (
-          <div className="pt-4 px-6 text-center">
-            <TermsAndConditionsModal terms={event.eventTermsAndConditions} />
-          </div>
-        )}
+        {/* Instructions Link */}
+        <div className="pt-4 px-6 text-center">
+          <a
+            href="https://orchestars.vn/check-in-process-rules-at-event-disney-25"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline text-xs text-gray-500 hover:text-gray-800"
+          >
+            {t('ticket.instructions')}
+          </a>
+        </div>
 
         <section className="p-6 space-y-4 text-sm border-b border-gray-100">
           <div className="grid grid-cols-2 gap-4">
@@ -294,6 +300,16 @@ export function TicketDetails({
           </div>
         )}
       </article>
+      {/* Terms (left) and Language Switcher (right) */}
+      <div className="pt-4 px-6 flex items-center">
+        {event?.eventTermsAndConditions && (
+          <TermsAndConditionsModal terms={event.eventTermsAndConditions} />
+        )}
+        {/* push switcher to right */}
+        <div className="ml-auto">
+          <LanguageSwitcher className="bg-white/90 hover:bg-white text-gray-800 hover:text-gray-900 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 rounded-md px-2 py-1 shadow flex items-center gap-1" />
+        </div>
+      </div>
     </div>
   )
 }

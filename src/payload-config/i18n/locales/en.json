@@ -248,7 +248,8 @@
     "booked": "Booked",
     "qrCodeNotAvailable": "QR code available for booked tickets only.",
     "termsAndConditions": "Terms & Conditions",
-    "details": "Ticket Details"
+    "details": "Ticket Details",
+    "instructions": "Instructions"
   },
   "checkout": {
     "personalInfo": "Personal Information",
