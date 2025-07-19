@@ -98,7 +98,7 @@ export const findTickets = async (opts: {
 
   // If countOnly is true, return an array with the count as length for compatibility
   if (countOnly) {
-    const count = rows[0]?.count || 0
+    const count = Number(rows[0]?.count ?? 0)
     return new Array(count).fill(null) as TicketDTO[]
   }
 

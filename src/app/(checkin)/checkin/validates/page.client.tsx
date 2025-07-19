@@ -264,6 +264,8 @@ export default function ValidatePageClient() {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
+    const controller = new AbortController()
+
     const performAutoSelection = async () => {
       clearExpiredCache()
 
@@ -299,7 +301,7 @@ export default function ValidatePageClient() {
 
       try {
         // Reuse existing events fetch to avoid extra network call
-        const response = await fetch('/api/checkin-app/events')
+        const response = await fetch('/api/checkin-app/events', { signal: controller.signal })
         if (!response.ok) {
           throw new Error('Failed to fetch events')
         }
@@ -339,7 +341,11 @@ export default function ValidatePageClient() {
     }
 
     performAutoSelection()
-  }, [router, searchParams])
+
+    // Cleanup in case component unmounts during fetch
+    return () => controller.abort()
+  // We only depend on router here; URL params are read just once on mount
+  }, [router])
 
   // If not hydrated yet, show loading
   if (!isHydrated) {
@@ -456,6 +462,8 @@ export default function ValidatePageClient() {
       }
 
       if (response.ok) {
+        // Clear any previous "too many matches" banner once we have valid results
+        setTooManyMatches(prev => (prev.show ? { ...prev, show: false } : prev))
         if (activeTab === 'seat' || activeTab === 'email' || activeTab === 'phone') {
           if (data.tickets && data.tickets.length > 1) {
             // Multiple tickets found for the seat

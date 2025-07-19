@@ -28,9 +28,12 @@ export const CheckinNav: React.FC<CheckinNavProps> = ({ dark = false }) => {
   // OR when we are on the event-selection page with ?mode=paper
   const isPaperActive = pathname === '/checkin/paper' || (pathname === '/checkin/events' && modeParam === 'paper')
 
+  // Determine whether URL param indicates search mode (makes future modes safer)
+  const isSearchMode = modeParam === 'search'
+
   // Search tab is active on validates pages or on event selection when in search mode
   const isSearchActive =
-    pathname.startsWith('/checkin/validates') || (pathname === '/checkin/events' && modeParam === 'search')
+    pathname.startsWith('/checkin/validates') || (pathname === '/checkin/events' && isSearchMode)
 
   const baseInactive = dark
     ? 'bg-white/20 text-white hover:bg-white/30'
