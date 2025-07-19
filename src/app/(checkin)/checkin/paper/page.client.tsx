@@ -10,13 +10,13 @@ import { useTranslate } from '@/providers/I18n/client'
 import { type TicketDTO } from '@/lib/checkin/findTickets'
 import ScheduleStatsInfo from '@/components/ScheduleStatsInfo'
 import { TicketCard } from '@/components/ui/TicketCard'
-import { 
-  attemptAutoSelection, 
-  type EventWithSchedules 
+import {
+  attemptAutoSelection,
+  type EventWithSchedules
 } from '@/lib/checkin/autoEventSelection'
-import { 
-  getCachedEventSelection, 
-  setCachedEventSelection, 
+import {
+  getCachedEventSelection,
+  setCachedEventSelection,
   clearExpiredCache
 } from '@/lib/checkin/eventSelectionCache'
 import { format } from 'date-fns'
@@ -40,7 +40,7 @@ const PaperPageClient = () => {
   const { token } = useAuth()
   const { t } = useTranslate()
   const seatInputRef = useRef<HTMLInputElement>(null)
-  
+
   // Get event and schedule from URL params
   const [currentEventId, setCurrentEventId] = useState<string | null>(
     searchParams.get('eventId') || searchParams.get('event')
@@ -48,7 +48,7 @@ const PaperPageClient = () => {
   const [currentScheduleId, setCurrentScheduleId] = useState<string | null>(
     searchParams.get('scheduleId') || searchParams.get('schedule')
   )
-  
+
   // Auto-selection state
   const [autoSelection, setAutoSelection] = useState<AutoSelectionState>({
     isAutoSelected: false,
@@ -56,7 +56,7 @@ const PaperPageClient = () => {
     attempted: false,
     error: null
   })
-  
+
   // State for paper check-in
   const [seatNumber, setSeatNumber] = useState('')
   const [isValidating, setIsValidating] = useState(false)
@@ -69,17 +69,17 @@ const PaperPageClient = () => {
   // Auto-selection logic on mount
   useEffect(() => {
     if (typeof window === 'undefined') return
-    
+
     const performAutoSelection = async () => {
       // Clear any expired cache first
       clearExpiredCache()
-      
+
       // If we already have event/schedule from URL params, use them
       if (currentEventId && currentScheduleId) {
         setAutoSelection(prev => ({ ...prev, attempted: true, isAutoSelected: false }))
         return
       }
-      
+
       // Check if we have a valid cached selection
       const cachedSelection = getCachedEventSelection()
       if (cachedSelection) {
@@ -93,27 +93,27 @@ const PaperPageClient = () => {
         })
         return
       }
-      
+
       // Attempt auto-selection
       setAutoSelection(prev => ({ ...prev, isLoading: true, attempted: false }))
-      
+
       try {
         // Fetch events for auto-selection
         const response = await fetch('/api/checkin-app/events')
         if (!response.ok) {
           throw new Error('Failed to fetch events')
         }
-        
+
         const data = await response.json()
         const events: EventWithSchedules[] = data.events?.docs || []
-        
+
         const autoSelectionResult = await attemptAutoSelection(events)
-        
+
         if (autoSelectionResult.success && autoSelectionResult.eventId && autoSelectionResult.scheduleId) {
           // Auto-selection successful
           setCurrentEventId(autoSelectionResult.eventId)
           setCurrentScheduleId(autoSelectionResult.scheduleId)
-          
+
           // Cache the selection
           setCachedEventSelection(
             autoSelectionResult.eventId,
@@ -126,7 +126,7 @@ const PaperPageClient = () => {
               scheduleTime: autoSelectionResult.schedule?.details?.[0]?.time
             }
           )
-          
+
           setAutoSelection({
             isAutoSelected: true,
             isLoading: false,
@@ -141,7 +141,7 @@ const PaperPageClient = () => {
             attempted: true,
             error: autoSelectionResult.reason || 'unknown'
           })
-          
+
           const reason = autoSelectionResult.reason || 'unknown'
           router.push(`/checkin/events?mode=paper&reason=${reason}`)
         }
@@ -153,28 +153,24 @@ const PaperPageClient = () => {
           attempted: true,
           error: 'fetch_error'
         })
-        
+
         // Redirect to manual selection
         router.push('/checkin/events?mode=paper&reason=fetch_error')
       }
     }
-    
+
     performAutoSelection()
   }, [router, currentEventId, currentScheduleId])
 
-  // Fetch stats on mount and poll every 20s
+  // Fetch stats on mount only (no auto-polling for performance)
   useEffect(() => {
     async function fetchStats() {
       if (!currentEventId || !currentScheduleId) return
       try {
-        await fetch(`/api/checkin-app/stats?eventId=${currentEventId}&scheduleId=${currentScheduleId}`)
-      } catch (_) {}
+        await fetch(`/api/checkin-app/event-stats?eventId=${currentEventId}&scheduleId=${currentScheduleId}`)
+      } catch (_) { }
     }
     fetchStats()
-    const interval = setInterval(fetchStats, 20000)
-    return () => {
-      clearInterval(interval)
-    }
   }, [currentEventId, currentScheduleId])
 
   // Handle seat number input
@@ -319,7 +315,7 @@ const PaperPageClient = () => {
         <div className="max-w-2xl mx-auto py-8 px-2 sm:px-0">
           {/* Event info and stats */}
           <ScheduleStatsInfo eventId={currentEventId} scheduleId={currentScheduleId} />
-          
+
           {/* Auto-selection indicator */}
           {autoSelection.isAutoSelected && !missingContext && (
             <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-700 rounded-lg">
@@ -333,7 +329,7 @@ const PaperPageClient = () => {
               </div>
             </div>
           )}
-          
+
           {/* Loading indicator during auto-selection */}
           {autoSelection.isLoading && (
             <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
@@ -348,7 +344,7 @@ const PaperPageClient = () => {
               </div>
             </div>
           )}
-          
+
           <div className="text-right mb-4">
             <Link href="/checkin/events?mode=paper" className="text-sm text-indigo-700 hover:underline">{t('checkin.paper.changeEvent') || 'Change event'}</Link>
           </div>
@@ -358,7 +354,7 @@ const PaperPageClient = () => {
               <div className="space-y-6">
                 {/* Event/Schedule Context Required */}
                 {missingContext && (
-                  <div 
+                  <div
                     className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border border-amber-200 dark:border-amber-700 rounded-lg p-6 shadow-sm"
                     role="alert"
                     aria-live="polite"
@@ -374,7 +370,7 @@ const PaperPageClient = () => {
                         <p className="text-amber-700 dark:text-amber-300 mb-4">
                           {t('checkin.paper.selectEventMessage')}
                         </p>
-                        <Link 
+                        <Link
                           href="/checkin/events?mode=paper"
                           className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                           aria-label="Navigate to event selection page for paper check-in"
@@ -393,8 +389,8 @@ const PaperPageClient = () => {
                 {!missingContext && (
                   <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
                     <div className="mb-6">
-                      <label 
-                        htmlFor="seat-input" 
+                      <label
+                        htmlFor="seat-input"
                         className="block text-lg font-semibold text-gray-900 dark:text-white mb-3"
                       >
                         {t('checkin.paper.seatNumberLabel')}
@@ -427,7 +423,7 @@ const PaperPageClient = () => {
                         {t('checkin.paper.seatNumberHelp')}
                       </p>
                     </div>
-                    
+
                     <button
                       onClick={validateSeat}
                       disabled={!seatNumber.trim() || isValidating}
@@ -453,26 +449,24 @@ const PaperPageClient = () => {
                     </button>
                   </div>
                 )}
-                
+
                 {/* Feedback Display */}
                 {feedback && (
-                  <div 
-                    className={`border-2 rounded-xl p-6 shadow-lg transition-all duration-300 ${
-                      feedback.type === 'success' 
-                        ? 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700' 
-                        : feedback.type === 'error' 
-                        ? 'bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-red-200 dark:border-red-700' 
+                  <div
+                    className={`border-2 rounded-xl p-6 shadow-lg transition-all duration-300 ${feedback.type === 'success'
+                      ? 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700'
+                      : feedback.type === 'error'
+                        ? 'bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-red-200 dark:border-red-700'
                         : 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700'
-                    }`}
+                      }`}
                     role="alert"
                     aria-live="polite"
                   >
                     <div className="flex items-start">
-                      <div className={`flex-shrink-0 mr-4 ${
-                        feedback.type === 'success' ? 'text-green-600 dark:text-green-400' :
+                      <div className={`flex-shrink-0 mr-4 ${feedback.type === 'success' ? 'text-green-600 dark:text-green-400' :
                         feedback.type === 'error' ? 'text-red-600 dark:text-red-400' :
-                        'text-blue-600 dark:text-blue-400'
-                      }`}>
+                          'text-blue-600 dark:text-blue-400'
+                        }`}>
                         {feedback.type === 'success' ? (
                           <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -487,20 +481,19 @@ const PaperPageClient = () => {
                           </svg>
                         )}
                       </div>
-                      <p className={`text-lg font-medium ${
-                        feedback.type === 'success' ? 'text-green-800 dark:text-green-200' :
+                      <p className={`text-lg font-medium ${feedback.type === 'success' ? 'text-green-800 dark:text-green-200' :
                         feedback.type === 'error' ? 'text-red-800 dark:text-red-200' :
-                        'text-blue-800 dark:text-blue-200'
-                      }`}>
+                          'text-blue-800 dark:text-blue-200'
+                        }`}>
                         {feedback.message}
                       </p>
                     </div>
                   </div>
                 )}
-                
+
                 {/* Error Display */}
                 {error && (
-                  <div 
+                  <div
                     className="bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-2 border-red-200 dark:border-red-700 rounded-xl p-6 shadow-lg"
                     role="alert"
                     aria-live="assertive"
@@ -513,7 +506,7 @@ const PaperPageClient = () => {
                     </div>
                   </div>
                 )}
-                
+
                 {/* Ticket Confirmation (reuse VisitorInfoCard) */}
                 {validatedTicket && !missingContext && (
                   <div className="border-t-4 border-indigo-700 mt-8 pt-6">
