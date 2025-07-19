@@ -94,6 +94,10 @@ export const attemptAutoSelection = async (events: EventWithSchedules[]): Promis
     
     // Exactly one event found - auto-select it
     const event = todaysEvents[0]
+    if (!event) {
+      return { success: false, reason: 'no_events_today' }
+    }
+    
     const today = getTodayInVietnam()
     
     // Find today's schedule within the event
