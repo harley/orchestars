@@ -673,23 +673,10 @@ export default function ValidatePageClient() {
       `}</style>
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-start justify-center p-4 pt-8">
         <div className="max-w-lg w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6">
-          {/* Back Button */}
-          <button
-            type="button"
-            onClick={() => router.replace('/checkin/events')}
-            className="mb-4 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
-          >
-            ← Back to Events
-          </button>
-
           <CheckinNav />
 
-          {/* Title - More prominent */}
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
-            Search Tickets
-          </h1>
           <p className="text-gray-600 dark:text-gray-400 mb-4 text-center text-sm">
-            Look up tickets for people without QR code or Paper tickets
+            For people without QR code or Paper tickets
           </p>
 
           {/* Event & Stats */}
@@ -697,7 +684,7 @@ export default function ValidatePageClient() {
 
           {/* Auto-selection indicator */}
           {autoSelection.isAutoSelected && eventId && scheduleId && (
-            <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-700 rounded-lg">
+            <div className="p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-700 rounded-md">
               <div className="flex items-center">
                 <svg className="w-5 h-5 text-green-600 dark:text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -711,7 +698,7 @@ export default function ValidatePageClient() {
 
           {/* Loading indicator during auto-selection */}
           {autoSelection.isLoading && (
-            <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+            <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
               <div className="flex items-center">
                 <svg className="animate-spin w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -726,7 +713,7 @@ export default function ValidatePageClient() {
 
           {/* Change event link */}
           {(autoSelection.isAutoSelected || (!autoSelection.isLoading && eventId && scheduleId)) && (
-            <div className="text-right mb-4">
+            <div className="text-right">
               <button
                 onClick={() => router.push('/checkin/events?mode=search')}
                 className="text-sm text-indigo-700 hover:underline"

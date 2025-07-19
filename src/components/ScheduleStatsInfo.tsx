@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { User, Users } from 'lucide-react'
+import { User, Users, RotateCcw } from 'lucide-react'
 import { useTranslate } from '@/providers/I18n/client'
 
 interface Props {
@@ -22,14 +22,12 @@ const ScheduleStatsInfo: React.FC<Props> = ({ eventId, scheduleId, className = '
   const [eventTitle, setEventTitle] = useState('')
   const [eventDate, setEventDate] = useState('')
   const [eventTime, setEventTime] = useState('')
-  const [eventLocation, setEventLocation] = useState('')
 
   useEffect(() => {
     if (typeof window === 'undefined') return
     setEventTitle(localStorage.getItem('eventTitle') || '')
     setEventDate(localStorage.getItem('eventScheduleDate') || '')
     setEventTime(localStorage.getItem('eventScheduleTime') || '')
-    setEventLocation(localStorage.getItem('eventLocation') || '')
   }, [])
 
   const fetchStats = useCallback(async () => {
@@ -66,23 +64,28 @@ const ScheduleStatsInfo: React.FC<Props> = ({ eventId, scheduleId, className = '
       <button
         onClick={fetchStats}
         disabled={stats.loading}
-        className="absolute top-2 right-2 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         title="Refresh stats"
         aria-label="Refresh check-in statistics"
       >
-        <span className={`text-sm ${stats.loading ? 'animate-spin' : ''}`}>
-          🔄
-        </span>
+        <RotateCcw className={`w-4 h-4 ${stats.loading ? 'animate-spin' : ''}`} />
       </button>
 
       {/* Title and basic meta */}
       {eventTitle && (
         <>
           <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1 pr-8">{eventTitle}</h2>
-          <div className="space-y-0.5 text-xs text-gray-600 dark:text-gray-300 mb-3">
-            {eventDate && <div>Date: {eventDate}</div>}
-            {eventTime && <div>Time: {eventTime}</div>}
-            {eventLocation && <div>Location: {eventLocation}</div>}
+          <div className="flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-300 mb-3">
+            {eventDate && (
+              <span className="px-2 py-0.5 min-w-[80px] text-center rounded-full whitespace-nowrap bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 font-bold" aria-label={`Event date ${eventDate}`}>
+                {eventDate}
+              </span>
+            )}
+            {eventTime && (
+              <span className="px-2 py-0.5 min-w-[80px] text-center rounded-full whitespace-nowrap bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100" aria-label={`Event time ${eventTime}`}>
+                {eventTime}
+              </span>
+            )}
           </div>
         </>
       )}
@@ -92,12 +95,20 @@ const ScheduleStatsInfo: React.FC<Props> = ({ eventId, scheduleId, className = '
         <div className="flex items-center text-blue-600 dark:text-blue-400">
           <User className="w-4 h-4 mr-1" />
           <span className="font-medium truncate">{t('checkin.event.checkedInByMe')}</span>
-          <span className="ml-1 font-bold">{stats.loading ? '...' : stats.adminCheckins}</span>
+          {stats.loading ? (
+            <span className="ml-1 font-bold text-gray-400 animate-pulse">...</span>
+          ) : (
+            <span className="ml-1 font-bold" aria-live="polite">{stats.adminCheckins}</span>
+          )}
         </div>
         <div className="flex items-center text-green-600 dark:text-green-400">
           <Users className="w-4 h-4 mr-1" />
           <span className="font-medium truncate">{t('checkin.event.totalCheckedIn')}</span>
-          <span className="ml-1 font-bold">{stats.loading ? '...' : stats.totalCheckins}</span>
+          {stats.loading ? (
+            <span className="ml-1 font-bold text-gray-400 animate-pulse">...</span>
+          ) : (
+            <span className="ml-1 font-bold" aria-live="polite">{stats.totalCheckins}</span>
+          )}
         </div>
       </div>
     </div>
