@@ -48,9 +48,15 @@ export const getTodayInVietnam = (): string => {
 export const findTodaysEvents = (events: EventWithSchedules[]): EventWithSchedules[] => {
   const today = getTodayInVietnam()
   
+  // Defensive check to ensure events is an array
+  if (!Array.isArray(events)) {
+    console.warn('findTodaysEvents: events parameter is not an array:', events)
+    return []
+  }
+  
   return events.filter(event => {
-    // Only consider active/published events
-    if (event.status && !['active', 'published'].includes(event.status)) {
+    // Only consider events that are open for sales or upcoming
+    if (event.status && !['published_open_sales', 'published_upcoming'].includes(event.status)) {
       return false
     }
     

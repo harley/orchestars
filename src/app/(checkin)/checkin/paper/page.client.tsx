@@ -12,14 +12,12 @@ import ScheduleStatsInfo from '@/components/ScheduleStatsInfo'
 import { TicketCard } from '@/components/ui/TicketCard'
 import { 
   attemptAutoSelection, 
-  getAutoSelectionFailureMessage,
   type EventWithSchedules 
 } from '@/lib/checkin/autoEventSelection'
 import { 
   getCachedEventSelection, 
   setCachedEventSelection, 
-  clearExpiredCache,
-  isCurrentSelectionAutoSelected 
+  clearExpiredCache
 } from '@/lib/checkin/eventSelectionCache'
 import { format } from 'date-fns'
 
@@ -107,7 +105,7 @@ const PaperPageClient = () => {
         }
         
         const data = await response.json()
-        const events: EventWithSchedules[] = data.events || []
+        const events: EventWithSchedules[] = data.events?.docs || []
         
         const autoSelectionResult = await attemptAutoSelection(events)
         
@@ -345,7 +343,7 @@ const PaperPageClient = () => {
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                  Finding today's event...
+                  Finding today&apos;s event...
                 </span>
               </div>
             </div>

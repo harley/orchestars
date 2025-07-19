@@ -1,4 +1,3 @@
-import { format } from 'date-fns'
 import { toZonedTime } from 'date-fns-tz'
 import { getTodayInVietnam } from './autoEventSelection'
 

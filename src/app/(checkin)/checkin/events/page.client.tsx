@@ -60,17 +60,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     }) || false
   }
   
-  // Helper function to check if a schedule is today
-  const isScheduleToday = (schedule: Schedule): boolean => {
-    const today = getTodayInVietnam()
-    if (!schedule.date) return false
-    try {
-      const scheduleDate = format(new Date(schedule.date), 'yyyy-MM-dd')
-      return scheduleDate === today
-    } catch {
-      return false
-    }
-  }
+
   
   // Get auto-selection failure reason from URL
   const autoSelectionReason = searchParams.get('reason')
@@ -421,7 +411,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
                 </div>
               )}
             </div>
-          ))}
+          )})}
         </div>
 
         {selectedEvent && selectedSchedule && (
