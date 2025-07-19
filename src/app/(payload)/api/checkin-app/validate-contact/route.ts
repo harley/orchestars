@@ -96,21 +96,21 @@ export async function POST(req: NextRequest) {
 
     // For phone searches, check if we should use enhanced ILIKE search
     if (phoneNumber) {
-      const sanitizedPhone = sanitizeSearchTerm(phoneNumber)
       const payload = await getPayload()
 
-      // Normalize phone number for digit-only matching
+      // Normalize phone number for digit-only matching (consistent with findTickets.ts)
       const normalizePhoneNumber = (phone: string): string => {
         return phone.replace(/\D/g, '') // Remove all non-digit characters
       }
-      const searchDigits = normalizePhoneNumber(sanitizedPhone)
+      const normalizedPhone = normalizePhoneNumber(phoneNumber)
+      const sanitizedPhone = sanitizeSearchTerm(normalizedPhone)
 
       // Count unique users that match the phone pattern and have tickets for this event
       const uniqueUserCountQuery = sql`
         SELECT COUNT(DISTINCT u.id) as unique_user_count
         FROM users u
         INNER JOIN tickets t ON t.user_id = u.id
-        WHERE (u.phone_number ILIKE ${'%' + searchDigits + '%'} OR u.phone_number ILIKE ${'%' + sanitizedPhone + '%'})
+        WHERE u.phone_number ILIKE ${'%' + sanitizedPhone + '%'}
           AND t.event_id = ${eventId}
           AND t.event_schedule_id = ${scheduleId}
           AND t.status = 'booked'
