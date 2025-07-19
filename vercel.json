@@ -1,4 +1,10 @@
 {
+  "functions": {
+    "src/app/api/checkin-app/**": {
+      "maxDuration": 10,
+      "memory": 512
+    }
+  },
   "crons": [
     {
       "path": "/api/cron/send-qr-event-ticket",
