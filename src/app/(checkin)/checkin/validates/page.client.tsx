@@ -348,8 +348,8 @@ export default function ValidatePageClient() {
 
     // Cleanup in case component unmounts during fetch
     return () => controller.abort()
-    // We only depend on router here; URL params are read just once on mount
-  }, [router])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]) // searchParams intentionally omitted - we only want this to run once on mount
 
   // If not hydrated yet, show loading
   if (!isHydrated) {
