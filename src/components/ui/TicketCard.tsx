@@ -1,4 +1,7 @@
+'use client'
+
 import React from 'react'
+import { useRouter } from 'next/navigation'
 import { getTicketClassColor } from '@/utilities/getTicketClassColor'
 
 export function TicketCard({ ticket, onCheckIn, isCheckingIn }: {
@@ -6,20 +9,30 @@ export function TicketCard({ ticket, onCheckIn, isCheckingIn }: {
   onCheckIn: (ticket: any) => void,
   isCheckingIn: boolean
 }) {
+  const router = useRouter()
   const ticketColors = getTicketClassColor(ticket.ticketPriceInfo)
+
+  const handleSeatClick = () => {
+    if (ticket.ticketCode) {
+      window.open(`/ticket/${ticket.ticketCode}`, '_blank')
+    }
+  }
 
   return (
     <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 transition-shadow hover:shadow-md">
       {/* Responsive wrapper: stacks on mobile, row on sm+ */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center flex-wrap">
         {/* Left: Seat box with ticket class color and tier label */}
-        <div
-          className="flex flex-col items-center justify-center w-16 min-w-16 rounded-lg shadow h-full py-2"
+        <button
+          onClick={handleSeatClick}
+          className="flex flex-col items-center justify-center w-16 min-w-16 rounded-lg shadow h-full py-2 transition-transform hover:scale-105 active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           style={{ backgroundColor: ticketColors.color, color: ticketColors.textColor }}
+          aria-label={`View QR code for seat ${ticket.seat}`}
+          title="Tap to view QR code"
         >
           <span className="text-xs font-medium opacity-80 mb-1">{ticket.ticketPriceName || 'N/A'}</span>
           <span className="text-xl font-bold leading-none tracking-tight">{ticket.seat}</span>
-        </div>
+        </button>
         {/* Middle: Ticket info */}
         <div className="flex-1 flex flex-col justify-center">
           {/* Row 1: Ticket code only */}
@@ -70,8 +83,8 @@ export function TicketCard({ ticket, onCheckIn, isCheckingIn }: {
               onClick={() => onCheckIn(ticket)}
               disabled={isCheckingIn}
               className={`px-6 py-2 rounded-md font-semibold text-white transition-colors text-base ${isCheckingIn
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
                 }`}
             >
               {isCheckingIn ? 'Checking...' : 'Check In'}
