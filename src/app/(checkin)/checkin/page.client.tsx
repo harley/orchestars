@@ -38,7 +38,11 @@ export default function Login() {
       if (res?.ok) {
         const token = await res.json() // or decode from cookie if SSR-only
         setToken(token.token) // optional since cookie already stores it
+        // Navigate to scan page then refresh to ensure server components (like AdminNav)
+        // re-fetch the admin user based on the newly set cookie so that the navbar
+        // immediately reflects the logged-in state without requiring a full page reload.
         router.replace('/checkin/scan')
+        router.refresh()
       } else {
         const err = await res.json()
         console.error('err', err)
