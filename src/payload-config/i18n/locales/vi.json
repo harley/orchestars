@@ -248,7 +248,8 @@
     "booked": "Đã đặt",
     "qrCodeNotAvailable": "Mã QR chỉ có sẵn cho vé đã đặt.",
     "termsAndConditions": "Điều khoản & Điều kiện",
-    "details": "Chi tiết vé"
+    "details": "Chi tiết vé",
+    "instructions": "Hướng dẫn"
   },
   "checkout": {
     "personalInfo": "Thông tin cá nhân",
