@@ -2,8 +2,6 @@ import type { CollectionConfig } from 'payload'
 import { isAdminOrSuperAdmin, isSuperAdmin } from '@/access/isAdminOrSuperAdmin'
 import { ADMIN_TOKEN_EXPIRATION_IN_SECONDS } from '@/config/app'
 
-console.log('ADMIN_TOKEN_EXPIRATION_IN_SECONDS', ADMIN_TOKEN_EXPIRATION_IN_SECONDS)
-
 const Admins: CollectionConfig = {
   slug: 'admins',
   admin: {
