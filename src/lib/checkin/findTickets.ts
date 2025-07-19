@@ -82,8 +82,8 @@ export const findTickets = async (opts: {
       ${email ? (useILIKE ? sql`AND u.email ILIKE ${'%' + email + '%'}` : sql`AND u.email = ${email}`) : sql``}
       ${
         phoneNumber
-          ? useILIKE 
-            ? sql`AND (u.phone_number ILIKE ${'%' + normalizePhoneNumber(phoneNumber) + '%'} OR u.phone_number ILIKE ${'%' + phoneNumber + '%'})`
+          ? useILIKE
+            ? sql`AND u.phone_number ILIKE ${'%' + normalizePhoneNumber(phoneNumber) + '%'}`
             : sql`AND EXISTS (SELECT 1 FROM users_phone_numbers upn WHERE upn._parent_id = u.id AND upn.phone = ${phoneNumber})`
           : sql``
       }
