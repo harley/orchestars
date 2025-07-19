@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { User, Users } from 'lucide-react'
 import { useTranslate } from '@/providers/I18n/client'
 
@@ -32,7 +32,7 @@ const ScheduleStatsInfo: React.FC<Props> = ({ eventId, scheduleId, className = '
     setEventLocation(localStorage.getItem('eventLocation') || '')
   }, [])
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     if (!eventId || !scheduleId) return
     
     setStats((prev) => ({ ...prev, loading: true }))
@@ -52,11 +52,11 @@ const ScheduleStatsInfo: React.FC<Props> = ({ eventId, scheduleId, className = '
       console.error('Failed to fetch event stats:', _)
       setStats((prev) => ({ ...prev, loading: false }))
     }
-  }
+  }, [eventId, scheduleId])
 
   useEffect(() => {
     fetchStats()
-  }, [eventId, scheduleId])
+  }, [fetchStats])
 
   if (!eventId || !scheduleId) return null
 
