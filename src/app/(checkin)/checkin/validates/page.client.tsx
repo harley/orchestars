@@ -673,15 +673,6 @@ export default function ValidatePageClient() {
       `}</style>
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-start justify-center p-4 pt-8">
         <div className="max-w-lg w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6">
-          {/* Back Button */}
-          <button
-            type="button"
-            onClick={() => router.replace('/checkin/events')}
-            className="mb-4 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
-          >
-            ← Back to Events
-          </button>
-
           <CheckinNav />
 
           <p className="text-gray-600 dark:text-gray-400 mb-4 text-center text-sm">
