@@ -12,17 +12,6 @@ export interface CachedEventSelection {
 }
 
 /**
- * Get the timestamp for end of day in Vietnam timezone
- */
-export const getEndOfDayTimestamp = (): number => {
-  const now = new Date()
-  const vietnamTime = toZonedTime(now, 'Asia/Ho_Chi_Minh')
-  const endOfDay = new Date(vietnamTime)
-  endOfDay.setHours(23, 59, 59, 999)
-  return endOfDay.getTime()
-}
-
-/**
  * Check if the cached selection is still valid (same day and not expired)
  */
 export const isCacheValid = (): boolean => {

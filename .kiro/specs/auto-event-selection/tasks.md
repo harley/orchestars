@@ -70,3 +70,10 @@
   - Create tests for navigation flow between auto-selection and manual selection
   - Test edge cases like multiple events, no events, and network failures
   - _Requirements: 1.1, 1.2, 1.3, 2.4, 2.5, 4.1, 4.4, 7.1, 7.2_
+
+- [x] 11. Code cleanup and documentation updates
+  - Remove unused `getEndOfDayTimestamp` function from eventSelectionCache.ts
+  - Update design documentation to reflect actual implementation approach
+  - Ensure spec files accurately represent the implemented solution
+  - Clean up any remaining dead code or unused imports
+  - _Requirements: Code quality, maintainability_

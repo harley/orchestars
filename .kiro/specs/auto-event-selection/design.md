@@ -450,66 +450,101 @@ describe('Paper Check-in with Auto-Selection', () => {
 ## Performance Considerations
 
 ### Caching Strategy
+The implementation uses a simplified date-based caching approach that stores event selections in localStorage with daily expiration:
+
 ```typescript
-// Cache selected event until end of day
-const getEndOfDayTimestamp = (): number => {
-  const now = new Date()
-  const vietnamTime = toZonedTime(now, 'Asia/Ho_Chi_Minh')
-  const endOfDay = new Date(vietnamTime)
-  endOfDay.setHours(23, 59, 59, 999)
-  return endOfDay.getTime()
-}
-
-const cachedEventSelection = {
-  eventId: null as string | null,
-  scheduleId: null as string | null,
-  date: '',
-  isAutoSelected: false,
-  expiresAt: 0
-}
-
-const getCachedEventSelection = (): {
-  eventId: string | null
-  scheduleId: string | null
-  isAutoSelected: boolean
-} | null => {
-  const today = getTodayInVietnam()
-  const now = Date.now()
+// Cache validation based on date comparison
+const isCacheValid = (): boolean => {
+  if (typeof window === 'undefined') return false
   
-  // Check if cache is valid (same day and not expired)
-  if (
-    cachedEventSelection.date === today &&
-    now < cachedEventSelection.expiresAt &&
-    cachedEventSelection.eventId &&
-    cachedEventSelection.scheduleId
-  ) {
-    return {
-      eventId: cachedEventSelection.eventId,
-      scheduleId: cachedEventSelection.scheduleId,
-      isAutoSelected: cachedEventSelection.isAutoSelected
-    }
+  const today = getTodayInVietnam()
+  const cachedDate = localStorage.getItem('autoSelectionDate')
+  const cachedEventId = localStorage.getItem('selectedEventId')
+  const cachedScheduleId = localStorage.getItem('selectedScheduleId')
+  
+  // Check if we have the required cached data and it's for today
+  return !!(
+    cachedDate === today &&
+    cachedEventId &&
+    cachedScheduleId
+  )
+}
+
+const getCachedEventSelection = (): CachedEventSelection | null => {
+  if (typeof window === 'undefined') return null
+  
+  if (!isCacheValid()) {
+    return null
   }
   
-  return null
+  const eventId = localStorage.getItem('selectedEventId')
+  const scheduleId = localStorage.getItem('selectedScheduleId')
+  const isAutoSelected = localStorage.getItem('isAutoSelected') === 'true'
+  
+  if (!eventId || !scheduleId) {
+    return null
+  }
+  
+  return {
+    eventId,
+    scheduleId,
+    isAutoSelected,
+    // ... additional metadata
+  }
 }
 
 const setCachedEventSelection = (
   eventId: string,
   scheduleId: string,
-  isAutoSelected: boolean
-) => {
-  const today = getTodayInVietnam()
-  cachedEventSelection.eventId = eventId
-  cachedEventSelection.scheduleId = scheduleId
-  cachedEventSelection.date = today
-  cachedEventSelection.isAutoSelected = isAutoSelected
-  cachedEventSelection.expiresAt = getEndOfDayTimestamp()
+  isAutoSelected: boolean,
+  eventData?: {
+    title?: string
+    location?: string
+    scheduleDate?: string
+    scheduleTime?: string
+  }
+): void => {
+  if (typeof window === 'undefined') return
   
-  // Also store in localStorage for persistence across page reloads
+  const today = getTodayInVietnam()
+  
+  // Store core selection data
   localStorage.setItem('selectedEventId', eventId)
   localStorage.setItem('selectedScheduleId', scheduleId)
   localStorage.setItem('isAutoSelected', isAutoSelected.toString())
   localStorage.setItem('autoSelectionDate', today)
+  
+  // Store additional event data if provided
+  if (eventData?.title) {
+    localStorage.setItem('eventTitle', eventData.title)
+  }
+  // ... other metadata storage
+}
+
+// Automatic cleanup of expired cache entries
+const clearExpiredCache = (): void => {
+  if (typeof window === 'undefined') return
+  
+  const today = getTodayInVietnam()
+  const cachedDate = localStorage.getItem('autoSelectionDate')
+  
+  // If cached date is not today, clear all selection-related cache
+  if (cachedDate && cachedDate !== today) {
+    const keysToRemove = [
+      'selectedEventId',
+      'selectedScheduleId',
+      'isAutoSelected',
+      'autoSelectionDate',
+      'eventTitle',
+      'eventLocation',
+      'eventScheduleDate',
+      'eventScheduleTime'
+    ]
+    
+    keysToRemove.forEach(key => {
+      localStorage.removeItem(key)
+    })
+  }
 }
 ```
 
