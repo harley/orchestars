@@ -7,7 +7,7 @@ const LoginPage = async () => {
   const authData = await checkAuthenticated()
 
   if (authData?.user) {
-    return redirect('/checkin/events')
+    return redirect('/checkin/scan')
   }
 
   return <LoginPageClient />
