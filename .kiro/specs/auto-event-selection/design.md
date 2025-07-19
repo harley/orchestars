@@ -156,14 +156,21 @@ export async function GET() {
   try {
     const today = getTodayInVietnam()
     
+    // Calculate start and end of day in Vietnam timezone, then convert to UTC
+    const vietnamStartOfDay = toZonedTime(new Date(`${today}T00:00:00`), 'Asia/Ho_Chi_Minh')
+    const vietnamEndOfDay = toZonedTime(new Date(`${today}T23:59:59.999`), 'Asia/Ho_Chi_Minh')
+    
+    const utcStartOfDay = fromZonedTime(vietnamStartOfDay, 'Asia/Ho_Chi_Minh')
+    const utcEndOfDay = fromZonedTime(vietnamEndOfDay, 'Asia/Ho_Chi_Minh')
+    
     const events = await payload.find({
       collection: 'events',
       where: {
         and: [
           {
             'schedules.date': {
-              greater_than_equal: `${today}T00:00:00.000Z`,
-              less_than: `${today}T23:59:59.999Z`
+              greater_than_equal: utcStartOfDay.toISOString(),
+              less_than: utcEndOfDay.toISOString()
             }
           },
           {

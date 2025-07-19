@@ -74,8 +74,14 @@ const PaperPageClient = () => {
       // Clear any expired cache first
       clearExpiredCache()
 
+      // Get initial values from URL params
+      const urlEventId = searchParams.get('eventId') || searchParams.get('event')
+      const urlScheduleId = searchParams.get('scheduleId') || searchParams.get('schedule')
+
       // If we already have event/schedule from URL params, use them
-      if (currentEventId && currentScheduleId) {
+      if (urlEventId && urlScheduleId) {
+        setCurrentEventId(urlEventId)
+        setCurrentScheduleId(urlScheduleId)
         setAutoSelection(prev => ({ ...prev, attempted: true, isAutoSelected: false }))
         return
       }
@@ -160,7 +166,7 @@ const PaperPageClient = () => {
     }
 
     performAutoSelection()
-  }, [router, currentEventId, currentScheduleId])
+  }, [router, searchParams])
 
   // Fetch stats on mount only (no auto-polling for performance)
   useEffect(() => {
