@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/CheckIn/useAuth'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import Link from 'next/link'
@@ -10,6 +10,18 @@ import { useTranslate } from '@/providers/I18n/client'
 import { type TicketDTO } from '@/lib/checkin/findTickets'
 import ScheduleStatsInfo from '@/components/ScheduleStatsInfo'
 import { TicketCard } from '@/components/ui/TicketCard'
+import { 
+  attemptAutoSelection, 
+  getAutoSelectionFailureMessage,
+  type EventWithSchedules 
+} from '@/lib/checkin/autoEventSelection'
+import { 
+  getCachedEventSelection, 
+  setCachedEventSelection, 
+  clearExpiredCache,
+  isCurrentSelectionAutoSelected 
+} from '@/lib/checkin/eventSelectionCache'
+import { format } from 'date-fns'
 
 
 interface FeedbackState {
@@ -17,15 +29,35 @@ interface FeedbackState {
   message: string
 }
 
+interface AutoSelectionState {
+  isAutoSelected: boolean
+  isLoading: boolean
+  attempted: boolean
+  error: string | null
+}
+
 const PaperPageClient = () => {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const { token } = useAuth()
   const { t } = useTranslate()
   const seatInputRef = useRef<HTMLInputElement>(null)
   
   // Get event and schedule from URL params
-  const eventId = searchParams.get('eventId') || searchParams.get('event')
-  const scheduleId = searchParams.get('scheduleId') || searchParams.get('schedule')
+  const [currentEventId, setCurrentEventId] = useState<string | null>(
+    searchParams.get('eventId') || searchParams.get('event')
+  )
+  const [currentScheduleId, setCurrentScheduleId] = useState<string | null>(
+    searchParams.get('scheduleId') || searchParams.get('schedule')
+  )
+  
+  // Auto-selection state
+  const [autoSelection, setAutoSelection] = useState<AutoSelectionState>({
+    isAutoSelected: false,
+    isLoading: false,
+    attempted: false,
+    error: null
+  })
   
   // State for paper check-in
   const [seatNumber, setSeatNumber] = useState('')
@@ -36,22 +68,108 @@ const PaperPageClient = () => {
   const [feedback, setFeedback] = useState<FeedbackState | null>(null)
   const [lastValidationTime, setLastValidationTime] = useState(0)
 
-  // Removed unused event info state variables
-
-  // Load event info from localStorage on mount
+  // Auto-selection logic on mount
   useEffect(() => {
     if (typeof window === 'undefined') return
-
-  }, [])
-
-  // Removed unused stats state variables
+    
+    const performAutoSelection = async () => {
+      // Clear any expired cache first
+      clearExpiredCache()
+      
+      // If we already have event/schedule from URL params, use them
+      if (currentEventId && currentScheduleId) {
+        setAutoSelection(prev => ({ ...prev, attempted: true, isAutoSelected: false }))
+        return
+      }
+      
+      // Check if we have a valid cached selection
+      const cachedSelection = getCachedEventSelection()
+      if (cachedSelection) {
+        setCurrentEventId(cachedSelection.eventId)
+        setCurrentScheduleId(cachedSelection.scheduleId)
+        setAutoSelection({
+          isAutoSelected: cachedSelection.isAutoSelected,
+          isLoading: false,
+          attempted: true,
+          error: null
+        })
+        return
+      }
+      
+      // Attempt auto-selection
+      setAutoSelection(prev => ({ ...prev, isLoading: true, attempted: false }))
+      
+      try {
+        // Fetch events for auto-selection
+        const response = await fetch('/api/checkin-app/events')
+        if (!response.ok) {
+          throw new Error('Failed to fetch events')
+        }
+        
+        const data = await response.json()
+        const events: EventWithSchedules[] = data.events || []
+        
+        const autoSelectionResult = await attemptAutoSelection(events)
+        
+        if (autoSelectionResult.success && autoSelectionResult.eventId && autoSelectionResult.scheduleId) {
+          // Auto-selection successful
+          setCurrentEventId(autoSelectionResult.eventId)
+          setCurrentScheduleId(autoSelectionResult.scheduleId)
+          
+          // Cache the selection
+          setCachedEventSelection(
+            autoSelectionResult.eventId,
+            autoSelectionResult.scheduleId,
+            true, // isAutoSelected
+            {
+              title: autoSelectionResult.event?.title,
+              location: autoSelectionResult.event?.eventLocation,
+              scheduleDate: autoSelectionResult.schedule?.date ? format(new Date(autoSelectionResult.schedule.date), 'dd-MM-yyyy') : undefined,
+              scheduleTime: autoSelectionResult.schedule?.details?.[0]?.time
+            }
+          )
+          
+          setAutoSelection({
+            isAutoSelected: true,
+            isLoading: false,
+            attempted: true,
+            error: null
+          })
+        } else {
+          // Auto-selection failed - redirect to manual selection
+          setAutoSelection({
+            isAutoSelected: false,
+            isLoading: false,
+            attempted: true,
+            error: autoSelectionResult.reason || 'unknown'
+          })
+          
+          const reason = autoSelectionResult.reason || 'unknown'
+          router.push(`/checkin/events?mode=paper&reason=${reason}`)
+        }
+      } catch (error) {
+        console.error('Auto-selection failed:', error)
+        setAutoSelection({
+          isAutoSelected: false,
+          isLoading: false,
+          attempted: true,
+          error: 'fetch_error'
+        })
+        
+        // Redirect to manual selection
+        router.push('/checkin/events?mode=paper&reason=fetch_error')
+      }
+    }
+    
+    performAutoSelection()
+  }, [router, currentEventId, currentScheduleId])
 
   // Fetch stats on mount and poll every 20s
   useEffect(() => {
     async function fetchStats() {
-      if (!eventId || !scheduleId) return
+      if (!currentEventId || !currentScheduleId) return
       try {
-        await fetch(`/api/checkin-app/stats?eventId=${eventId}&scheduleId=${scheduleId}`)
+        await fetch(`/api/checkin-app/stats?eventId=${currentEventId}&scheduleId=${currentScheduleId}`)
       } catch (_) {}
     }
     fetchStats()
@@ -59,7 +177,7 @@ const PaperPageClient = () => {
     return () => {
       clearInterval(interval)
     }
-  }, [eventId, scheduleId])
+  }, [currentEventId, currentScheduleId])
 
   // Handle seat number input
   const handleSeatChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,7 +189,7 @@ const PaperPageClient = () => {
 
   // Validate seat number with throttling
   const validateSeat = useCallback(async () => {
-    if (!seatNumber.trim() || !eventId || !scheduleId) {
+    if (!seatNumber.trim() || !currentEventId || !currentScheduleId) {
       setError(t('checkin.paper.seatValidationError'))
       return
     }
@@ -94,8 +212,8 @@ const PaperPageClient = () => {
         },
         body: JSON.stringify({
           seatNumber: seatNumber.trim(),
-          eventId,
-          scheduleId,
+          eventId: currentEventId,
+          scheduleId: currentScheduleId,
         }),
       })
       if (response.status === 401) {
@@ -121,7 +239,7 @@ const PaperPageClient = () => {
     } finally {
       setIsValidating(false)
     }
-  }, [seatNumber, eventId, scheduleId, lastValidationTime, token, t])
+  }, [seatNumber, currentEventId, currentScheduleId, lastValidationTime, token, t])
 
   // Handle check-in
   const handleCheckIn = async () => {
@@ -187,7 +305,7 @@ const PaperPageClient = () => {
   }
 
   // Check if event/schedule context is missing
-  const missingContext = !eventId || !scheduleId
+  const missingContext = !currentEventId || !currentScheduleId
 
   // Auto-focus on mount
   useEffect(() => {
@@ -202,7 +320,37 @@ const PaperPageClient = () => {
         <CheckinNav />
         <div className="max-w-2xl mx-auto py-8 px-2 sm:px-0">
           {/* Event info and stats */}
-          <ScheduleStatsInfo eventId={eventId} scheduleId={scheduleId} />
+          <ScheduleStatsInfo eventId={currentEventId} scheduleId={currentScheduleId} />
+          
+          {/* Auto-selection indicator */}
+          {autoSelection.isAutoSelected && !missingContext && (
+            <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-700 rounded-lg">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 text-green-600 dark:text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span className="text-sm font-medium text-green-800 dark:text-green-200">
+                  Auto-selected for today
+                </span>
+              </div>
+            </div>
+          )}
+          
+          {/* Loading indicator during auto-selection */}
+          {autoSelection.isLoading && (
+            <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+              <div className="flex items-center">
+                <svg className="animate-spin w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                  Finding today's event...
+                </span>
+              </div>
+            </div>
+          )}
+          
           <div className="text-right mb-4">
             <Link href="/checkin/events?mode=paper" className="text-sm text-indigo-700 hover:underline">{t('checkin.paper.changeEvent') || 'Change event'}</Link>
           </div>
