@@ -10,7 +10,8 @@ export function TicketCard({ ticket, onCheckIn, isCheckingIn }: {
 
   return (
     <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 transition-shadow hover:shadow-md">
-      <div className="flex flex-row items-stretch gap-4">
+      {/* Responsive wrapper: stacks on mobile, row on sm+ */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center flex-wrap">
         {/* Left: Seat box with ticket class color and tier label */}
         <div
           className="flex flex-col items-center justify-center w-16 min-w-16 rounded-lg shadow h-full py-2"
@@ -52,18 +53,18 @@ export function TicketCard({ ticket, onCheckIn, isCheckingIn }: {
           </div>
         </div>
         {/* Right: Check In button or badge, vertically centered */}
-        <div className="flex flex-col justify-center items-end min-w-[120px] ml-2">
+        <div className="flex flex-col justify-center items-start sm:items-end w-full sm:w-auto ml-0 sm:ml-2 sm:ml-auto">
           {ticket.isCheckedIn ? (
-            <>
-              <span className="inline-flex items-center px-4 py-2 text-base font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 mb-1">
+            <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 sm:gap-1 mt-1 sm:mt-0">
+              <span className="inline-flex items-center px-4 py-2 text-base font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">
                 Checked In
               </span>
               {ticket.checkinRecord?.checkInTime && (
-                <span className="text-xs text-gray-500 dark:text-gray-300 mt-0.5 text-center block w-full">
+                <span className="text-xs text-gray-500 dark:text-gray-300 sm:w-full text-center">
                   {new Date(ticket.checkinRecord.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
               )}
-            </>
+            </div>
           ) : (
             <button
               onClick={() => onCheckIn(ticket)}
