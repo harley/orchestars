@@ -22,14 +22,12 @@ const ScheduleStatsInfo: React.FC<Props> = ({ eventId, scheduleId, className = '
   const [eventTitle, setEventTitle] = useState('')
   const [eventDate, setEventDate] = useState('')
   const [eventTime, setEventTime] = useState('')
-  const [eventLocation, setEventLocation] = useState('')
 
   useEffect(() => {
     if (typeof window === 'undefined') return
     setEventTitle(localStorage.getItem('eventTitle') || '')
     setEventDate(localStorage.getItem('eventScheduleDate') || '')
     setEventTime(localStorage.getItem('eventScheduleTime') || '')
-    setEventLocation(localStorage.getItem('eventLocation') || '')
   }, [])
 
   const fetchStats = useCallback(async () => {
@@ -79,10 +77,17 @@ const ScheduleStatsInfo: React.FC<Props> = ({ eventId, scheduleId, className = '
       {eventTitle && (
         <>
           <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1 pr-8">{eventTitle}</h2>
-          <div className="space-y-0.5 text-xs text-gray-600 dark:text-gray-300 mb-3">
-            {eventDate && <div>Date: {eventDate}</div>}
-            {eventTime && <div>Time: {eventTime}</div>}
-            {eventLocation && <div>Location: {eventLocation}</div>}
+          <div className="flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-300 mb-3">
+            {eventDate && (
+              <span className="px-2 py-0.5 border border-primary text-primary rounded-full whitespace-nowrap">
+                {eventDate}
+              </span>
+            )}
+            {eventTime && (
+              <span className="px-2 py-0.5 bg-gray-200 dark:bg-gray-600 rounded-full whitespace-nowrap">
+                {eventTime}
+              </span>
+            )}
           </div>
         </>
       )}
