@@ -13,6 +13,16 @@ import { useTranslate } from '@/providers/I18n/client'
 import { getTicketClassColor } from '@/utilities/getTicketClassColor'
 import ScheduleStatsInfo from '@/components/ScheduleStatsInfo'
 import { TicketCard } from '@/components/ui/TicketCard'
+import {
+  attemptAutoSelection,
+  type EventWithSchedules
+} from '@/lib/checkin/autoEventSelection'
+import {
+  getCachedEventSelection,
+  setCachedEventSelection,
+  clearExpiredCache
+} from '@/lib/checkin/eventSelectionCache'
+import { format } from 'date-fns'
 
 interface CheckinHistoryProps {}
 
@@ -141,6 +151,29 @@ export default function ValidatePageClient() {
   const { isHydrated, token } = useAuth()
   const searchParams = useSearchParams()
   const { t } = useTranslate()
+
+  // Auto-selection state
+  interface AutoSelectionState {
+    isAutoSelected: boolean
+    isLoading: boolean
+    attempted: boolean
+    error: string | null
+  }
+
+  const [autoSelection, setAutoSelection] = useState<AutoSelectionState>({
+    isAutoSelected: false,
+    isLoading: false,
+    attempted: false,
+    error: null
+  })
+
+  // Event context state
+  const [currentEventId, setCurrentEventId] = useState<string | null>(
+    searchParams.get('eventId') || searchParams.get('event')
+  )
+  const [currentScheduleId, setCurrentScheduleId] = useState<string | null>(
+    searchParams.get('scheduleId') || searchParams.get('schedule')
+  )
   // Translation hook and additional toast hook removed as they were unused
 
   const ticketInputRef = useRef<HTMLInputElement>(null)
@@ -152,8 +185,9 @@ export default function ValidatePageClient() {
   const lastValidateRef = useRef<number>(0)
   const lastCheckInRef = useRef<number>(0)
 
-  const eventId = searchParams?.get('eventId')
-  const scheduleId = searchParams?.get('scheduleId')
+  // Use currentEventId and currentScheduleId for API calls, fallback to URL params for backward compatibility
+  const eventId = currentEventId || searchParams?.get('eventId')
+  const scheduleId = currentScheduleId || searchParams?.get('scheduleId')
   const [scheduleDate] = useState('')
   const [showDateWarning, setShowDateWarning] = useState(false);
 
@@ -210,6 +244,87 @@ export default function ValidatePageClient() {
       phoneInputRef.current?.focus()
     }
   }, [activeTab])
+
+  // Auto-selection logic on mount with network optimization
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const performAutoSelection = async () => {
+      clearExpiredCache()
+
+      // Check URL params first (no network call needed)
+      const urlEventId = searchParams.get('eventId') || searchParams.get('event')
+      const urlScheduleId = searchParams.get('scheduleId') || searchParams.get('schedule')
+
+      if (urlEventId && urlScheduleId) {
+        // Use URL params if available - no loading state needed
+        setCurrentEventId(urlEventId)
+        setCurrentScheduleId(urlScheduleId)
+        setAutoSelection({ isAutoSelected: false, isLoading: false, attempted: true, error: null })
+        return
+      }
+
+      // Check cached selection (no network call needed)
+      const cachedSelection = getCachedEventSelection()
+      if (cachedSelection) {
+        // Use cached selection - no loading state needed
+        setCurrentEventId(cachedSelection.eventId)
+        setCurrentScheduleId(cachedSelection.scheduleId)
+        setAutoSelection({ 
+          isAutoSelected: cachedSelection.isAutoSelected, 
+          isLoading: false, 
+          attempted: true, 
+          error: null 
+        })
+        return
+      }
+
+      // Only show loading state when network call is actually needed
+      setAutoSelection(prev => ({ ...prev, isLoading: true }))
+
+      try {
+        // Reuse existing events fetch to avoid extra network call
+        const response = await fetch('/api/checkin-app/events')
+        if (!response.ok) {
+          throw new Error('Failed to fetch events')
+        }
+
+        const data = await response.json()
+        const events: EventWithSchedules[] = data.events?.docs || []
+
+        const autoSelectionResult = await attemptAutoSelection(events)
+
+        if (autoSelectionResult.success && autoSelectionResult.eventId && autoSelectionResult.scheduleId) {
+          // Set event context and cache selection
+          setCurrentEventId(autoSelectionResult.eventId)
+          setCurrentScheduleId(autoSelectionResult.scheduleId)
+          setCachedEventSelection(
+            autoSelectionResult.eventId,
+            autoSelectionResult.scheduleId,
+            true,
+            {
+              title: autoSelectionResult.event?.title,
+              location: autoSelectionResult.event?.eventLocation,
+              scheduleDate: autoSelectionResult.schedule?.date ? format(new Date(autoSelectionResult.schedule.date), 'dd-MM-yyyy') : undefined,
+              scheduleTime: autoSelectionResult.schedule?.details?.[0]?.time
+            }
+          )
+          setAutoSelection({ isAutoSelected: true, isLoading: false, attempted: true, error: null })
+        } else {
+          // Redirect to manual selection
+          const reason = autoSelectionResult.reason || 'unknown'
+          router.push(`/checkin/events?mode=search&reason=${reason}`)
+        }
+      } catch (error) {
+        console.error('Auto-selection failed:', error)
+        // Graceful fallback - allow manual search without auto-selection
+        setAutoSelection({ isAutoSelected: false, isLoading: false, attempted: true, error: 'fetch_error' })
+        // Don't redirect immediately - let user proceed with manual event selection if needed
+      }
+    }
+
+    performAutoSelection()
+  }, [router, searchParams])
 
   // If not hydrated yet, show loading
   if (!isHydrated) {
@@ -526,6 +641,47 @@ export default function ValidatePageClient() {
 
         {/* Event & Stats */}
         <ScheduleStatsInfo eventId={eventId} scheduleId={scheduleId} />
+
+        {/* Auto-selection indicator */}
+        {autoSelection.isAutoSelected && eventId && scheduleId && (
+          <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-700 rounded-lg">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-green-600 dark:text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm font-medium text-green-800 dark:text-green-200">
+                Auto-selected for today
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Loading indicator during auto-selection */}
+        {autoSelection.isLoading && (
+          <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+            <div className="flex items-center">
+              <svg className="animate-spin w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                Finding today&apos;s event...
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Change event link */}
+        {(autoSelection.isAutoSelected || (!autoSelection.isLoading && eventId && scheduleId)) && (
+          <div className="text-right mb-4">
+            <button
+              onClick={() => router.push('/checkin/events?mode=search')}
+              className="text-sm text-indigo-700 hover:underline"
+            >
+              Change event
+            </button>
+          </div>
+        )}
 
         {/* Date Warning */}
         {showDateWarning && (
