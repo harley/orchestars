@@ -732,8 +732,8 @@ export default function ValidatePageClient() {
                     Too Many Matches Found
                   </h3>
                   <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
-                    Found {tooManyMatches.matchCount} {tooManyMatches.searchType === 'email' ? 'email addresses' : 'phone numbers'} matching &ldquo;{tooManyMatches.searchTerm}&rdquo;. 
-                    Please be more specific to see results (showing max 3 matches).
+                    Found {tooManyMatches.matchCount} users with {tooManyMatches.searchType === 'email' ? 'email addresses' : 'phone numbers'} matching &ldquo;{tooManyMatches.searchTerm}&rdquo;. 
+                    Please be more specific to see results (showing max 3 users).
                   </p>
                   <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
                     Try searching with more characters or the full {tooManyMatches.searchType === 'email' ? 'email address' : 'phone number'}.
@@ -916,6 +916,37 @@ export default function ValidatePageClient() {
         {/* Multiple Tickets */}
         {multipleTickets.length > 0 && (
           <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+            {/* Multiple Users Warning Banner */}
+            {(() => {
+              const uniqueUserEmails = new Set(multipleTickets.map(ticket => ticket.email).filter(Boolean))
+              const uniqueUserCount = uniqueUserEmails.size
+              
+              if (uniqueUserCount > 1) {
+                return (
+                  <div className="mb-4 p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-lg">
+                    <div className="flex items-start">
+                      <svg className="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <h3 className="text-sm font-medium text-orange-800 dark:text-orange-200">
+                          ⚠️ Multiple People Found
+                        </h3>
+                        <p className="mt-1 text-sm text-orange-700 dark:text-orange-300">
+                          These tickets belong to <strong>{uniqueUserCount} different people</strong>. 
+                          Please verify each person&apos;s identity before checking them in.
+                        </p>
+                        <p className="mt-2 text-xs text-orange-600 dark:text-orange-400">
+                          Double-check names, emails, and phone numbers match the person in front of you.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )
+              }
+              return null
+            })()}
+            
             {/* Header: Checked in X of Y tickets */}
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
               Checked in {multipleTickets.filter(t => t.isCheckedIn).length} of {multipleTickets.length} tickets

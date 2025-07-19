@@ -134,6 +134,33 @@ const TooManyMatchesBanner = ({ state, onDismiss }: {
 }
 ```
 
+**Multiple Users Warning Banner Component:**
+```typescript
+const MultipleUsersWarningBanner = ({ uniqueUserCount }: { uniqueUserCount: number }) => {
+  return (
+    <div className="mb-4 p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-lg">
+      <div className="flex items-start">
+        <svg className="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+        </svg>
+        <div>
+          <h3 className="text-sm font-medium text-orange-800 dark:text-orange-200">
+            ⚠️ Multiple People Found
+          </h3>
+          <p className="mt-1 text-sm text-orange-700 dark:text-orange-300">
+            These tickets belong to <strong>{uniqueUserCount} different people</strong>. 
+            Please verify each person's identity before checking them in.
+          </p>
+          <p className="mt-2 text-xs text-orange-600 dark:text-orange-400">
+            Double-check names, emails, and phone numbers match the person in front of you.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+```
+
 **New Auto-Selection Integration:**
 ```typescript
 // Import existing auto-selection utilities
@@ -227,50 +254,46 @@ useEffect(() => {
 
 **Modified File:** `src/app/api/checkin-app/validate-contact/route.ts`
 
-**Enhanced Email Search Logic with Result Limiting:**
+**Enhanced Email Search Logic with Unique User Limiting:**
 ```typescript
-const MAX_PARTIAL_MATCH_RESULTS = 3
+const MAX_UNIQUE_USERS = 3
 
-// Enhanced ILIKE matching with result limiting
-const emailQuery = {
-  email: {
-    contains: searchEmail,
-    mode: 'insensitive'
-  }
-}
+// Enhanced ILIKE matching with unique user limiting
+// First, count unique users that match the email pattern and have tickets for this event
+const uniqueUserCountQuery = sql`
+  SELECT COUNT(DISTINCT u.id) as unique_user_count
+  FROM users u
+  INNER JOIN tickets t ON t.user_id = u.id
+  WHERE u.email ILIKE ${'%' + sanitizedEmail + '%'}
+    AND t.event_id = ${eventId}
+    AND t.event_schedule_id = ${scheduleId}
+    AND t.status = 'booked'
+`
 
-// First, count potential matches to determine if we should show results
-const matchCount = await payload.count({
-  collection: 'users',
-  where: {
-    and: [
-      emailQuery,
-      // Include event/schedule filters to scope the search
-      { 'tickets.eventSchedule': { equals: scheduleId } },
-      { 'tickets.event': { equals: eventId } }
-    ]
-  }
-})
+const userCountResult = await payload.db.drizzle.execute(uniqueUserCountQuery)
+const uniqueUserCount = Number(userCountResult.rows[0]?.unique_user_count ?? 0)
 
-if (matchCount.totalDocs > MAX_PARTIAL_MATCH_RESULTS) {
+if (uniqueUserCount > MAX_UNIQUE_USERS) {
   return Response.json({
     tickets: [],
     tooManyMatches: true,
-    matchCount: matchCount.totalDocs,
+    matchCount: uniqueUserCount,
     searchTerm: searchEmail,
     searchType: 'email'
   })
 }
 
-// Proceed with actual search if within limit
-const emailResults = await payload.find({
-  collection: 'users',
-  where: emailQuery,
-  limit: MAX_PARTIAL_MATCH_RESULTS
+// Proceed with actual search if within unique user limit
+// This will return ALL tickets for the matching users (not limited to 3 tickets)
+const tickets = await findTickets({
+  email: sanitizedEmail,
+  eventId,
+  scheduleId,
+  useILIKE: true
 })
 ```
 
-**Enhanced Phone Search Logic with Result Limiting:**
+**Enhanced Phone Search Logic with Unique User Limiting:**
 ```typescript
 const normalizePhoneNumber = (phone: string): string => {
   return phone.replace(/\D/g, '') // Remove all non-digit characters
@@ -278,43 +301,37 @@ const normalizePhoneNumber = (phone: string): string => {
 
 const searchDigits = normalizePhoneNumber(searchPhone)
 
-// Count matches first
-const phoneMatchCount = await payload.count({
-  collection: 'users',
-  where: {
-    and: [
-      {
-        phoneNumber: {
-          contains: searchDigits,
-          mode: 'insensitive'
-        }
-      },
-      { 'tickets.eventSchedule': { equals: scheduleId } },
-      { 'tickets.event': { equals: eventId } }
-    ]
-  }
-})
+// Count unique users that match the phone pattern and have tickets for this event
+const uniqueUserCountQuery = sql`
+  SELECT COUNT(DISTINCT u.id) as unique_user_count
+  FROM users u
+  INNER JOIN tickets t ON t.user_id = u.id
+  WHERE (u.phone_number ILIKE ${'%' + searchDigits + '%'} OR u.phone_number ILIKE ${'%' + sanitizedPhone + '%'})
+    AND t.event_id = ${eventId}
+    AND t.event_schedule_id = ${scheduleId}
+    AND t.status = 'booked'
+`
 
-if (phoneMatchCount.totalDocs > MAX_PARTIAL_MATCH_RESULTS) {
+const userCountResult = await payload.db.drizzle.execute(uniqueUserCountQuery)
+const uniqueUserCount = Number(userCountResult.rows[0]?.unique_user_count ?? 0)
+
+if (uniqueUserCount > MAX_UNIQUE_USERS) {
   return Response.json({
     tickets: [],
     tooManyMatches: true,
-    matchCount: phoneMatchCount.totalDocs,
+    matchCount: uniqueUserCount,
     searchTerm: searchPhone,
     searchType: 'phone'
   })
 }
 
-// Proceed with search if within limit
-const phoneResults = await payload.find({
-  collection: 'users',
-  where: {
-    phoneNumber: {
-      contains: searchDigits,
-      mode: 'insensitive'
-    }
-  },
-  limit: MAX_PARTIAL_MATCH_RESULTS
+// Proceed with actual search if within unique user limit
+// This will return ALL tickets for the matching users (not limited to 3 tickets)
+const tickets = await findTickets({
+  phoneNumber: sanitizedPhone,
+  eventId,
+  scheduleId,
+  useILIKE: true
 })
 ```
 

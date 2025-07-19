@@ -3,8 +3,10 @@ import { findTickets } from '@/lib/checkin/findTickets'
 import { getAdminUser } from '@/utilities/getAdminUser'
 import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
+import { sql } from '@payloadcms/db-postgres'
+import { getPayload } from '@/payload-config/getPayloadConfig'
 
-const MAX_PARTIAL_MATCH_RESULTS = 3
+const MAX_UNIQUE_USERS = 3
 
 // Sanitize search input for ILIKE queries
 const sanitizeSearchTerm = (term: string): string => {
@@ -50,32 +52,39 @@ export async function POST(req: NextRequest) {
     // For email searches, check if we should use enhanced ILIKE search
     if (email) {
       const sanitizedEmail = sanitizeSearchTerm(email)
-      
-      // First, count potential matches to determine if we should show results
-      const matchCount = await findTickets({ 
-        email: sanitizedEmail, 
-        eventId, 
-        scheduleId, 
-        useILIKE: true, 
-        countOnly: true 
-      })
+      const payload = await getPayload()
 
-      if (matchCount.length > MAX_PARTIAL_MATCH_RESULTS) {
+      // First, count unique users that match the email pattern and have tickets for this event
+      const uniqueUserCountQuery = sql`
+        SELECT COUNT(DISTINCT u.id) as unique_user_count
+        FROM users u
+        INNER JOIN tickets t ON t.user_id = u.id
+        WHERE u.email ILIKE ${'%' + sanitizedEmail + '%'}
+          AND t.event_id = ${eventId}
+          AND t.event_schedule_id = ${scheduleId}
+          AND t.status = 'booked'
+      `
+
+      const userCountResult = await payload.db.drizzle.execute(uniqueUserCountQuery)
+      const uniqueUserCount = Number((userCountResult as any).rows[0]?.unique_user_count ?? 0)
+
+      if (uniqueUserCount > MAX_UNIQUE_USERS) {
         return NextResponse.json({
           tickets: [],
           tooManyMatches: true,
-          matchCount: matchCount.length,
+          matchCount: uniqueUserCount,
           searchTerm: email,
           searchType: 'email'
         })
       }
 
-      // Proceed with actual search if within limit
-      const tickets = await findTickets({ 
-        email: sanitizedEmail, 
-        eventId, 
-        scheduleId, 
-        useILIKE: true 
+      // Proceed with actual search if within unique user limit
+      // This will return ALL tickets for the matching users (not limited to 3 tickets)
+      const tickets = await findTickets({
+        email: sanitizedEmail,
+        eventId,
+        scheduleId,
+        useILIKE: true
       })
 
       if (tickets.length === 0) {
@@ -88,32 +97,45 @@ export async function POST(req: NextRequest) {
     // For phone searches, check if we should use enhanced ILIKE search
     if (phoneNumber) {
       const sanitizedPhone = sanitizeSearchTerm(phoneNumber)
-      
-      // First, count potential matches
-      const matchCount = await findTickets({ 
-        phoneNumber: sanitizedPhone, 
-        eventId, 
-        scheduleId, 
-        useILIKE: true, 
-        countOnly: true 
-      })
+      const payload = await getPayload()
 
-      if (matchCount.length > MAX_PARTIAL_MATCH_RESULTS) {
+      // Normalize phone number for digit-only matching
+      const normalizePhoneNumber = (phone: string): string => {
+        return phone.replace(/\D/g, '') // Remove all non-digit characters
+      }
+      const searchDigits = normalizePhoneNumber(sanitizedPhone)
+
+      // Count unique users that match the phone pattern and have tickets for this event
+      const uniqueUserCountQuery = sql`
+        SELECT COUNT(DISTINCT u.id) as unique_user_count
+        FROM users u
+        INNER JOIN tickets t ON t.user_id = u.id
+        WHERE (u.phone_number ILIKE ${'%' + searchDigits + '%'} OR u.phone_number ILIKE ${'%' + sanitizedPhone + '%'})
+          AND t.event_id = ${eventId}
+          AND t.event_schedule_id = ${scheduleId}
+          AND t.status = 'booked'
+      `
+
+      const userCountResult = await payload.db.drizzle.execute(uniqueUserCountQuery)
+      const uniqueUserCount = Number((userCountResult as any).rows[0]?.unique_user_count ?? 0)
+
+      if (uniqueUserCount > MAX_UNIQUE_USERS) {
         return NextResponse.json({
           tickets: [],
           tooManyMatches: true,
-          matchCount: matchCount.length,
+          matchCount: uniqueUserCount,
           searchTerm: phoneNumber,
           searchType: 'phone'
         })
       }
 
-      // Proceed with actual search if within limit
-      const tickets = await findTickets({ 
-        phoneNumber: sanitizedPhone, 
-        eventId, 
-        scheduleId, 
-        useILIKE: true 
+      // Proceed with actual search if within unique user limit
+      // This will return ALL tickets for the matching users (not limited to 3 tickets)
+      const tickets = await findTickets({
+        phoneNumber: sanitizedPhone,
+        eventId,
+        scheduleId,
+        useILIKE: true
       })
 
       if (tickets.length === 0) {

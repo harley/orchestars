@@ -37,6 +37,19 @@ export function TicketCard({ ticket, onCheckIn, isCheckingIn }: {
               {ticket.orderCode}
             </div>
           )}
+          {/* Row 4: Email and Phone for verification */}
+          <div className="text-xs text-gray-600 dark:text-gray-300 mt-1 space-y-0.5">
+            {ticket.email && (
+              <div className="truncate">
+                📧 {ticket.email}
+              </div>
+            )}
+            {ticket.phoneNumber && (
+              <div className="truncate">
+                📱 {ticket.phoneNumber}
+              </div>
+            )}
+          </div>
         </div>
         {/* Right: Check In button or badge, vertically centered */}
         <div className="flex flex-col justify-center items-end min-w-[120px] ml-2">
@@ -55,11 +68,10 @@ export function TicketCard({ ticket, onCheckIn, isCheckingIn }: {
             <button
               onClick={() => onCheckIn(ticket)}
               disabled={isCheckingIn}
-              className={`px-6 py-2 rounded-md font-semibold text-white transition-colors text-base ${
-                isCheckingIn
+              className={`px-6 py-2 rounded-md font-semibold text-white transition-colors text-base ${isCheckingIn
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
-              }`}
+                }`}
             >
               {isCheckingIn ? 'Checking...' : 'Check In'}
             </button>

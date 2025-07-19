@@ -29,7 +29,10 @@ This requirement inherits all acceptance criteria from **Auto Event Selection Re
 2. WHEN an email search is performed THEN the system SHALL find matches that contain the search term anywhere in the email address
 3. WHEN searching with partial email domains THEN the system SHALL return all matching results (e.g., "gmail" finds all @gmail.com addresses)
 4. WHEN searching with partial usernames THEN the system SHALL return all matching results (e.g., "john" finds john@example.com, johnny@test.com)
-5. WHEN email search returns multiple results THEN the system SHALL display all matching tickets using the existing TicketCard component
+5. WHEN email search finds tickets from 3 or fewer unique users THEN the system SHALL display all matching tickets using the existing TicketCard component
+6. WHEN email search finds tickets from more than 3 unique users THEN the system SHALL display "Too Many Users Found" message with the count of unique users and search term
+7. WHEN "Too Many Users Found" is displayed THEN the system SHALL provide guidance to be more specific with the search term
+8. WHEN search results contain tickets from multiple users THEN the system SHALL display a prominent warning banner above the ticket list to alert event admins
 
 ### Requirement 3: Enhanced Phone Number Search with ILIKE Pattern Matching
 
@@ -41,7 +44,9 @@ This requirement inherits all acceptance criteria from **Auto Event Selection Re
 2. WHEN a phone search is performed THEN the system SHALL find matches that contain the search digits anywhere in the phone number
 3. WHEN searching with partial phone numbers THEN the system SHALL return all matching results (e.g., "123" finds +84123456789, 0123456789)
 4. WHEN searching with formatted phone numbers THEN the system SHALL ignore formatting characters and match digits only
-5. WHEN phone search returns multiple results THEN the system SHALL display all matching tickets using the existing TicketCard component
+5. WHEN phone search finds tickets from 3 or fewer unique users THEN the system SHALL display all matching tickets using the existing TicketCard component
+6. WHEN phone search finds tickets from more than 3 unique users THEN the system SHALL display "Too Many Users Found" message with the count of unique users and search term
+7. WHEN "Too Many Users Found" is displayed THEN the system SHALL provide guidance to be more specific with the search term
 
 ### Requirement 4: Navigation and Context Preservation
 
@@ -73,7 +78,8 @@ This requirement inherits all acceptance criteria from **Auto Event Selection Re
 #### Acceptance Criteria
 
 1. WHEN search terms contain special characters THEN the system SHALL handle them safely without causing SQL injection or errors
-2. WHEN ILIKE searches return too many results THEN the system SHALL limit results to a reasonable number (e.g., 50) and provide feedback
+2. WHEN determining if there are "too many users" THEN the system SHALL count unique user_id values from the tickets.user_id field joined with users table
 3. WHEN network errors occur during enhanced searches THEN the system SHALL provide clear error messages and retry options
 4. WHEN auto-selection fails in search mode THEN the system SHALL handle it gracefully using the same error handling as Paper check-in
 5. WHEN switching between search types THEN the system SHALL clear previous results and provide appropriate loading states
+6. WHEN search terms are too short (less than 2 characters) THEN the system SHALL provide appropriate validation feedback
