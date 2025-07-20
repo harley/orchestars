@@ -15,6 +15,17 @@ import jsQR from 'jsqr'
 import { useTranslate } from '@/providers/I18n/client'
 import { getTicketClassColor } from '@/utilities/getTicketClassColor'
 import { CheckinNav } from '@/components/CheckinNav'
+import { useSearchParams } from 'next/navigation'
+import {
+  attemptAutoSelection,
+  type EventWithSchedules
+} from '@/lib/checkin/autoEventSelection'
+import {
+  getCachedEventSelection,
+  setCachedEventSelection,
+  clearExpiredCache
+} from '@/lib/checkin/eventSelectionCache'
+import ScheduleStatsInfo from '@/components/ScheduleStatsInfo'
 
 const ScanHistory = forwardRef((props: {}, ref) => {
   const [history, setHistory] = useState<CheckinRecord[]>([])
@@ -131,7 +142,22 @@ const ScanHistory = forwardRef((props: {}, ref) => {
 })
 ScanHistory.displayName = 'ScanHistory'
 
+interface AutoSelectionState {
+  isAutoSelected: boolean
+  isLoading: boolean
+  attempted: boolean
+  error: string | null
+  eventInfo?: {
+    title: string
+    location?: string
+    scheduleDate?: string
+  }
+}
+
 export const ScanPageClient: React.FC = () => {
+  const searchParams = useSearchParams()
+  const { t } = useTranslate()
+
   const [feedback, setFeedback] = useState<{ type: 'success' | 'warning' | 'error'; message: string } | null>(
     null,
   )
@@ -144,9 +170,25 @@ export const ScanPageClient: React.FC = () => {
     ticketCode: string
     ticketPriceInfo: any
   } | null>(null)
+
+  // Selected event and schedule for ScheduleStatsInfo
+  const [currentEventId, setCurrentEventId] = useState<string | null>(
+    searchParams.get('eventId') || searchParams.get('event')
+  )
+  const [currentScheduleId, setCurrentScheduleId] = useState<string | null>(
+    searchParams.get('scheduleId') || searchParams.get('schedule')
+  )
+
+  // Auto-selection state
+  const [autoSelection, setAutoSelection] = useState<AutoSelectionState>({
+    isAutoSelected: false,
+    isLoading: false,
+    attempted: false,
+    error: null
+  })
+
   const historyRef = useRef<{ fetchHistory: () => void }>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { t } = useTranslate()
 
   // Client-side caching and debouncing for better performance
   const lastScanTimeRef = useRef<number>(0)
@@ -155,8 +197,215 @@ export const ScanPageClient: React.FC = () => {
   const SCAN_DEBOUNCE_MS = 2000 // Prevent duplicate scans within 2 seconds
   const CACHE_DURATION_MS = 30000 // Cache results for 30 seconds
 
+  // Auto-selection logic on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const performAutoSelection = async () => {
+      // Clear any expired cache first
+      clearExpiredCache()
+
+      // Get initial values from URL params
+      const urlEventId = searchParams.get('eventId') || searchParams.get('event')
+      const urlScheduleId = searchParams.get('scheduleId') || searchParams.get('schedule')
+
+      // If we already have event/schedule from URL params, use them
+      if (urlEventId && urlScheduleId) {
+        setCurrentEventId(urlEventId)
+        setCurrentScheduleId(urlScheduleId)
+        setAutoSelection(prev => ({ ...prev, attempted: true, isAutoSelected: false }))
+        return
+      }
+
+      // Check if we have a valid cached selection
+      const cachedSelection = getCachedEventSelection()
+      if (cachedSelection) {
+        // Validate cached schedule date
+        let validCachedDate = null
+        if (cachedSelection.scheduleDate) {
+          try {
+            const testDate = new Date(cachedSelection.scheduleDate)
+            if (!isNaN(testDate.getTime())) {
+              validCachedDate = cachedSelection.scheduleDate
+            }
+          } catch (error) {
+            console.warn('Invalid cached schedule date:', cachedSelection.scheduleDate)
+          }
+        }
+
+        setCurrentEventId(cachedSelection.eventId)
+        setCurrentScheduleId(cachedSelection.scheduleId)
+        setAutoSelection({
+          isAutoSelected: cachedSelection.isAutoSelected,
+          isLoading: false,
+          attempted: true,
+          error: null,
+          eventInfo: {
+            title: cachedSelection.eventTitle || 'Event',
+            location: cachedSelection.eventLocation,
+            scheduleDate: validCachedDate
+          }
+        })
+        return
+      }
+
+      // No cached selection or URL params - attempt auto-selection
+      setAutoSelection(prev => ({ ...prev, isLoading: true }))
+
+      try {
+        // Fetch events
+        const eventsRes = await fetch('/api/checkin-app/events')
+        if (!eventsRes.ok) {
+          throw new Error('Failed to fetch events')
+        }
+
+        const eventsData = await eventsRes.json()
+        const events: EventWithSchedules[] = eventsData.events || []
+
+        // Attempt auto-selection
+        const autoResult = await attemptAutoSelection(events)
+
+        if (autoResult.success && autoResult.eventId && autoResult.scheduleId) {
+          // Validate schedule date before using it
+          let validScheduleDate = null
+          if (autoResult.schedule?.date) {
+            try {
+              const testDate = new Date(autoResult.schedule.date)
+              if (!isNaN(testDate.getTime())) {
+                validScheduleDate = autoResult.schedule.date
+              }
+            } catch (error) {
+              console.warn('Invalid schedule date from auto-selection:', autoResult.schedule.date)
+            }
+          }
+
+          // Cache the successful auto-selection
+          setCachedEventSelection({
+            eventId: autoResult.eventId,
+            scheduleId: autoResult.scheduleId,
+            isAutoSelected: true,
+            eventTitle: autoResult.event?.title || 'Event',
+            eventLocation: autoResult.event?.eventLocation,
+            scheduleDate: validScheduleDate
+          })
+
+          setCurrentEventId(autoResult.eventId)
+          setCurrentScheduleId(autoResult.scheduleId)
+          setAutoSelection({
+            isAutoSelected: true,
+            isLoading: false,
+            attempted: true,
+            error: null,
+            eventInfo: {
+              title: autoResult.event?.title || 'Event',
+              location: autoResult.event?.eventLocation,
+              scheduleDate: validScheduleDate
+            }
+          })
+        } else {
+          // Auto-selection failed
+          setAutoSelection({
+            isAutoSelected: false,
+            isLoading: false,
+            attempted: true,
+            error: autoResult.reason || 'Auto-selection failed'
+          })
+        }
+      } catch (error) {
+        console.error('Auto-selection error:', error)
+        setAutoSelection({
+          isAutoSelected: false,
+          isLoading: false,
+          attempted: true,
+          error: 'Failed to load events'
+        })
+      }
+    }
+
+    performAutoSelection()
+  }, [searchParams])
+
   const handleUploadClick = () => {
     fileInputRef.current?.click()
+  }
+
+  const processImageWithMultipleTechniques = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, originalWidth: number, originalHeight: number) => {
+    const techniques = [
+      // 1. Original image
+      () => ctx.getImageData(0, 0, originalWidth, originalHeight),
+
+      // 2. Increase contrast
+      () => {
+        const imageData = ctx.getImageData(0, 0, originalWidth, originalHeight)
+        const data = imageData.data
+        const contrast = 1.5
+        const factor = (259 * (contrast + 255)) / (255 * (259 - contrast))
+
+        for (let i = 0; i < data.length; i += 4) {
+          data[i] = factor * (data[i] - 128) + 128     // Red
+          data[i + 1] = factor * (data[i + 1] - 128) + 128 // Green
+          data[i + 2] = factor * (data[i + 2] - 128) + 128 // Blue
+        }
+        return imageData
+      },
+
+      // 3. Convert to grayscale with high contrast
+      () => {
+        const imageData = ctx.getImageData(0, 0, originalWidth, originalHeight)
+        const data = imageData.data
+
+        for (let i = 0; i < data.length; i += 4) {
+          const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2])
+          const enhanced = gray > 128 ? 255 : 0 // High contrast black/white
+          data[i] = enhanced
+          data[i + 1] = enhanced
+          data[i + 2] = enhanced
+        }
+        return imageData
+      },
+
+      // 4. Adaptive threshold
+      () => {
+        const imageData = ctx.getImageData(0, 0, originalWidth, originalHeight)
+        const data = imageData.data
+
+        // Calculate average brightness
+        let totalBrightness = 0
+        for (let i = 0; i < data.length; i += 4) {
+          totalBrightness += Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2])
+        }
+        const avgBrightness = totalBrightness / (data.length / 4)
+        const threshold = avgBrightness * 0.8 // Adaptive threshold
+
+        for (let i = 0; i < data.length; i += 4) {
+          const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2])
+          const enhanced = gray > threshold ? 255 : 0
+          data[i] = enhanced
+          data[i + 1] = enhanced
+          data[i + 2] = enhanced
+        }
+        return imageData
+      }
+    ]
+
+    // Try each technique
+    for (let i = 0; i < techniques.length; i++) {
+      try {
+        const imageData = techniques[i]()
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: 'dontInvert'
+        })
+
+        if (code) {
+          console.log(`QR code found using technique ${i + 1}`)
+          return code
+        }
+      } catch (error) {
+        console.warn(`Technique ${i + 1} failed:`, error)
+      }
+    }
+
+    return null
   }
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,6 +413,7 @@ export const ScanPageClient: React.FC = () => {
     if (!file || isProcessing) return
 
     setIsProcessing(true)
+    setFeedback({ type: 'info', message: 'Processing image...' })
 
     try {
       const imageUrl = URL.createObjectURL(file)
@@ -175,21 +425,39 @@ export const ScanPageClient: React.FC = () => {
         const ctx = canvas.getContext('2d')
         if (!ctx) {
           setFeedback({ type: 'error', message: t('checkin.scan.error.canvasNotSupported') })
+          setIsProcessing(false)
           return
         }
 
-        canvas.width = image.width
-        canvas.height = image.height
-        ctx.drawImage(image, 0, 0, image.width, image.height)
+        // Scale image to reasonable size for processing (max 800px)
+        const maxSize = 800
+        let { width, height } = image
 
-        const imageData = ctx.getImageData(0, 0, image.width, image.height)
-        const code = jsQR(imageData.data, imageData.width, imageData.height)
+        if (width > maxSize || height > maxSize) {
+          const scale = Math.min(maxSize / width, maxSize / height)
+          width = Math.round(width * scale)
+          height = Math.round(height * scale)
+        }
+
+        canvas.width = width
+        canvas.height = height
+
+        // Draw image with good quality
+        ctx.imageSmoothingEnabled = true
+        ctx.imageSmoothingQuality = 'high'
+        ctx.drawImage(image, 0, 0, width, height)
+
+        // Try multiple processing techniques
+        const code = processImageWithMultipleTechniques(canvas, ctx, width, height)
 
         if (code) {
+          console.log('QR code detected:', code.data)
           validateAndCheckIn(code.data)
         } else {
+          console.log('QR code not found in image')
           setFeedback({ type: 'error', message: t('checkin.scan.error.noQrFound') })
           if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
+          setIsProcessing(false)
         }
 
         URL.revokeObjectURL(imageUrl)
@@ -199,11 +467,13 @@ export const ScanPageClient: React.FC = () => {
         setFeedback({ type: 'error', message: t('checkin.scan.error.failedToLoadImage') })
         if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
         URL.revokeObjectURL(imageUrl)
+        setIsProcessing(false)
       }
     } catch (err) {
-      console.error(err)
+      console.error('Image processing error:', err)
       setFeedback({ type: 'error', message: t('checkin.scan.error.processingImage') })
       if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
+      setIsProcessing(false)
     }
 
     if (event.target) {
@@ -391,6 +661,30 @@ export const ScanPageClient: React.FC = () => {
         {/* Navigation Toggle */}
         <CheckinNav dark />
         <h1 className="text-2xl font-bold mb-2">{t('checkin.scan.title')}</h1>
+
+        {/* Event Selection Info */}
+        {autoSelection.isLoading && (
+          <div className="text-center mb-4 p-3 bg-blue-500/20 rounded-lg border border-blue-500/30">
+            <p className="text-blue-300 text-sm">{t('checkin.loadingEvents')}</p>
+          </div>
+        )}
+
+        {autoSelection.attempted && !autoSelection.isLoading && autoSelection.error && (
+          <div className="text-center mb-4 p-3 bg-orange-500/20 rounded-lg border border-orange-500/30">
+            <p className="text-orange-300 text-sm">
+              {autoSelection.error === 'multiple_events_today' ? 'Multiple events today - manual selection needed' :
+               autoSelection.error === 'no_events_today' ? 'No events scheduled for today' :
+               'Auto-selection failed'}
+            </p>
+          </div>
+        )}
+
+        {/* Schedule Stats Info - reusing the component from paper/search tabs */}
+        <ScheduleStatsInfo
+          eventId={currentEventId}
+          scheduleId={currentScheduleId}
+          className="bg-gray-800 dark:bg-gray-700 rounded-lg p-4 mb-4 border border-gray-600 dark:border-gray-600"
+        />
 
         {/* Dynamic instruction/last scan info area */}
         {lastScannedTicket ? (

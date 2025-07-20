@@ -1,0 +1,1 @@
+Hello Claude, please read docs in ./kiro/steering/*.md to understand the project.
