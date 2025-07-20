@@ -176,7 +176,7 @@
     "PROMO006": "Chưa thoả mãn số lượng vé tối thiểu để áp dụng mã giảm giá",
     "PROMO007": "Bạn đã dùng hết số lượt được áp dụng cho giảm giá {{promotionCode}}",
     "PROMO008": "Chưa thoả mãn số lượng vé tối thiểu để áp dụng mã giảm giá {{promotionCode}}",
-    "PROMO009": "Không thể áp dụng nhiều mã giảm giá cho một đơn hàng", 
+    "PROMO009": "Không thể áp dụng nhiều mã giảm giá cho một đơn hàng",
     "PROMO010": "Chỉ cho phép áp dụng tối đa {{maxAppliedPromotions}} mã giảm giá cho một đơn hàng",
     "PROMO011": "Mã giảm giá {{promotionCodes}} không hợp lệ",
     "EVT001": "Sự kiện không được để trống",
@@ -346,8 +346,7 @@
       "search": "Checkin thủ công"
     },
     "scan": {
-      "title": "Scan mã QR",
-      "instruction": "Đặt mã QR vào khung quét",
+      "instruction": "Quét QR để check-in",
       "upload": "Tải lên mã QR",
       "history": "Lịch sử checkin",
       "refreshHistory": "Làm mới lịch sử",
@@ -363,7 +362,9 @@
         "failedToLoadImage": "Không tải được hình ảnh",
         "processingImage": "Lỗi xử lý hình ảnh",
         "failed": "Checkin thất bại",
-        "network": "Lỗi kết nối mạng"
+        "network": "Lỗi kết nối mạng",
+        "wrongDatePast": "Vé này dành cho \"{{eventTitle}}\" vào ngày {{eventDate}} đã kết thúc. Vé này không thể sử dụng cho sự kiện hôm nay.",
+        "wrongDateFuture": "Vé này dành cho \"{{eventTitle}}\" vào ngày {{eventDate}}, nhưng hôm nay là {{today}}. Vui lòng sử dụng vé đúng cho sự kiện hôm nay."
       },
       "success": "Soát vé thành công",
       "alreadyCheckedIn": "Đã soát vé rồi"

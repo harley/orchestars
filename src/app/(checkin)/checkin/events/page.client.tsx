@@ -45,7 +45,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
   const { toast } = useToast()
 
   const searchParams = useSearchParams()
-  
+
   // Helper function to check if an event has today's schedule
   const hasScheduleToday = (event: Event): boolean => {
     const today = getTodayInVietnam()
@@ -59,9 +59,9 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
       }
     }) || false
   }
-  
 
-  
+
+
   // Get auto-selection failure reason from URL
   const autoSelectionReason = searchParams.get('reason')
 
@@ -169,7 +169,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
 
     // Wait for all requests to complete
     const results = await Promise.all(fetchPromises)
-    
+
     // Update state based on results
     setEventStats(prev => {
       const updatedStats = { ...prev }
@@ -199,7 +199,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     setSelectedEvent(event)
     setSelectedSchedule(null)
     setEventStats({}) // Clear previous stats
-    
+
     // Fetch stats for the newly selected event
     fetchEventStats(event)
   }
@@ -226,7 +226,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     if (selectedSchedule.date) {
       localStorage.setItem('eventScheduleDate', format(selectedSchedule.date, 'dd-MM-yyyy'))
     }
-    
+
     // Store schedule time details
     if (selectedSchedule.details && selectedSchedule.details.length > 0) {
               const timeDetails = selectedSchedule.details.map((detail) => detail.time).filter(Boolean)
@@ -249,6 +249,8 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
       router.push(`/checkin/paper?${params.toString()}`)
     } else if (mode === 'search') {
       router.push(`/checkin/validates?${params.toString()}`)
+    } else if (mode === 'scan') {
+      router.push(`/checkin/scan?${params.toString()}`)
     } else {
       // Default to search mode for backward compatibility
       router.push(`/checkin/validates?${params.toString()}`)
@@ -259,7 +261,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="w-full max-w-md mx-auto">
         <CheckinNav />
-        
+
         {/* Auto-selection failure message */}
         {autoSelectionReason && (
           <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
@@ -276,7 +278,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
             </div>
           </div>
         )}
-        
+
         {/* Refresh Button - only show when event is selected and has stats */}
         {selectedEvent && Object.keys(eventStats).length > 0 && (
           <div className="mb-4 flex justify-end">
@@ -290,14 +292,14 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
             </button>
           </div>
         )}
-        
+
         <div className="space-y-6">
           {publicEvents?.map((event) => {
             const eventHasToday = hasScheduleToday(event)
             return (
               <div key={event.id} className={`rounded-lg shadow p-4 ${
-                eventHasToday 
-                  ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200' 
+                eventHasToday
+                  ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200'
                   : 'bg-white'
               }`}>
                 <div className="flex items-center justify-between mb-2">
@@ -382,7 +384,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
                               )}
                             </div>
                           </div>
-                          
+
                           {stats ? (
                             <div className="grid grid-cols-2 gap-3 text-sm">
                               <div className="flex items-center text-blue-600">

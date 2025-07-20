@@ -346,8 +346,7 @@
       "search": "Checkin via Search"
     },
     "scan": {
-      "title": "Scan QR Code",
-      "instruction": "Position the code within the frame",
+      "instruction": "Scan QR once to check-in",
       "upload": "Upload QR",
       "history": "Checkin History",
       "refreshHistory": "Refresh History",
@@ -363,7 +362,9 @@
         "failedToLoadImage": "Failed to load image.",
         "processingImage": "Error processing image.",
         "failed": "Check-in failed",
-        "network": "Network error"
+        "network": "Network error",
+        "wrongDatePast": "This ticket is for \"{{eventTitle}}\" on {{eventDate}} which has already passed. This ticket cannot be used for today's event.",
+        "wrongDateFuture": "This ticket is for \"{{eventTitle}}\" on {{eventDate}}, but today is {{today}}. Please use the correct ticket for today's event."
       },
       "success": "Checked In",
       "alreadyCheckedIn": "Already checked in"

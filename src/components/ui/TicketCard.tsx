@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import { useRouter } from 'next/navigation'
 import { getTicketClassColor } from '@/utilities/getTicketClassColor'
 
 export function TicketCard({ ticket, onCheckIn, isCheckingIn }: {
@@ -9,7 +8,6 @@ export function TicketCard({ ticket, onCheckIn, isCheckingIn }: {
   onCheckIn: (ticket: any) => void,
   isCheckingIn: boolean
 }) {
-  const router = useRouter()
   const ticketColors = getTicketClassColor(ticket.ticketPriceInfo)
 
   const handleSeatClick = () => {
