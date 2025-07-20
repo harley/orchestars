@@ -346,8 +346,7 @@
       "search": "Checkin via Search"
     },
     "scan": {
-      "title": "Scan QR Code",
-      "instruction": "Position the code within the frame",
+      "instruction": "Scan QR once to check-in",
       "upload": "Upload QR",
       "history": "Checkin History",
       "refreshHistory": "Refresh History",

@@ -34,6 +34,8 @@ interface TicketRow {
 
 export async function POST(req: NextRequest) {
   const ticketCode = req.nextUrl.searchParams.get('ticketCode')
+  const selectedEventId = req.nextUrl.searchParams.get('eventId')
+  const selectedScheduleId = req.nextUrl.searchParams.get('scheduleId')
 
   if (!ticketCode) {
     return NextResponse.json({
@@ -98,6 +100,12 @@ export async function POST(req: NextRequest) {
       }
 
       const ticket = rows[0]
+      if (!ticket) {
+        return NextResponse.json(
+          { success: false, message: 'Ticket not found' },
+          { status: 404 }
+        )
+      }
 
       // Check if ticket is for the wrong day or expired event
       const today = getTodayInVietnam()
@@ -116,13 +124,24 @@ export async function POST(req: NextRequest) {
             const eventTitle = ticket.event_title || 'Event'
             const todayFormatted = format(new Date(today), 'dd-MM-yyyy')
 
-            if (isPastEvent) {
+            // If specific event/schedule is manually selected, allow more flexible validation
+            const isManualSelection = selectedEventId && selectedScheduleId
+            const isMatchingManualSelection = isManualSelection &&
+              ticket.event_id === selectedEventId &&
+              ticket.event_schedule_id === selectedScheduleId
+
+            // For manual selections that match, allow testing ahead of event date
+            if (isMatchingManualSelection && !isPastEvent) {
+              // Allow future events when manually selected for testing
+              console.log(`Allowing future event scan for testing: ticket ${ticketCode} for ${eventDate}`)
+            } else if (isPastEvent) {
               const message = t('checkin.scan.error.wrongDatePast', locale, {
                 eventTitle,
                 eventDate
               })
               throw new Error(message)
-            } else {
+            } else if (!isMatchingManualSelection) {
+              // Only show future date error if not manually selected for this specific event/schedule
               const message = t('checkin.scan.error.wrongDateFuture', locale, {
                 eventTitle,
                 eventDate,

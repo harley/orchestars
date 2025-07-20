@@ -15,7 +15,7 @@ import jsQR from 'jsqr'
 import { useTranslate } from '@/providers/I18n/client'
 import { getTicketClassColor } from '@/utilities/getTicketClassColor'
 import { CheckinNav } from '@/components/CheckinNav'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import {
   attemptAutoSelection,
   type EventWithSchedules
@@ -156,6 +156,7 @@ interface AutoSelectionState {
 
 export const ScanPageClient: React.FC = () => {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const { t } = useTranslate()
 
   const [feedback, setFeedback] = useState<{ type: 'success' | 'warning' | 'error'; message: string } | null>(
@@ -221,14 +222,14 @@ export const ScanPageClient: React.FC = () => {
       const cachedSelection = getCachedEventSelection()
       if (cachedSelection) {
         // Validate cached schedule date
-        let validCachedDate = null
+        let validCachedDate: string | null = null
         if (cachedSelection.scheduleDate) {
           try {
             const testDate = new Date(cachedSelection.scheduleDate)
             if (!isNaN(testDate.getTime())) {
               validCachedDate = cachedSelection.scheduleDate
             }
-          } catch (error) {
+          } catch (_error) {
             console.warn('Invalid cached schedule date:', cachedSelection.scheduleDate)
           }
         }
@@ -243,7 +244,7 @@ export const ScanPageClient: React.FC = () => {
           eventInfo: {
             title: cachedSelection.eventTitle || 'Event',
             location: cachedSelection.eventLocation,
-            scheduleDate: validCachedDate
+            scheduleDate: validCachedDate || undefined
           }
         })
         return
@@ -267,27 +268,29 @@ export const ScanPageClient: React.FC = () => {
 
         if (autoResult.success && autoResult.eventId && autoResult.scheduleId) {
           // Validate schedule date before using it
-          let validScheduleDate = null
+          let validScheduleDate: string | null = null
           if (autoResult.schedule?.date) {
             try {
               const testDate = new Date(autoResult.schedule.date)
               if (!isNaN(testDate.getTime())) {
                 validScheduleDate = autoResult.schedule.date
               }
-            } catch (error) {
+            } catch (_error) {
               console.warn('Invalid schedule date from auto-selection:', autoResult.schedule.date)
             }
           }
 
           // Cache the successful auto-selection
-          setCachedEventSelection({
-            eventId: autoResult.eventId,
-            scheduleId: autoResult.scheduleId,
-            isAutoSelected: true,
-            eventTitle: autoResult.event?.title || 'Event',
-            eventLocation: autoResult.event?.eventLocation,
-            scheduleDate: validScheduleDate
-          })
+          setCachedEventSelection(
+            autoResult.eventId,
+            autoResult.scheduleId,
+            true,
+            {
+              title: autoResult.event?.title || 'Event',
+              location: autoResult.event?.eventLocation,
+              scheduleDate: validScheduleDate || undefined
+            }
+          )
 
           setCurrentEventId(autoResult.eventId)
           setCurrentScheduleId(autoResult.scheduleId)
@@ -299,17 +302,21 @@ export const ScanPageClient: React.FC = () => {
             eventInfo: {
               title: autoResult.event?.title || 'Event',
               location: autoResult.event?.eventLocation,
-              scheduleDate: validScheduleDate
+              scheduleDate: validScheduleDate || undefined
             }
           })
         } else {
-          // Auto-selection failed
+          // Auto-selection failed - redirect to manual selection
           setAutoSelection({
             isAutoSelected: false,
             isLoading: false,
             attempted: true,
             error: autoResult.reason || 'Auto-selection failed'
           })
+
+          // Redirect to manual event selection
+          const reason = autoResult.reason || 'unknown'
+          router.push(`/checkin/events?mode=scan&reason=${reason}`)
         }
       } catch (error) {
         console.error('Auto-selection error:', error)
@@ -323,7 +330,7 @@ export const ScanPageClient: React.FC = () => {
     }
 
     performAutoSelection()
-  }, [searchParams])
+  }, [searchParams, router])
 
   const handleUploadClick = () => {
     fileInputRef.current?.click()
@@ -342,9 +349,9 @@ export const ScanPageClient: React.FC = () => {
         const factor = (259 * (contrast + 255)) / (255 * (259 - contrast))
 
         for (let i = 0; i < data.length; i += 4) {
-          data[i] = factor * (data[i] - 128) + 128     // Red
-          data[i + 1] = factor * (data[i + 1] - 128) + 128 // Green
-          data[i + 2] = factor * (data[i + 2] - 128) + 128 // Blue
+          data[i] = factor * ((data[i] || 0) - 128) + 128     // Red
+          data[i + 1] = factor * ((data[i + 1] || 0) - 128) + 128 // Green
+          data[i + 2] = factor * ((data[i + 2] || 0) - 128) + 128 // Blue
         }
         return imageData
       },
@@ -355,7 +362,7 @@ export const ScanPageClient: React.FC = () => {
         const data = imageData.data
 
         for (let i = 0; i < data.length; i += 4) {
-          const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2])
+          const gray = Math.round(0.299 * (data[i] || 0) + 0.587 * (data[i + 1] || 0) + 0.114 * (data[i + 2] || 0))
           const enhanced = gray > 128 ? 255 : 0 // High contrast black/white
           data[i] = enhanced
           data[i + 1] = enhanced
@@ -372,13 +379,13 @@ export const ScanPageClient: React.FC = () => {
         // Calculate average brightness
         let totalBrightness = 0
         for (let i = 0; i < data.length; i += 4) {
-          totalBrightness += Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2])
+          totalBrightness += Math.round(0.299 * (data[i] || 0) + 0.587 * (data[i + 1] || 0) + 0.114 * (data[i + 2] || 0))
         }
         const avgBrightness = totalBrightness / (data.length / 4)
         const threshold = avgBrightness * 0.8 // Adaptive threshold
 
         for (let i = 0; i < data.length; i += 4) {
-          const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2])
+          const gray = Math.round(0.299 * (data[i] || 0) + 0.587 * (data[i + 1] || 0) + 0.114 * (data[i + 2] || 0))
           const enhanced = gray > threshold ? 255 : 0
           data[i] = enhanced
           data[i + 1] = enhanced
@@ -391,7 +398,9 @@ export const ScanPageClient: React.FC = () => {
     // Try each technique
     for (let i = 0; i < techniques.length; i++) {
       try {
-        const imageData = techniques[i]()
+        const technique = techniques[i]
+        if (!technique) continue
+        const imageData = technique()
         const code = jsQR(imageData.data, imageData.width, imageData.height, {
           inversionAttempts: 'dontInvert'
         })
@@ -413,7 +422,7 @@ export const ScanPageClient: React.FC = () => {
     if (!file || isProcessing) return
 
     setIsProcessing(true)
-    setFeedback({ type: 'info', message: 'Processing image...' })
+    setFeedback({ type: 'warning', message: 'Processing image...' })
 
     try {
       const imageUrl = URL.createObjectURL(file)
@@ -551,7 +560,12 @@ export const ScanPageClient: React.FC = () => {
 
     try {
       // Single optimized API call for validation + check-in
-      const scanRes = await fetch(`/api/checkin-app/scan?ticketCode=${normalizedCode}`, {
+      // Include selected event/schedule for flexible validation
+      const queryParams = new URLSearchParams({ ticketCode: normalizedCode })
+      if (currentEventId) queryParams.append('eventId', currentEventId)
+      if (currentScheduleId) queryParams.append('scheduleId', currentScheduleId)
+
+      const scanRes = await fetch(`/api/checkin-app/scan?${queryParams.toString()}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
@@ -631,7 +645,7 @@ export const ScanPageClient: React.FC = () => {
     } finally {
       setIsProcessing(false)
     }
-  }, [isProcessing, t, SCAN_DEBOUNCE_MS, CACHE_DURATION_MS])
+  }, [isProcessing, t, SCAN_DEBOUNCE_MS, CACHE_DURATION_MS, currentEventId, currentScheduleId])
 
   // Auto-clear feedback overlay and re-enable scanning
   useEffect(() => {
@@ -685,6 +699,36 @@ export const ScanPageClient: React.FC = () => {
           scheduleId={currentScheduleId}
           className="bg-gray-800 dark:bg-gray-700 rounded-lg p-4 mb-4 border border-gray-600 dark:border-gray-600"
         />
+
+        {/* Change Event Button - Show when event is selected */}
+        {(autoSelection.isAutoSelected || (!autoSelection.isLoading && currentEventId && currentScheduleId)) && (
+          <div className="text-center mb-4">
+            <button
+              onClick={() => router.push('/checkin/events?mode=scan')}
+              className="text-sm text-blue-400 hover:text-blue-300 hover:underline transition-colors"
+            >
+              Change event
+            </button>
+          </div>
+        )}
+
+        {/* Missing Event Selection Message */}
+        {autoSelection.attempted && !autoSelection.isLoading && !currentEventId && !currentScheduleId && (
+          <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-4 mb-4">
+            <h3 className="text-lg font-semibold text-orange-300 mb-2">
+              Event Selection Required
+            </h3>
+            <p className="text-orange-200 mb-4 text-sm">
+              Please select an event and schedule to start scanning QR codes.
+            </p>
+            <button
+              onClick={() => router.push('/checkin/events?mode=scan')}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors"
+            >
+              Select Event
+            </button>
+          </div>
+        )}
 
         {/* Dynamic instruction/last scan info area */}
         {lastScannedTicket ? (

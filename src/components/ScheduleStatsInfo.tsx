@@ -32,7 +32,7 @@ const ScheduleStatsInfo: React.FC<Props> = ({ eventId, scheduleId, className = '
 
   const fetchStats = useCallback(async () => {
     if (!eventId || !scheduleId) return
-    
+
     setStats((prev) => ({ ...prev, loading: true }))
     try {
       const res = await fetch(`/api/checkin-app/event-stats?eventId=${eventId}&scheduleId=${scheduleId}`)
@@ -74,7 +74,7 @@ const ScheduleStatsInfo: React.FC<Props> = ({ eventId, scheduleId, className = '
       {/* Title and basic meta */}
       {eventTitle && (
         <>
-          <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1 pr-8">{eventTitle}</h2>
+          <h2 className="text-base font-semibold text-blue-600 mb-1 pr-8">{eventTitle}</h2>
           <div className="flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-300 mb-3">
             {eventDate && (
               <span className="px-2 py-0.5 min-w-[80px] text-center rounded-full whitespace-nowrap bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 font-bold" aria-label={`Event date ${eventDate}`}>
@@ -115,4 +115,4 @@ const ScheduleStatsInfo: React.FC<Props> = ({ eventId, scheduleId, className = '
   )
 }
 
-export default ScheduleStatsInfo 
+export default ScheduleStatsInfo

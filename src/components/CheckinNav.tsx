@@ -22,7 +22,7 @@ export const CheckinNav: React.FC<CheckinNavProps> = ({ dark = false }) => {
   const { t } = useTranslate()
 
   // Helper to decide which tab is active
-  const isQRActive = pathname === '/checkin/scan'
+  const isQRActive = pathname === '/checkin/scan' || (pathname === '/checkin/events' && modeParam === 'scan')
 
   // Paper tab is active either on the dedicated /checkin/paper page
   // OR when we are on the event-selection page with ?mode=paper
@@ -63,4 +63,4 @@ export const CheckinNav: React.FC<CheckinNavProps> = ({ dark = false }) => {
       </div>
     </div>
   )
-} 
+}
