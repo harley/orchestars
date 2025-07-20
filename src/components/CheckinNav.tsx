@@ -47,9 +47,9 @@ export const CheckinNav: React.FC<CheckinNavProps> = ({ dark = false }) => {
 
   return (
     <div className="text-center mb-4 w-full max-w-md mx-auto">
-      <h2 className={`text-lg font-semibold mb-3${dark ? ' text-white' : ' text-gray-900'}`}>{
+      <h1 className={`text-lg font-semibold mb-3${dark ? ' text-white' : ' text-gray-900'}`}>{
         t('Check-in by')
-      }</h2>
+      }</h1>
       <div className="grid grid-cols-3 gap-2 w-full">
         <Link href="/checkin/scan" className={tabClass(isQRActive)}>
           {t('QR')}

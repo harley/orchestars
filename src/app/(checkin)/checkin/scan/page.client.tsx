@@ -674,8 +674,6 @@ export const ScanPageClient: React.FC = () => {
       <div className="w-full max-w-md mx-auto flex flex-col items-center">
         {/* Navigation Toggle */}
         <CheckinNav dark />
-        <h1 className="text-2xl font-bold mb-2">{t('checkin.scan.title')}</h1>
-
         {/* Event Selection Info */}
         {autoSelection.isLoading && (
           <div className="text-center mb-4 p-3 bg-blue-500/20 rounded-lg border border-blue-500/30">
