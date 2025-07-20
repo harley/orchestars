@@ -367,7 +367,7 @@
         "wrongDateFuture": "This ticket is for \"{{eventTitle}}\" on {{eventDate}}, but today is {{today}}. Please use the correct ticket for today's event."
       },
       "success": "Checked In",
-      "alreadyCheckedIn": "Already checked in"
+      "alreadyCheckedIn": "Failed! Checked in before!"
     },
     "event": {
       "dateTBA": "Date: TBA",

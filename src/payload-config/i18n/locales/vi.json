@@ -367,7 +367,7 @@
         "wrongDateFuture": "Vé này dành cho \"{{eventTitle}}\" vào ngày {{eventDate}}, nhưng hôm nay là {{today}}. Vui lòng sử dụng vé đúng cho sự kiện hôm nay."
       },
       "success": "Soát vé thành công",
-      "alreadyCheckedIn": "Đã soát vé rồi"
+      "alreadyCheckedIn": "Không được! Đã soát vé rồi"
     },
     "event": {
       "dateTBA": "Date: TBA",
