@@ -261,7 +261,7 @@ export const ScanPageClient: React.FC = () => {
         }
 
         const eventsData = await eventsRes.json()
-        const events: EventWithSchedules[] = eventsData.events || []
+        const events: EventWithSchedules[] = eventsData.events?.docs || []
 
         // Attempt auto-selection
         const autoResult = await attemptAutoSelection(events)
