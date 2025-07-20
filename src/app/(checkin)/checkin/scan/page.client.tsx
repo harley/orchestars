@@ -26,6 +26,9 @@ import {
   clearExpiredCache
 } from '@/lib/checkin/eventSelectionCache'
 import ScheduleStatsInfo from '@/components/ScheduleStatsInfo'
+import { AlreadyCheckedInInfo } from './components/AlreadyCheckedInInfo'
+import { WrongEventError } from './components/WrongEventError'
+import { LastCheckedInInfo } from './components/LastCheckedInInfo'
 
 const ScanHistory = forwardRef((props: {}, ref) => {
   const [history, setHistory] = useState<CheckinRecord[]>([])
@@ -171,6 +174,18 @@ export const ScanPageClient: React.FC = () => {
     ticketCode: string
     ticketPriceInfo: any
   } | null>(null)
+  const [alreadyCheckedInInfo, setAlreadyCheckedInInfo] = useState<{
+    seat: string
+    ticketPriceName: string | null
+    attendeeName: string
+    ticketCode: string
+    ticketPriceInfo: any
+    checkedInAt: string
+  } | null>(null)
+  const [wrongEventError, setWrongEventError] = useState<{
+    message: string
+    ticketCode: string
+  } | null>(null)
 
   // Selected event and schedule for ScheduleStatsInfo
   const [currentEventId, setCurrentEventId] = useState<string | null>(
@@ -197,6 +212,69 @@ export const ScanPageClient: React.FC = () => {
   const scanCacheRef = useRef<Map<string, { result: any; timestamp: number }>>(new Map())
   const SCAN_DEBOUNCE_MS = 2000 // Prevent duplicate scans within 2 seconds
   const CACHE_DURATION_MS = 30000 // Cache results for 30 seconds
+
+  // Helper functions to handle scan results consistently
+  const handleSuccessfulCheckin = useCallback((ticketInfo: any, ticketCode: string) => {
+    setLastScannedTicket({
+      seat: ticketInfo.seat,
+      ticketPriceName: ticketInfo.ticketPriceName,
+      attendeeName: ticketInfo.attendeeName,
+      ticketCode: ticketCode,
+      ticketPriceInfo: ticketInfo.ticketPriceInfo,
+    })
+    // Clear other states
+    setAlreadyCheckedInInfo(null)
+    setWrongEventError(null)
+    
+    setFeedback({ type: 'success', message: t('checkin.scan.success') })
+    if (window.navigator.vibrate) window.navigator.vibrate(200)
+  }, [t])
+
+  const handleAlreadyCheckedIn = useCallback((ticketInfo: any, ticketCode: string) => {
+    setAlreadyCheckedInInfo({
+      seat: ticketInfo.seat,
+      ticketPriceName: ticketInfo.ticketPriceName,
+      attendeeName: ticketInfo.attendeeName,
+      ticketCode: ticketCode,
+      ticketPriceInfo: ticketInfo.ticketPriceInfo,
+      checkedInAt: ticketInfo.checkedInAt,
+    })
+    // Clear other states
+    setLastScannedTicket(null)
+    setWrongEventError(null)
+    
+    setFeedback({ type: 'error', message: t('checkin.scan.alreadyCheckedIn') })
+    if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200])
+  }, [t])
+
+  const handleScanError = useCallback((message: string, ticketCode: string) => {
+    // Check for date-related error messages in both English and Vietnamese
+    const isDateError = message && (
+      message.includes('already passed') ||
+      message.includes('different day') ||
+      message.includes('today is') ||
+      message.includes('đã kết thúc') ||
+      message.includes('hôm nay là') ||
+      message.includes('vào ngày')
+    )
+
+    if (isDateError) {
+      // Show date errors in the info box above camera
+      setWrongEventError({
+        message: message,
+        ticketCode: ticketCode,
+      })
+      setLastScannedTicket(null)
+      setAlreadyCheckedInInfo(null)
+      setFeedback(null) // Clear any overlay feedback
+      setPersistentError(null) // Clear persistent error
+    } else {
+      setFeedback({ type: 'error', message: message })
+      setWrongEventError(null) // Clear wrong event error for other errors
+      setPersistentError(null) // Clear persistent error for other errors
+    }
+    if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
+  }, [])
 
   // Auto-selection logic on mount
   useEffect(() => {
@@ -514,41 +592,13 @@ export const ScanPageClient: React.FC = () => {
         const ticketInfo = scanData.ticket
 
         if (scanData.alreadyCheckedIn) {
-          setFeedback({ type: 'warning', message: t('checkin.scan.alreadyCheckedIn') })
-          if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200])
+          handleAlreadyCheckedIn(ticketInfo, normalizedCode)
         } else {
-          setLastScannedTicket({
-            seat: ticketInfo.seat,
-            ticketPriceName: ticketInfo.ticketPriceName,
-            attendeeName: ticketInfo.attendeeName,
-            ticketCode: normalizedCode,
-            ticketPriceInfo: ticketInfo.ticketPriceInfo,
-          })
-
-          setFeedback({ type: 'success', message: t('checkin.scan.success') })
-          if (window.navigator.vibrate) window.navigator.vibrate(200)
+          handleSuccessfulCheckin(ticketInfo, normalizedCode)
         }
       } else {
         const msg = scanData.message || t('checkin.scan.error.failed')
-        // For persistent errors (wrong day/expired), show as banner; otherwise use overlay
-        // Check for date-related error messages in both English and Vietnamese
-        const isDateError = scanData.message && (
-          scanData.message.includes('already passed') ||
-          scanData.message.includes('different day') ||
-          scanData.message.includes('today is') ||
-          scanData.message.includes('đã kết thúc') ||
-          scanData.message.includes('hôm nay là') ||
-          scanData.message.includes('vào ngày')
-        )
-
-        if (isDateError) {
-          setPersistentError(scanData.message)
-          setFeedback(null) // Clear any overlay feedback
-        } else {
-          setFeedback({ type: 'error', message: msg })
-          setPersistentError(null) // Clear persistent error for other errors
-        }
-        if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
+        handleScanError(msg, normalizedCode)
       }
       return
     }
@@ -597,43 +647,14 @@ export const ScanPageClient: React.FC = () => {
 
         // Check if ticket was already checked in
         if (scanData.alreadyCheckedIn) {
-          setFeedback({ type: 'warning', message: t('checkin.scan.alreadyCheckedIn') })
-          if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200])
+          handleAlreadyCheckedIn(ticketInfo, normalizedCode)
         } else {
-          // Store the ticket information for display
-          setLastScannedTicket({
-            seat: ticketInfo.seat,
-            ticketPriceName: ticketInfo.ticketPriceName,
-            attendeeName: ticketInfo.attendeeName,
-            ticketCode: normalizedCode,
-            ticketPriceInfo: ticketInfo.ticketPriceInfo,
-          })
-
-          setFeedback({ type: 'success', message: t('checkin.scan.success') })
-          if (window.navigator.vibrate) window.navigator.vibrate(200)
+          handleSuccessfulCheckin(ticketInfo, normalizedCode)
         }
         // Removed: historyRef.current?.fetchHistory();
       } else {
         const msg = !scanRes.ok ? scanData.message || t('checkin.scan.error.failed') : t('checkin.scan.error.failed')
-        // For persistent errors (wrong day/expired), show as banner; otherwise use overlay
-        // Check for date-related error messages in both English and Vietnamese
-        const isDateError = scanData.message && (
-          scanData.message.includes('already passed') ||
-          scanData.message.includes('different day') ||
-          scanData.message.includes('today is') ||
-          scanData.message.includes('đã kết thúc') ||
-          scanData.message.includes('hôm nay là') ||
-          scanData.message.includes('vào ngày')
-        )
-
-        if (isDateError) {
-          setPersistentError(scanData.message)
-          setFeedback(null) // Clear any overlay feedback
-        } else {
-          setFeedback({ type: 'error', message: msg })
-          setPersistentError(null) // Clear persistent error for other errors
-        }
-        if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
+        handleScanError(msg, normalizedCode)
       }
     } catch (error) {
       console.error('Check-in error:', error)
@@ -645,7 +666,7 @@ export const ScanPageClient: React.FC = () => {
     } finally {
       setIsProcessing(false)
     }
-  }, [isProcessing, t, SCAN_DEBOUNCE_MS, CACHE_DURATION_MS, currentEventId, currentScheduleId])
+  }, [isProcessing, t, SCAN_DEBOUNCE_MS, CACHE_DURATION_MS, currentEventId, currentScheduleId, handleSuccessfulCheckin, handleAlreadyCheckedIn, handleScanError])
 
   // Auto-clear feedback overlay and re-enable scanning
   useEffect(() => {
@@ -730,36 +751,11 @@ export const ScanPageClient: React.FC = () => {
 
         {/* Dynamic instruction/last scan info area */}
         {lastScannedTicket ? (
-          (() => {
-            const ticketColors = getTicketClassColor(lastScannedTicket.ticketPriceInfo)
-            return (
-              <div className="text-center mb-6 p-4 bg-green-500/20 rounded-lg border border-green-500/30">
-                <p className="text-green-400 text-sm font-medium mb-2">{t('checkin.scan.lastCheckIn')}</p>
-                <div className="flex justify-between items-center gap-2">
-                  <div className="flex items-center gap-2 text-white font-medium">
-                    <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">
-                      {lastScannedTicket.seat}
-                    </span>
-                    <span
-                      className="px-2 py-1 rounded text-xs font-medium"
-                      style={{
-                        backgroundColor: ticketColors.color,
-                        color: ticketColors.textColor,
-                      }}
-                    >
-                      {lastScannedTicket.ticketPriceName || 'N/A'}
-                    </span>
-                    <span className="text-gray-300 text-sm">
-                      {lastScannedTicket.ticketCode}
-                    </span>
-                  </div>
-                  <span className="text-white font-semibold">
-                    {lastScannedTicket.attendeeName}
-                  </span>
-                </div>
-              </div>
-            )
-          })()
+          <LastCheckedInInfo ticketInfo={lastScannedTicket} />
+        ) : alreadyCheckedInInfo ? (
+          <AlreadyCheckedInInfo ticketInfo={alreadyCheckedInInfo} />
+        ) : wrongEventError ? (
+          <WrongEventError error={wrongEventError} />
         ) : (
           <p className="text-gray-400 mb-6">{t('checkin.scan.instruction')}</p>
         )}
@@ -776,9 +772,7 @@ export const ScanPageClient: React.FC = () => {
             <div
               className={`absolute inset-0 flex items-center justify-center p-4 text-center text-white text-4xl font-bold transition-opacity duration-200 ${
                 feedback.type === 'success'
-                  ? 'bg-emerald-600/90'
-                  : feedback.type === 'warning'
-                  ? 'bg-orange-500/90'
+                  ? 'bg-emerald-600/90 animate-pulse border-4 border-emerald-400'
                   : 'bg-red-600/90'
               }`}
             >

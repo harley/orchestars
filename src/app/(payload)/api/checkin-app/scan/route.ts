@@ -4,7 +4,6 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { sql } from '@payloadcms/db-postgres'
-import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
 import { getAdminUser } from '@/utilities/getAdminUser'
 import { isAdminOrSuperAdminOrEventAdmin } from '@/access/isAdminOrSuperAdmin'
 import { getPayload } from '@/payload-config/getPayloadConfig'
@@ -54,11 +53,11 @@ export async function POST(req: NextRequest) {
           req: { user: adminUser },
         })
       ) {
-        throw new Error(
-          `${CHECKIN_ERROR_CODE.CHECKIN005}: Unauthorized access attempt by user ${
-            adminUser?.id || 'unknown'
-          }`,
-        )
+        console.warn(`${CHECKIN_ERROR_CODE.CHECKIN005}: Unauthorized access attempt by user ${adminUser?.id || 'unknown'}`)
+        return NextResponse.json({
+          success: false,
+          message: 'Unauthorized access'
+        }, { status: 401 })
       }
 
       const payload = await getPayload()
@@ -96,7 +95,11 @@ export async function POST(req: NextRequest) {
       const rows = (result as { rows: TicketRow[] }).rows || []
 
       if (!rows.length) {
-        throw new Error(`${CHECKIN_ERROR_CODE.CHECKIN001}: Ticket not found for code ${ticketCode}`)
+        return NextResponse.json({
+          success: false,
+          message: 'Ticket not found',
+          userValidationError: true
+        }, { status: 404 })
       }
 
       const ticket = rows[0]
@@ -139,7 +142,11 @@ export async function POST(req: NextRequest) {
                 eventTitle,
                 eventDate
               })
-              throw new Error(message)
+              return NextResponse.json({
+                success: false,
+                message: message,
+                userValidationError: true
+              }, { status: 400 })
             } else if (!isMatchingManualSelection) {
               // Only show future date error if not manually selected for this specific event/schedule
               const message = t('checkin.scan.error.wrongDateFuture', locale, {
@@ -147,7 +154,11 @@ export async function POST(req: NextRequest) {
                 eventDate,
                 today: todayFormatted
               })
-              throw new Error(message)
+              return NextResponse.json({
+                success: false,
+                message: message,
+                userValidationError: true
+              }, { status: 400 })
             }
           }
         }
@@ -210,9 +221,11 @@ export async function POST(req: NextRequest) {
         (insertResult as { rows: { id: string; check_in_time: string }[] }).rows || []
 
       if (!checkinRows.length) {
-        throw new Error(
-          `${CHECKIN_ERROR_CODE.CHECKIN004}: Failed to create checkin record for ticket ${ticketCode} by admin ${adminUser.id}`,
-        )
+        console.error(`${CHECKIN_ERROR_CODE.CHECKIN004}: Failed to create checkin record for ticket ${ticketCode} by admin ${adminUser.id}`)
+        return NextResponse.json({
+          success: false,
+          message: 'Failed to create check-in record'
+        }, { status: 500 })
       }
       const checkinRow = checkinRows[0]!
 
@@ -234,13 +247,14 @@ export async function POST(req: NextRequest) {
         },
       })
     } catch (error) {
-      console.error('Scan error:', error)
+      // Handle any unexpected system errors (database connection issues, etc.)
+      console.error('Unexpected scan system error:', error)
       return NextResponse.json(
         {
           success: false,
-          message: await handleNextErrorMsgResponse(error),
+          message: 'Internal server error',
         },
-        { status: 400 },
+        { status: 500 }
       )
     }
   }, `qr-scan-${ticketCode}`)
