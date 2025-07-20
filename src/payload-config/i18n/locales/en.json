@@ -363,7 +363,9 @@
         "failedToLoadImage": "Failed to load image.",
         "processingImage": "Error processing image.",
         "failed": "Check-in failed",
-        "network": "Network error"
+        "network": "Network error",
+        "wrongDatePast": "This ticket is for \"{{eventTitle}}\" on {{eventDate}} which has already passed. This ticket cannot be used for today's event.",
+        "wrongDateFuture": "This ticket is for \"{{eventTitle}}\" on {{eventDate}}, but today is {{today}}. Please use the correct ticket for today's event."
       },
       "success": "Checked In",
       "alreadyCheckedIn": "Already checked in"

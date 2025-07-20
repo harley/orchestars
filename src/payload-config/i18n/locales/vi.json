@@ -363,7 +363,9 @@
         "failedToLoadImage": "Không tải được hình ảnh",
         "processingImage": "Lỗi xử lý hình ảnh",
         "failed": "Checkin thất bại",
-        "network": "Lỗi kết nối mạng"
+        "network": "Lỗi kết nối mạng",
+        "wrongDatePast": "Vé này dành cho \"{{eventTitle}}\" vào ngày {{eventDate}} đã kết thúc. Vé này không thể sử dụng cho sự kiện hôm nay.",
+        "wrongDateFuture": "Vé này dành cho \"{{eventTitle}}\" vào ngày {{eventDate}}, nhưng hôm nay là {{today}}. Vui lòng sử dụng vé đúng cho sự kiện hôm nay."
       },
       "success": "Soát vé thành công",
       "alreadyCheckedIn": "Đã soát vé rồi"

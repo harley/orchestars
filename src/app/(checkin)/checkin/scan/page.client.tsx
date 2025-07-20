@@ -69,17 +69,17 @@ const ScanHistory = forwardRef((props: {}, ref) => {
               const ticketType = (record.ticket as any)?.ticketPriceName || (record.ticket as any)?.ticketPriceInfo?.name || 'N/A'
               const ticketPriceInfo = (record.ticket as any)?.ticketPriceInfo
               const ticketColors = getTicketClassColor(ticketPriceInfo)
-              
+
               // Determine checkin method based on the manual field
               // Future: Add support for 'printed' method
               const checkinMethod = (record as any).manual ? 'Manual' : 'QR'
-              
+
               // Memoize style object to prevent unnecessary re-renders
               const ticketStyle = {
                 backgroundColor: ticketColors.color,
                 color: ticketColors.textColor,
               }
-              
+
               return (
                 <li key={record.id} className="text-sm text-gray-800 border-b pb-2">
                   <div className="flex justify-between items-center font-medium mb-1">
@@ -87,7 +87,7 @@ const ScanHistory = forwardRef((props: {}, ref) => {
                       <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">
                         {record.seat}
                       </span>
-                      <span 
+                      <span
                         className="px-2 py-1 rounded text-xs font-medium"
                         style={ticketStyle}
                       >
@@ -135,6 +135,7 @@ export const ScanPageClient: React.FC = () => {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'warning' | 'error'; message: string } | null>(
     null,
   )
+  const [persistentError, setPersistentError] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [lastScannedTicket, setLastScannedTicket] = useState<{
     seat: string
@@ -217,7 +218,7 @@ export const ScanPageClient: React.FC = () => {
     const normalizedCode = ticketCode.toUpperCase()
 
     // Client-side debouncing: prevent duplicate scans
-    if (normalizedCode === lastScanCodeRef.current && 
+    if (normalizedCode === lastScanCodeRef.current &&
         now - lastScanTimeRef.current < SCAN_DEBOUNCE_MS) {
       console.log('Scan debounced - duplicate within 2 seconds')
       return
@@ -228,11 +229,11 @@ export const ScanPageClient: React.FC = () => {
     if (cached && now - cached.timestamp < CACHE_DURATION_MS) {
       console.log('Using cached scan result')
       const scanData = cached.result
-      
+
       // Display cached result
       if (scanData.success) {
         const ticketInfo = scanData.ticket
-        
+
         if (scanData.alreadyCheckedIn) {
           setFeedback({ type: 'warning', message: t('checkin.scan.alreadyCheckedIn') })
           if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200])
@@ -244,12 +245,30 @@ export const ScanPageClient: React.FC = () => {
             ticketCode: normalizedCode,
             ticketPriceInfo: ticketInfo.ticketPriceInfo,
           })
-          
+
           setFeedback({ type: 'success', message: t('checkin.scan.success') })
           if (window.navigator.vibrate) window.navigator.vibrate(200)
         }
       } else {
-        setFeedback({ type: 'error', message: scanData.message || t('checkin.scan.error.failed') })
+        const msg = scanData.message || t('checkin.scan.error.failed')
+        // For persistent errors (wrong day/expired), show as banner; otherwise use overlay
+        // Check for date-related error messages in both English and Vietnamese
+        const isDateError = scanData.message && (
+          scanData.message.includes('already passed') ||
+          scanData.message.includes('different day') ||
+          scanData.message.includes('today is') ||
+          scanData.message.includes('đã kết thúc') ||
+          scanData.message.includes('hôm nay là') ||
+          scanData.message.includes('vào ngày')
+        )
+
+        if (isDateError) {
+          setPersistentError(scanData.message)
+          setFeedback(null) // Clear any overlay feedback
+        } else {
+          setFeedback({ type: 'error', message: msg })
+          setPersistentError(null) // Clear persistent error for other errors
+        }
         if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
       }
       return
@@ -291,7 +310,7 @@ export const ScanPageClient: React.FC = () => {
 
       if (scanRes.status === 200 && scanData.success) {
         const ticketInfo = scanData.ticket
-        
+
         // Check if ticket was already checked in
         if (scanData.alreadyCheckedIn) {
           setFeedback({ type: 'warning', message: t('checkin.scan.alreadyCheckedIn') })
@@ -305,21 +324,38 @@ export const ScanPageClient: React.FC = () => {
             ticketCode: normalizedCode,
             ticketPriceInfo: ticketInfo.ticketPriceInfo,
           })
-          
+
           setFeedback({ type: 'success', message: t('checkin.scan.success') })
           if (window.navigator.vibrate) window.navigator.vibrate(200)
         }
         // Removed: historyRef.current?.fetchHistory();
       } else {
         const msg = !scanRes.ok ? scanData.message || t('checkin.scan.error.failed') : t('checkin.scan.error.failed')
-        setFeedback({ type: 'error', message: msg })
+        // For persistent errors (wrong day/expired), show as banner; otherwise use overlay
+        // Check for date-related error messages in both English and Vietnamese
+        const isDateError = scanData.message && (
+          scanData.message.includes('already passed') ||
+          scanData.message.includes('different day') ||
+          scanData.message.includes('today is') ||
+          scanData.message.includes('đã kết thúc') ||
+          scanData.message.includes('hôm nay là') ||
+          scanData.message.includes('vào ngày')
+        )
+
+        if (isDateError) {
+          setPersistentError(scanData.message)
+          setFeedback(null) // Clear any overlay feedback
+        } else {
+          setFeedback({ type: 'error', message: msg })
+          setPersistentError(null) // Clear persistent error for other errors
+        }
         if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
       }
     } catch (error) {
       console.error('Check-in error:', error)
       setFeedback({ type: 'error', message: t('checkin.scan.error.network') })
       if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100])
-      
+
       // Remove failed cache entry
       scanCacheRef.current.delete(normalizedCode)
     } finally {
@@ -343,7 +379,7 @@ export const ScanPageClient: React.FC = () => {
   // Keep the last scanned ticket visible (no auto-clear)
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
+    <div className="flex flex-col items-center min-h-screen bg-gray-900 text-white p-4">
       <input
         type="file"
         ref={fileInputRef}
@@ -355,7 +391,7 @@ export const ScanPageClient: React.FC = () => {
         {/* Navigation Toggle */}
         <CheckinNav dark />
         <h1 className="text-2xl font-bold mb-2">{t('checkin.scan.title')}</h1>
-        
+
         {/* Dynamic instruction/last scan info area */}
         {lastScannedTicket ? (
           (() => {
@@ -368,7 +404,7 @@ export const ScanPageClient: React.FC = () => {
                     <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">
                       {lastScannedTicket.seat}
                     </span>
-                    <span 
+                    <span
                       className="px-2 py-1 rounded text-xs font-medium"
                       style={{
                         backgroundColor: ticketColors.color,
@@ -391,7 +427,7 @@ export const ScanPageClient: React.FC = () => {
         ) : (
           <p className="text-gray-400 mb-6">{t('checkin.scan.instruction')}</p>
         )}
-        
+
         <div className="w-full relative aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 border-gray-700">
           <QRScanner
             onScan={validateAndCheckIn}
@@ -403,10 +439,10 @@ export const ScanPageClient: React.FC = () => {
           {feedback && (
             <div
               className={`absolute inset-0 flex items-center justify-center p-4 text-center text-white text-4xl font-bold transition-opacity duration-200 ${
-                feedback.type === 'success' 
-                  ? 'bg-emerald-600/90' 
-                  : feedback.type === 'warning' 
-                  ? 'bg-orange-500/90' 
+                feedback.type === 'success'
+                  ? 'bg-emerald-600/90'
+                  : feedback.type === 'warning'
+                  ? 'bg-orange-500/90'
                   : 'bg-red-600/90'
               }`}
             >
@@ -414,6 +450,25 @@ export const ScanPageClient: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Persistent Error Banner */}
+        {persistentError && (
+          <div className="w-full mt-4 p-4 bg-red-600/90 border border-red-500 rounded-lg">
+            <div className="flex justify-between items-start gap-3">
+              <div className="text-white text-sm leading-relaxed">
+                {persistentError}
+              </div>
+              <button
+                onClick={() => setPersistentError(null)}
+                className="flex-shrink-0 text-white hover:text-red-200 transition-colors"
+                aria-label="Dismiss error"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Removed flashlight toggle as it's not needed */}
         <div className="w-full mt-6 space-y-3">
           {/* Extra actions */}
@@ -433,4 +488,4 @@ export const ScanPageClient: React.FC = () => {
       </div>
     </div>
   )
-} 
+}

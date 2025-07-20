@@ -4,6 +4,18 @@ import { getLocale, t } from '@/providers/I18n/server'
 export const handleNextErrorMsgResponse = async (error: any) => {
   // Get the error code and parameters from the error object
   const errorCode = error.errorCode || error.message
+
+  // Check if this is already a user-facing translated message
+  // These messages should be returned as-is without further processing
+  if (typeof errorCode === 'string' && (
+    errorCode.includes('This ticket is for') ||
+    errorCode.includes('Vé này dành cho') ||
+    errorCode.includes('already passed') ||
+    errorCode.includes('đã kết thúc')
+  )) {
+    return errorCode
+  }
+
   const [code, paramsString] = errorCode.split('|')
 
   // Parse parameters if they exist
@@ -22,7 +34,8 @@ export const handleNextErrorMsgResponse = async (error: any) => {
   // Try to get the translated message for the error code
   const translatedMessage = t(`errorCode.${code}`, locale, params)
 
-  if (translatedMessage) {
+  // Only return translatedMessage if it's different from the input (meaning translation was found)
+  if (translatedMessage && translatedMessage !== `errorCode.${code}`) {
     return translatedMessage
   }
 
