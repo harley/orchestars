@@ -22,3 +22,5 @@ export const TICKET_ZONE = {
 }
 
 export const TICKET_ZONES = Object.values(TICKET_ZONE)
+
+export type TicketZoneLabel = typeof TICKET_ZONE[keyof typeof TICKET_ZONE]['label'];

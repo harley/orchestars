@@ -26,6 +26,12 @@ interface SidebarProps {
   className?: string
 }
 
+const menuItems = [
+  { icon: Settings, label: 'Account Settings', href: '/user/profile' },
+  { icon: CreditCard, label: 'Purchased Tickets', href: '/user/my-tickets', active: true },
+  { icon: Calendar, label: 'My Events', href: '/user/my-events' },
+]
+
 const ContentSideBar = ({
   className,
   onClickMenuItem,
@@ -35,7 +41,7 @@ const ContentSideBar = ({
 }) => {
   const { t } = useTranslate()
   const menuItems = [
-    { icon: Settings, label: t('userprofile.sidebar.accountSettings'), href: '/user/profile' },
+    { icon: Settings, label: t('userprofile.sidebar.accountInfo'), href: '/user/profile' },
     {
       icon: CreditCard,
       label: t('userprofile.sidebar.manageTickets'),
