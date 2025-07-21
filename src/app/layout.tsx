@@ -17,6 +17,7 @@ import { getLocale } from '@/providers/I18n/server'
 
 import { Analytics } from '@vercel/analytics/next'
 import PixelTracker from '@/components/PixelTracker'
+import GATracker from '@/components/GATracker'
 
 export const metadata: Metadata = {
   metadataBase: new URL(getServerSideURL()),
@@ -48,6 +49,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
           strategy="afterInteractive"
         />
+
         <Script id="gtag-init" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
@@ -56,6 +58,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             gtag('config', '${GA_ID}');
           `}
         </Script>
+        <GATracker />
 
         <Providers locale={lang}>
           <Suspense fallback={null}>
