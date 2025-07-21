@@ -45,7 +45,8 @@
     ".next/types/**/*.ts",
     "redirects.js",
     "next.config.js",
-    "next-sitemap.config.cjs"
+    "next-sitemap.config.cjs",
+    "src/lib/gtag.d.ts"
   ],
   "exclude": [
     "node_modules"
