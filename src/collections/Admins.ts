@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isAdminOrSuperAdmin, isSuperAdmin } from '@/access/isAdminOrSuperAdmin'
+import { ADMIN_TOKEN_EXPIRATION_IN_SECONDS } from '@/config/app'
 
 const Admins: CollectionConfig = {
   slug: 'admins',
@@ -7,7 +8,9 @@ const Admins: CollectionConfig = {
     useAsTitle: 'email',
     group: 'System',
   },
-  auth: true, // Enable authentication for this collection
+  auth: {
+    tokenExpiration: ADMIN_TOKEN_EXPIRATION_IN_SECONDS,
+  }, // Enable authentication for this collection
   access: {
     read: ({ req: { user } }) => {
       if (!user) return false

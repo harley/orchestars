@@ -24,7 +24,9 @@
     "enterLastName": "Nhập họ của bạn",
     "enterFirstName": "Nhập tên của bạn",
     "enterPhoneNumber": "Nhập số điện thoại",
-    "enterEmail": "Nhập email"
+    "enterEmail": "Nhập email",
+    "seat": "Ghế",
+    "phoneNumber": "Số điện thoại"
   },
   "event": {
     "chooseAttendingDate": "Chọn ngày bạn muốn tham dự",
@@ -174,7 +176,7 @@
     "PROMO006": "Chưa thoả mãn số lượng vé tối thiểu để áp dụng mã giảm giá",
     "PROMO007": "Bạn đã dùng hết số lượt được áp dụng cho giảm giá {{promotionCode}}",
     "PROMO008": "Chưa thoả mãn số lượng vé tối thiểu để áp dụng mã giảm giá {{promotionCode}}",
-    "PROMO009": "Không thể áp dụng nhiều mã giảm giá cho một đơn hàng", 
+    "PROMO009": "Không thể áp dụng nhiều mã giảm giá cho một đơn hàng",
     "PROMO010": "Chỉ cho phép áp dụng tối đa {{maxAppliedPromotions}} mã giảm giá cho một đơn hàng",
     "PROMO011": "Mã giảm giá {{promotionCodes}} không hợp lệ",
     "EVT001": "Sự kiện không được để trống",
@@ -246,7 +248,8 @@
     "booked": "Đã đặt",
     "qrCodeNotAvailable": "Mã QR chỉ có sẵn cho vé đã đặt.",
     "termsAndConditions": "Điều khoản & Điều kiện",
-    "details": "Chi tiết vé"
+    "details": "Chi tiết vé",
+    "instructions": "Hướng dẫn"
   },
   "checkout": {
     "personalInfo": "Thông tin cá nhân",
@@ -288,6 +291,7 @@
     "pleaseEnterEmailAndPassword": "Vui lòng nhập cả email và mật khẩu",
     "login": "Đăng nhập",
     "loadingEvents": "Đang tải sự kiện...",
+    "refreshStats": "Cập nhật thống ké soát vé",
     "pleaseLoginFirst": "Vui lòng đăng nhập trước",
     "pleaseSelectEventAndSchedule": "Vui lòng chọn một sự kiện và lịch trình",
     "noSchedulesAvailable": "Không có lịch trình nào cho sự kiện này",
@@ -342,8 +346,7 @@
       "search": "Checkin thủ công"
     },
     "scan": {
-      "title": "Scan mã QR",
-      "instruction": "Đặt mã QR vào khung quét",
+      "instruction": "Quét QR để check-in",
       "upload": "Tải lên mã QR",
       "history": "Lịch sử checkin",
       "refreshHistory": "Làm mới lịch sử",
@@ -359,10 +362,13 @@
         "failedToLoadImage": "Không tải được hình ảnh",
         "processingImage": "Lỗi xử lý hình ảnh",
         "failed": "Checkin thất bại",
-        "network": "Lỗi kết nối mạng"
+        "network": "Lỗi kết nối mạng",
+        "wrongDatePast": "Vé này dành cho \"{{eventTitle}}\" vào ngày {{eventDate}} đã kết thúc. Vé này không thể sử dụng cho sự kiện hôm nay.",
+        "wrongDateFuture": "Vé này dành cho \"{{eventTitle}}\" vào ngày {{eventDate}}, nhưng hôm nay là {{today}}. Vui lòng sử dụng vé đúng cho sự kiện hôm nay."
       },
       "success": "Soát vé thành công",
-      "alreadyCheckedIn": "Đã soát vé rồi"
+      "alreadyCheckedIn": "Không được! Đã dùng rồi!",
+      "checkedInTime": "Đã soát vé"
     },
     "event": {
       "dateTBA": "Date: TBA",
@@ -382,7 +388,40 @@
       "lookingUp": "Đang tìm...",
       "lookUp": "Tìm kiếm",
       "clearAndStartNew": "Xóa và tìm lại"
-    }
+    },
+    "paper": {
+      "title": "Checkin Vé In",
+      "subtitle": "Checkin nhanh cho khách có vé in giấy",
+      "tabLabel": "Vé In",
+      "eventSelectionRequired": "Cần Chọn Sự Kiện",
+      "selectEventMessage": "Vui lòng chọn sự kiện và suất chiếu trước khi checkin vé in",
+      "selectEvent": "Chọn Sự Kiện",
+      "seatNumberLabel": "Số Ghế",
+      "seatNumberInstruction": "Nhập số ghế từ vé giấy. Không cần check ID.",
+      "seatNumberPlaceholder": "Ví dụ: A1, Z45, AA11,...",
+      "seatNumberHelp": "Nhấn Enter hoặc nhấp nút Kiểm Tra Ghế",
+      "validateSeat": "Kiểm Tra Ghế",
+      "validating": "Đang kiểm tra...",
+      "ticketFoundTitle": "Đã Tìm Thấy Vé - Xác Nhận Checkin",
+      "ticketClass": "Loại Vé",
+      "alreadyCheckedInTitle": "Đã Soát Vé",
+      "alreadyCheckedInMessage": "Vé này đã được soát và không thể xử lý lại",
+      "checkInNow": "Checkin Ngay",
+      "checkingIn": "Đang checkin...",
+      "seatValidationError": "Vui lòng nhập số ghế và đảm bảo đã chọn sự kiện/suất chiếu",
+      "authenticationRequired": "Cần xác thực. Vui lòng làm mới trang.",
+      "connectionFailed": "Kết nối thất bại. Vui lòng thử lại.",
+      "seatNotFound": "Không tìm thấy ghế cho sự kiện này",
+      "checkInFailed": "Checkin thất bại",
+      "checkInSuccessful": "Checkin thành công",
+      "alreadyCheckedInStatus": "Vé này đã được checkin trước đó",
+      "hasBeenCheckedIn": "đã được checkin thành công",
+      "changeEvent": "Chọn sự kiện khác",
+      "myCheckedCount": "Tôi đã soát",
+      "totalCheckedCount": "Tổng đã soát"
+    },
+    "ticketCode": "Mã vé",
+    "orderCode": "Mã đơn hàng"
   },
   "customerCheckinTicket": {
     "ticketCheckIn": "Tự Check In",

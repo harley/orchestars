@@ -1,14 +1,16 @@
 'use client'
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { useTranslate } from '@/providers/I18n/client'
 import { format } from 'date-fns'
 import { Event } from '@/types/Event'
 import { useToast } from '@/hooks/use-toast'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
-import { Check, Users, User, RefreshCw } from 'lucide-react'
+import { Check, Users, User, RefreshCw, Calendar } from 'lucide-react'
+import { CheckinNav } from '@/components/CheckinNav'
+import { getTodayInVietnam, getAutoSelectionFailureMessage } from '@/lib/checkin/autoEventSelection'
+import { markAsManualSelection } from '@/lib/checkin/eventSelectionCache'
 
 interface ChooseEventClientPageProps {
   publicEvents: Event[]
@@ -42,7 +44,26 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
   const { t } = useTranslate()
   const { toast } = useToast()
 
-  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  // Helper function to check if an event has today's schedule
+  const hasScheduleToday = (event: Event): boolean => {
+    const today = getTodayInVietnam()
+    return event.schedules?.some(schedule => {
+      if (!schedule.date) return false
+      try {
+        const scheduleDate = format(new Date(schedule.date), 'yyyy-MM-dd')
+        return scheduleDate === today
+      } catch {
+        return false
+      }
+    }) || false
+  }
+
+
+
+  // Get auto-selection failure reason from URL
+  const autoSelectionReason = searchParams.get('reason')
 
   useEffect(() => {
     const storedEventId = localStorage.getItem('selectedEventId')
@@ -148,7 +169,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
 
     // Wait for all requests to complete
     const results = await Promise.all(fetchPromises)
-    
+
     // Update state based on results
     setEventStats(prev => {
       const updatedStats = { ...prev }
@@ -178,7 +199,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     setSelectedEvent(event)
     setSelectedSchedule(null)
     setEventStats({}) // Clear previous stats
-    
+
     // Fetch stats for the newly selected event
     fetchEventStats(event)
   }
@@ -205,7 +226,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
     if (selectedSchedule.date) {
       localStorage.setItem('eventScheduleDate', format(selectedSchedule.date, 'dd-MM-yyyy'))
     }
-    
+
     // Store schedule time details
     if (selectedSchedule.details && selectedSchedule.details.length > 0) {
               const timeDetails = selectedSchedule.details.map((detail) => detail.time).filter(Boolean)
@@ -214,41 +235,50 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
       }
     }
 
+    // Mark this selection as manual (not auto-selected)
+    markAsManualSelection()
+
     const params = new URLSearchParams({
       eventId: selectedEvent.id.toString(),
       scheduleId: selectedSchedule.id.toString(),
     })
 
-    router.push(`/checkin/validates?${params.toString()}`)
+    // Route based on mode parameter
+    const mode = searchParams.get('mode')
+    if (mode === 'paper') {
+      router.push(`/checkin/paper?${params.toString()}`)
+    } else if (mode === 'search') {
+      router.push(`/checkin/validates?${params.toString()}`)
+    } else if (mode === 'scan') {
+      router.push(`/checkin/scan?${params.toString()}`)
+    } else {
+      // Default to search mode for backward compatibility
+      router.push(`/checkin/validates?${params.toString()}`)
+    }
   }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="w-full max-w-md mx-auto">
-        {/* Navigation Toggle */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Link
-            href="/checkin/scan"
-            className={`text-center py-2 px-4 rounded font-semibold ${
-              pathname === '/checkin/scan'
-                ? 'bg-gray-900 text-white'
-                : 'bg-gray-300 text-gray-800 hover:bg-gray-400'
-            }`}
-          >
-            {t('checkin.nav.qr')}
-          </Link>
-          <Link
-            href="/checkin/events"
-            className={`text-center py-2 px-4 rounded font-semibold ${
-              pathname === '/checkin/events'
-                ? 'bg-gray-900 text-white'
-                : 'bg-gray-300 text-gray-800 hover:bg-gray-400'
-            }`}
-          >
-            {t('checkin.nav.search')}
-          </Link>
-        </div>
-        
+        <CheckinNav />
+
+        {/* Auto-selection failure message */}
+        {autoSelectionReason && (
+          <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+            <div className="flex items-start">
+              <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
+              <div>
+                <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
+                  Auto-selection not available
+                </h3>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  {getAutoSelectionFailureMessage(autoSelectionReason)}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Refresh Button - only show when event is selected and has stats */}
         {selectedEvent && Object.keys(eventStats).length > 0 && (
           <div className="mb-4 flex justify-end">
@@ -262,11 +292,24 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
             </button>
           </div>
         )}
-        
+
         <div className="space-y-6">
-          {publicEvents?.map((event) => (
-            <div key={event.id} className="bg-white rounded-lg shadow p-4">
-              <h2 className="text-xl font-bold text-gray-900">{event.title}</h2>
+          {publicEvents?.map((event) => {
+            const eventHasToday = hasScheduleToday(event)
+            return (
+              <div key={event.id} className={`rounded-lg shadow p-4 ${
+                eventHasToday
+                  ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200'
+                  : 'bg-white'
+              }`}>
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-xl font-bold text-gray-900">{event.title}</h2>
+                  {eventHasToday && (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Today
+                    </span>
+                  )}
+                </div>
               <p className="text-sm text-gray-500 mb-2">
                 {!!event.startDatetime && !!event.endDatetime && (
                   <>
@@ -341,7 +384,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
                               )}
                             </div>
                           </div>
-                          
+
                           {stats ? (
                             <div className="grid grid-cols-2 gap-3 text-sm">
                               <div className="flex items-center text-blue-600">
@@ -373,7 +416,7 @@ export default function ChooseEventClientPage({ publicEvents }: ChooseEventClien
                 </div>
               )}
             </div>
-          ))}
+          )})}
         </div>
 
         {selectedEvent && selectedSchedule && (

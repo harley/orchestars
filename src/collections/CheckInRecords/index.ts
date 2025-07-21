@@ -92,6 +92,29 @@ export const CheckInRecords: CollectionConfig = {
       },
     },
     {
+      name: 'checkinMethod',
+      type: 'select',
+      required: true,
+      defaultValue: 'qr',
+      options: [
+        {
+          label: 'QR Code',
+          value: 'qr',
+        },
+        {
+          label: 'Paper',
+          value: 'paper',
+        },
+        {
+          label: 'Search',
+          value: 'search',
+        },
+      ],
+      admin: {
+        description: 'Method used for check-in: QR scan, paper ticket entry, or search',
+      },
+    },
+    {
       name: 'deletedAt',
       type: 'date',
       required: false,

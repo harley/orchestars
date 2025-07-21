@@ -93,6 +93,7 @@ export async function POST(request: Request) {
         eventScheduleId: ticket.eventScheduleId,
         checkInTime: new Date().toISOString(),
         manual: true,
+        checkinMethod: 'search', // Customer self-checkin via search
       },
     })
     revalidateTag('checkin-history')

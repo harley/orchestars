@@ -63,6 +63,7 @@ export const ORDER_ERROR_CODE = {
 
 export const CHECKIN_ERROR_CODE = {
   CHECKIN001: 'Ticket not found',
+  CHECKIN002: 'Wrong date or expired ticket',
   CHECKIN004: 'Failed to create checkin record',
   CHECKIN005: 'Unauthorized',
   CHECKIN013: 'Ticket code missing',

@@ -25,13 +25,14 @@ export async function GET() {
     collection: 'events',
     where: {
       status: {
-        equals: 'published_open_sales',
+        in: ['published_open_sales', 'published_upcoming'],
       },
     },
     limit: 50, // Add pagination limit
     select: {
       id: true,
       title: true,
+      status: true,
       eventLocation: true,
       startDatetime: true,
       endDatetime: true,
