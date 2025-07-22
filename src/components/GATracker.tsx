@@ -1,19 +1,25 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { pageview } from '@/lib/gtag'
 
 const GATracker = () => {
+  const [isHydrated, setIsHydrated] = useState(false)
+
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    if (!pathname || typeof searchParams?.toString !== 'function') return
+    setIsHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isHydrated || !pathname || typeof searchParams?.toString !== 'function') return
 
     const url = pathname + searchParams.toString()
     pageview(url)
-  }, [pathname, searchParams])
+  }, [isHydrated, pathname, searchParams])
 
   return null
 }
