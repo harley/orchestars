@@ -9,7 +9,7 @@ const GATracker = () => {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    if (!pathname) return
+    if (!pathname || typeof searchParams?.toString !== 'function') return
 
     const url = pathname + searchParams.toString()
     pageview(url)
