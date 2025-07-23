@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--no-deprecation SKIP_PAYLOAD_INIT=true next build",
+    "build": "NODE_OPTIONS='--max-old-space-size=8192' next build",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --turbo",
     "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
@@ -32,6 +32,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
     "@mezh-hq/react-seat-toolkit": "^3.3.5",
+    "@next/third-parties": "^15.4.3",
     "@payloadcms/admin-bar": "^3.44.0",
     "@payloadcms/db-postgres": "^3.44.0",
     "@payloadcms/email-nodemailer": "^3.44.0",
