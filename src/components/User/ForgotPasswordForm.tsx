@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { useTranslate } from '@/providers/I18n/client'
 import { useToast } from '@/hooks/use-toast'
+import { AuthFormMode } from './types';
 
 interface ForgotPasswordFormProps {
   onBackToLogin: () => void;
-  mode?: 'forgotPassword' | 'firstTimeLogin';
+  mode?: AuthFormMode;
 }
 
 export default function ForgotPasswordForm({ onBackToLogin, mode = 'forgotPassword' }: ForgotPasswordFormProps) {

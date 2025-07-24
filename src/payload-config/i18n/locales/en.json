@@ -19,14 +19,14 @@
     "goHome": "Go Home",
     "back": "Back",
     "cancel": "Cancel",
-    "lastName": "Last Name",
     "firstName": "First Name",
-    "enterLastName": "Enter your last name",
+    "lastName": "Last Name",
+    "phoneNumber": "Phone Number",
     "enterFirstName": "Enter your first name",
+    "enterLastName": "Enter your last name",
     "enterPhoneNumber": "Enter your phone number",
     "enterEmail": "Enter your email",
-    "seat": "Seat",
-    "phoneNumber": "Phone number"
+    "seat": "Seat"
   },
   "event": {
     "chooseAttendingDate": "Choose Your Attending Date",
@@ -164,7 +164,8 @@
     "thankYouForYourSubmission": "Thank you! Your information has been submitted successfully. We will contact you soon.",
     "failedMessage": "An error occurred! Please try again",
     "requiredField": "This field is required",
-    "invalidEmail": "Please enter a valid email address"
+    "invalidEmail": "Please enter a valid email address",
+    "invalidPhoneNumber": "Please enter a valid phone number"
   },
   "errorCode": {
     "SYS001": "An error occurred! Please try again",
@@ -229,7 +230,8 @@
     "CUS002": "Last name is required",
     "CUS003": "Phone number is required",
     "CUS004": "Email is required",
-    "UNAUTHORIZED": "Unauthorized"
+    "UNAUTHORIZED": "Unauthorized",
+    "USER001": "Email or phone number already exists"
   },
   "error": {
     "title": "Oops! Something went wrong",
@@ -604,7 +606,16 @@
     "signingIn": "Signing in...",
     "affiliateLoginLink": "Become our ambassador",
     "joinAmbassadorProgram": "Join Our Ambassador Program",
-    "joinAmbassadorProgramDescription": "Earn rewards and exclusive benefits"
+    "joinAmbassadorProgramDescription": "Earn rewards and exclusive benefits",
+    "register": "Register",
+    "registering": "Registering...",
+    "registerSuccess": "Registration successful!",
+    "registerFailed": "Registration failed",
+    "checkEmailToVerify": "Please check your email to verify and set your password.",
+    "pleaseFillAllFields": "Please fill in all fields.",
+    "noAccountRegisterNow": "Don't have an account? Register now",
+    "createAccountToContinue": "Create an account to continue",
+    "alreadyHaveAccount": "Already have an account? Sign in here"
   },
   "navbar": {
     "profile": "Profile",
