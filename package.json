@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--no-deprecation SKIP_PAYLOAD_INIT=true next build",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation NODE_OPTIONS=--max-old-space-size=4096 SKIP_PAYLOAD_INIT=true next build",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --turbo",
     "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
