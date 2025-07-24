@@ -6,7 +6,7 @@ import type { Header as HeaderType, Media, Page } from '@/payload-types'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import { useTranslate } from '@/providers/I18n/client'
 import { Event } from '@/types/Event'
-import LoginForm from '@/components/User/LoginForm'
+import AuthForm from '@/components/User/AuthForm'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { logout } from '@/app/(user)/user/actions/logout'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
@@ -237,11 +237,12 @@ const Navbar = ({
                 {/* Login Modal */}
                 <Sheet open={loginOpen} onOpenChange={setLoginOpen}>
                   <SheetContent side="right" className="bg-white border-gray-800 max-w-md w-full">
-                    <LoginForm
+                    <AuthForm
                       onSuccess={() => {
                         setLoginOpen(false)
                         window.location.href = '/user/profile'
                       }}
+                      onCloseSheet={() => setLoginOpen(false)}
                     />
                   </SheetContent>
                 </Sheet>
