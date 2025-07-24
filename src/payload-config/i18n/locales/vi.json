@@ -544,7 +544,7 @@
     "page": "Trang {{current}} / {{total}}",
     "memberSince": "Thành viên từ",
     "currentPoints": "Điểm hiện tại",
-    "pointsToNextRank": "Điểm đến",
+    "pointsToNextRank": "Điểm đến hạng tiếp theo",
     "standard": "Tiêu chuẩn",
     "journeyToTier": "Hành trình đến",
     "tier": "Hạng",
@@ -564,7 +564,8 @@
       "product": "Sản phẩm",
       "giftTicket": "Vé",
       "discount": "Giảm giá"
-    }
+    },
+    "highestTierSecured": "Đã đạt hạng cao nhất"
   },
   "auth": {
     "signInSuccessfully": "Đăng nhập thành công",

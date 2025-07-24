@@ -543,7 +543,7 @@
     "page": "Page {{current}} of {{total}}",
     "memberSince": "Member since",
     "currentPoints": "Current Points",
-    "pointsToNextRank": "Points to",
+    "pointsToNextRank": "Points to next tier",
     "standard": "Standard",
     "journeyToTier": "Journey to",
     "tier": "Tier",
@@ -563,7 +563,8 @@
       "product": "Product",
       "giftTicket": "Ticket",
       "discount": "Discount"
-    }
+    },
+    "highestTierSecured": "Highest tier secured"
   },
   "auth": {
     "signInSuccessfully": "Sign in successfully",
