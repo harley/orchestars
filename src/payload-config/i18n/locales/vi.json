@@ -19,14 +19,14 @@
     "goHome": "Về Trang Chủ",
     "back": "Quay Lại",
     "cancel": "Hủy Bỏ",
-    "lastName": "Họ",
     "firstName": "Tên",
-    "enterLastName": "Nhập họ của bạn",
+    "lastName": "Họ",
+    "phoneNumber": "Số điện thoại",
     "enterFirstName": "Nhập tên của bạn",
-    "enterPhoneNumber": "Nhập số điện thoại",
+    "enterLastName": "Nhập họ của bạn",
+    "enterPhoneNumber": "Nhập số điện thoại của bạn",
     "enterEmail": "Nhập email",
-    "seat": "Ghế",
-    "phoneNumber": "Số điện thoại"
+    "seat": "Ghế"
   },
   "event": {
     "chooseAttendingDate": "Chọn ngày bạn muốn tham dự",
@@ -164,7 +164,8 @@
     "thankYouForYourSubmission": "Cảm ơn bạn! Thông tin của bạn đã được gửi thành công. Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.",
     "failedMessage": "Có lỗi xảy ra! Vui lòng thử lại",
     "requiredField": "Trường này là bắt buộc",
-    "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ"
+    "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ",
+    "invalidPhoneNumber": "Vui lòng nhập số điện thoại hợp lệ"
   },
   "errorCode": {
     "SYS001": "Có lỗi xảy ra! Vui lòng thử lại",
@@ -229,7 +230,8 @@
     "CUS002": "Họ không được để trống",
     "CUS003": "Số điện thoại không được để trống",
     "CUS004": "Email không được để trống",
-    "UNAUTHORIZED": "Không có quyền truy cập"
+    "UNAUTHORIZED": "Không có quyền truy cập",
+    "USER001": "Email hoặc số điện thoại đã tồn tại"
   },
   "error": {
     "title": "Rất tiếc! Đã xảy ra lỗi",
@@ -606,7 +608,16 @@
     "signingIn": "Đang đăng nhập...",
     "affiliateLoginLink": "Trở thành đại sứ của chúng tôi",
     "joinAmbassadorProgram": "Tham gia Chương Trình Đại Sứ",
-    "joinAmbassadorProgramDescription": "Nhận những ưu đãi độc quyền"
+    "joinAmbassadorProgramDescription": "Nhận những ưu đãi độc quyền",
+    "register": "Đăng ký",
+    "registering": "Đang đăng ký...",
+    "registerSuccess": "Đăng ký thành công!",
+    "registerFailed": "Đăng ký thất bại",
+    "checkEmailToVerify": "Vui lòng kiểm tra email để xác minh và đặt mật khẩu.",
+    "pleaseFillAllFields": "Vui lòng điền đầy đủ tất cả các trường.",
+    "alreadyHaveAccount": "Đã có tài khoản? Đăng nhập tại đây",
+    "createAccountToContinue": "Tạo tài khoản để tiếp tục",
+    "noAccountRegisterNow": "Chưa có tài khoản? Đăng ký ngay"
   },
   "navbar": {
     "profile": "Thông tin tài khoản",
