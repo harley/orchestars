@@ -48,9 +48,6 @@ export async function GET(_req: NextRequest) {
         ? membershipRank.condition?.minPoints
         : 0);
 
-    console.log(pointsToNextRank, 'pointsToNextRank');
-    console.log(membershipRank, 'membershipRank');
-
     return NextResponse.json(
       {
         success: true,
