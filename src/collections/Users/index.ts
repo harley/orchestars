@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { sendAffiliateSetupEmail } from './hooks/sendAffiliateSetupEmail'
 import { AFFILIATE_USER_STATUSES, USER_ROLES, USER_ROLE } from './constants'
+import { validateUser } from './hooks/validateUser'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -104,6 +105,7 @@ export const Users: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeValidate: [validateUser],
     afterChange: [sendAffiliateSetupEmail],
   },
 }

@@ -19,6 +19,7 @@ import {
   createUserPromotionRedemption,
   validateCustomerInfo,
   validateOrderItemsBookingTypeSeat,
+  validateOrderItemsBookingTypeTicketClass,
 } from '@/app/(payload)/api/bank-transfer/order/utils'
 
 import {
@@ -34,6 +35,7 @@ import {
   generateZaloPayOrderData,
 } from './utils'
 import { handleNextErrorMsgResponse } from '@/utilities/handleNextErrorMsgResponse'
+import { getNextBodyData } from '@/utilities/getNextBodyData'
 
 enum BOOKING_TYPE {
   ticketClass = 'ticketClass',
@@ -41,7 +43,7 @@ enum BOOKING_TYPE {
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json()
+  const body = await getNextBodyData(request)
   const bookingType = (body.bookingType as BOOKING_TYPE) || BOOKING_TYPE.ticketClass
 
   if (!bookingType || !Object.values(BOOKING_TYPE).includes(bookingType)) {
@@ -56,20 +58,20 @@ export async function POST(request: NextRequest) {
 }
 
 const handleOrderWithBookingTypeSeat = async ({ body }: { body: Record<string, any> }) => {
-  const customer = body.customer as CustomerInfo
-
-  const order = body.order as NewInputOrder
-  let orderItems = order.orderItems as NewOrderItemWithBookingType[]
-
-  await validateCustomerInfo({ customer })
-  await validateOrderItemsBookingTypeSeat({ orderItems })
-
-  // for booking seat, quantity always 1
-  orderItems = orderItems.map((ordItem) => ({ ...ordItem, quantity: 1 }))
-
-  const orderCode = generateCode('ORD')
-
   try {
+    const customer = body.customer as CustomerInfo
+
+    const order = (body.order as NewInputOrder) || {}
+
+    validateCustomerInfo({ customer })
+
+    let orderItems = order.orderItems as NewOrderItemWithBookingType[]
+    validateOrderItemsBookingTypeSeat({ orderItems })
+
+    // for booking seat, quantity always 1
+    orderItems = orderItems.map((ordItem) => ({ ...ordItem, quantity: 1 }))
+
+    const orderCode = generateCode('ORD')
     await payload.init({ config })
 
     // // check seat available
@@ -159,14 +161,15 @@ const handleOrderWithBookingTypeSeat = async ({ body }: { body: Record<string, a
 }
 
 const handleOrderWithBookingTypeTicketClass = async ({ body }: { body: Record<string, any> }) => {
-  const customer = body.customer as CustomerInfo
-
-  const order = body.order as NewInputOrder
-  const orderItems = order.orderItems
-
-  const orderCode = generateCode('ORD')
-
   try {
+    const customer = body.customer as CustomerInfo
+    validateCustomerInfo({ customer })
+    const order = (body?.order as NewInputOrder) || {}
+    const orderItems = order?.orderItems || []
+
+    validateOrderItemsBookingTypeTicketClass({ orderItems })
+
+    const orderCode = generateCode('ORD')
     await payload.init({ config })
 
     // // check seat available
