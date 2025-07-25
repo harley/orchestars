@@ -18,6 +18,13 @@ export async function GET(_req: NextRequest) {
       }
     })
 
+    const membershipRank = membershipPoint?.docs?.[0]?.membershipRank;
+
+    const membershipRankLabel =
+      typeof membershipRank === "object" && membershipRank !== null && "rankNameLabel" in membershipRank
+        ? membershipRank.rankNameLabel
+        : "Standard";
+
     const nextRank = await payload.find({
       collection: 'membership-rank-configs',
       where: {
@@ -29,17 +36,14 @@ export async function GET(_req: NextRequest) {
       limit: 1,
     })
 
-    const membershipRank = membershipPoint?.docs?.[0]?.membershipRank;
-    const membershipRankLabel =
-      typeof membershipRank === "object" && membershipRank !== null && "rankNameLabel" in membershipRank
-        ? membershipRank.rankNameLabel
-        : "Standard";
-
     const nextRankLabel = 
-      nextRank?.docs?.[0]?.rankNameLabel ||
-      (typeof membershipRank === "object" && membershipRank !== null && "rankNameLabel" in membershipRank
-        ? membershipRank.rankNameLabel
-        : "Standard");
+      nextRank?.docs?.[0]?.rankNameLabel || membershipRankLabel;
+
+    const pointsToNextRank =
+      nextRank?.docs?.[0]?.condition?.minPoints ||
+      (typeof membershipRank === "object" && membershipRank !== null && "condition" in membershipRank
+        ? membershipRank.condition?.minPoints
+        : 0);
 
     return NextResponse.json(
       {
@@ -48,7 +52,7 @@ export async function GET(_req: NextRequest) {
           totalPoints: membershipPoint?.docs?.[0]?.totalPoints || 0,
           membershipRank: membershipRankLabel,
           nextRank: nextRankLabel,
-          pointsToNextRank: nextRank?.docs?.[0]?.condition?.minPoints || 0,
+          pointsToNextRank: pointsToNextRank,
         }
       },
       { status: 200 },

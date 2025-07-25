@@ -118,10 +118,16 @@ const UserProfile = ({ userData, className } : { className?: string, userData?: 
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Target className="w-4 h-4" />
-                    <span className="text-sm">{t('userprofile.pointsToNextRank')}  {t('userprofile.tier')} {membershipPoint?.nextRank || 'Standard'}</span>
+                    <span className="text-sm">{t('userprofile.pointsToNextRank')}</span>
                   </div>
                   <p className="text-2xl font-bold">
-                    {((membershipPoint?.pointsToNextRank ?? 0) - (membershipPoint?.totalPoints ?? 0)).toLocaleString()}
+                    {(() => {
+                      const pointsNeeded = (membershipPoint?.pointsToNextRank ?? 0) - (membershipPoint?.totalPoints ?? 0);
+                      const displayPoints = pointsNeeded <= 0
+                        ? t('userprofile.highestTierSecured')
+                        : pointsNeeded.toLocaleString();
+                      return displayPoints;
+                    })()}
                   </p>
                 </div>
 
