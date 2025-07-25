@@ -11,6 +11,7 @@ import { EVENT_STATUS } from '@/collections/Events/constants/status'
 import { getExistingSeatHolding } from '@/app/(payload)/api/seat-holding/seat/utils'
 import { DISCOUNT_APPLY_SCOPE } from '@/collections/Promotion/constants'
 import { sql } from '@payloadcms/db-postgres/drizzle'
+import { normalizeVietnamesePhoneNumber } from '@/utilities/normalizeVietnamesePhoneNumber'
 
 // Utility function to get affiliate data from cookies
 export const getAffiliateDataFromCookies = async (
@@ -1360,16 +1361,73 @@ export const checkRemainingQuantitySeats = async ({
 }
 
 export const validateCustomerInfo = ({ customer }: { customer: CustomerInfo }) => {
-  if (!customer.firstName) {
-    throw new Error('CUS001')
+  // Trim all fields
+  const firstName = customer?.firstName?.trim();
+  const lastName = customer?.lastName?.trim();
+  const phoneNumber = customer?.phoneNumber?.trim();
+  const email = customer?.email?.trim();
+
+  if (!firstName) {
+    throw new Error('CUS001');
   }
-  if (!customer.lastName) {
-    throw new Error('CUS002')
+  if (!lastName) {
+    throw new Error('CUS002');
   }
-  if (!customer.phoneNumber) {
-    throw new Error('CUS003')
+  if (!phoneNumber) {
+    throw new Error('CUS003');
   }
-  if (!customer.email) {
-    throw new Error('CUS004')
+  if (!email) {
+    throw new Error('CUS004');
   }
+  // Email format check
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error('CUS005'); // Invalid email format
+  }
+
+  // Optionally, update the customer object with trimmed values
+  customer.firstName = firstName;
+  customer.lastName = lastName;
+  customer.phoneNumber = normalizeVietnamesePhoneNumber(phoneNumber);
+  customer.email = email.toLowerCase();
+}
+
+export const validateOrderItemsBookingTypeTicketClass = ({
+  orderItems,
+}: {
+  orderItems: NewOrderItem[]
+}) => {
+  if (!orderItems?.length) {
+    throw new Error('ORD001')
+  }
+
+  // To check for duplicates: key = ticketPriceId + eventScheduleId
+  const seen = new Set<string>();
+
+  orderItems.forEach((item) => {
+    if (!item.eventId) {
+      throw new Error('EVT008')
+    }
+    if (!item.ticketPriceId) {
+      throw new Error('TICK010')
+    }
+    if (!item.eventScheduleId) {
+      throw new Error('EVT009')
+    }
+    // Check quantity is a number, integer, and > 0
+    if (
+      item.quantity === undefined ||
+      item.quantity === null ||
+      typeof item.quantity !== 'number' ||
+      !Number.isInteger(item.quantity) ||
+      item.quantity <= 0
+    ) {
+      throw new Error('ORD008')
+    }
+    // Check for duplicate ticket class + schedule
+    const key = `${item.ticketPriceId}|${item.eventScheduleId}`;
+    if (seen.has(key)) {
+      throw new Error(`ORD009`);
+    }
+    seen.add(key);
+  })
 }

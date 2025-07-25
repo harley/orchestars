@@ -212,6 +212,8 @@
     "ORD005": "Please select your seat and try again",
     "ORD006": "The adjustment amount is invalid",
     "ORD007": "The adjustment amount cannot be negative",
+    "ORD008": "The ticket quantity cannot be empty",
+    "ORD009": "Duplicate ticket found",
     "CHECKIN001": "Ticket not found",
     "CHECKIN002": "Seat is not assigned to ticket",
     "CHECKIN003": "Ticket already checked in",
@@ -230,6 +232,7 @@
     "CUS002": "Last name is required",
     "CUS003": "Phone number is required",
     "CUS004": "Email is required",
+    "CUS005": "Invalid email format",
     "UNAUTHORIZED": "Unauthorized",
     "USER001": "Email or phone number already exists"
   },

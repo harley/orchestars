@@ -212,6 +212,8 @@
     "ORD005": "Vui lòng chọn ghế và thực hiện lại thao tác",
     "ORD006": "Số tiền điều chỉnh không hợp lệ",
     "ORD007": "Số tiền điều chỉnh không được âm",
+    "ORD008": "Số lượng vé không được để trống",
+    "ORD009": "Vé bị lặp lại",
     "CHECKIN001": "Không tìm thấy vé",
     "CHECKIN002": "Ghế chưa được chỉ định cho vé",
     "CHECKIN003": "Vé này đã được check-in",
@@ -230,6 +232,7 @@
     "CUS002": "Họ không được để trống",
     "CUS003": "Số điện thoại không được để trống",
     "CUS004": "Email không được để trống",
+    "CUS005": "Email không đúng định dạng",
     "UNAUTHORIZED": "Không có quyền truy cập",
     "USER001": "Email hoặc số điện thoại đã tồn tại"
   },
