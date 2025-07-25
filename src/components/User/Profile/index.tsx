@@ -123,9 +123,10 @@ const UserProfile = ({ userData, className } : { className?: string, userData?: 
                   <p className="text-2xl font-bold">
                     {(() => {
                       const pointsNeeded = (membershipPoint?.pointsToNextRank ?? 0) - (membershipPoint?.totalPoints ?? 0);
-                      return pointsNeeded <= 0 
+                      const displayPoints = pointsNeeded <= 0
                         ? t('userprofile.highestTierSecured')
                         : pointsNeeded.toLocaleString();
+                      return displayPoints;
                     })()}
                   </p>
                 </div>

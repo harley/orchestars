@@ -37,10 +37,7 @@ export async function GET(_req: NextRequest) {
     })
 
     const nextRankLabel = 
-      nextRank?.docs?.[0]?.rankNameLabel ||
-      (typeof membershipRank === "object" && membershipRank !== null && "rankNameLabel" in membershipRank
-        ? membershipRank.rankNameLabel
-        : "Platinum");
+      nextRank?.docs?.[0]?.rankNameLabel || membershipRankLabel;
 
     const pointsToNextRank =
       nextRank?.docs?.[0]?.condition?.minPoints ||
