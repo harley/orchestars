@@ -32,7 +32,7 @@ export async function GET(_req: NextRequest) {
           greater_than: membershipPoint?.docs?.[0]?.totalPoints || 0,
         }
       },
-      sort: 'condition_min_points',
+      sort: 'condition.minPoints',
       limit: 1,
     })
 
