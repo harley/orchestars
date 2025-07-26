@@ -12,6 +12,7 @@ import { getExistingSeatHolding } from '@/app/(payload)/api/seat-holding/seat/ut
 import { DISCOUNT_APPLY_SCOPE } from '@/collections/Promotion/constants'
 import { sql } from '@payloadcms/db-postgres/drizzle'
 import { normalizeVietnamesePhoneNumber } from '@/utilities/normalizeVietnamesePhoneNumber'
+import { TICKET_STATUS } from '@/collections/Tickets/constants'
 
 // Utility function to get affiliate data from cookies
 export const getAffiliateDataFromCookies = async (
@@ -109,7 +110,7 @@ export const checkBookedOrPendingPaymentSeats = async ({
 
     WHERE 
         ( 
-          (ord.status = ${ORDER_STATUS.completed.value})
+          (ord.status = ${ORDER_STATUS.completed.value} AND ticket.status = ${TICKET_STATUS.booked.value})
           OR
           (ord.status = ${ORDER_STATUS.processing.value} AND ord.expire_at >= ${currentTime})
         )
@@ -273,7 +274,7 @@ export const checkTicketClassAvailable = async ({
 
         WHERE 
             ( 
-              (ord.status = '${ORDER_STATUS.completed.value}')
+              (ord.status = '${ORDER_STATUS.completed.value}' AND ticket.status = '${TICKET_STATUS.booked.value}')
               OR
               (ord.status = '${ORDER_STATUS.processing.value}' AND ord.expire_at >= '${currentTime}')
             )
