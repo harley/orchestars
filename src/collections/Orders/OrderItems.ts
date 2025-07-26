@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { ORDER_ITEM_STATUSES } from './constants'
 
 export const OrderItems: CollectionConfig = {
   slug: 'orderItems',
@@ -67,6 +68,15 @@ export const OrderItems: CollectionConfig = {
       type: 'number',
       required: true,
       min: 0,
+      admin: {
+        readOnly: true,
+      },
+    },
+    {
+      name: 'status',
+      type: 'select',
+      required: false,
+      options: ORDER_ITEM_STATUSES,
       admin: {
         readOnly: true,
       },
