@@ -1394,6 +1394,7 @@ export interface OrderItem {
   seat?: string | null;
   quantity: number;
   price: number;
+  status?: ('processing' | 'canceled' | 'completed') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -3194,6 +3195,7 @@ export interface OrderItemsSelect<T extends boolean = true> {
   seat?: T;
   quantity?: T;
   price?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }

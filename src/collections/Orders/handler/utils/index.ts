@@ -12,6 +12,7 @@ import { getExistingSeatHolding } from '@/app/(payload)/api/seat-holding/seat/ut
 import { Event, Order, Payment, Promotion, User } from '@/payload-types'
 import { generateCode } from '@/utilities/generateCode'
 import { BasePayload, PayloadRequest } from 'payload'
+import { ORDER_ITEM_STATUS } from '../../constants'
 
 export const checkSeatAvailable = async ({
   orderItems,
@@ -160,6 +161,7 @@ export const createOrderAndTickets = async ({
         order: newOrder.id,
         price: ticketPriceInfo.price as number,
         quantity: 1, // for booking seat, quantity always 1
+        status: ORDER_ITEM_STATUS.completed.value,
       },
       req: { transactionID },
     })

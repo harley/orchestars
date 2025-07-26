@@ -16,6 +16,7 @@ import { POINT_PER_VND } from '@/config/affiliate'
 import { AFFILIATE_ACTION_TYPE_LOG } from '@/collections/Affiliate/constants/actionTypeLog'
 import { TAX_PERCENTAGE_DEFAULT } from '@/collections/Events/constants/tax'
 import { calculatePointCompletedOrder } from '@/collections/Membership/hooks/calculatePointCompletedOrder'
+import { ORDER_ITEM_STATUS } from '../constants'
 
 const updateTicketsAndSendEmail = async (originalDoc: Order, req: FieldHookArgs['req']) => {
   const orderItems = await req.payload
@@ -35,20 +36,36 @@ const updateTicketsAndSendEmail = async (originalDoc: Order, req: FieldHookArgs[
     event: { equals: (oItem.event as Event).id },
   }))
 
-  const tickets = await req.payload
-    .update({
-      collection: 'tickets',
+  // update order items to completed status
+
+  const [, tickets] = await Promise.all([
+    req.payload.update({
+      collection: 'orderItems',
       where: {
-        or: orConditions,
+        id: { in: orderItems.map((oItem) => oItem.id) },
       },
       data: {
-        status: 'booked',
+        status: ORDER_ITEM_STATUS.completed.value,
       },
       req: {
         transactionID: req.transactionID,
       },
-    })
-    .then((res) => res.docs || [])
+    }),
+    req.payload
+      .update({
+        collection: 'tickets',
+        where: {
+          or: orConditions,
+        },
+        data: {
+          status: 'booked',
+        },
+        req: {
+          transactionID: req.transactionID,
+        },
+      })
+      .then((res) => res.docs || []),
+  ])
 
   const user = tickets?.[0]?.user as User
   const event = tickets?.[0]?.event as Event

@@ -1,7 +1,7 @@
 import { BasePayload } from 'payload'
 import { subMinutes } from 'date-fns'
 import { PAYMENT_STATUS } from '../constants'
-import { ORDER_STATUS } from '@/collections/Orders/constants'
+import { ORDER_ITEM_STATUS, ORDER_STATUS } from '@/collections/Orders/constants'
 import { TICKET_STATUS } from '@/collections/Tickets/constants'
 
 // Add debounce tracking
@@ -48,6 +48,13 @@ export const updatePaymentStatus = async ({ payload }: { payload: BasePayload })
             status = '${ORDER_STATUS.canceled.value}',
             updated_at = NOW()
             WHERE id IN (SELECT order_id FROM temp_expired_orders);
+
+            -- Update order items table
+            UPDATE order_items
+            SET 
+            status = '${ORDER_ITEM_STATUS.canceled.value}',
+            updated_at = NOW()
+            WHERE order_id IN (SELECT order_id FROM temp_expired_orders);
 
             -- Update tickets table
             UPDATE tickets

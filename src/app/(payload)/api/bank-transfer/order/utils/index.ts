@@ -6,7 +6,7 @@ import { Event, Payment, Promotion, User } from '@/payload-types'
 import { generateCode } from '@/utilities/generateCode'
 import { isAfter, isBefore } from 'date-fns'
 import { USER_PROMOTION_REDEMPTION_STATUS } from '@/collections/Promotion/constants/status'
-import { ORDER_STATUS } from '@/collections/Orders/constants'
+import { ORDER_ITEM_STATUS, ORDER_STATUS } from '@/collections/Orders/constants'
 import { EVENT_STATUS } from '@/collections/Events/constants/status'
 import { getExistingSeatHolding } from '@/app/(payload)/api/seat-holding/seat/utils'
 import { DISCOUNT_APPLY_SCOPE } from '@/collections/Promotion/constants'
@@ -550,6 +550,7 @@ export const createOrderAndTickets = async ({
         order: newOrder.id,
         price: ticketPriceInfo.price as number,
         quantity: 1, // for booking seat, quantity always 1
+        status: ORDER_ITEM_STATUS.processing.value,
       },
       req: { transactionID },
     })
@@ -684,6 +685,7 @@ export const createOrderWithMultiplePromotionsAndTickets = async ({
         order: newOrder.id,
         price: ticketPriceInfo.price as number,
         quantity: 1, // for booking seat, quantity always 1
+        status: ORDER_ITEM_STATUS.processing.value,
       },
       req: { transactionID },
       depth: 0,
@@ -813,6 +815,7 @@ export const createOrderAndTicketsWithTicketClassType = async ({
         order: newOrder.id,
         price: item.price,
         quantity: item.quantity,
+        status: ORDER_ITEM_STATUS.processing.value,
       },
       req: { transactionID },
     })

@@ -80,6 +80,8 @@ import * as migration_20250714_080211_add_phone_number_index from './20250714_08
 import * as migration_20250715_013630_add_gift_ticket_fields from './20250715_013630_add_gift_ticket_fields';
 import * as migration_20250715_140337_add_checkin_method_to_checkin_records from './20250715_140337_add_checkin_method_to_checkin_records';
 import * as migration_20250716_013339_add_order_and_type_to_email_collection from './20250716_013339_add_order_and_type_to_email_collection';
+import * as migration_20250719_070659_add_trigram_indexes_for_checkin_search from './20250719_070659_add_trigram_indexes_for_checkin_search';
+import * as migration_20250726_032622_add_order_item_status from './20250726_032622_add_order_item_status';
 
 export const migrations = [
   {
@@ -491,5 +493,15 @@ export const migrations = [
     up: migration_20250716_013339_add_order_and_type_to_email_collection.up,
     down: migration_20250716_013339_add_order_and_type_to_email_collection.down,
     name: '20250716_013339_add_order_and_type_to_email_collection',
+  },
+  {
+    up: migration_20250719_070659_add_trigram_indexes_for_checkin_search.up,
+    down: migration_20250719_070659_add_trigram_indexes_for_checkin_search.down,
+    name: '20250719_070659_add_trigram_indexes_for_checkin_search',
+  },
+  {
+    up: migration_20250726_032622_add_order_item_status.up,
+    down: migration_20250726_032622_add_order_item_status.down,
+    name: '20250726_032622_add_order_item_status'
   },
 ];
