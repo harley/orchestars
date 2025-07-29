@@ -15,7 +15,7 @@ const EventBanner = ({ event }: { event: Event }) => {
 
   const isOpenForSales = event.status === EVENT_STATUS.published_open_sales.value
   const isEarlierThanEndDate = event.endDatetime
-    ? new Date() < toZonedTime(new Date(event.endDatetime), 'Asia/Ho_Chi_Minh')
+    ? new Date() < new Date(event.endDatetime)
     : false
 
   return (
