@@ -15,7 +15,7 @@
       "schedule": "*/2 * * * *"
     },
     {
-      "path": "/api/payload-jobs/run",
+      "path": "/api/cron/update-payment-status",
       "schedule": "*/5 * * * *"
     }
   ]
