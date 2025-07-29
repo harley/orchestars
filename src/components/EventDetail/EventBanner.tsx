@@ -8,8 +8,15 @@ import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 import Image from 'next/image'
 import { useTranslate } from '@/providers/I18n/client'
 
+import { EVENT_STATUS } from '@/collections/Events/constants/status'
+
 const EventBanner = ({ event }: { event: Event }) => {
   const { t } = useTranslate()
+
+  const isOpenForSales = event.status === EVENT_STATUS.published_open_sales.value
+  const isEarlierThanEndDate = event.endDatetime
+    ? new Date() < new Date(event.endDatetime)
+    : false
 
   return (
     <section className="bg-gradient-to-b from-gray-50 to-gray-100 py-10 relative">
@@ -106,20 +113,23 @@ const EventBanner = ({ event }: { event: Event }) => {
               </div>
 
               {/* CTA Button */}
-              <div className="mt-8">
-                <button
-                  type="button"
-                  className="w-full md:w-auto px-8 py-4 bg-black text-white text-lg font-bold rounded-lg shadow-lg hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-                  onClick={() => {
-                    const el = document.getElementById('seat-map-date-select')
-                    if (el) {
-                      el.scrollIntoView({ behavior: 'smooth' })
-                    }
-                  }}
-                >
-                  {t('event.bookNow')}
-                </button>
-              </div>
+              {isOpenForSales && isEarlierThanEndDate && (
+                <div className="mt-8">
+                  <button
+                    type="button"
+                    className="w-full md:w-auto px-8 py-4 bg-black text-white text-lg font-bold rounded-lg shadow-lg hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                    onClick={() => {
+                      const el = document.getElementById('seat-map-date-select')
+                      if (el) {
+                        el.scrollIntoView({ behavior: 'smooth' })
+                      }
+                    }}
+                  >
+                    {t('event.bookNow')}
+                  </button>
+                </div>
+              )}
+
             </div>
 
             <div className="relative w-full md:min-w-[200px] md:max-w-[40vw] flex-shrink-0 flex-grow-0 flex items-center justify-center p-4 md:p-0">
