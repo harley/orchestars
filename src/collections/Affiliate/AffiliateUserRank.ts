@@ -89,8 +89,7 @@ export const AffiliateUserRanks: CollectionConfig = {
       required: true,
       defaultValue: 0,
       admin: {
-        description:
-          'Tổng tiền từ các đơn hàng của Affiliate User.',
+        description: 'Tổng tiền từ các đơn hàng của Affiliate User.',
         readOnly: true,
         // disabled: true,
       },
@@ -176,4 +175,60 @@ export const AffiliateUserRanks: CollectionConfig = {
       },
     },
   ],
+  hooks: {
+    afterChange: [
+      async ({ doc, req, operation }) => {
+        if (operation != 'update') return
+        // Fetch all affiliate ranks and sort by minimum points in ascending order
+        const affiliateRanks = await req.payload
+          .find({
+            collection: 'affiliate-ranks',
+            limit: AFFILIATE_RANKS.length,
+            depth: 0,
+            where: {
+              rankName: { in: AFFILIATE_RANKS.map((rank) => rank.value) },
+            },
+          })
+          .then((res) => res.docs.sort((a, b) => b.minPoints - a.minPoints))
+        // Determine the highest eligible rank based on total points
+        const currentPoints = doc.totalPoints || 0
+        const highestEligibleRank = affiliateRanks.find((rank) => currentPoints >= rank.minPoints)
+        // If highest eligible rank != current rank
+        if (highestEligibleRank && highestEligibleRank.rankName !== doc.currentRank) {
+          // update the affiliate user rank
+          await req.payload.update({
+            collection: 'affiliate-user-ranks',
+            id: doc.id,
+            data: {
+              currentRank: highestEligibleRank.rankName,
+            },
+          })
+          // Find elegible event aff user ranks to be updated
+          const eligibleEvents = await req.payload
+            .find({
+              collection: 'event-affiliate-user-ranks',
+              where: {
+                affiliateUser: { equals: doc.affiliateUser },
+                currentRank: { not_equals: highestEligibleRank.rankName },
+              },
+            })
+            .then((res) => res.docs)
+          // Send eligible events to notify-event-rank-upgrade endpoint to notify user
+          if (eligibleEvents.length > 0) {
+            await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/notify-event-rank-upgrade`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                eligibleRank: highestEligibleRank.rankName,
+                eligibleEvents: eligibleEvents.map((e) => ({
+                  eventId: e.id,
+                  oldRank: e.eventAffiliateRank,
+                })),
+              }),
+            })
+          }
+        }
+      },
+    ],
+  },
 }
