@@ -209,16 +209,16 @@ export const EventAffiliateUserRanks: CollectionConfig = {
         // disabled: true,
       },
     },
-    {
-      name: 'isCompleted',
-      type: 'checkbox',
-      label: 'Đã Hoàn Thành',
-      defaultValue: false,
-      admin: {
-        description:
-          'Khi đã hoàn thành, những giá trị sẽ được tính toán và lưu vào các thông số hạng tổng của Affiliate User. Chỉ thực hiện hành động này sau khi event đã kết thúc',
-      },
-    },
+    // {
+    //   name: 'isCompleted',
+    //   type: 'checkbox',
+    //   label: 'Đã Hoàn Thành',
+    //   defaultValue: false,
+    //   admin: {
+    //     description:
+    //       'Khi đã hoàn thành, những giá trị sẽ được tính toán và lưu vào các thông số hạng tổng của Affiliate User. Chỉ thực hiện hành động này sau khi event đã kết thúc',
+    //   },
+    // },
   ],
   hooks: {
     beforeValidate: [
@@ -234,37 +234,37 @@ export const EventAffiliateUserRanks: CollectionConfig = {
         }
 
         // can not update is completed from true to false
-        if (originalDoc?.isCompleted && !data?.isCompleted) {
-          throw new APIError('Không thể cập nhật trạng thái đã hoàn thành', 400, {}, true)
-        }
+        // if (originalDoc?.isCompleted && !data?.isCompleted) {
+        //   throw new APIError('Không thể cập nhật trạng thái đã hoàn thành', 400, {}, true)
+        // }
 
-        const isChecked = data?.isCompleted && !originalDoc?.isCompleted
+        // const isChecked = data?.isCompleted && !originalDoc?.isCompleted
 
-        // validate isCompleted, just updated to true if the event has been completed
-        if (isChecked) {
-          // check if the event has been completed
-          const event = await req.payload
-            .find({
-              collection: 'events',
-              where: { id: { equals: data.event } },
-              depth: 0,
-              limit: 1,
-            })
-            .then((res) => res.docs?.[0])
+        // // validate isCompleted, just updated to true if the event has been completed
+        // if (isChecked) {
+        //   // check if the event has been completed
+        //   const event = await req.payload
+        //     .find({
+        //       collection: 'events',
+        //       where: { id: { equals: data.event } },
+        //       depth: 0,
+        //       limit: 1,
+        //     })
+        //     .then((res) => res.docs?.[0])
 
-          if (!event) {
-            throw new APIError('Event not found', 400, {}, true)
-          }
+        //   if (!event) {
+        //     throw new APIError('Event not found', 400, {}, true)
+        //   }
 
-          if (
-            event.status === 'completed' ||
-            (event.endDatetime && dateFns.isAfter(new Date(), event.endDatetime))
-          ) {
-            data.isCompleted = true
-          } else {
-            throw new APIError('Event is not completed', 400, {}, true)
-          }
-        }
+        //   if (
+        //     event.status === 'completed' ||
+        //     (event.endDatetime && dateFns.isAfter(new Date(), event.endDatetime))
+        //   ) {
+        //     data.isCompleted = true
+        //   } else {
+        //     throw new APIError('Event is not completed', 400, {}, true)
+        //   }
+        // }
 
         return data
       },
@@ -273,109 +273,108 @@ export const EventAffiliateUserRanks: CollectionConfig = {
       async ({ req, operation, doc, previousDoc }) => {
         if (operation !== 'update') return
 
-        const isChecked = doc?.isCompleted && !previousDoc?.isCompleted
+        // const isChecked = doc?.isCompleted && !previousDoc?.isCompleted
 
         // update totalPoints, totalRevenue, totalRevenueBeforeDiscount, totalTicketsSold, totalCommissionEarned, totalTicketsRewarded to affiliate-user-ranks colleciton
-        if (isChecked) {
-          const affiliateUserId = doc.affiliateUser?.id || doc.affiliateUser
+        // if (isChecked) {
+        const affiliateUserId = doc.affiliateUser?.id || doc.affiliateUser
 
-          // save to affiliate-user-ranks, if it is not exist, create a new one
-          const affiliateUserRank = await req.payload
-            .find({
-              collection: 'affiliate-user-ranks',
-              where: { affiliateUser: { equals: affiliateUserId } },
-              limit: 1,
-              depth: 0,
-            })
-            .then((res) => res.docs?.[0])
+        // save to affiliate-user-ranks, if it is not exist, create a new one
+        const affiliateUserRank = await req.payload
+          .find({
+            collection: 'affiliate-user-ranks',
+            where: { affiliateUser: { equals: affiliateUserId } },
+            limit: 1,
+            depth: 0,
+          })
+          .then((res) => res.docs?.[0])
 
-          const affiliateRanks = await req.payload
-            .find({
-              collection: 'affiliate-ranks',
-              limit: AFFILIATE_RANKS.length,
-              depth: 0,
-              where: {
-                rankName: { in: AFFILIATE_RANKS.map((rank) => rank.value) },
-              },
-            })
-            .then((res) => res.docs)
+        const affiliateRanks = await req.payload
+          .find({
+            collection: 'affiliate-ranks',
+            limit: AFFILIATE_RANKS.length,
+            depth: 0,
+            where: {
+              rankName: { in: AFFILIATE_RANKS.map((rank) => rank.value) },
+            },
+          })
+          .then((res) => res.docs)
 
-          const sortedRanks = affiliateRanks.sort((a, b) => b.minPoints - a.minPoints)
+        const sortedRanks = affiliateRanks.sort((a, b) => b.minPoints - a.minPoints)
 
-          if (!affiliateUserRank) {
-            // create a new one
-            
-            const newRank = sortedRanks.find((rank) => doc.totalPoints >= rank.minPoints)
-            await req.payload.create({
-              collection: 'affiliate-user-ranks',
-              data: {
-                affiliateUser: affiliateUserId,
-                currentRank: newRank?.rankName as AffiliateRank,
-                totalPoints: doc.totalPoints,
-                totalRevenue: doc.totalRevenue,
-                totalRevenueBeforeTax: doc.totalRevenueBeforeTax,
-                totalRevenueAfterTax: doc.totalRevenueAfterTax,
-                totalRevenueBeforeDiscount: doc.totalRevenueBeforeDiscount,
-                totalTicketsSold: doc.totalTicketsSold,
-                totalCommissionEarned: doc.totalCommissionEarned,
-                totalTicketsRewarded: doc.totalTicketsRewarded,
-                lastActivityDate: new Date().toISOString(),
-                rankAchievedDate: new Date().toISOString(),
-              },
-            })
-          } else {
-            // update affiliate user rank
-            let pendingRankUpgrade: AffiliateRank | null = null
-            const totalPoints = (affiliateUserRank.totalPoints || 0) + (doc.totalPoints || 0)
-            const nextRankCanReach = sortedRanks.find((rank) => totalPoints >= rank.minPoints)
-            if (nextRankCanReach && nextRankCanReach.rankName !== affiliateUserRank.currentRank) {
-              pendingRankUpgrade = nextRankCanReach.rankName as AffiliateRank
-            }
-            await req.payload.update({
-              collection: 'affiliate-user-ranks',
-              id: affiliateUserRank.id,
-              data: {
-                pendingRankUpgrade,
-                lastActivityDate: new Date().toISOString(),
-                totalPoints: totalPoints,
-                totalRevenue: (affiliateUserRank.totalRevenue || 0) + (doc.totalRevenue || 0),
-                totalRevenueBeforeTax:
-                  (affiliateUserRank.totalRevenueBeforeTax || 0) + (doc.totalRevenueBeforeTax || 0),
-                totalRevenueAfterTax:
-                  (affiliateUserRank.totalRevenueAfterTax || 0) + (doc.totalRevenueAfterTax || 0),
-                totalRevenueBeforeDiscount:
-                  (affiliateUserRank.totalRevenueBeforeDiscount || 0) +
-                  (doc.totalRevenueBeforeDiscount || 0),
-                totalTicketsSold:
-                  (affiliateUserRank.totalTicketsSold || 0) + (doc.totalTicketsSold || 0),
-                totalCommissionEarned:
-                  (affiliateUserRank.totalCommissionEarned || 0) + (doc.totalCommissionEarned || 0),
-                totalTicketsRewarded:
-                  (affiliateUserRank.totalTicketsRewarded || 0) + (doc.totalTicketsRewarded || 0),
-              },
-            })
-          }
-
-          const pointsBefore = affiliateUserRank?.totalPoints || 0
-          const pointsAfter = pointsBefore + (doc.totalPoints || 0)
-          const pointsChange = pointsAfter - pointsBefore
-          // need to write log
+        if (!affiliateUserRank) {
+          // create a new one
+          const newRank = sortedRanks.find((rank) => doc.totalPoints >= rank.minPoints)
           await req.payload.create({
-            collection: 'affiliate-rank-logs',
+            collection: 'affiliate-user-ranks',
             data: {
               affiliateUser: affiliateUserId,
-              eventAffiliateRank: doc.eventAffiliateRank,
-              rankContext: 'user',
-              pointsChange,
-              pointsBefore,
-              pointsAfter,
-              rankBefore: affiliateUserRank?.currentRank,
-              actionType: AFFILIATE_ACTION_TYPE_LOG.event_completed.value,
-              occurredAt: new Date().toISOString(),
-              description: `Cập nhật điểm tích lũy, doanh thu, số vé bán được, hoa hồng nhận được, số vé thưởng có thể nhận được từ sự kiện sau khi event đã hoàn thành`,
+              currentRank: newRank?.rankName as AffiliateRank,
+              totalPoints: doc.totalPoints,
+              totalRevenue: doc.totalRevenue,
+              totalRevenueBeforeTax: doc.totalRevenueBeforeTax,
+              totalRevenueAfterTax: doc.totalRevenueAfterTax,
+              totalRevenueBeforeDiscount: doc.totalRevenueBeforeDiscount,
+              totalTicketsSold: doc.totalTicketsSold,
+              totalCommissionEarned: doc.totalCommissionEarned,
+              totalTicketsRewarded: doc.totalTicketsRewarded,
+              lastActivityDate: new Date().toISOString(),
+              rankAchievedDate: new Date().toISOString(),
+            },
+          })
+        } else {
+          // update affiliate user rank
+          let pendingRankUpgrade: AffiliateRank | null = null
+          const totalPoints = (affiliateUserRank.totalPoints || 0) + (doc.totalPoints || 0)
+          const nextRankCanReach = sortedRanks.find((rank) => totalPoints >= rank.minPoints)
+          if (nextRankCanReach && nextRankCanReach.rankName !== affiliateUserRank.currentRank) {
+            pendingRankUpgrade = nextRankCanReach.rankName as AffiliateRank
+          }
+          await req.payload.update({
+            collection: 'affiliate-user-ranks',
+            id: affiliateUserRank.id,
+            data: {
+              pendingRankUpgrade,
+              lastActivityDate: new Date().toISOString(),
+              totalPoints: totalPoints,
+              totalRevenue: (affiliateUserRank.totalRevenue || 0) + (doc.totalRevenue || 0),
+              totalRevenueBeforeTax:
+                (affiliateUserRank.totalRevenueBeforeTax || 0) + (doc.totalRevenueBeforeTax || 0),
+              totalRevenueAfterTax:
+                (affiliateUserRank.totalRevenueAfterTax || 0) + (doc.totalRevenueAfterTax || 0),
+              totalRevenueBeforeDiscount:
+                (affiliateUserRank.totalRevenueBeforeDiscount || 0) +
+                (doc.totalRevenueBeforeDiscount || 0),
+              totalTicketsSold:
+                (affiliateUserRank.totalTicketsSold || 0) + (doc.totalTicketsSold || 0),
+              totalCommissionEarned:
+                (affiliateUserRank.totalCommissionEarned || 0) + (doc.totalCommissionEarned || 0),
+              totalTicketsRewarded:
+                (affiliateUserRank.totalTicketsRewarded || 0) + (doc.totalTicketsRewarded || 0),
             },
           })
         }
+
+        const pointsBefore = affiliateUserRank?.totalPoints || 0
+        const pointsAfter = pointsBefore + (doc.totalPoints || 0)
+        const pointsChange = pointsAfter - pointsBefore
+        // need to write log
+        await req.payload.create({
+          collection: 'affiliate-rank-logs',
+          data: {
+            affiliateUser: affiliateUserId,
+            eventAffiliateRank: doc.eventAffiliateRank,
+            rankContext: 'user',
+            pointsChange,
+            pointsBefore,
+            pointsAfter,
+            rankBefore: affiliateUserRank?.currentRank,
+            actionType: AFFILIATE_ACTION_TYPE_LOG.event_completed.value,
+            occurredAt: new Date().toISOString(),
+            description: `Cập nhật điểm tích lũy, doanh thu, số vé bán được, hoa hồng nhận được, số vé thưởng có thể nhận được từ sự kiện sau khi event đã hoàn thành`,
+          },
+        })
+        // }
       },
     ],
   },
