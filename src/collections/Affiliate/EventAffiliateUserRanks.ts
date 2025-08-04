@@ -209,16 +209,16 @@ export const EventAffiliateUserRanks: CollectionConfig = {
         // disabled: true,
       },
     },
-    // {
-    //   name: 'isCompleted',
-    //   type: 'checkbox',
-    //   label: 'Đã Hoàn Thành',
-    //   defaultValue: false,
-    //   admin: {
-    //     description:
-    //       'Khi đã hoàn thành, những giá trị sẽ được tính toán và lưu vào các thông số hạng tổng của Affiliate User. Chỉ thực hiện hành động này sau khi event đã kết thúc',
-    //   },
-    // },
+    {
+      name: 'isCompleted',
+      type: 'checkbox',
+      label: 'Đã Hoàn Thành',
+      defaultValue: true,
+      admin: {
+        description:
+          'Khi đã hoàn thành, những giá trị sẽ được tính toán và lưu vào các thông số hạng tổng của Affiliate User. Chỉ thực hiện hành động này sau khi event đã kết thúc',
+      },
+    },
   ],
   hooks: {
     beforeValidate: [
@@ -234,13 +234,13 @@ export const EventAffiliateUserRanks: CollectionConfig = {
         }
 
         // can not update is completed from true to false
-        // if (originalDoc?.isCompleted && !data?.isCompleted) {
-        //   throw new APIError('Không thể cập nhật trạng thái đã hoàn thành', 400, {}, true)
-        // }
+        if (originalDoc?.isCompleted && !data?.isCompleted) {
+          throw new APIError('Không thể cập nhật trạng thái đã hoàn thành', 400, {}, true)
+        }
 
         // const isChecked = data?.isCompleted && !originalDoc?.isCompleted
 
-        // // validate isCompleted, just updated to true if the event has been completed
+        // validate isCompleted, just updated to true if the event has been completed
         // if (isChecked) {
         //   // check if the event has been completed
         //   const event = await req.payload
@@ -265,7 +265,9 @@ export const EventAffiliateUserRanks: CollectionConfig = {
         //     throw new APIError('Event is not completed', 400, {}, true)
         //   }
         // }
-
+        if (data) {
+          data.isCompleted = true
+        }
         return data
       },
     ],
@@ -274,6 +276,7 @@ export const EventAffiliateUserRanks: CollectionConfig = {
         if (operation !== 'update') return
 
         // const isChecked = doc?.isCompleted && !previousDoc?.isCompleted
+        // const isChecked = doc?.isCompleted
 
         // update totalPoints, totalRevenue, totalRevenueBeforeDiscount, totalTicketsSold, totalCommissionEarned, totalTicketsRewarded to affiliate-user-ranks colleciton
         // if (isChecked) {
@@ -304,6 +307,7 @@ export const EventAffiliateUserRanks: CollectionConfig = {
 
         if (!affiliateUserRank) {
           // create a new one
+
           const newRank = sortedRanks.find((rank) => doc.totalPoints >= rank.minPoints)
           await req.payload.create({
             collection: 'affiliate-user-ranks',

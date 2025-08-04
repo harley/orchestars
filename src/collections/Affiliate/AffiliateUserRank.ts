@@ -203,30 +203,30 @@ export const AffiliateUserRanks: CollectionConfig = {
               currentRank: highestEligibleRank.rankName,
             },
           })
-          // Find elegible event aff user ranks to be updated
-          const eligibleEvents = await req.payload
-            .find({
-              collection: 'event-affiliate-user-ranks',
-              where: {
-                affiliateUser: { equals: doc.affiliateUser },
-                currentRank: { not_equals: highestEligibleRank.rankName },
-              },
-            })
-            .then((res) => res.docs)
-          // Send eligible events to notify-event-rank-upgrade endpoint to notify user
-          if (eligibleEvents.length > 0) {
-            await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/notify-event-rank-upgrade`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                eligibleRank: highestEligibleRank.rankName,
-                eligibleEvents: eligibleEvents.map((e) => ({
-                  eventId: e.id,
-                  oldRank: e.eventAffiliateRank,
-                })),
-              }),
-            })
-          }
+          // // Find elegible event aff user ranks to be updated
+          // const eligibleEvents = await req.payload
+          //   .find({
+          //     collection: 'event-affiliate-user-ranks',
+          //     where: {
+          //       affiliateUser: { equals: doc.affiliateUser },
+          //       eventAffiliateRank: { not_equals: highestEligibleRank.rankName },
+          //     },
+          //   })
+          //   .then((res) => res.docs)
+          // // Send eligible events to notify-event-rank-upgrade endpoint to notify user
+          // if (eligibleEvents.length > 0) {
+          //   await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/notify-event-rank-upgrade`, {
+          //     method: 'POST',
+          //     headers: { 'Content-Type': 'application/json' },
+          //     body: JSON.stringify({
+          //       eligibleRank: highestEligibleRank.rankName,
+          //       eligibleEvents: eligibleEvents.map((e) => ({
+          //         eventId: e.id,
+          //         oldRank: e.eventAffiliateRank,
+          //       })),
+          //     }),
+          //   })
+          // }
         }
       },
     ],
