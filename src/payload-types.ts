@@ -1790,9 +1790,9 @@ export interface EventAffiliateUserRank {
    */
   affiliateUser: number | User;
   /**
-   * Trạng thái của hạng trong event: Draft (bản nháp), Active (hoạt động), Disabled (vô hiệu hóa)
+   * Trạng thái của hạng trong event: Draft (bản nháp), Active (hoạt động), Disabled (vô hiệu hóa), Completed (Đã hoàn thành)
    */
-  status: 'draft' | 'active' | 'disabled';
+  status: 'draft' | 'active' | 'disabled' | 'completed';
   /**
    * Khi khóa, hạng này sẽ không thay đổi trong suốt event
    */
@@ -1833,10 +1833,6 @@ export interface EventAffiliateUserRank {
    * Thời điểm Affiliate User thực hiện hành động gần nhất (bán vé, tích điểm, v.v.) trong event này
    */
   lastActivityDate?: string | null;
-  /**
-   * Khi đã hoàn thành, những giá trị sẽ được tính toán và lưu vào các thông số hạng tổng của Affiliate User. Chỉ thực hiện hành động này sau khi event đã kết thúc
-   */
-  isCompleted?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -3510,7 +3506,6 @@ export interface EventAffiliateUserRanksSelect<T extends boolean = true> {
   totalCommissionEarned?: T;
   totalTicketsRewarded?: T;
   lastActivityDate?: T;
-  isCompleted?: T;
   updatedAt?: T;
   createdAt?: T;
 }

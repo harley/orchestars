@@ -149,6 +149,9 @@ export const AffiliateUserRanks: CollectionConfig = {
       admin: {
         description: 'Ngày Affiliate User đạt được hạng hiện tại',
         readOnly: true,
+        date: {
+          pickerAppearance: 'dayAndTime',
+        },
         // disabled: true,
       },
     },
@@ -160,6 +163,9 @@ export const AffiliateUserRanks: CollectionConfig = {
         description:
           'Thời điểm Affiliate User thực hiện hành động gần nhất (bán vé, tích điểm, nâng hạng, v.v.)',
         readOnly: true,
+        date: {
+          pickerAppearance: 'dayAndTime',
+        },
         // disabled: true,
       },
     },

@@ -2,21 +2,17 @@ import { FieldHookArgs } from 'payload'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 import { sql } from '@payloadcms/db-postgres/drizzle'
 
-import {
-  Event,
-  User,
-  Order,
-  AffiliateUserRank as AffiliateUserRankType,
-  EventAffiliateUserRank,
-  EventAffiliateRank,
-} from '@/payload-types'
+import { Event, User, Order } from '@/payload-types'
 import { sendTicketMail } from '../helper/sendTicketMail'
-import { AFFILIATE_RANKS, AFFILIATE_RANK } from '@/collections/Affiliate/constants'
-import { POINT_PER_VND } from '@/config/affiliate'
-import { AFFILIATE_ACTION_TYPE_LOG } from '@/collections/Affiliate/constants/actionTypeLog'
+import { AFFILIATE_RANKS, EVENT_AFFILIATE_RANK_STATUS } from '@/collections/Affiliate/constants'
 import { TAX_PERCENTAGE_DEFAULT } from '@/collections/Events/constants/tax'
 import { calculatePointCompletedOrder } from '@/collections/Membership/hooks/calculatePointCompletedOrder'
 import { ORDER_ITEM_STATUS } from '../constants'
+import { updateAffiliateUserRankAfterOrderCompleted } from '@/collections/Affiliate/helper/updateAffiliateUserRankAfterEventUserRankUpdated'
+import { upsertEventAffiliateUserRankAfterCompletedOrder } from '@/collections/Affiliate/helper/upsertEventAffiliateUserRankAfterCompletedOrder'
+import { updateEventAffiliateRankLogAfterCompletedOrder } from '@/collections/Affiliate/helper/updateEventAffiliateRankLogAfterCompletedOrder'
+import { exchangeVNDToPoint } from '@/utilities/exchangeVNDToPoint'
+import { createEventAffiliateRankIfNotExists } from '@/collections/Affiliate/helper/createEventAffiliateRank'
 
 const updateTicketsAndSendEmail = async (originalDoc: Order, req: FieldHookArgs['req']) => {
   const orderItems = await req.payload
@@ -137,20 +133,142 @@ const updateTicketsAndSendEmail = async (originalDoc: Order, req: FieldHookArgs[
 //   console.log(`Updated ${updatedTickets.docs?.length || 0} tickets to ${newTicketStatus}`)
 // }
 
-const getAffiliateOrderWhereClause = (affiliateUserId: number, orderId: string | number) => {
-  return sql`WHERE (
-    (ord.affiliate_affiliate_user_id = ${affiliateUserId} AND ord.status = 'completed') OR 
-    (ord.affiliate_affiliate_user_id = ${affiliateUserId} AND ord.id = ${orderId})
-  )`
+const getMetricsByOrderId = async ({
+  orderId,
+  event,
+  affiliateUserId,
+  db,
+}: {
+  orderId: number
+  event: Event
+  affiliateUserId: number
+  db: FieldHookArgs['req']['payload']['db']
+}) => {
+  const eventId = event?.id as number
+  const orderQuery = sql`
+  SELECT 
+    SUM(ord.total) AS total_after_discount_value, 
+    SUM(ord.total_before_discount) AS total_before_discount_value
+  FROM orders ord
+  WHERE ord.id IN (
+    SELECT DISTINCT oi.order_id
+    FROM order_items oi
+    WHERE oi.event_id = ${eventId}
+  )
+  AND (ord.affiliate_affiliate_user_id = ${affiliateUserId} AND ord.id = ${orderId})
+`
+
+  const ticketsQuery = sql`
+  SELECT 
+    COUNT(ticket.id) AS total_ticket_sold
+  FROM tickets ticket
+  LEFT JOIN orders ord ON ord.id = ticket.order_id
+  WHERE (ord.affiliate_affiliate_user_id = ${affiliateUserId} AND ord.id = ${orderId}) AND ticket.event_id = ${eventId}
+`
+
+  const [resultCountTotal, resultCountTotalTicketSold] = await Promise.all([
+    db.drizzle.execute(orderQuery).then(
+      (res) =>
+        (
+          res as {
+            rows: Array<{
+              total_after_discount_value?: string
+              total_before_discount_value?: string
+            }>
+          }
+        ).rows?.[0],
+    ),
+    db.drizzle
+      .execute(ticketsQuery)
+      .then((res) => (res as { rows?: Array<{ total_ticket_sold?: string }> }).rows?.[0]),
+  ])
+
+  const totalBeforeDiscountValue = Number(resultCountTotal?.total_before_discount_value) || 0
+  const totalAfterDiscountValue = Number(resultCountTotal?.total_after_discount_value) || 0
+  const taxPercentage = event?.vat?.enabled ? event.vat?.percentage || TAX_PERCENTAGE_DEFAULT : 0
+
+  const totalValueAfterTaxAfterDiscount = totalAfterDiscountValue
+  const totalValueBeforeTaxAfterDiscount = Number(
+    (totalAfterDiscountValue / (1 + taxPercentage / 100)).toFixed(2),
+  )
+  const totalTicketSold = Number(resultCountTotalTicketSold?.total_ticket_sold) || 0
+
+  return {
+    totalBeforeDiscountValue,
+    totalValueAfterTaxAfterDiscount,
+    totalValueBeforeTaxAfterDiscount,
+    totalTicketSold,
+    totalPoints: exchangeVNDToPoint(totalValueBeforeTaxAfterDiscount),
+  }
 }
 
-const getAffiliateAggregates = async (
-  affiliateUserId: number,
-  orderId: string | number,
-  event: Event,
-  db: FieldHookArgs['req']['payload']['db'],
-) => {
-  const whereClause = getAffiliateOrderWhereClause(affiliateUserId, orderId)
+const getCompletedEventAffiliateUsrRankMetrics = async ({
+  affiliateUserId,
+  eventId,
+  db,
+}: {
+  affiliateUserId: number
+  eventId: number
+  db: FieldHookArgs['req']['payload']['db']
+}) => {
+  const completedEventAffiliateUserRankMetricsQuery = sql`
+    SELECT 
+      SUM(total_points) AS total_points,
+      SUM(total_revenue) AS total_revenue,
+      SUM(total_revenue_before_tax) AS total_revenue_before_tax,
+      SUM(total_revenue_after_tax) AS total_revenue_after_tax,
+      SUM(total_revenue_before_discount) AS total_revenue_before_discount,
+      SUM(total_tickets_sold) AS total_tickets_sold
+    FROM event_affiliate_user_ranks
+    WHERE affiliate_user_id = ${affiliateUserId}
+    AND event_id = ${eventId}
+    AND status = ${EVENT_AFFILIATE_RANK_STATUS.completed.value}
+  `
+
+  const completedEventAffiliateUserRankMetrics = await db.drizzle
+    .execute(completedEventAffiliateUserRankMetricsQuery)
+    .then(
+      (res) =>
+        (
+          res as {
+            rows?: Array<{
+              total_points?: string
+              total_revenue?: string
+              total_revenue_before_tax?: string
+              total_revenue_after_tax?: string
+              total_revenue_before_discount?: string
+              total_tickets_sold?: string
+            }>
+          }
+        ).rows?.[0],
+    )
+
+  const totalPoints = Number(completedEventAffiliateUserRankMetrics?.total_points) || 0
+  const totalRevenue = Number(completedEventAffiliateUserRankMetrics?.total_revenue) || 0
+  const totalRevenueAfterTax =
+    Number(completedEventAffiliateUserRankMetrics?.total_revenue_after_tax) || 0
+  const totalRevenueBeforeDiscount =
+    Number(completedEventAffiliateUserRankMetrics?.total_revenue_before_discount) || 0
+  const totalTicketSold = Number(completedEventAffiliateUserRankMetrics?.total_tickets_sold) || 0
+
+  return {
+    totalRevenue,
+    totalRevenueAfterTax,
+    totalRevenueBeforeDiscount,
+    totalTicketSold,
+    totalPoints,
+  }
+}
+
+const getCompletedOrderMetricsByAffiliateUser = async ({
+  affiliateUserId,
+  event,
+  db,
+}: {
+  affiliateUserId: number
+  event: Event
+  db: FieldHookArgs['req']['payload']['db']
+}) => {
   const eventId = event?.id as number
   const valueQuery = sql`
       SELECT 
@@ -162,10 +280,7 @@ const getAffiliateAggregates = async (
         FROM order_items oi
         WHERE oi.event_id = ${eventId}
       )
-      AND (
-        (ord.affiliate_affiliate_user_id = ${affiliateUserId} AND ord.status = 'completed') OR 
-        (ord.affiliate_affiliate_user_id = ${affiliateUserId} AND ord.id = ${orderId})
-      )
+      AND (ord.affiliate_affiliate_user_id = ${affiliateUserId} AND ord.status = 'completed')
   `
 
   const ticketsQuery = sql`
@@ -173,7 +288,7 @@ const getAffiliateAggregates = async (
         COUNT(ticket.id) AS total_ticket_sold
       FROM tickets ticket
       LEFT JOIN orders ord ON ord.id = ticket.order_id
-      ${whereClause} AND ticket.event_id = ${eventId}
+      WHERE (ord.affiliate_affiliate_user_id = ${affiliateUserId} AND ord.status = 'completed') AND ticket.event_id = ${eventId}
   `
 
   const [resultCountTotal, resultCountTotalTicketSold] = await Promise.all([
@@ -195,12 +310,7 @@ const getAffiliateAggregates = async (
 
   const totalBeforeDiscountValue = Number(resultCountTotal?.total_before_discount_value) || 0
   const totalAfterDiscountValue = Number(resultCountTotal?.total_after_discount_value) || 0
-
-  // totalAfterDiscountValue = total after tax + total after discount value
-
   const taxPercentage = event?.vat?.enabled ? event.vat?.percentage || TAX_PERCENTAGE_DEFAULT : 0
-
-  // total beforeVATAndAfterDiscountValue = totalAfterDiscountValue / 1 + (taxPercentage / 100)
 
   const totalValueAfterTaxAfterDiscount = totalAfterDiscountValue
   const totalValueBeforeTaxAfterDiscount = Number(
@@ -214,163 +324,76 @@ const getAffiliateAggregates = async (
     totalAfterDiscountValue,
     totalBeforeDiscountValue,
     totalTicketSold,
+    totalPoints: exchangeVNDToPoint(totalValueBeforeTaxAfterDiscount),
   }
 }
 
-const upsertEventAffiliateUserRank = async (
-  {
-    eventAffiliateUserRank,
-    affiliateUserId,
-    exchangedToPoints,
-    totalBeforeDiscountValue,
-    totalValueAfterTaxAfterDiscount,
-    totalValueBeforeTaxAfterDiscount,
-    totalTicketSold,
-    eventAffiliateRank,
-  }: {
-    eventAffiliateUserRank?: EventAffiliateUserRank
-    affiliateUserId: string
-    exchangedToPoints: number
-    totalBeforeDiscountValue: number
-    totalValueAfterTaxAfterDiscount: number
-    totalValueBeforeTaxAfterDiscount: number
-    totalTicketSold: number
-    eventAffiliateRank: EventAffiliateRank
-  },
-  req: FieldHookArgs['req'],
+const getAffiliateAggregates = async (
+  affiliateUserId: number,
+  orderId: number,
+  event: Event,
+  db: FieldHookArgs['req']['payload']['db'],
 ) => {
-  const commonData = {
-    totalPoints: exchangedToPoints,
-    totalRevenue: totalValueBeforeTaxAfterDiscount,
-    totalRevenueBeforeTax: totalValueBeforeTaxAfterDiscount,
-    totalRevenueAfterTax: totalValueAfterTaxAfterDiscount,
-    totalRevenueBeforeDiscount: totalBeforeDiscountValue,
-    totalTicketsSold: totalTicketSold,
-    totalCommissionEarned: 0, // todo
-    totalTicketsRewarded: 0, // todo
-    lastActivityDate: new Date().toISOString(),
-  }
+  const [metricsByOrder, metricsByAllCompletedOrders, metricsByCompletedEventAffiliateUserRank] =
+    await Promise.all([
+      getMetricsByOrderId({ orderId, event, affiliateUserId, db }),
+      getCompletedOrderMetricsByAffiliateUser({ affiliateUserId, event, db }),
+      getCompletedEventAffiliateUsrRankMetrics({
+        affiliateUserId,
+        eventId: event?.id as number,
+        db,
+      }),
+    ])
 
-  // get total totalTicketsRewarded based on the current eventAffiliateRank
-  if (eventAffiliateRank.eventRewards?.ticketRewards) {
-    // now check by totalRevenueBeforeDiscount first in eventAffiliateRank.eventRewards?.ticketRewards array
-    // sort by minRevenue desc first
-    const ticketRewards = eventAffiliateRank.eventRewards?.ticketRewards?.sort(
-      (a, b) => b.minRevenue - a.minRevenue,
-    )
-    const ticketReward = ticketRewards?.find(
-      (reward) => reward.minRevenue <= totalValueBeforeTaxAfterDiscount,
-    )
-    if (ticketReward) {
-      commonData.totalTicketsRewarded = ticketReward.rewardTickets || 0
-    }
-  }
+  const totalValueAfterTaxAfterDiscount =
+    metricsByOrder.totalValueAfterTaxAfterDiscount +
+    metricsByAllCompletedOrders.totalValueAfterTaxAfterDiscount -
+    metricsByCompletedEventAffiliateUserRank.totalRevenueAfterTax
 
-  if (eventAffiliateRank.eventRewards?.commissionRewards) {
-    // sort by minRevenue desc first
-    const commissionRewards = eventAffiliateRank.eventRewards?.commissionRewards?.sort(
-      (a, b) => b.minRevenue - a.minRevenue,
-    )
-    const commissionReward = commissionRewards?.find(
-      (reward) => reward.minRevenue <= totalValueBeforeTaxAfterDiscount,
-    )
-    if (commissionReward) {
-      const commissionRate = commissionReward.commissionRate || 0
+  const totalValueBeforeTaxAfterDiscount =
+    metricsByOrder.totalValueBeforeTaxAfterDiscount +
+    metricsByAllCompletedOrders.totalValueBeforeTaxAfterDiscount -
+    metricsByCompletedEventAffiliateUserRank.totalRevenue
 
-      commonData.totalCommissionEarned = Number(
-        ((totalValueBeforeTaxAfterDiscount * commissionRate) / 100).toFixed(2),
-      )
-    }
-  }
+  const totalBeforeDiscountValue =
+    metricsByOrder.totalBeforeDiscountValue +
+    metricsByAllCompletedOrders.totalBeforeDiscountValue -
+    metricsByCompletedEventAffiliateUserRank.totalRevenueBeforeDiscount
 
-  if (!eventAffiliateUserRank) {
-    // create affiliate user rank
-    return req.payload.create({
-      collection: 'event-affiliate-user-ranks',
-      data: {
-        ...commonData,
-        affiliateUser: Number(affiliateUserId),
-        eventAffiliateRank: eventAffiliateRank.id,
-        event: eventAffiliateRank.event,
-        status: 'active',
-      },
-      req,
-    })
-  }
+  const totalTicketSold =
+    metricsByOrder.totalTicketSold +
+    metricsByAllCompletedOrders.totalTicketSold -
+    metricsByCompletedEventAffiliateUserRank.totalTicketSold
 
-  return req.payload.update({
-    collection: 'event-affiliate-user-ranks',
-    id: eventAffiliateUserRank.id,
-    data: {
-      ...commonData,
+  const totalPoints = exchangeVNDToPoint(totalValueBeforeTaxAfterDiscount)
+
+  return {
+    totalValueAfterTaxAfterDiscount: Number(totalValueAfterTaxAfterDiscount.toFixed(2)),
+    totalValueBeforeTaxAfterDiscount: Number(totalValueBeforeTaxAfterDiscount.toFixed(2)),
+    totalBeforeDiscountValue: Number(totalBeforeDiscountValue.toFixed(2)),
+    totalTicketSold: Number(totalTicketSold.toFixed(2)),
+    totalPoints,
+    metrics: {
+      metricsByOrder,
+      metricsByAllCompletedOrders,
+      metricsByCompletedEventAffiliateUserRank,
     },
-    req,
-  })
-}
-
-const createAffiliateRankLog = (
-  {
-    affiliateUserId,
-    exchangedToPoints,
-    eventAffiliateUserRank,
-    originalDoc,
-    event,
-    eventAffiliateRank,
-  }: {
-    affiliateUserId: string
-    exchangedToPoints: number
-    eventAffiliateUserRank: EventAffiliateUserRank | undefined
-    originalDoc: Order
-    event: Event | null
-    eventAffiliateRank: EventAffiliateRank | null
-  },
-  req: FieldHookArgs['req'],
-) => {
-  const pointsBefore = eventAffiliateUserRank?.totalPoints || 0
-  const pointsChange = exchangedToPoints - pointsBefore
-
-  return req.payload.create({
-    collection: 'affiliate-rank-logs',
-    data: {
-      rankContext: 'event',
-      affiliateUser: Number(affiliateUserId),
-      actionType: AFFILIATE_ACTION_TYPE_LOG.add_points.value,
-      eventAffiliateRank: eventAffiliateRank?.id,
-      occurredAt: new Date().toISOString(),
-      pointsChange: pointsChange,
-      pointsBefore: pointsBefore,
-      pointsAfter: exchangedToPoints,
-      rankBefore:
-        (eventAffiliateUserRank?.eventAffiliateRank as EventAffiliateRank)?.rankName || null,
-      order: originalDoc.id,
-      event: event?.id,
-      description: `Cập nhật điểm tích lũy cho người dùng affiliate sau khi Đơn hàng #${originalDoc.orderCode} được hoàn thành`,
-    },
-    req,
-  })
-}
-
-const updateAffiliateStats = async (
-  originalDoc: Order,
-  event: Event | null,
-  req: FieldHookArgs['req'],
-) => {
-  const affiliateUserIdValue =
-    (originalDoc?.affiliate?.affiliateUser as User)?.id || originalDoc?.affiliate?.affiliateUser
-
-  if (!affiliateUserIdValue) {
-    return
   }
+}
 
-  const affiliateUserId = String(affiliateUserIdValue)
-
+const getEventAffiliateUserRankAndRanks = async (
+  affiliateUserId: number,
+  eventId: number,
+  req: FieldHookArgs['req'],
+) => {
   const [eventAffiliateUserRank, affiliateRanks] = await Promise.all([
     req.payload
       .find({
         collection: 'event-affiliate-user-ranks',
         where: {
-          affiliateUser: { equals: Number(affiliateUserId) },
-          event: { equals: event?.id },
+          affiliateUser: { equals: affiliateUserId },
+          event: { equals: eventId },
+          status: { equals: EVENT_AFFILIATE_RANK_STATUS.active.value },
         },
         limit: 1,
         depth: 1,
@@ -388,72 +411,66 @@ const updateAffiliateStats = async (
       .then((res) => res.docs),
   ])
 
+  return {
+    eventAffiliateUserRank,
+    affiliateRanks,
+  }
+}
+
+const updateAffiliateStats = async (
+  originalDoc: Order,
+  event: Event | null,
+  req: FieldHookArgs['req'],
+) => {
+  const affiliateUserIdValue =
+    (originalDoc?.affiliate?.affiliateUser as User)?.id || originalDoc?.affiliate?.affiliateUser
+
+  if (!affiliateUserIdValue) {
+    return
+  }
+
+  const affiliateUserId = Number(affiliateUserIdValue) as number
+
+  const { eventAffiliateUserRank, affiliateRanks } = await getEventAffiliateUserRankAndRanks(
+    affiliateUserId,
+    event?.id as number,
+    req,
+  )
+
   const {
     totalBeforeDiscountValue,
     totalValueAfterTaxAfterDiscount,
     totalValueBeforeTaxAfterDiscount,
     totalTicketSold,
-  } = await getAffiliateAggregates(
-    Number(affiliateUserId),
-    originalDoc.id,
-    event as Event,
-    req.payload.db,
+    totalPoints,
+  } = await getAffiliateAggregates(affiliateUserId, originalDoc.id, event as Event, req.payload.db)
+
+  console.log(
+    `totalBeforeDiscountValue,
+    totalValueAfterTaxAfterDiscount,
+    totalValueBeforeTaxAfterDiscount,
+    totalTicketSold,`,
+    totalBeforeDiscountValue,
+    totalValueAfterTaxAfterDiscount,
+    totalValueBeforeTaxAfterDiscount,
+    totalTicketSold,
   )
 
-  const exchangedToPoints = Math.ceil(totalValueBeforeTaxAfterDiscount / POINT_PER_VND)
   const sortedRanks = affiliateRanks.sort((a, b) => b.minPoints - a.minPoints)
 
-  // if eventAffiliateUserRank is not set, get default rank of user
-  let eventAffiliateRank: EventAffiliateRank | null =
-    eventAffiliateUserRank?.eventAffiliateRank as EventAffiliateRank | null
-  let affiliateUserRank: AffiliateUserRankType | undefined = undefined
-  if (!eventAffiliateRank) {
-    // 1. Fetch the user's currentRank from affiliate-user-ranks
-    affiliateUserRank = await req.payload
-      .find({
-        collection: 'affiliate-user-ranks',
-        where: {
-          affiliateUser: { equals: Number(affiliateUserId) },
-        },
-        limit: 1,
-        depth: 0,
-      })
-      .then((res) => res.docs?.[0])
+  const eventAffiliateRank = await createEventAffiliateRankIfNotExists({
+    eventId: event?.id as number,
+    affiliateUserId,
+    eventAffiliateUserRank,
+    affiliateRanks: sortedRanks,
+    req,
+  })
 
-    // 2. Use currentRank to get the EventAffiliateRank for this event
-    const userCurrentRank = affiliateUserRank?.currentRank || AFFILIATE_RANK.Tier1.value
-    eventAffiliateRank = await req.payload
-      .find({
-        collection: 'event-affiliate-ranks',
-        where: {
-          event: { equals: event?.id },
-          rankName: { equals: userCurrentRank },
-          status: { equals: 'active' },
-        },
-        limit: 1,
-        depth: 0,
-      })
-      .then((res) => res.docs?.[0] || null)
-
-    if (!eventAffiliateRank) {
-      // create event affiliate rank based on the affiliate user rank
-      eventAffiliateRank = await req.payload.create({
-        collection: 'event-affiliate-ranks',
-        data: {
-          event: event?.id as number,
-          rankName: userCurrentRank,
-          status: 'active',
-          eventRewards: sortedRanks.find((rank) => rank.rankName === userCurrentRank)?.rewards,
-        },
-      })
-    }
-  }
-
-  await upsertEventAffiliateUserRank(
+  const activeEventAffiliateUserRank = await upsertEventAffiliateUserRankAfterCompletedOrder(
     {
       eventAffiliateUserRank,
       affiliateUserId,
-      exchangedToPoints,
+      totalPoints,
       totalBeforeDiscountValue,
       totalValueAfterTaxAfterDiscount,
       totalValueBeforeTaxAfterDiscount,
@@ -463,12 +480,18 @@ const updateAffiliateStats = async (
     req,
   )
 
-  await createAffiliateRankLog(
+  await updateAffiliateUserRankAfterOrderCompleted({
+    affiliateUserId,
+    activeEventAffiliateUserRank,
+    req,
+  })
+
+  await updateEventAffiliateRankLogAfterCompletedOrder(
     {
       affiliateUserId,
-      exchangedToPoints,
+      totalPoints,
       eventAffiliateUserRank,
-      originalDoc,
+      completedOrder: originalDoc,
       event,
       eventAffiliateRank,
     },
@@ -497,7 +520,7 @@ const handleCalculatingPointCompletedOrder = async (
 ) => {
   try {
     const total = originalDoc.total || 0
-    const points = Math.ceil(total / POINT_PER_VND)
+    const points = exchangeVNDToPoint(total)
     const userId = (originalDoc.user as Order)?.id || originalDoc.user
     if (userId && points > 0) {
       await calculatePointCompletedOrder({

@@ -82,6 +82,7 @@ import * as migration_20250715_140337_add_checkin_method_to_checkin_records from
 import * as migration_20250716_013339_add_order_and_type_to_email_collection from './20250716_013339_add_order_and_type_to_email_collection';
 import * as migration_20250719_070659_add_trigram_indexes_for_checkin_search from './20250719_070659_add_trigram_indexes_for_checkin_search';
 import * as migration_20250726_032622_add_order_item_status from './20250726_032622_add_order_item_status';
+import * as migration_20250805_133549_update_fields_affiliate from './20250805_133549_update_fields_affiliate';
 
 export const migrations = [
   {
@@ -502,6 +503,11 @@ export const migrations = [
   {
     up: migration_20250726_032622_add_order_item_status.up,
     down: migration_20250726_032622_add_order_item_status.down,
-    name: '20250726_032622_add_order_item_status'
+    name: '20250726_032622_add_order_item_status',
+  },
+  {
+    up: migration_20250805_133549_update_fields_affiliate.up,
+    down: migration_20250805_133549_update_fields_affiliate.down,
+    name: '20250805_133549_update_fields_affiliate'
   },
 ];
