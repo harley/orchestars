@@ -5,7 +5,7 @@ import { PAYMENT_STATUSES } from './constants'
 export const Payments: CollectionConfig = {
   slug: 'payments',
   admin: {
-    useAsTitle: 'total',
+    useAsTitle: 'id',
   },
   access: {
     create: () => false,
