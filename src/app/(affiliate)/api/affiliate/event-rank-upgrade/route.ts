@@ -136,8 +136,14 @@ export async function POST(req: NextRequest) {
       },
     })
     const newRecordData = {
-      event: rankToUpdate.event, // reuse event ID
-      affiliateUser: rankToUpdate.affiliateUser,
+      event:
+        typeof rankToUpdate.event === 'object' && rankToUpdate.event !== null
+          ? rankToUpdate.event.id
+          : rankToUpdate.event, // reuse event ID
+      affiliateUser:
+        typeof rankToUpdate.affiliateUser === 'object' && rankToUpdate.affiliateUser !== null
+          ? rankToUpdate.affiliateUser.id
+          : rankToUpdate.affiliateUser,
       eventAffiliateRank: body.newRank.id, // updated rank
       status: 'active' as const,
       isLocked: false,
