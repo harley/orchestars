@@ -136,17 +136,11 @@ export async function POST(req: NextRequest) {
       },
     })
     const newRecordData = {
-      event:
-        typeof rankToUpdate.event === 'object' && rankToUpdate.event !== null
-          ? rankToUpdate.event.id
-          : rankToUpdate.event, // reuse event ID
-      affiliateUser:
-        typeof rankToUpdate.affiliateUser === 'object' && rankToUpdate.affiliateUser !== null
-          ? rankToUpdate.affiliateUser.id
-          : rankToUpdate.affiliateUser,
+      event: body.eventID, // event ID
+      affiliateUser: userID, // affiliate user ID
       eventAffiliateRank: body.newRank.id, // updated rank
       status: 'active' as const,
-      isLocked: false,
+      isLocked: true,
       totalPoints: 0,
       totalRevenue: 0,
       totalRevenueAfterTax: 0,
@@ -157,7 +151,10 @@ export async function POST(req: NextRequest) {
       totalTicketsRewarded: 0,
       lastActivityDate: new Date().toISOString(),
     }
-
+    // Validate required fields
+    if (!newRecordData.event || !newRecordData.affiliateUser || !newRecordData.eventAffiliateRank) {
+      throw new Error('Missing required fields: event, affiliateUser, or eventAffiliateRank')
+    }
     await payload.create({
       collection: 'event-affiliate-user-ranks',
       data: newRecordData,
