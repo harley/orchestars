@@ -5,6 +5,13 @@ import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { AffiliateSidebar } from '@/components/Affiliate/AffiliateSidebar'
 import { ProtectedRoute } from '@/components/Affiliate/ProtectedRoute'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { AFFILIATE_RANKS } from '@/collections/Affiliate/constants'
+import {
+  EventAffiliateUserRank,
+  AffiliateUserRank,
+  EventAffiliateRank,
+  AffiliateRank,
+} from '@/payload-types'
 import {
   Dialog,
   DialogContent,
@@ -17,10 +24,8 @@ import useFetchData from '@/hooks/useFetchData'
 
 export default function RankUpgradePage() {
   const { data, loading, error } = useFetchData<{
-    type: string
-    rank: string
-    eligibleEvents: { eventId: string; oldRank: string; newRank: string }[]
-    timestamp: number
+    globalRank: AffiliateRank
+    eligibleEvents: { eventId: string; oldRank: EventAffiliateRank }[]
   }>(`/api/affiliate/event-rank-upgrade`, { defaultLoading: true })
   console.log(data)
   const [confirmedEvents, setConfirmedEvents] = useState<Set<string>>(new Set())
@@ -45,7 +50,7 @@ export default function RankUpgradePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           eventID: eventId,
-          newRank: data?.rank,
+          newRank: data?.globalRank as AffiliateRank,
         }),
       })
 
@@ -78,7 +83,7 @@ export default function RankUpgradePage() {
                   {!loading && notification && (
                     <>
                       <h1 className="text-2xl font-bold mb-4">
-                        🎉 Bạn đã được nâng lên hạng {notification.rank}
+                        🎉 Bạn đã được nâng lên hạng {notification.globalRank.rankName}
                       </h1>
                       <div className="grid gap-4 md:grid-cols-2">
                         {notification.eligibleEvents.length === 0 && (
@@ -89,7 +94,8 @@ export default function RankUpgradePage() {
                             <CardHeader>
                               <CardTitle>Sự kiện: {e.eventId}</CardTitle>
                               <p className="text-sm text-muted-foreground">
-                                Hạng cũ: {e.oldRank} → Hạng mới: {notification.rank}
+                                Hạng cũ: {e.oldRank.rankName} → Hạng mới:{' '}
+                                {notification.globalRank.rankName}
                               </p>
                             </CardHeader>
                             <CardContent className="space-y-2">

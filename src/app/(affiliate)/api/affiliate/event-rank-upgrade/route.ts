@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { authorizeApiRequest } from '@/app/(affiliate)/utils/authorizeApiRequest'
 import { AFFILIATE_RANKS } from '@/collections/Affiliate/constants'
-import { EventAffiliateUserRank, AffiliateUserRank, EventAffiliateRank } from '@/payload-types'
+import {
+  EventAffiliateUserRank,
+  AffiliateUserRank,
+  EventAffiliateRank,
+  AffiliateRank,
+} from '@/payload-types'
 
 export async function GET(req: NextRequest) {
   try {
@@ -61,8 +66,9 @@ export async function GET(req: NextRequest) {
     // Compare and filter events that can be upgraded
     const eligibleEvents = eventAffUserRanks
       .filter((eventRank) => {
-        const eventAffRank = eventRank.eventAffiliateRank as EventAffiliateRank
-
+        const eventAffRank = eventRank.eventAffiliateRank
+        // typeof eventRank.event === 'object' ? eventRank.event.id : eventRank.event,
+        if (typeof eventAffRank === 'number') return false
         const currentEventRank = affiliateRankConfigs.find(
           (rank) => rank.rankName === eventAffRank.rankName,
         )
@@ -75,12 +81,11 @@ export async function GET(req: NextRequest) {
         const eventAffRank = eventRank.eventAffiliateRank as EventAffiliateRank
 
         return {
-          eventId: eventRank.event,
-          oldRank: eventAffRank.rankName,
-          newRank: globalRank.rankName,
+          eventId: typeof eventRank.event === 'object' ? eventRank.event.id : eventRank.event,
+          oldRank: eventAffRank,
         }
       })
-    return NextResponse.json({ eligibleEvents })
+    return NextResponse.json({ eligibleEvents, globalRank })
   } catch (err) {
     console.error(err)
     return NextResponse.json(
@@ -97,7 +102,7 @@ export async function GET(req: NextRequest) {
 
 type RankUpdateRequestBody = {
   eventID: number
-  newRank: AffiliateUserRank
+  newRank: AffiliateRank
 }
 export async function POST(req: NextRequest) {
   try {
@@ -151,6 +156,7 @@ export async function POST(req: NextRequest) {
       collection: 'event-affiliate-user-ranks',
       data: newRecordData,
     })
+    return NextResponse.json({ success: true })
   } catch (err) {
     console.error(err)
     return NextResponse.json({ error: 'Error updating event affiliate rank' }, { status: 500 })
