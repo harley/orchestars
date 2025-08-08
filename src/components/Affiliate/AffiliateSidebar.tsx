@@ -79,7 +79,7 @@ export function AffiliateSidebar() {
     }
 
     checkRankUpgrade()
-  }, [])
+  }, [authUser])
 
   return (
     <Sidebar variant="inset">
