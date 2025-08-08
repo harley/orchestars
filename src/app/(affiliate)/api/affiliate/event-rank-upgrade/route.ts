@@ -141,11 +141,11 @@ export async function POST(req: NextRequest) {
       eventAffiliateRank: body.newRank.id, // updated rank
       status: 'active' as const,
       isLocked: true,
-      totalPoints: 0,
-      totalRevenue: 0,
-      totalRevenueAfterTax: 0,
-      totalRevenueBeforeTax: 0,
-      totalRevenueBeforeDiscount: 0,
+      totalPoints: rankToUpdate.totalPoints, //This must be existing points and revenue from the previous rank
+      totalRevenue: rankToUpdate.totalRevenue,
+      totalRevenueAfterTax: rankToUpdate.totalRevenueAfterTax,
+      totalRevenueBeforeTax: rankToUpdate.totalRevenueBeforeTax,
+      totalRevenueBeforeDiscount: rankToUpdate.totalRevenueBeforeDiscount,
       totalTicketsSold: 0,
       totalCommissionEarned: 0,
       totalTicketsRewarded: 0,
