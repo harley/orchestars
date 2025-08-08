@@ -1,3 +1,5 @@
+import { User } from '@/payload-types'
+
 export type Ticket = {
   id: string
   attendeeName: string
@@ -11,4 +13,11 @@ export type Ticket = {
   ticketPriceInfo?: any
   isCheckedIn?: boolean
   checkinRecord?: any
+  user?: User
+  giftInfo?: {
+    /**
+     * Marks whether the ticket has been gifted.
+     */
+    isGifted?: boolean;
+  };
 }

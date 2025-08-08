@@ -569,7 +569,19 @@
       "giftTicket": "Ticket",
       "discount": "Discount"
     },
-    "highestTierSecured": "Highest tier secured"
+    "highestTierSecured": "Highest tier secured",
+    "giftTicket": "Gift Ticket",
+    "giftNow": "Gift Now",
+    "giftTicketForm": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone"
+    },
+    "common": {
+      "cancel": "Cancel",
+      "processing": "Processing..."
+    }
   },
   "auth": {
     "signInSuccessfully": "Sign in successfully",
