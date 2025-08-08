@@ -13,18 +13,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import {
-  Link2,
-  Home,
-  DollarSign,
-  Calendar,
-  LogOut,
-  User,
-} from 'lucide-react'
+import { Link2, Home, DollarSign, Calendar, LogOut, User } from 'lucide-react'
 import Link from 'next/link'
 import { useAffiliateAuthenticated } from '@/app/(affiliate)/providers/Affiliate'
 
 import { logout } from '@/app/(affiliate)/actions/logout'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState, useEffect } from 'react'
 
 const navigationItems = [
   {
@@ -69,6 +64,22 @@ const metricsItems = [
 
 export function AffiliateSidebar() {
   const authUser = useAffiliateAuthenticated()
+  const [hasRankUpgrade, setHasRankUpgrade] = useState(false)
+  useEffect(() => {
+    const checkRankUpgrade = async () => {
+      try {
+        const res = await fetch('/api/affiliate/event-rank-upgrade')
+        const data = await res.json()
+        if (data?.eligibleEvents?.length > 0) {
+          setHasRankUpgrade(true)
+        }
+      } catch (err) {
+        console.error('Failed to fetch rank upgrade info:', err)
+      }
+    }
+
+    checkRankUpgrade()
+  }, [])
 
   return (
     <Sidebar variant="inset">
@@ -128,6 +139,26 @@ export function AffiliateSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        {hasRankUpgrade && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Thông báo</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <div className="rounded-lg bg-green-100 px-4 py-3 text-green-900 shadow-lg ">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <p className="text-sm font-medium text-green-900 whitespace-normal">
+                    Bạn có event đủ điều kiện nâng hạng mới!
+                  </p>
+                  <Link
+                    href="/affiliate/rankUpgrade"
+                    className="inline-flex items-center rounded-full border border-yellow-500 px-3 py-1 text-sm font-medium text-yellow-700 hover:bg-yellow-100 transition"
+                  >
+                    Đi đến trang nâng hạng
+                  </Link>
+                </div>
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
