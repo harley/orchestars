@@ -84,8 +84,10 @@ export async function generateMetadata({
   const resolvedParams = await params
   const tickets = await getTicketsByOrderCode({ hashedOrderCode: resolvedParams.hashedOrderCode })
 
+  const decoded = decodeOrderCode(resolvedParams.hashedOrderCode)
   const pageTitle: string =
-    tickets.length > 0 ? `Order ${resolvedParams.hashedOrderCode} Tickets` : 'Tickets'
+    tickets.length > 0 && decoded ? `Order ${decoded.orderCode} Tickets` : 'Tickets'
+
   return {
     title: pageTitle,
   }

@@ -26,6 +26,7 @@ interface GiftModalProps {
 
 export const GiftModal: React.FC<GiftModalProps> = ({ isOpen, onClose, onSuccess, ticketId, ownerId }) => {
   const { t } = useTranslate()
+  const { toast } = useToast()
   const {
     handleSubmit,
     control,
@@ -42,8 +43,6 @@ export const GiftModal: React.FC<GiftModalProps> = ({ isOpen, onClose, onSuccess
   })
 
   const handleFormSubmit = async (data: FormValues) => {
-    console.log('Form submitted:', data)
-
     try {
       const response = await fetch('/api/tickets/gift-ticket', {
         method: 'POST',
@@ -64,8 +63,6 @@ export const GiftModal: React.FC<GiftModalProps> = ({ isOpen, onClose, onSuccess
         const errorData = await response.json()
         throw new Error(errorData.message || 'Failed to gift ticket')
       }
-
-      console.log('Response from server:', await response.json())
       
       reset()
       onClose()
@@ -73,6 +70,12 @@ export const GiftModal: React.FC<GiftModalProps> = ({ isOpen, onClose, onSuccess
 
     } catch (error) {
       console.error('Error submitting form:', error)
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      toast({
+        title: 'Error',
+        description: `Failed to gift ticket: ${errorMessage}`,
+        variant: 'destructive',
+      })
       
     }
   }

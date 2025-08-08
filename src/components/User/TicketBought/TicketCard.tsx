@@ -93,7 +93,7 @@ export const TicketCard: React.FC<{ ticket: Ticket }> = ({ ticket }) => {
         isOpen={isGiftModalOpen}
         onClose={() => setIsGiftModalOpen(false)}
         ticketId={ticket.id}
-        ownerId={ticket.user?.id ?? 0}
+        ownerId={ticket.user!.id}
       />
     </>
   )

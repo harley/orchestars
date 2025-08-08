@@ -1,10 +1,13 @@
 import crypto from 'crypto';
 
-const ENCRYPTION_KEY = process.env.ORDER_CODE_SECRET || 'default-secret-key-32-characters';
+const ENCRYPTION_KEY = process.env.ORDER_CODE_SECRET;
 const ALGORITHM = 'aes-256-ctr'
-const SALT = process.env.ORDER_CODE_SALT || 'orchestars-order-salt-2024'
+const SALT = process.env.ORDER_CODE_SALT
 
 function getKey(): Buffer {
+  if (!ENCRYPTION_KEY || !SALT) {
+    throw new Error('ORDER_CODE_SECRET and ORDER_CODE_SALT environment variables must be set');
+  }
   return crypto.scryptSync(ENCRYPTION_KEY, SALT, 32);
 }
 

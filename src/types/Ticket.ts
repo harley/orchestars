@@ -16,7 +16,7 @@ export type Ticket = {
   user?: User
   giftInfo?: {
     /**
-     * Đánh dấu vé có phải là vé tặng hay không
+     * Marks whether the ticket has been gifted.
      */
     isGifted?: boolean;
   };

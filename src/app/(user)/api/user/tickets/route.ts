@@ -51,6 +51,10 @@ export async function GET(req: NextRequest) {
               }
             : {}),
         },
+        page,
+        limit,
+        sort: '-createdAt', // Sort by latest first
+        depth: 1, // We only need basic event info since we already filtered them
       })
     } else {
       // Find tickets owned by the user
