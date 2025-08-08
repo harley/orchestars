@@ -11,7 +11,7 @@ interface Props {
 export const TicketTypeFilterTab: React.FC<Props> = ({ typeFilter, setTypeFilter, t }) => {
   return (
     <div className="flex gap-6 text-sm font-medium mb-4">
-      {(['booked', 'cancelled', 'pending_payment'] as const).map((filter) => (
+      {(['booked', 'cancelled', 'pending_payment', 'gifted'] as const).map((filter) => (
         <button
           key={filter}
           className={`pb-1 border-b-2 ${typeFilter === filter ? 'text-green-600 border-green-600' : 'text-gray-500 border-transparent'}`}

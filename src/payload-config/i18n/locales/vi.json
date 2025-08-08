@@ -570,7 +570,19 @@
       "giftTicket": "Vé",
       "discount": "Giảm giá"
     },
-    "highestTierSecured": "Đã đạt hạng cao nhất"
+    "highestTierSecured": "Đã đạt hạng cao nhất",
+    "giftTicket": "Tặng Vé",
+    "giftNow": "Tặng ngay",
+    "giftTicketForm": {
+      "firstName": "Tên",
+      "lastName": "Họ",
+      "email": "Email",
+      "phone": "Số điện thoại"
+    },
+    "common": {
+      "cancel": "Hủy",
+      "processing": "Đang xử lý..."
+    }
   },
   "auth": {
     "signInSuccessfully": "Đăng nhập thành công",

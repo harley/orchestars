@@ -7,12 +7,21 @@ import TicketsSwipeViewer from './page.client'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { ORDER_STATUS } from '@/collections/Orders/constants'
 
+import { decodeOrderCode } from '@/utilities/orderCodeHash'
+
 const getTicketsByOrderCode = cache(
   async ({
-    orderCode,
+    hashedOrderCode,
   }: {
-    orderCode: string
+    hashedOrderCode: string
   }): Promise<{ ticket: Ticket; isCheckedIn: boolean; checkedInAt: string | null }[]> => {
+   
+    const decoded = decodeOrderCode(hashedOrderCode)
+    if (!decoded) {
+      throw new Error('Invalid order code')
+    }
+    const { orderCode, userId } = decoded
+
     const payload = await getPayload()
     const query = sql`
       SELECT t.id as id, 
@@ -40,9 +49,15 @@ const getTicketsByOrderCode = cache(
       LEFT JOIN events_schedules es ON t.event_schedule_id = es.id
       LEFT JOIN checkin_records cr ON t.id = cr.ticket_id
       WHERE ord.order_code = ${orderCode} AND ord.status = ${ORDER_STATUS.completed.value}
+        AND (
+          (t.gift_info_is_gifted = 'FALSE' AND t.user_id = ${userId})
+          OR 
+          (t.gift_info_is_gifted = 'TRUE' AND t.gift_info_gift_recipient_id = ${userId})
+        )
       ORDER BY t.created_at ASC
     `
     const result = await payload.db.drizzle.execute(query)
+
     return ((result as { rows: any[] }).rows || []).map((ticket) => ({
       ticket: {
         ...ticket,
@@ -63,14 +78,14 @@ const getTicketsByOrderCode = cache(
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ orderCode: string }>
+  params: Promise<{ hashedOrderCode: string }>
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }): Promise<Metadata> {
   const resolvedParams = await params
-  const tickets = await getTicketsByOrderCode({ orderCode: resolvedParams.orderCode })
+  const tickets = await getTicketsByOrderCode({ hashedOrderCode: resolvedParams.hashedOrderCode })
 
   const pageTitle: string =
-    tickets.length > 0 ? `Order ${resolvedParams.orderCode} Tickets` : 'Tickets'
+    tickets.length > 0 ? `Order ${resolvedParams.hashedOrderCode} Tickets` : 'Tickets'
   return {
     title: pageTitle,
   }
@@ -79,12 +94,12 @@ export async function generateMetadata({
 export default async function TicketsPage({
   params,
 }: {
-  params: Promise<{ orderCode: string }>
+  params: Promise<{ hashedOrderCode: string }>
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const resolvedParams = await params
-  const { orderCode } = resolvedParams
-  const tickets = await getTicketsByOrderCode({ orderCode })
+  const { hashedOrderCode } = resolvedParams
+  const tickets = await getTicketsByOrderCode({ hashedOrderCode })
 
   if (!tickets.length) {
     return (

@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
     if (ticketStatus === 'canceled') {
       ticketStatus = TICKET_STATUS.cancelled.value
-    }
+    } 
 
     // First find relevant events based on date filter
     const eventsQuery = await payload.find({
@@ -31,27 +31,53 @@ export async function GET(req: NextRequest) {
 
     const eventIds = eventsQuery.docs.map((event) => event.id)
 
-    // Then find tickets for these events
-    const ticketsQuery = await payload.find({
-      collection: 'tickets',
-      where: {
-        user: {
-          equals: userId,
+    let ticketsQuery
+
+    if (ticketStatus === 'gifted') {
+      ticketsQuery = await payload.find({
+        collection: 'tickets',
+        where: {
+          'giftInfo.giftRecipient': {
+            equals: userId,
+          },
+          'giftInfo.isGifted': {
+            equals: true,
+          },
+          ...(eventIds.length > 0
+            ? {
+                event: {
+                  in: eventIds,
+                },
+              }
+            : {}),
         },
-        ...(ticketStatus ? { status: { equals: ticketStatus } } : {}),
-        ...(eventIds.length > 0
-          ? {
-              event: {
-                in: eventIds,
-              },
-            }
-          : {}),
-      },
-      page,
-      limit,
-      sort: '-createdAt', // Sort by latest first
-      depth: 1, // We only need basic event info since we already filtered them
-    })
+      })
+    } else {
+      // Find tickets owned by the user
+      ticketsQuery = await payload.find({
+        collection: 'tickets',
+        where: {
+          user: {
+            equals: userId,
+          },
+          'giftInfo.isGifted': {
+            equals: false,
+          },
+          ...(ticketStatus ? { status: { equals: ticketStatus } } : {}),
+          ...(eventIds.length > 0
+            ? {
+                event: {
+                  in: eventIds,
+                },
+              }
+            : {}),
+        },
+        page,
+        limit,
+        sort: '-createdAt', // Sort by latest first
+        depth: 1, // We only need basic event info since we already filtered them
+      })
+    }
 
     return NextResponse.json({ data: ticketsQuery })
   } catch (err) {
