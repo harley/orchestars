@@ -13,7 +13,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import { Link2, Home, DollarSign, Calendar, LogOut, User } from 'lucide-react'
+import { Link2, Home, DollarSign, Calendar, LogOut, User, SquareArrowUp } from 'lucide-react'
 import Link from 'next/link'
 import { useAffiliateAuthenticated } from '@/app/(affiliate)/providers/Affiliate'
 
@@ -60,6 +60,11 @@ const metricsItems = [
     url: '/affiliate/events',
     icon: Calendar,
   },
+  {
+    title: 'Rank Upgrade',
+    url: '/affiliate/rankUpgrade',
+    icon: SquareArrowUp,
+  },
 ]
 
 export function AffiliateSidebar() {
@@ -79,7 +84,7 @@ export function AffiliateSidebar() {
     }
 
     checkRankUpgrade()
-  }, [])
+  }, [authUser])
 
   return (
     <Sidebar variant="inset">
@@ -143,7 +148,7 @@ export function AffiliateSidebar() {
           <SidebarGroup>
             <SidebarGroupLabel>Thông báo</SidebarGroupLabel>
             <SidebarGroupContent>
-              <div className="rounded-lg bg-green-100 px-4 py-3 text-green-900 shadow-lg ">
+              <div className="rounded-lg bg-green-100 px-4 py-3 text-green-900 shadow-sm ">
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <p className="text-sm font-medium text-green-900 whitespace-normal">
                     Bạn có event đủ điều kiện nâng hạng mới!
@@ -162,14 +167,6 @@ export function AffiliateSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          {/* <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link href="/affiliate/settings">
-                <Settings className="h-4 w-4" />
-                <span>Settings</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem> */}
           <SidebarMenuItem>
             <form action={logout}>
               <SidebarMenuButton type="submit">
