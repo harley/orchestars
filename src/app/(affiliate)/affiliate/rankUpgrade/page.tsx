@@ -90,7 +90,7 @@ export default function RankUpgradePage() {
                           </p>
                         )}
                       </div>
-                      <div className="grid gap-4 md:grid-cols-2">
+                      <div className="grid gap-4 md:grid-cols-3">
                         {notification.eligibleEvents.map((e) => (
                           <>
                             <Card key={e.eventId} className="relative shadow-md max-w-sm">
