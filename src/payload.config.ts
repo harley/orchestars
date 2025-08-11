@@ -3,7 +3,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 
 import sharp from 'sharp' // sharp-import
 import path from 'path'
-import { buildConfig, PayloadRequest } from 'payload'
+import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { Categories } from './collections/Categories'
@@ -30,13 +30,11 @@ import { SeatHoldings } from './collections/SeatHoldings'
 import { Promotions } from './collections/Promotion'
 import { UserPromotionRedemptions } from './collections/Promotion/UserPromotionRedemtion'
 import Admins from './collections/Admins'
-import { updatePaymentStatus } from './collections/Payments/jobs/updatePaymentStatus'
 import { i18n } from './payload-config/i18n'
 import { localization } from './payload-config/localization'
 import { Emails } from './collections/Emails'
 import { Logs } from './collections/Logs'
 import { emailAdapter } from './payload-config/email'
-import { IS_LOCAL_DEVELOPMENT } from './config/app'
 import { SeatingCharts } from './collections/SeatingCharts'
 import { MarketingTracking } from './collections/MarketingTracking'
 import { PromotionConfigs } from './collections/Promotion/PromotionConfigs'
@@ -201,36 +199,36 @@ export default buildConfig({
   //     }, TIME_OUT)
   //   }
   // },
-  jobs: {
-    access: {
-      run: ({ req }: { req: PayloadRequest }): boolean => {
-        // Allow logged in users to execute this endpoint (default)
-        if (req.user) return true
+  // jobs: {
+  //   access: {
+  //     run: ({ req }: { req: PayloadRequest }): boolean => {
+  //       // Allow logged in users to execute this endpoint (default)
+  //       if (req.user) return true
 
-        console.log('Initializing cron job')
-        // If there is no logged in user, then check
-        // for the Vercel Cron secret to be present as an
-        // Authorization header:
-        const authHeader = req.headers.get('authorization')
-        return authHeader === `Bearer ${process.env.CRON_SECRET}`
-      },
-    },
-    tasks: [],
-    autoRun: [
-      {
-        cron: '*/5 * * * *', // Runs every 5 minutes
-        limit: 1, // limit jobs to process each run
-        queue: 'updatePaymentStatus', // name of the queue
-      },
-    ],
-    shouldAutoRun: async (payload) => {
-      if (!IS_LOCAL_DEVELOPMENT) {
-        updatePaymentStatus({ payload })
-      }
+  //       console.log('Initializing cron job')
+  //       // If there is no logged in user, then check
+  //       // for the Vercel Cron secret to be present as an
+  //       // Authorization header:
+  //       const authHeader = req.headers.get('authorization')
+  //       return authHeader === `Bearer ${process.env.CRON_SECRET}`
+  //     },
+  //   },
+  //   tasks: [],
+  //   autoRun: [
+  //     {
+  //       cron: '*/5 * * * *', // Runs every 5 minutes
+  //       limit: 1, // limit jobs to process each run
+  //       queue: 'updatePaymentStatus', // name of the queue
+  //     },
+  //   ],
+  //   shouldAutoRun: async (payload) => {
+  //     if (!IS_LOCAL_DEVELOPMENT) {
+  //       updatePaymentStatus({ payload })
+  //     }
 
-      return true
-    },
-  },
+  //     return true
+  //   },
+  // },
   email: emailAdapter(),
   i18n,
   localization,
