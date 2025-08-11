@@ -9,6 +9,7 @@ import {
   AffiliateRank,
   Event,
 } from '@/payload-types'
+import { getGlobalRank } from '@/app/(affiliate)/utils/getGlobalRank'
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,20 +19,6 @@ export async function GET(req: NextRequest) {
 
     //Initialize Payload
     const payload = await getPayload()
-
-    // Fetch current affiliate user rank
-    const affiliateUserRank = await payload
-      .find({
-        collection: 'affiliate-user-ranks',
-        where: { affiliateUser: { equals: Number(userID) } },
-        limit: 1,
-        depth: 0,
-      })
-      .then((res) => res.docs?.[0] as AffiliateUserRank)
-
-    if (!affiliateUserRank?.currentRank) {
-      return NextResponse.json({ eligibleEvents: [] }) // No rank = no eligible upgrade
-    }
 
     // Fetch event affiliate user ranks of this user
     const eventAffUserRanks = await payload
@@ -54,18 +41,12 @@ export async function GET(req: NextRequest) {
         depth: 0,
       })
       .then((res) => res.docs)
-
-    // Get point value of current rank
-    const globalRank = affiliateRankConfigs.find(
-      //Global rank: Affiliate rank. What should be passed is event affiliate rank
-      (rank) => rank.rankName === affiliateUserRank.currentRank,
-    )
-
+    const { affiliateUserRank, globalRank } = await getGlobalRank(Number(userID))
     if (!globalRank) {
-      return NextResponse.json({ eligibleEvents: [] }) // invalid config
+      return NextResponse.json({ eligibleEvents: [] })
     }
-    // (Idea: Pass to AffiliateRank to get minPoint -> compare)
-    // Compare and filter events that can be upgraded
+
+    // Pass to AffiliateRank to get minPoint -> Compare and filter events that can be upgraded
     const filtered = eventAffUserRanks.filter((eventRank) => {
       const eventAffRank = eventRank.eventAffiliateRank
       if (typeof eventAffRank === 'number') return false
@@ -77,6 +58,7 @@ export async function GET(req: NextRequest) {
 
       return globalRank.minPoints > currentEventRank.minPoints
     })
+
     const eligibleEvents = await Promise.all(
       filtered.map(async (eventRank) => {
         const eventAffRank = eventRank.eventAffiliateRank as EventAffiliateRank
@@ -123,7 +105,6 @@ export async function GET(req: NextRequest) {
 }
 type RankUpdateRequestBody = {
   eventID: number
-  newRank: AffiliateRank
 }
 export async function POST(req: NextRequest) {
   try {
@@ -139,7 +120,11 @@ export async function POST(req: NextRequest) {
     const rankToUpdate = await payload
       .find({
         collection: 'event-affiliate-user-ranks',
-        where: { event: { equals: body.eventID }, affiliateUser: { equals: userID } }, //Since event is a relationship field in event-affiliate-user-ranks, it’s stored as a string or number (the ID of the related event)
+        where: {
+          event: { equals: body.eventID },
+          affiliateUser: { equals: userID },
+          status: { equals: 'active' },
+        }, //Since event is a relationship field in event-affiliate-user-ranks, it’s stored as a string or number (the ID of the related event)
         limit: 1,
         depth: 1,
       })
@@ -148,6 +133,7 @@ export async function POST(req: NextRequest) {
     if (!rankToUpdate) {
       return NextResponse.json({ error: 'Rank not found' }, { status: 404 })
     }
+
     //Update existing record status = completed
     await payload.update({
       collection: 'event-affiliate-user-ranks',
@@ -156,15 +142,20 @@ export async function POST(req: NextRequest) {
         status: 'completed',
       },
     })
+    const { affiliateUserRank, globalRank } = await getGlobalRank(Number(userID))
+
     // For event ID, find the event aff rank related
     const eventAffRanks = await payload
       .find({
         collection: 'event-affiliate-ranks',
-        where: { event: { equals: body.eventID }, rankName: { equals: body.newRank.rankName } },
+        where: { event: { equals: body.eventID }, rankName: { equals: globalRank?.rankName } },
       })
       .then((res) => res.docs?.[0] as EventAffiliateRank)
     if (!eventAffRanks) {
-      throw new Error() //Error: Event affiliate rank is not configured. Please contact an admin
+      return NextResponse.json(
+        { error: 'Event affiliate rank is not configured. Please contact an admin for support' },
+        { status: 404 },
+      )
     }
     const newRecordData = {
       event: body.eventID, // event ID
@@ -182,10 +173,12 @@ export async function POST(req: NextRequest) {
       totalTicketsRewarded: 0,
       lastActivityDate: new Date().toISOString(),
     }
+
     // Validate required fields
     // if (!newRecordData.event || !newRecordData.affiliateUser || !newRecordData.eventAffiliateRank) {
     //   throw new Error('Missing required fields: event, affiliateUser, or eventAffiliateRank')
     // }
+
     await payload.create({
       collection: 'event-affiliate-user-ranks',
       data: newRecordData as any,

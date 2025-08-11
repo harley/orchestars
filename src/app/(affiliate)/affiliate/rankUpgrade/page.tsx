@@ -5,13 +5,7 @@ import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { AffiliateSidebar } from '@/components/Affiliate/AffiliateSidebar'
 import { ProtectedRoute } from '@/components/Affiliate/ProtectedRoute'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { AFFILIATE_RANKS } from '@/collections/Affiliate/constants'
-import {
-  EventAffiliateUserRank,
-  AffiliateUserRank,
-  EventAffiliateRank,
-  AffiliateRank,
-} from '@/payload-types'
+import { EventAffiliateRank, AffiliateRank } from '@/payload-types'
 import {
   Dialog,
   DialogContent,
@@ -21,41 +15,55 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import useFetchData from '@/hooks/useFetchData'
+import { useToast } from '@/components/ui/use-toast'
 
+type EligibleEvent = { eventId: number; eventTitle: string; oldRank: EventAffiliateRank }
 export default function RankUpgradePage() {
+  const { toast } = useToast()
   const { data, loading, error } = useFetchData<{
     globalRank: AffiliateRank
-    eligibleEvents: { eventId: string; eventTitle: string; oldRank: EventAffiliateRank }[]
+    eligibleEvents: EligibleEvent[]
   }>(`/api/affiliate/event-rank-upgrade`, { defaultLoading: true })
-  const [confirmedEvents, setConfirmedEvents] = useState<Set<string>>(new Set())
-  const [termsOpenFor, setTermsOpenFor] = useState<string | null>(null)
-  const [confirmingEventId, setConfirmingEventId] = useState<string | null>(null)
 
-  const handleConfirm = async (eventId: string) => {
+  const [confirmedEvents, setConfirmedEvents] = useState<Set<number>>(new Set())
+  const [termsOpenFor, setTermsOpenFor] = useState<number | null>(null)
+  const [confirmingEventId, setConfirmingEventId] = useState<number | null>(null)
+
+  const handleConfirm = async (eventId: number, eventName: string) => {
     try {
       setConfirmingEventId(eventId)
-
-      const selectedEvent = data?.eligibleEvents.find((e) => e.eventId === eventId)
-      if (!selectedEvent) return
-
       const res = await fetch('/api/affiliate/event-rank-upgrade', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          eventID: eventId,
-          newRank: data?.globalRank as AffiliateRank,
+          eventID: Number(eventId),
         }),
       })
-
       const result = await res.json()
-      if (!res.ok) throw new Error(result.error || 'Unknown error')
-
+      if (!res.ok) {
+        toast({
+          variant: 'destructive',
+          title: 'Có lỗi xảy ra khi nâng hạng. Vui lòng thử lại.',
+          description: `Sự kiện: ${eventName}`,
+        })
+        throw new Error(result.error || 'Unknown error')
+      }
+      toast({
+        variant: 'success',
+        title: 'Nâng hạng thành công!',
+        description: `Sự kiện: ${eventName}`,
+      })
       setConfirmedEvents((prev) => new Set([...prev, eventId]))
     } catch (err) {
       console.error(err)
-      alert('Có lỗi xảy ra khi nâng hạng. Vui lòng thử lại.')
+      toast({
+        variant: 'destructive',
+        title: 'Có lỗi xảy ra khi nâng hạng. Vui lòng thử lại.',
+        description: `Sự kiện: ${eventName}`,
+      })
     } finally {
       setConfirmingEventId(null)
+      setTermsOpenFor(null)
     }
   }
 
@@ -92,12 +100,12 @@ export default function RankUpgradePage() {
                       </div>
                       <div className="grid gap-4 md:grid-cols-3">
                         {notification.eligibleEvents.map((e) => (
-                          <>
-                            <Card key={e.eventId} className="relative shadow-md max-w-sm">
+                          <React.Fragment key={e.eventId}>
+                            <Card className="relative shadow-md max-w-sm">
                               <CardHeader>
                                 {confirmedEvents.has(e.eventId) && (
-                                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70">
-                                    <span className="text-2xl font-bold text-green-600 transform -rotate-12 border-4 border-green-600 px-4 py-2 rounded-lg">
+                                  <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+                                    <span className="text-2xl font-bold text-green-600 -rotate-12 border-4 border-green-600 px-4 py-2 rounded-lg">
                                       Đã Nâng Hạng
                                     </span>
                                   </div>
@@ -111,20 +119,23 @@ export default function RankUpgradePage() {
                               <CardContent className="space-y-2">
                                 <Button
                                   className="w-lg bg-blue-400 border text-white hover:bg-gray-200"
-                                  onClick={() => setTermsOpenFor(e.eventId)}
+                                  onClick={() => setTermsOpenFor(e.eventId)} // set selected
                                 >
                                   Xem điều khoản
                                 </Button>
                               </CardContent>
                             </Card>
+
+                            {/* open only when this card is selected */}
                             <Dialog
-                              open={!!termsOpenFor}
-                              onOpenChange={() => setTermsOpenFor(null)}
+                              open={termsOpenFor === e.eventId}
+                              onOpenChange={(open) => !open && setTermsOpenFor(null)}
                             >
                               <DialogContent className="max-w-3xl">
                                 <DialogHeader>
                                   <DialogTitle>Điều khoản nâng hạng</DialogTitle>
                                 </DialogHeader>
+
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-sm text-muted-foreground">
                                   <div>
                                     <h3 className="font-bold mb-2 text-lg">
@@ -145,6 +156,7 @@ export default function RankUpgradePage() {
                                     </ul>
                                   </div>
                                 </div>
+
                                 <ul className="mt-4 text-sm">
                                   <li>
                                     - Nếu bạn ở lại hạng <strong>Bạc</strong>, bạn sẽ cần đạt thêm{' '}
@@ -152,22 +164,18 @@ export default function RankUpgradePage() {
                                   </li>
                                   <li>
                                     - Nếu nâng hạng, điểm sẽ được <strong>Reset về 0</strong> và bạn
-                                    sẽ <strong>Mất quyền nhận phần thưởng của hạng cũ</strong>. Vui
-                                    lòng cân nhắc trước khi nâng hạng.
+                                    sẽ <strong>Mất quyền nhận phần thưởng của hạng cũ</strong>.
                                   </li>
                                 </ul>
+
                                 <DialogFooter className="mt-6">
                                   <Button
-                                    className={`w-full text-white w-xl ${
-                                      confirmedEvents.has(e.eventId)
-                                        ? 'bg-gray-500 cursor-not-allowed'
-                                        : 'bg-blue-500 hover:bg-blue-700'
-                                    }`}
+                                    className={`w-full text-white w-xl ${confirmedEvents.has(e.eventId) ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700'}`}
                                     disabled={
                                       confirmedEvents.has(e.eventId) ||
                                       confirmingEventId === e.eventId
                                     }
-                                    onClick={() => handleConfirm(e.eventId)}
+                                    onClick={() => handleConfirm(e.eventId, e.eventTitle)}
                                   >
                                     {confirmedEvents.has(e.eventId)
                                       ? 'Đã xác nhận'
@@ -178,7 +186,7 @@ export default function RankUpgradePage() {
                                 </DialogFooter>
                               </DialogContent>
                             </Dialog>
-                          </>
+                          </React.Fragment>
                         ))}
                       </div>
                     </>

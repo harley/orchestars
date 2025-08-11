@@ -18,8 +18,8 @@ import Link from 'next/link'
 import { useAffiliateAuthenticated } from '@/app/(affiliate)/providers/Affiliate'
 
 import { logout } from '@/app/(affiliate)/actions/logout'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 
 const navigationItems = [
   {
@@ -68,6 +68,7 @@ const metricsItems = [
 ]
 
 export function AffiliateSidebar() {
+  const pathname = usePathname()
   const authUser = useAffiliateAuthenticated()
   const [hasRankUpgrade, setHasRankUpgrade] = useState(false)
   useEffect(() => {
@@ -144,7 +145,7 @@ export function AffiliateSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        {hasRankUpgrade && (
+        {hasRankUpgrade && pathname !== '/affiliate/rankUpgrade' && (
           <SidebarGroup>
             <SidebarGroupLabel>Thông báo</SidebarGroupLabel>
             <SidebarGroupContent>
