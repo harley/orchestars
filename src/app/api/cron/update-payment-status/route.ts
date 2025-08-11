@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { updatePaymentStatus } from '@/collections/Payments/jobs/updatePaymentStatus'
+import { checkAuthorizedCronJob } from '@/utilities/checkAuthorizedCronJob'
+
+export const dynamic = 'force-dynamic'
+export const maxDuration = 120; 
 
 export async function GET(req: NextRequest) {
   try {
-    console.log('--> executing /api/cron/update-payment-status\n')
-    const authHeader = req.headers.get('authorization')
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    console.log('--> executing Update Payment Status\n')
+    if (!checkAuthorizedCronJob(req)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendMailJob } from '@/collections/Emails/jobs/sendMail'
 import { getPayload } from '@/payload-config/getPayloadConfig'
+import { checkAuthorizedCronJob } from '@/utilities/checkAuthorizedCronJob';
 // import { getServerSideURL } from '@/utilities/getURL'
 
 export const dynamic = 'force-dynamic'
@@ -9,13 +10,9 @@ export const maxDuration = 120;
 export async function GET(req: NextRequest) {
   try {
     // Check for authorization header
-    console.log('--> executing /api/cron/send-email\n')
-    const authHeader = req.headers.get('authorization')
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    console.log('--> executing Send Mail\n')
+    if (!checkAuthorizedCronJob(req)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Validate request origin
