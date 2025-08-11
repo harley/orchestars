@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Joi from 'joi'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { AFFILIATE_USER_STATUS, USER_ROLE } from '@/collections/Users/constants'
+import { getNextBodyData } from '@/utilities/getNextBodyData'
 // import { sendMailAndWriteLog } from '@/collections/Emails/utils'
 // import { affiliateRegistrationEmailHtml } from '@/mail/templates/AffiliateRegistrationEmail'
 // import { EMAIL_DEFAULT_FROM_ADDRESS } from '@/config/email'
@@ -31,19 +32,19 @@ const affiliateRegisterSchema = Joi.object({
 export async function POST(request: NextRequest) {
   try {
     // hidden registration form when env is production
-    const env = process.env.NEXT_PUBLIC_ENVIRONMENT
-    const hiddenRegistrationPage = !env || env === 'production'
-    if (hiddenRegistrationPage) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Page not found',
-        },
-        { status: 404 },
-      )
-    }
+    // const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+    // const hiddenRegistrationPage = !env || env === 'production'
+    // if (hiddenRegistrationPage) {
+    //   return NextResponse.json(
+    //     {
+    //       success: false,
+    //       error: 'Page not found',
+    //     },
+    //     { status: 404 },
+    //   )
+    // }
 
-    const body = await request.json()
+    const body = await getNextBodyData(request)
     const { error, value } = affiliateRegisterSchema.validate(body, {
       abortEarly: false,
       stripUnknown: true,

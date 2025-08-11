@@ -22,3 +22,12 @@ export const AFFILIATE_RANK_STATUS = {
 }
 
 export const AFFILIATE_RANK_STATUSES = Object.values(AFFILIATE_RANK_STATUS)
+
+export const EVENT_AFFILIATE_RANK_STATUS = {
+  draft: { label: 'Draft', value: 'draft' },
+  active: { label: 'Active', value: 'active' },
+  disabled: { label: 'Disabled', value: 'disabled' },
+  completed: { label: 'Completed', value: 'completed' },
+}
+
+export const EVENT_AFFILIATE_RANK_STATUSES = Object.values(EVENT_AFFILIATE_RANK_STATUS)
