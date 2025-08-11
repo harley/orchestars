@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { TicketCard } from './TicketCard'
 import { Loader2 } from 'lucide-react'
 import {
@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/pagination'
 import { useTranslate } from '@/providers/I18n/client'
 import { Ticket } from '@/types/Ticket'
+import { GiftModal } from './GiftModal'
 
 interface TicketProps {
   tickets: Ticket[]
@@ -21,6 +22,7 @@ interface TicketProps {
   hasPrevPage: boolean
   nextPage: () => void
   prevPage: () => void
+  refresh: (page?: number, options?: { forceFetch?: boolean }) => void
 }
 
 const TicketsList = ({
@@ -33,8 +35,23 @@ const TicketsList = ({
   hasPrevPage,
   nextPage,
   prevPage,
+  refresh,
 }: TicketProps) => {
   const { t } = useTranslate()
+
+  const [isGiftModalOpen, setIsGiftModalOpen] = useState(false)
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
+
+  const onSelectTicket = (ticket: Ticket) => {
+    setSelectedTicket(ticket)
+    setIsGiftModalOpen(true)
+  }
+
+  const handleSuccessGiftTicket = () => {
+    refresh(1, { forceFetch: true })
+    setSelectedTicket(null)
+    setIsGiftModalOpen(false)
+  }
 
   if (error) {
     return <div className="text-center py-8 text-red-500">{error}</div>
@@ -42,6 +59,17 @@ const TicketsList = ({
 
   return (
     <div>
+      {/* Gift Modal */}
+      {isGiftModalOpen && selectedTicket && (
+        <GiftModal
+          isOpen={isGiftModalOpen}
+          onClose={() => setIsGiftModalOpen(false)}
+          onSuccess={handleSuccessGiftTicket}
+          ticketId={selectedTicket.id}
+          ticket={selectedTicket}
+        />
+      )}
+
       <div className="grid gap-6 transition-opacity duration-200 ease-in-out">
         {tickets?.map((ticket) => (
           <div
@@ -50,7 +78,7 @@ const TicketsList = ({
               isLoading ? 'opacity-50' : 'opacity-100'
             }`}
           >
-            <TicketCard ticket={ticket} />
+            <TicketCard ticket={ticket} onSelectTicket={onSelectTicket} />
           </div>
         ))}
 

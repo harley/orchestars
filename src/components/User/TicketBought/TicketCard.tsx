@@ -1,11 +1,10 @@
 'use client'
-import React, { useState } from 'react'
+import React from 'react'
 import { format, parse } from 'date-fns'
 import { categories } from '@/components/EventDetail/data/seat-maps/categories'
 import { Ticket } from '@/types/Ticket'
 // import { Ticket } from '@/payload-types'
 import { useTranslate } from '@/providers/I18n/client'
-import { GiftModal } from './GiftModal'
 
 function getZoneId(ticket: any): string {
   const ticketPriceId = ticket?.ticketPriceInfo?.ticketPriceId || ticket?.ticketPriceInfo?.id
@@ -13,9 +12,8 @@ function getZoneId(ticket: any): string {
   return matched?.key || 'unknown'
 }
 
-export const TicketCard: React.FC<{ ticket: Ticket }> = ({ ticket }) => {
+export const TicketCard: React.FC<{ ticket: Ticket, onSelectTicket: (ticket: Ticket) => any }> = ({ ticket, onSelectTicket }) => {
   const { t } = useTranslate()
-  const [isGiftModalOpen, setIsGiftModalOpen] = useState(false)
   const zoneId = getZoneId(ticket)
   const zone = categories.find((c) => c.id === zoneId)
   const parsedDate = parse(ticket?.eventDate, 'dd/MM/yyyy', new Date())
@@ -30,7 +28,7 @@ export const TicketCard: React.FC<{ ticket: Ticket }> = ({ ticket }) => {
         {/* Gift Button - Show only for 'booked' status tickets */}
         {ticket.status === 'booked' && !ticket.giftInfo?.isGifted && (
           <button
-            onClick={() => setIsGiftModalOpen(true)}
+            onClick={() => onSelectTicket(ticket)}
             className="absolute top-3 right-3 bg-black hover:bg-black text-white text-sm px-3 py-1 rounded-full transition-colors z-10"
           >
             🎁 {t('userprofile.giftTicket')}
@@ -88,13 +86,7 @@ export const TicketCard: React.FC<{ ticket: Ticket }> = ({ ticket }) => {
         </div>
       </div>
       
-      {/* Gift Modal */}
-      <GiftModal
-        isOpen={isGiftModalOpen}
-        onClose={() => setIsGiftModalOpen(false)}
-        ticketId={ticket.id}
-        ownerId={ticket.user!.id}
-      />
+   
     </>
   )
 }

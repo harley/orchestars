@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { authorizeApiRequest } from '@/app/(user)/utils/authorizeApiRequest'
 import { TICKET_STATUS } from '@/collections/Tickets/constants'
+import { RECIPIENT_TICKET_STATUS } from '@/collections/Tickets/constants/recipient-ticket-status'
 
 export async function GET(req: NextRequest) {
   try {
@@ -43,6 +44,9 @@ export async function GET(req: NextRequest) {
           'giftInfo.isGifted': {
             equals: true,
           },
+          'giftInfo.status': {
+            equals: RECIPIENT_TICKET_STATUS.confirmed.value,
+          },
           ...(eventIds.length > 0
             ? {
                 event: {
@@ -64,9 +68,21 @@ export async function GET(req: NextRequest) {
           user: {
             equals: userId,
           },
-          'giftInfo.isGifted': {
-            equals: false,
-          },
+          or: [
+            {
+              'giftInfo.isGifted': {
+                equals: false,
+              },
+            },
+            {
+              'giftInfo.isGifted': {
+                equals: true,
+              },
+              'giftInfo.recipientConfirmationExpiresAt': {
+                less_than: new Date().toISOString(),
+              },
+            },
+          ],
           ...(ticketStatus ? { status: { equals: ticketStatus } } : {}),
           ...(eventIds.length > 0
             ? {

@@ -494,6 +494,7 @@
     "statusHold": "Tạm Giữ",
     "statusCancelled": "Đã Hủy",
     "userLogin": "Đăng Nhập",
+    "giftTicketSuccess": "Vé đã được tặng thành công!",
     "accountSettings": {
       "infoHelper": "Cung cấp thông tin chính xác sẽ giúp hỗ trợ bạn khi mua vé hoặc khi cần xác minh vé.",
       "fullName": "Họ và Tên",
@@ -573,6 +574,12 @@
     "highestTierSecured": "Đã đạt hạng cao nhất",
     "giftTicket": "Tặng Vé",
     "giftNow": "Tặng ngay",
+    "ticketInformation": "Thông Tin Vé",
+    "recipientInformation": "Thông Tin Người Nhận",
+    "attendee": "Người Tham Dự",
+    "status": "Trạng Thái",
+    "zone": "Khu Vực",
+    "eventTitle": "Tên Sự Kiện",
     "giftTicketForm": {
       "firstName": "Tên",
       "lastName": "Họ",
@@ -632,7 +639,8 @@
     "pleaseFillAllFields": "Vui lòng điền đầy đủ tất cả các trường.",
     "alreadyHaveAccount": "Đã có tài khoản? Đăng nhập tại đây",
     "createAccountToContinue": "Tạo tài khoản để tiếp tục",
-    "noAccountRegisterNow": "Chưa có tài khoản? Đăng ký ngay"
+    "noAccountRegisterNow": "Chưa có tài khoản? Đăng ký ngay",
+    "invalidConfirmationLink": "Liên kết xác nhận không hợp lệ"
   },
   "navbar": {
     "profile": "Thông tin tài khoản",
@@ -670,6 +678,21 @@
   },
   "forgotPassword": {
     "title": "Quên mật khẩu"
+  },
+  "giftTicketVerification": {
+    "title": "Vé Tặng Đã Được Xác Nhận!",
+    "description": "Vé tặng của bạn đã được xác nhận thành công! Để xem và quản lý vé tặng của mình, bạn cần thiết lập mật khẩu trước.",
+    "countdownTitle": "Thiết Lập Mật Khẩu Trong Vòng:",
+    "countdownDescription": "Hoàn thành thiết lập mật khẩu để truy cập vé của bạn",
+    "instructionsTitle": "Cách Truy Cập Vé Tặng Của Bạn:",
+    "step1": "Nhấn vào nút Thiết Lập Mật Khẩu bên dưới",
+    "step2": "Tạo mật khẩu bảo mật cho tài khoản của bạn",
+    "step3": "Đăng nhập và vào \"Vé Của Tôi\" để xem vé tặng của bạn",
+    "setupPasswordButton": "Thiết Lập Mật Khẩu Ngay",
+    "simpleInstructionsTitle": "Cách Truy Cập Vé Tặng Của Bạn:",
+    "simpleStep1": "Nhấn vào biểu tượng đăng nhập trong header để mở form đăng nhập",
+    "simpleStep2": "Đăng nhập vào tài khoản của bạn",
+    "simpleStep3": "Vào \"Vé Của Tôi\" để xem vé tặng của bạn"
   },
   "locale": "vi-vn"
 }
