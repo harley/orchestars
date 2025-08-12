@@ -6,6 +6,9 @@ export const setDateFrom = async (req: NextRequest) => {
 
   // Set dateFrom based on timeRange
   let dateFrom: Date | undefined
+  if (!timeRange) {
+    return null
+  }
   if (timeRange === '6m') {
     dateFrom = new Date()
     dateFrom.setMonth(dateFrom.getMonth() - 6)

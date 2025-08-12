@@ -1,14 +1,14 @@
-import type { AffiliateRank, AffiliateUserRank } from '@/payload-types'
+import type { AffiliateRank, AffiliateUserRank, EventAffiliateRank } from '@/payload-types'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 
 /**
  * Fetch the user's GLOBAL affiliate rank (AffiliateRank),
  * based on their AffiliateUserRank.currentRank.
  *
- * Returns both the AffiliateUserRank doc and the matched AffiliateRank.
+ * Returns matching Affiliate Rank and EventAffiliateRanks that has the same rank.
  */
 export async function getGlobalRank(userId: number): Promise<{
-  affiliateUserRank: AffiliateUserRank | null
+  eventAffRankRecords: EventAffiliateRank[]
   globalRank: AffiliateRank | null
 }> {
   //Initialize Payload
@@ -26,10 +26,20 @@ export async function getGlobalRank(userId: number): Promise<{
       .then((r) => r.docs?.[0])) || null
 
   if (!affiliateUserRank?.currentRank) {
-    return { affiliateUserRank: null, globalRank: null }
+    return { eventAffRankRecords: [], globalRank: null }
   }
+  // 2) Get all event affiliate rank that has the same rank
+  const eventAffRankRecords = await payload
+    .find({
+      collection: 'event-affiliate-ranks',
+      where: {
+        rankName: { equals: affiliateUserRank.currentRank },
+      },
+      depth: 0,
+    })
+    .then((res) => res.docs)
 
-  // 2) Get the AffiliateRank config whose rankName matches currentRank
+  // 2) Get the new AffiliateRank config whose rankName matches currentRank
   const globalRank =
     (await payload
       .find({
@@ -40,5 +50,5 @@ export async function getGlobalRank(userId: number): Promise<{
       })
       .then((r) => r.docs?.[0])) || null
 
-  return { affiliateUserRank, globalRank }
+  return { eventAffRankRecords, globalRank }
 }

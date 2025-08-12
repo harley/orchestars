@@ -16,8 +16,31 @@ import {
 import { Button } from '@/components/ui/button'
 import useFetchData from '@/hooks/useFetchData'
 import { useToast } from '@/components/ui/use-toast'
+import { formatMoney } from '@/utilities/formatMoney'
 
-type EligibleEvent = { eventId: number; eventTitle: string; oldRank: EventAffiliateRank }
+type EligibleEvent = {
+  eventId: number
+  eventTitle: string
+  oldRank: EventAffiliateRank
+  oldRankGlobal: AffiliateRank
+  newEventAffRank: EventAffiliateRank
+}
+type Reward = {
+  commissionRate?: number | null
+  minTickets?: number | null
+  maxTickets?: number | null
+  minRevenue?: number | null
+  maxRevenue?: number | null
+  rewardTickets?: number | null
+}
+type RewardBag =
+  | {
+      commissionRewards?: Reward[] | null
+      ticketRewards?: Reward[] | null
+    }
+  | null
+  | undefined
+
 export default function RankUpgradePage() {
   const { toast } = useToast()
   const { data, loading, error } = useFetchData<{
@@ -66,6 +89,37 @@ export default function RankUpgradePage() {
       setTermsOpenFor(null)
     }
   }
+  const pickRewardsArray = (eventRewards: RewardBag, globalRewards: RewardBag): Reward[] => {
+    const eComm = eventRewards?.commissionRewards ?? []
+    const eTick = eventRewards?.ticketRewards ?? []
+    const gComm = globalRewards?.commissionRewards ?? []
+    const gTick = globalRewards?.ticketRewards ?? []
+
+    if (eComm.length) return eComm
+    if (eTick.length) return eTick
+    if (gComm.length) return gComm
+    if (gTick.length) return gTick
+    return []
+  }
+
+  const getTickets = (r: Reward) => r?.rewardTickets ?? r?.minTickets ?? 'N/A'
+
+  const getMinRevenue = (eventRewards: RewardBag, globalRewards: RewardBag): number | null => {
+    const arr = pickRewardsArray(eventRewards, globalRewards)
+    const values = arr
+      .map((r) => (typeof r.minRevenue === 'number' ? r.minRevenue : null))
+      .filter((v): v is number => v != null)
+    return values.length ? Math.min(...values) : null
+  }
+
+  const {
+    data: revenueCardMetrics,
+    loading: loadingMetrics,
+    error: errorMetrics,
+    refetch: refetchMetrics,
+  } = useFetchData(`/api/affiliate/revenue-card-metrics`, {
+    defaultLoading: true,
+  })
 
   const notification = data
 
@@ -142,29 +196,134 @@ export default function RankUpgradePage() {
                                       Hạng cũ: {e.oldRank.rankNameLabel}
                                     </h3>
                                     <ul className="list-disc list-inside space-y-1 text-md">
-                                      <li>Phần thưởng: Quà tặng 1</li>
-                                      <li>Điểm yêu cầu: 500 điểm</li>
+                                      <li>
+                                        Phần thưởng:{' '}
+                                        {pickRewardsArray(
+                                          e.oldRank.eventRewards,
+                                          e.oldRankGlobal.rewards,
+                                        ).length
+                                          ? pickRewardsArray(
+                                              e.oldRank.eventRewards,
+                                              e.oldRankGlobal.rewards,
+                                            ).map((reward, idx) => {
+                                              const parts: string[] = []
+                                              const tickets = getTickets(reward)
+                                              if (tickets !== 'N/A') parts.push(`${tickets} Vé`)
+                                              if (reward.commissionRate != null)
+                                                parts.push(`${reward.commissionRate}% hoa hồng`)
+
+                                              return (
+                                                <span key={idx}>
+                                                  {parts.join(', ')}
+                                                  {idx <
+                                                    pickRewardsArray(
+                                                      e.newEventAffRank.eventRewards,
+                                                      notification.globalRank.rewards,
+                                                    ).length -
+                                                      1 && '; '}
+                                                </span>
+                                              )
+                                            })
+                                          : 'Không có phần thưởng.'}
+                                      </li>
+                                      <li>
+                                        Doanh thu tối thiểu:{' '}
+                                        {formatMoney(
+                                          getMinRevenue(
+                                            e.oldRank.eventRewards,
+                                            e.oldRankGlobal.rewards,
+                                          ) || 0,
+                                        )}
+                                      </li>
                                     </ul>
                                   </div>
-                                  <div>
+                                  <div className="mb-1">
                                     <h3 className="font-bold mb-2 text-lg">
                                       Hạng mới: {notification.globalRank.rankNameLabel}
                                     </h3>
                                     <ul className="list-disc list-inside space-y-1 text-md">
-                                      <li>Phần thưởng: Quà tặng cao cấp</li>
-                                      <li>Điểm yêu cầu: 1000</li>
+                                      <li>
+                                        Phần thưởng:{' '}
+                                        {pickRewardsArray(
+                                          e.newEventAffRank.eventRewards,
+                                          notification.globalRank.rewards,
+                                        ).length
+                                          ? pickRewardsArray(
+                                              e.newEventAffRank.eventRewards,
+                                              notification.globalRank.rewards,
+                                            ).map((reward, idx) => {
+                                              const parts: string[] = []
+                                              const tickets = getTickets(reward)
+                                              if (tickets !== 'N/A') parts.push(`${tickets} Vé`)
+                                              if (reward.commissionRate != null)
+                                                parts.push(`${reward.commissionRate}% hoa hồng`)
+
+                                              return (
+                                                <span key={idx}>
+                                                  {parts.join(', ')}
+                                                  {idx <
+                                                    pickRewardsArray(
+                                                      e.newEventAffRank.eventRewards,
+                                                      notification.globalRank.rewards,
+                                                    ).length -
+                                                      1 && '; '}
+                                                </span>
+                                              )
+                                            })
+                                          : 'Không có phần thưởng.'}
+                                      </li>
+                                      <li>
+                                        Doanh thu tối thiểu:{' '}
+                                        {formatMoney(
+                                          getMinRevenue(
+                                            e.newEventAffRank.eventRewards,
+                                            notification.globalRank.rewards,
+                                          ) || 0,
+                                        )}
+                                      </li>
                                     </ul>
                                   </div>
                                 </div>
-
-                                <ul className="mt-4 text-sm">
+                                <ul className="list-decimal list-inside space-y-1 text-sm">
                                   <li>
-                                    - Nếu bạn ở lại hạng <strong>Bạc</strong>, bạn sẽ cần đạt thêm{' '}
-                                    <strong>200 điểm</strong> nữa để nhận phần thưởng tiếp theo.
+                                    Nếu bạn ở lại hạng {e.oldRank.rankNameLabel}, bạn sẽ cần đạt
+                                    thêm{' '}
+                                    {/* <strong>
+                                      {notification.globalRank.minPoints -
+                                        e.oldRankGlobal.minPoints}{' '}
+                                      điểm
+                                    </strong> */}
+                                    {(() => {
+                                      const minRev = getMinRevenue(
+                                        e.oldRank.eventRewards,
+                                        e.oldRankGlobal.rewards,
+                                      )
+                                      return minRev == null ? null : Number(
+                                          revenueCardMetrics?.netRevenue,
+                                        ) < minRev ? (
+                                        <>
+                                          {' '}
+                                          <strong>
+                                            {formatMoney(minRev - revenueCardMetrics?.netRevenue)}{' '}
+                                            doanh thu
+                                          </strong>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <strong>{formatMoney(0)} doanh thu</strong>
+                                        </>
+                                      )
+                                    })()}{' '}
+                                    nữa để nhận phần thưởng.
                                   </li>
                                   <li>
-                                    - Nếu nâng hạng, điểm sẽ được <strong>Reset về 0</strong> và bạn
-                                    sẽ <strong>Mất quyền nhận phần thưởng của hạng cũ</strong>.
+                                    Nếu nâng hạng, doanh thu sẽ được <strong>Reset về 0</strong> và
+                                    bạn sẽ{' '}
+                                    <strong>
+                                      Mất quyền nhận phần thưởng của hạng cũ (
+                                      {e.oldRank.rankNameLabel})
+                                    </strong>
+                                    .
                                   </li>
                                 </ul>
 

@@ -41,12 +41,15 @@ export async function GET(req: NextRequest) {
         depth: 0,
       })
       .then((res) => res.docs)
-    const { affiliateUserRank, globalRank } = await getGlobalRank(Number(userID))
+
+    // Fetch global (to be updated to) Affiliate Rank and EventAffiliateRanks that has the same rank
+    const { eventAffRankRecords, globalRank } = await getGlobalRank(Number(userID))
+
     if (!globalRank) {
       return NextResponse.json({ eligibleEvents: [] })
     }
 
-    // Pass to AffiliateRank to get minPoint -> Compare and filter events that can be upgraded
+    //  Filter events that can be upgraded (Pass to AffiliateRank to get minPoint -> Compare)
     const filtered = eventAffUserRanks.filter((eventRank) => {
       const eventAffRank = eventRank.eventAffiliateRank
       if (typeof eventAffRank === 'number') return false
@@ -61,7 +64,16 @@ export async function GET(req: NextRequest) {
 
     const eligibleEvents = await Promise.all(
       filtered.map(async (eventRank) => {
+        // get current event aff rank
         const eventAffRank = eventRank.eventAffiliateRank as EventAffiliateRank
+
+        // get current affiliate rank
+        const affRank = await payload
+          .find({
+            collection: 'affiliate-ranks',
+            where: { rankName: { equals: eventAffRank.rankName } },
+          })
+          .then((res) => res.docs?.[0] as AffiliateRank)
 
         // normalize eventId (relationship can be number|string or a populated object)
         const eventId =
@@ -69,7 +81,13 @@ export async function GET(req: NextRequest) {
             ? (eventRank.event as any).id
             : eventRank.event
 
-        // prefer populated title if depth:1 brought it in; otherwise fetch by ID
+        // get event aff rank (to be updated to)
+        const newEventAffRank = eventAffRankRecords.find((rank) => eventId === rank.event)
+        if (!newEventAffRank) {
+          throw new Error('Event Affiliate Rank missing. Please contact admin.')
+        }
+
+        // normalize event title
         let eventTitle: string | undefined =
           typeof eventRank.event === 'object' && eventRank.event !== null
             ? (eventRank.event as any).title
@@ -91,6 +109,8 @@ export async function GET(req: NextRequest) {
           eventId,
           eventTitle,
           oldRank: eventAffRank,
+          oldRankGlobal: affRank,
+          newEventAffRank,
         }
       }),
     )
@@ -142,7 +162,7 @@ export async function POST(req: NextRequest) {
         status: 'completed',
       },
     })
-    const { affiliateUserRank, globalRank } = await getGlobalRank(Number(userID))
+    const { eventAffRankRecords, globalRank } = await getGlobalRank(Number(userID))
 
     // For event ID, find the event aff rank related
     const eventAffRanks = await payload
