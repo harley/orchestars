@@ -298,9 +298,11 @@ export default function RankUpgradePage() {
                                         e.oldRank.eventRewards,
                                         e.oldRankGlobal.rewards,
                                       )
-                                      return minRev == null ? null : Number(
-                                          revenueCardMetrics?.netRevenue,
-                                        ) < minRev ? (
+                                      return minRev == null ? (
+                                        <>
+                                          <strong>{formatMoney(0)} doanh thu</strong>
+                                        </>
+                                      ) : Number(revenueCardMetrics?.netRevenue) < minRev ? (
                                         <>
                                           {' '}
                                           <strong>
