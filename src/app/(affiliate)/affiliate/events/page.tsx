@@ -210,7 +210,9 @@ export default function EventsPage() {
                                 </div>
                                 <div className="space-y-1">
                                   <p className="text-sm font-medium">Commission</p>
-                                  <p className="text-lg font-bold">{event.commission}</p>
+                                  <p className="text-lg font-bold">
+                                    {formatMoney(event.commission)}
+                                  </p>
                                 </div>
                                 <div className="space-y-1">
                                   <p className="text-sm font-medium">Tickets Reward</p>

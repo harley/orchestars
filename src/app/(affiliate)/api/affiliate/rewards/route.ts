@@ -12,11 +12,7 @@ export async function GET(req: NextRequest) {
     //Initialize Payload
     const payload = await getPayload()
 
-    const { searchParams } = new URL(req.url)
-    const timeRange = searchParams.get('timeRange') || '30d'
-    const { startDate, endDate } = getDateRangeFromTimeRange(timeRange)
-
-    //SQL query to get gross revenue: order nao cung update sang ben aff user rank a? U dung roi ma
+    //SQL query
     const result = await payload.db.drizzle.execute(sql`   
         SELECT 
             total_commission_earned,

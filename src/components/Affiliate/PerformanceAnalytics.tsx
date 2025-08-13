@@ -256,7 +256,7 @@ export function PerformanceAnalytics() {
                 <Skeleton className="h-4 w-20 bg-gray-200" />
                 <Skeleton className="h-3 w-24 bg-gray-200" />
               </div>
-            ) : !performanceData ? (
+            ) : !rewardsData ? (
               <div className="text-center py-8">Failed to load commission data</div>
             ) : (
               <>
@@ -280,7 +280,7 @@ export function PerformanceAnalytics() {
                 <Skeleton className="h-4 w-20 bg-gray-200" />
                 <Skeleton className="h-3 w-24 bg-gray-200" />
               </div>
-            ) : !performanceData ? (
+            ) : !rewardsData ? (
               <div className="text-center py-8">Failed to load ticket data</div>
             ) : (
               <>
