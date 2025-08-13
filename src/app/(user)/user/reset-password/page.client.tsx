@@ -4,13 +4,14 @@ import ResetPasswordForm from '@/components/User/ResetPasswordForm';
 
 interface ResetPasswordClientPageProps {
   token: string;
+  redirectTo?: string;
 }
 
-export default function ResetPasswordClientPage({ token }: ResetPasswordClientPageProps) {
+export default function ResetPasswordClientPage({ token, redirectTo }: ResetPasswordClientPageProps) {
   // Render the ResetPasswordForm and pass the token down
   return (
     <div className="w-full p-4 max-w-sm mx-auto  py-20">
-      <ResetPasswordForm initialToken={token} />
+      <ResetPasswordForm initialToken={token} redirectTo={redirectTo} />
     </div>
   );
 }

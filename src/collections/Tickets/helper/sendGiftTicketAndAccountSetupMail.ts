@@ -11,7 +11,7 @@ export const sendGiftTicketAndAccountSetupMail = async ({
   payload,
   transactionID,
   giftedByName,
-  setupLink,
+  confirmationLink,
 }: {
   user: User
   ticketData: {
@@ -25,7 +25,7 @@ export const sendGiftTicketAndAccountSetupMail = async ({
   }[]
   payload: BasePayload
   giftedByName: string
-  setupLink?: string
+  confirmationLink?: string
   transactionID?: TransactionID
 }) => {
   await Promise.all(
@@ -37,7 +37,7 @@ export const sendGiftTicketAndAccountSetupMail = async ({
         eventDate: data.eventDate,
         eventLocation: data.eventLocation,
         giftedByName: giftedByName,
-        setupLink: setupLink,
+        confirmationLink: confirmationLink,
       })
 
       const resendMailData = {

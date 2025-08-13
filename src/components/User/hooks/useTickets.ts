@@ -25,13 +25,13 @@ export function useTickets({ ticketStatus }: UseTicketsProps) {
   const cache = useRef<Map<string, TicketsResponse>>(new Map())
 
   const fetchTickets = useCallback(
-    async (page: number) => {
+    async (page: number, options?: { forceFetch?: boolean }) => {
       const cacheKey = `${ticketStatus}-${page}`
 
       // Check cache first
       const cachedData = cache.current.get(cacheKey)
 
-      if (cachedData) {
+      if (!options?.forceFetch && cachedData) {
         setTickets(cachedData.data.docs)
         setCurrentPage(cachedData.data.page)
         setTotalPages(cachedData.data.totalPages)
@@ -93,6 +93,7 @@ export function useTickets({ ticketStatus }: UseTicketsProps) {
     hasPrevPage: currentPage > 1,
     nextPage,
     prevPage,
-    refresh: () => fetchTickets(currentPage),
+    refresh: (page?: number, options?: { forceFetch?: boolean }) =>
+      fetchTickets(page || currentPage, options),
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from '@/payload-config/getPayloadConfig'
 import { authorizeApiRequest } from '@/app/(user)/utils/authorizeApiRequest'
 import { TICKET_STATUS } from '@/collections/Tickets/constants'
+import { RECIPIENT_TICKET_STATUS } from '@/collections/Tickets/constants/recipient-ticket-status'
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,7 +19,7 @@ export async function GET(req: NextRequest) {
 
     if (ticketStatus === 'canceled') {
       ticketStatus = TICKET_STATUS.cancelled.value
-    }
+    } 
 
     // First find relevant events based on date filter
     const eventsQuery = await payload.find({
@@ -31,27 +32,72 @@ export async function GET(req: NextRequest) {
 
     const eventIds = eventsQuery.docs.map((event) => event.id)
 
-    // Then find tickets for these events
-    const ticketsQuery = await payload.find({
-      collection: 'tickets',
-      where: {
-        user: {
-          equals: userId,
+    let ticketsQuery
+
+    if (ticketStatus === 'gifted') {
+      ticketsQuery = await payload.find({
+        collection: 'tickets',
+        where: {
+          'giftInfo.giftRecipient': {
+            equals: userId,
+          },
+          'giftInfo.isGifted': {
+            equals: true,
+          },
+          'giftInfo.status': {
+            equals: RECIPIENT_TICKET_STATUS.confirmed.value,
+          },
+          ...(eventIds.length > 0
+            ? {
+                event: {
+                  in: eventIds,
+                },
+              }
+            : {}),
         },
-        ...(ticketStatus ? { status: { equals: ticketStatus } } : {}),
-        ...(eventIds.length > 0
-          ? {
-              event: {
-                in: eventIds,
+        page,
+        limit,
+        sort: '-createdAt', // Sort by latest first
+        depth: 1, // We only need basic event info since we already filtered them
+      })
+    } else {
+      // Find tickets owned by the user
+      ticketsQuery = await payload.find({
+        collection: 'tickets',
+        where: {
+          user: {
+            equals: userId,
+          },
+          or: [
+            {
+              'giftInfo.isGifted': {
+                equals: false,
               },
-            }
-          : {}),
-      },
-      page,
-      limit,
-      sort: '-createdAt', // Sort by latest first
-      depth: 1, // We only need basic event info since we already filtered them
-    })
+            },
+            {
+              'giftInfo.isGifted': {
+                equals: true,
+              },
+              'giftInfo.recipientConfirmationExpiresAt': {
+                less_than: new Date().toISOString(),
+              },
+            },
+          ],
+          ...(ticketStatus ? { status: { equals: ticketStatus } } : {}),
+          ...(eventIds.length > 0
+            ? {
+                event: {
+                  in: eventIds,
+                },
+              }
+            : {}),
+        },
+        page,
+        limit,
+        sort: '-createdAt', // Sort by latest first
+        depth: 1, // We only need basic event info since we already filtered them
+      })
+    }
 
     return NextResponse.json({ data: ticketsQuery })
   } catch (err) {

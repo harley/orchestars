@@ -6,21 +6,28 @@ import TicketsList from './TicketsList'
 import { useTickets } from '@/components/User/hooks/useTickets'
 import { TicketTypeFilterTab } from './TicketTypeFilterTab'
 import { TicketStatus } from '@/collections/Tickets/constants'
+import { useSearchParams } from 'next/navigation'
 
 const TicketBought = ({ className }: { className?: string }) => {
   const { t } = useTranslate()
   const [mounted, setMounted] = useState(false)
+  const [ticketStatus, setTicketStatus] = useState<TicketStatus | 'gifted'>('booked')
+
+  const searchParams = useSearchParams()
+
+  const currentTab = searchParams.get('t')
+
+  useEffect(() => {
+    if (currentTab) {
+      setTicketStatus(currentTab as TicketStatus | 'gifted')
+    }
+  }, [currentTab])
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
   const containerClass = `max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 mt-8 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className || ''}`
-
-
-  const [ticketStatus, setTicketStatus] = useState<
-    TicketStatus | 'gifted'
-  >('booked')
 
   const {
     tickets,
@@ -32,6 +39,7 @@ const TicketBought = ({ className }: { className?: string }) => {
     hasPrevPage,
     nextPage,
     prevPage,
+    refresh,
   } = useTickets({ ticketStatus })
 
   return (
@@ -41,7 +49,12 @@ const TicketBought = ({ className }: { className?: string }) => {
       {/* <TimeFilterTabs timeFilter={timeFilter} setTimeFilter={setTimeFilter} t={t} /> */}
       <TicketTypeFilterTab
         typeFilter={ticketStatus}
-        setTypeFilter={setTicketStatus}
+        setTypeFilter={(type) => {
+          setTicketStatus(type)
+          const url = new URL(window.location.href)
+          url.searchParams.set('t', type)
+          window.history.pushState({}, '', url.toString())
+        }}
         t={t}
       ></TicketTypeFilterTab>
 
@@ -55,6 +68,7 @@ const TicketBought = ({ className }: { className?: string }) => {
         hasPrevPage={hasPrevPage}
         nextPage={nextPage}
         prevPage={prevPage}
+        refresh={refresh}
       />
     </div>
   )

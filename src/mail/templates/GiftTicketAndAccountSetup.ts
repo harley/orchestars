@@ -5,7 +5,7 @@ export interface TicketData {
   eventDate?: string
   eventLocation?: string
   giftedByName?: string
-  setupLink?: string
+  confirmationLink?: string
 }
 
 // todo
@@ -82,38 +82,31 @@ export function getGiftTicketAndAccountSetupEmailHtml(ticketData: TicketData) {
 
       <br />
 
-      
-      <p>
-        <strong>Thiết lập tài khoản:</strong><br />
-        <em>Account Setup:</em>
-      </p> 
-      
       ${
-        ticketData.setupLink
+        ticketData.confirmationLink
           ? `
-      <p>
-        Nếu bạn chưa từng đăng nhập trước đây, vui lòng nhấp vào liên kết sau để thiết lập mật khẩu và hoàn tất việc kích hoạt tài khoản:  
-        <a href="${ticketData.setupLink}" target="_blank">THIẾT LẬP MẬT KHẨU</a>. Liên kết này sẽ hết hạn sau 1 giờ.<br />
-        <em>If this is your first time accessing your account, please click the following link to set up your password: 
-        <a href="${ticketData.setupLink}" target="_blank">SET UP PASSWORD</a>. This link will expire in 1 hour.</em>
-        </p>
+          <p>
+            <strong>Xác nhận vé:</strong><br />
+            <em>Ticket Confirmation:</em>
+          </p> 
+          <p>
+            Vui lòng nhấp vào liên kết sau để xác nhận vé:  
+            <a href="${ticketData.confirmationLink}" target="_blank">XÁC NHẬN VÉ</a>. Liên kết này sẽ hết hạn sau 24 giờ.<br />
+            <em>Please click the following link to confirm your ticket: 
+            <a href="${ticketData.confirmationLink}" target="_blank">CONFIRM TICKET</a>. This link will expire in 24 hours.</em>
+            </p>
 
-      <p>
-        Sau khi thiết lập mật khẩu, bạn sẽ có thể truy cập vào thông tin tài khoản để theo dõi vé đã nhận.<br />
-        <em>After setting up your password, you will be able to access the account to manage and view your received tickets.</em>
-      </p>
+          <p>
+            Sau khi thiết lập mật khẩu, bạn sẽ có thể truy cập vào thông tin tài khoản để theo dõi vé đã nhận.<br />
+            <em>After setting up your password, you will be able to access the account to manage and view your received tickets.</em>
+          </p>
 
-      <p>
-        Nếu bạn đã thiết lập tài khoản trước đó, vui lòng bỏ qua bước này và đăng nhập như bình thường.<br />
-        <em>If you have already set up your account, you may skip this step and log in as usual.</em>
-      </p>
+          <p>
+            Nếu bạn đã thiết lập tài khoản trước đó, vui lòng bỏ qua bước này và đăng nhập như bình thường.<br />
+            <em>If you have already set up your account, you may skip this step and log in as usual.</em>
+          </p>
       `
-          : `
-      <p>
-        Bạn đã có tài khoản. Vui lòng đăng nhập để theo dõi vé đã nhận.<br />
-        <em>You have already set up your account. Please log in to manage and view your received tickets.</em>
-      </p>
-      `
+          : ` `
       }
 
       

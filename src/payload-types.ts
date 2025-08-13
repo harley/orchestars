@@ -1377,6 +1377,14 @@ export interface Ticket {
      * Ngày tặng vé
      */
     giftDate?: string | null;
+    /**
+     * Ngày hết hạn xác nhận vé của người nhận
+     */
+    recipientConfirmationExpiresAt?: string | null;
+    /**
+     * Trạng thái người nhận vé
+     */
+    status?: ('pending' | 'confirmed' | 'expired') | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -3258,6 +3266,8 @@ export interface TicketsSelect<T extends boolean = true> {
         attendeeName?: T;
         giftRecipient?: T;
         giftDate?: T;
+        recipientConfirmationExpiresAt?: T;
+        status?: T;
       };
   updatedAt?: T;
   createdAt?: T;

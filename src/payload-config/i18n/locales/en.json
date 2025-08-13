@@ -493,6 +493,7 @@
     "statusHold": "On Hold",
     "statusCancelled": "Cancelled",
     "userLogin": "Login",
+    "giftTicketSuccess": "Gift ticket success!",
     "accountSettings": {
       "infoHelper": "Providing accurate information will help support you during ticket purchases or when ticket verification is needed.",
       "fullName": "Full Name",
@@ -569,7 +570,25 @@
       "giftTicket": "Ticket",
       "discount": "Discount"
     },
-    "highestTierSecured": "Highest tier secured"
+    "highestTierSecured": "Highest tier secured",
+    "giftTicket": "Gift Ticket",
+    "giftNow": "Gift Now",
+    "ticketInformation": "Ticket Information",
+    "recipientInformation": "Recipient Information",
+    "attendee": "Attendee",
+    "status": "Status",
+    "zone": "Zone",
+    "eventTitle": "Event Title",
+    "giftTicketForm": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone"
+    },
+    "common": {
+      "cancel": "Cancel",
+      "processing": "Processing..."
+    }
   },
   "auth": {
     "signInSuccessfully": "Sign in successfully",
@@ -619,7 +638,8 @@
     "pleaseFillAllFields": "Please fill in all fields.",
     "noAccountRegisterNow": "Don't have an account? Register now",
     "createAccountToContinue": "Create an account to continue",
-    "alreadyHaveAccount": "Already have an account? Sign in here"
+    "alreadyHaveAccount": "Already have an account? Sign in here",
+    "invalidConfirmationLink": "Invalid confirmation link"
   },
   "navbar": {
     "profile": "Profile",
@@ -654,6 +674,21 @@
     "tryAgain": "Try Again",
     "ticketsSent": "🎫 Your tickets have been sent to your email address. You can also view them in your account dashboard.",
     "goToUpcomingEvents": "Go to upcoming events"
+  },
+  "giftTicketVerification": {
+    "title": "Gift Ticket Confirmed!",
+    "description": "Your gift ticket has been successfully confirmed! To view and manage your gift tickets, you need to set up a password first.",
+    "countdownTitle": "Setup Password Within:",
+    "countdownDescription": "Complete password setup to access your tickets",
+    "instructionsTitle": "How to Access Your Gift Tickets:",
+    "step1": "Click the Setup Password button below",
+    "step2": "Create a secure password for your account",
+    "step3": "Sign in and go to \"My Tickets\" to view your gift tickets",
+    "setupPasswordButton": "Setup Password Now",
+    "simpleInstructionsTitle": "How to Access Your Gift Tickets:",
+    "simpleStep1": "Click the login icon in the header to open the sign-in form",
+    "simpleStep2": "Sign in to your account",
+    "simpleStep3": "Go to \"My Tickets\" to view your gift tickets"
   },
   "locale": "en-US"
 }
