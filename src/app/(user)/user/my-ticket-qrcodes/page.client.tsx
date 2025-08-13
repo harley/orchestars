@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useUserAuthenticated } from '@/app/(user)/providers'
 import { TicketDetails } from './TicketDetails'
 import type { Ticket, Event } from '@/payload-types'
 import { Swiper, SwiperClass, SwiperSlide } from 'swiper/react'
@@ -46,7 +45,7 @@ function TicketFilters({
   tickets: TicketWithCheckIn[]
   onClearFilters: () => void
 }) {
-  const { t, locale } = useTranslate()
+  const { t } = useTranslate()
 
   return (
     <Card>
@@ -303,13 +302,11 @@ function TicketNavigation({
 function TicketViewer({
   filteredTickets,
   current,
-  swiperInstance,
   setSwiperInstance,
   setCurrent,
 }: {
   filteredTickets: TicketWithCheckIn[]
   current: number
-  swiperInstance: SwiperClass | null
   setSwiperInstance: (swiper: SwiperClass) => void
   setCurrent: (index: number) => void
 }) {
@@ -386,7 +383,6 @@ function TicketSummary({ tickets }: { tickets: TicketWithCheckIn[] }) {
 }
 
 export default function MyTicketQRCodesPageClient() {
-  const authUser = useUserAuthenticated()
   const { t, locale } = useTranslate()
   const [tickets, setTickets] = useState<TicketWithCheckIn[]>([])
   const [filteredTickets, setFilteredTickets] = useState<TicketWithCheckIn[]>([])
@@ -525,8 +521,6 @@ export default function MyTicketQRCodesPageClient() {
     let filtered = [...tickets]
 
     if (selectedEventDate !== 'all') {
-      console.log('Filtering tickets by date:', selectedEventDate)
-      
       // Get the schedule ID for the selected date
       const scheduleId = getScheduleIdFromDate(selectedEventDate)
       
@@ -536,21 +530,12 @@ export default function MyTicketQRCodesPageClient() {
         return
       }
       
-      console.log('Selected schedule ID:', scheduleId)
-      console.log('Available tickets:', tickets.map(t => ({
-        id: t.ticket.id,
-        eventScheduleId: t.ticket.eventScheduleId,
-        scheduleId: scheduleId
-      })))
-      
       // Filter tickets by eventScheduleId
       filtered = filtered.filter(t => {
         const matches = t.ticket.eventScheduleId === scheduleId
         console.log(`Ticket ${t.ticket.id}: eventScheduleId ${t.ticket.eventScheduleId} matches ${scheduleId}? ${matches}`)
         return matches
       })
-      
-      console.log('Filtered tickets count:', filtered.length)
     }
 
     setFilteredTickets(filtered)
@@ -646,7 +631,6 @@ export default function MyTicketQRCodesPageClient() {
             <TicketViewer
               filteredTickets={filteredTickets}
               current={current}
-              swiperInstance={swiperInstance}
               setSwiperInstance={setSwiperInstance}
               setCurrent={setCurrent}
             />

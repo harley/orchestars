@@ -283,7 +283,7 @@ export function TicketDetails({
         </section>
 
         {/* Instructions Link */}
-        <div className="pt-4 px-6 text-center">
+        {/* <div className="pt-4 px-6 text-center">
           <a
             href="https://orchestars.vn/check-in-process-rules-at-event-disney-25"
             target="_blank"
@@ -292,7 +292,7 @@ export function TicketDetails({
           >
             {t('ticket.instructions')}
           </a>
-        </div>
+        </div> */}
 
         <section className="p-6 space-y-4 text-sm border-b border-gray-100">
           <div className="grid grid-cols-2 gap-4">
