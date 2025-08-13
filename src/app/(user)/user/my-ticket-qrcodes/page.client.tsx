@@ -46,28 +46,28 @@ function TicketFilters({
   tickets: TicketWithCheckIn[]
   onClearFilters: () => void
 }) {
-  const { locale } = useTranslate()
+  const { t, locale } = useTranslate()
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Filter className="w-4 h-4" />
-          Filter Tickets
+          {t('userprofile.myTicketQRCodes.filterTickets')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Event</label>
+            <label className="text-sm font-medium">{t('userprofile.myTicketQRCodes.event')}</label>
             <Select value={selectedEventId} onValueChange={setSelectedEventId}>
               <SelectTrigger className="bg-white border-gray-300">
-                <SelectValue placeholder="Select an event" />
+                <SelectValue placeholder={t('userprofile.myTicketQRCodes.selectEvent')} />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-200">
-                <SelectItem value="all" className="hover:bg-gray-50">All events</SelectItem>
+                <SelectItem value="all" className="hover:bg-gray-50">{t('userprofile.myTicketQRCodes.allEvents')}</SelectItem>
                 {eventsLoading ? (
-                  <SelectItem value="loading" disabled>Loading events...</SelectItem>
+                  <SelectItem value="loading" disabled>{t('userprofile.myTicketQRCodes.loadingEvents')}</SelectItem>
                 ) : (
                   events.map((event) => (
                     <SelectItem 
@@ -84,24 +84,24 @@ function TicketFilters({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Event Date</label>
+            <label className="text-sm font-medium">{t('userprofile.myTicketQRCodes.eventDate')}</label>
             <Select 
               value={selectedEventDate} 
               onValueChange={setSelectedEventDate}
               disabled={selectedEventId === 'all'}
             >
               <SelectTrigger className="bg-white border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                <SelectValue placeholder={selectedEventId === 'all' ? 'Select an event first' : 'All dates'} />
+                <SelectValue placeholder={selectedEventId === 'all' ? t('userprofile.myTicketQRCodes.selectEventFirst') : t('userprofile.myTicketQRCodes.allDates')} />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-200">
-                <SelectItem value="all" className="hover:bg-gray-50">All dates</SelectItem>
+                <SelectItem value="all" className="hover:bg-gray-50">{t('userprofile.myTicketQRCodes.allDates')}</SelectItem>
                 {selectedEventId === 'all' ? (
                   <SelectItem value="disabled" disabled className="text-gray-400">
-                    Select an event to see available dates
+                    {t('userprofile.myTicketQRCodes.selectEventToFilterDates')}
                   </SelectItem>
                 ) : uniqueDates.length === 0 ? (
                   <SelectItem value="no-dates" disabled className="text-gray-400">
-                    No scheduled dates for this event
+                    {t('userprofile.myTicketQRCodes.noScheduledDates')}
                   </SelectItem>
                 ) : (
                   uniqueDates.map((date) => (
@@ -118,7 +118,7 @@ function TicketFilters({
             </Select>
             {selectedEventId === 'all' && (
               <p className="text-xs text-gray-500">
-                Select an event to filter by specific dates
+                {t('userprofile.myTicketQRCodes.selectEventToFilterDates')}
               </p>
             )}
           </div>
@@ -127,16 +127,16 @@ function TicketFilters({
         <div className="flex items-center justify-between text-sm text-gray-600">
           <span>
             {selectedEventId === 'all' ? (
-              'Select an event to view tickets'
+              t('userprofile.myTicketQRCodes.selectEventToViewTickets')
             ) : (
               <>
-                Showing {filteredTickets.length} of {tickets.length} tickets
+                {t('userprofile.myTicketQRCodes.showingTickets', { filtered: filteredTickets.length, total: tickets.length })}
                 <span className="ml-2">
-                  • Event: {events.find(e => e.id.toString() === selectedEventId)?.title || 'Unknown'}
+                  • {t('userprofile.myTicketQRCodes.eventLabel', { eventTitle: events.find(e => e.id.toString() === selectedEventId)?.title || 'Unknown' })}
                 </span>
                 {selectedEventDate !== 'all' && (
                   <span className="ml-2">
-                    • Date: {selectedEventDate}
+                    • {t('userprofile.myTicketQRCodes.dateLabel', { date: selectedEventDate })}
                   </span>
                 )}
               </>
@@ -148,7 +148,7 @@ function TicketFilters({
               size="sm"
               onClick={onClearFilters}
             >
-              Clear all filters
+              {t('userprofile.myTicketQRCodes.clearAllFilters')}
             </Button>
           )}
         </div>
@@ -159,12 +159,14 @@ function TicketFilters({
 
 // Header Component
 function PageHeader({ showFilters, setShowFilters }: { showFilters: boolean; setShowFilters: (value: boolean) => void }) {
+  const { t } = useTranslate()
+  
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 className="text-3xl font-bold">My Ticket QR Codes</h1>
+        <h1 className="text-3xl font-bold">{t('userprofile.myTicketQRCodes.title')}</h1>
         <p className="text-gray-600 mt-2">
-          View and manage your event tickets
+          {t('userprofile.myTicketQRCodes.subtitle')}
         </p>
       </div>
       
@@ -174,7 +176,7 @@ function PageHeader({ showFilters, setShowFilters }: { showFilters: boolean; set
         className="flex items-center gap-2"
       >
         <Filter className="w-4 h-4" />
-        {showFilters ? 'Hide' : 'Show'} Filters
+        {showFilters ? t('userprofile.myTicketQRCodes.hideFilters') : t('userprofile.myTicketQRCodes.showFilters')}
       </Button>
     </div>
   )
@@ -182,11 +184,13 @@ function PageHeader({ showFilters, setShowFilters }: { showFilters: boolean; set
 
 // Loading Component
 function LoadingSpinner() {
+  const { t } = useTranslate()
+  
   return (
     <div className="flex items-center justify-center min-h-[400px]">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading your tickets...</p>
+        <p className="text-gray-600">{t('userprofile.myTicketQRCodes.loadingTickets')}</p>
       </div>
     </div>
   )
@@ -194,12 +198,14 @@ function LoadingSpinner() {
 
 // Welcome Message Component
 function WelcomeMessage() {
+  const { t } = useTranslate()
+  
   return (
     <Card className="bg-blue-50 border-blue-200">
       <CardContent className="pt-6">
         <div className="text-center">
           <p className="text-blue-800 mb-3">
-            👋 Welcome! To view your tickets, please select an event from the dropdown above.
+            {t('userprofile.myTicketQRCodes.welcomeMessage')}
           </p>
         </div>
       </CardContent>
@@ -213,15 +219,17 @@ function NoTicketsMessage({ message, showClearButton, onClearFilters }: {
   showClearButton?: boolean; 
   onClearFilters?: () => void 
 }) {
+  const { t } = useTranslate()
+  
   return (
     <div className="py-16 text-center">
       <h1 className="text-2xl font-bold mb-4">{message}</h1>
       <p className="text-gray-600 mb-6">
-        {showClearButton ? 'Try adjusting your filter criteria.' : "You haven't purchased any tickets for this event yet."}
+        {showClearButton ? t('userprofile.myTicketQRCodes.tryAdjustingFilters') : t('userprofile.myTicketQRCodes.noTicketsForEvent')}
       </p>
       {showClearButton && onClearFilters && (
         <Button onClick={onClearFilters}>
-          Clear Filters
+          {t('userprofile.myTicketQRCodes.clearFilters')}
         </Button>
       )}
     </div>
@@ -246,6 +254,8 @@ function TicketNavigation({
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onInputCommit: () => void
 }) {
+  const { t } = useTranslate()
+  
   return (
     <div className="ticket-index-bar-ui flex items-center justify-center gap-2 w-full p-1 sm:p-2 rounded-t-lg bg-white text-base sm:text-lg z-10">
       <Button
@@ -254,7 +264,7 @@ function TicketNavigation({
         variant="ghost"
         size="icon"
         className={`nav-btn ${current === 0 ? 'opacity-40 cursor-not-allowed' : ''}`}
-        aria-label="Previous ticket"
+        aria-label={t('userprofile.myTicketQRCodes.previousTicket')}
       >
         <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
       </Button>
@@ -270,7 +280,7 @@ function TicketNavigation({
         }}
         className="ticket-index-input w-10 sm:w-12 text-center border border-gray-300 focus:border-primary outline-none transition-all duration-200 bg-transparent text-base sm:text-lg font-semibold rounded focus:bg-gray-100 mx-1"
         style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
-        aria-label="Go to ticket number"
+        aria-label={t('userprofile.myTicketQRCodes.goToTicketNumber')}
         inputMode="numeric"
         pattern="[0-9]*"
       />
@@ -281,7 +291,7 @@ function TicketNavigation({
         variant="ghost"
         size="icon"
         className={`nav-btn ${current === totalTickets - 1 ? 'opacity-40 cursor-not-allowed' : ''}`}
-        aria-label="Next ticket"
+        aria-label={t('userprofile.myTicketQRCodes.nextTicket')}
       >
         <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
       </Button>
@@ -344,28 +354,30 @@ function TicketViewer({
 
 // Ticket Summary Component
 function TicketSummary({ tickets }: { tickets: TicketWithCheckIn[] }) {
+  const { t } = useTranslate()
+  
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Ticket Summary</CardTitle>
+        <CardTitle>{t('userprofile.myTicketQRCodes.ticketSummary')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-primary">{tickets.length}</div>
-            <div className="text-sm text-gray-600">Total Tickets</div>
+            <div className="text-sm text-gray-600">{t('userprofile.myTicketQRCodes.totalTickets')}</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-green-600">
               {tickets.filter(t => t.isCheckedIn).length}
             </div>
-            <div className="text-sm text-gray-600">Checked In</div>
+            <div className="text-sm text-gray-600">{t('userprofile.myTicketQRCodes.checkedIn')}</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">
               {tickets.filter(t => !t.isCheckedIn).length}
             </div>
-            <div className="text-sm text-gray-600">Pending</div>
+            <div className="text-sm text-gray-600">{t('userprofile.myTicketQRCodes.pending')}</div>
           </div>
         </div>
       </CardContent>
@@ -611,10 +623,10 @@ export default function MyTicketQRCodesPageClient() {
       ) : selectedEventId === 'all' ? (
         <WelcomeMessage />
       ) : !tickets.length ? (
-        <NoTicketsMessage message="No tickets found" />
+        <NoTicketsMessage message={t('userprofile.myTicketQRCodes.noTicketsFound')} />
       ) : !filteredTickets.length ? (
         <NoTicketsMessage 
-          message="No tickets match your filters" 
+          message={t('userprofile.myTicketQRCodes.noTicketsMatchFilters')} 
           showClearButton={true} 
           onClearFilters={handleClearFilters}
         />
