@@ -83,6 +83,7 @@ import * as migration_20250716_013339_add_order_and_type_to_email_collection fro
 import * as migration_20250719_070659_add_trigram_indexes_for_checkin_search from './20250719_070659_add_trigram_indexes_for_checkin_search';
 import * as migration_20250726_032622_add_order_item_status from './20250726_032622_add_order_item_status';
 import * as migration_20250805_133549_update_fields_affiliate from './20250805_133549_update_fields_affiliate';
+import * as migration_20250813_054919_add_fields_ticket from './20250813_054919_add_fields_ticket';
 
 export const migrations = [
   {
@@ -508,6 +509,11 @@ export const migrations = [
   {
     up: migration_20250805_133549_update_fields_affiliate.up,
     down: migration_20250805_133549_update_fields_affiliate.down,
-    name: '20250805_133549_update_fields_affiliate'
+    name: '20250805_133549_update_fields_affiliate',
+  },
+  {
+    up: migration_20250813_054919_add_fields_ticket.up,
+    down: migration_20250813_054919_add_fields_ticket.down,
+    name: '20250813_054919_add_fields_ticket'
   },
 ];
