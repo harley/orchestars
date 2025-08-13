@@ -12,6 +12,8 @@ type PerformanceSummary = {
   total_points: number
   total_revenue: number
   total_tickets_sold: number
+  total_commission_earned: number
+  total_tickets_rewarded: number
   target_link: string
   schedule_dates: Array<Date>
   click_count: number
@@ -21,11 +23,11 @@ type PerformanceSummary = {
 
 // Utility to parse Postgres array string to JS array
 function parsePostgresArray(str: string): string[] {
-  if (!str || typeof str !== 'string') return [];
-  const trimmed = str.replace(/^{|}$/g, '');
-  const matches = trimmed.match(/"((?:[^"\\]|\\.)*)"|([^,]+)/g);
-  if (!matches) return [];
-  return matches.map((m) => m.replace(/^"|"$/g, ''));
+  if (!str || typeof str !== 'string') return []
+  const trimmed = str.replace(/^{|}$/g, '')
+  const matches = trimmed.match(/"((?:[^"\\]|\\.)*)"|([^,]+)/g)
+  if (!matches) return []
+  return matches.map((m) => m.replace(/^"|"$/g, ''))
 }
 
 export async function GET(_req: NextRequest) {
@@ -38,7 +40,7 @@ export async function GET(_req: NextRequest) {
 
     //SQL query to get gross revenue
     const result = await payload.db.drizzle.execute(sql`
-    WITH base_metrics AS (
+WITH base_metrics AS (
       SELECT 
         r.event_id,
         MAX(l.title) AS title,
@@ -48,6 +50,8 @@ export async function GET(_req: NextRequest) {
         r.total_points,
         r.total_revenue,
         r.total_tickets_sold,
+		r.total_commission_earned,
+		r.total_tickets_rewarded,
         MAX(lk.id) AS aff_link_id,
         MAX(lk.target_link) AS target_link,
         array_agg(DISTINCT s.date ORDER BY s.date) AS schedule_dates
@@ -56,8 +60,8 @@ export async function GET(_req: NextRequest) {
       JOIN events_schedules s ON s._parent_id = r.event_id
       JOIN affiliate_links lk ON lk.event_id = r.event_id
       JOIN events e ON e.id = r.event_id
-      WHERE r.affiliate_user_id = ${userRequest.id}
-      GROUP BY r.event_id, r.affiliate_user_id, e.status, r.total_points, r.total_revenue, r.total_tickets_sold
+      WHERE r.affiliate_user_id = ${userRequest.id} AND r.status = 'active'
+      GROUP BY r.event_id, r.affiliate_user_id, e.status, r.total_points, r.total_revenue, r.total_tickets_sold,r.total_commission_earned,r.total_tickets_rewarded
     ),
     with_clicks AS (
       SELECT 
@@ -65,9 +69,10 @@ export async function GET(_req: NextRequest) {
         COUNT(c.id) AS click_count
       FROM base_metrics bm
       LEFT JOIN affiliate_click_logs c ON bm.aff_link_id = c.affiliate_link_id
-      GROUP BY bm.event_id, bm.title, bm.event_location, bm.affiliate_user_id, bm.status, bm.total_points, bm.total_revenue, bm.total_tickets_sold, bm.aff_link_id, bm.target_link, bm.schedule_dates
-    )
-    SELECT 
+      GROUP BY bm.event_id, bm.title, bm.event_location, bm.affiliate_user_id, bm.status, bm.total_points, bm.total_revenue, bm.total_tickets_sold, bm.aff_link_id, bm.target_link, bm.schedule_dates, bm.total_commission_earned,bm.total_tickets_rewarded
+    ),
+    analytics_1 AS (
+	SELECT
       wc.event_id,
       wc.affiliate_user_id,
       wc.title,
@@ -76,6 +81,8 @@ export async function GET(_req: NextRequest) {
       wc.total_points,
       wc.total_revenue,
       wc.total_tickets_sold,
+	  wc.total_commission_earned,
+	  wc.total_tickets_rewarded,
       wc.target_link,
       wc.schedule_dates,
       wc.click_count,
@@ -94,10 +101,13 @@ export async function GET(_req: NextRequest) {
       wc.total_points,
       wc.total_revenue,
       wc.total_tickets_sold,
+	  wc.total_commission_earned,
+	  wc.total_tickets_rewarded,
       wc.target_link,
       wc.schedule_dates,
       wc.click_count
-    ORDER BY wc.event_id DESC;
+    ORDER BY wc.event_id DESC)
+	SELECT * FROM analytics_1;
     `)
 
     const performanceSummaryArray = ((result as { rows: any[] }).rows as PerformanceSummary[]).map(
@@ -121,6 +131,8 @@ export async function GET(_req: NextRequest) {
           totalPoints: Number(row.total_points) || 0,
           affLink: row.target_link,
           ticketNum: Number(row.total_tickets_sold) || 0,
+          commission: Number(row.total_commission_earned),
+          ticketsReward: Number(row.total_tickets_rewarded),
           totalRevenue: Number(row.total_revenue) || 0,
           clickNum: Number(row.click_count) || 0,
           minPrice: Number(row.min_price) || 0,

@@ -187,7 +187,7 @@ export default function EventsPage() {
                               </div>
                             </CardHeader>
                             <CardContent>
-                              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+                              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[repeat(6,1fr)_minmax(200px,auto)]">
                                 <div className="space-y-1">
                                   <p className="text-sm font-medium">Tickets Sold</p>
                                   <p className="text-lg font-bold">{event.ticketNum}</p>
@@ -207,6 +207,14 @@ export default function EventsPage() {
                                 <div className="space-y-1">
                                   <p className="text-sm font-medium">Total Points</p>
                                   <p className="text-lg font-bold">{event.totalPoints}</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-sm font-medium">Commission</p>
+                                  <p className="text-lg font-bold">{event.commission}</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-sm font-medium">Tickets Reward</p>
+                                  <p className="text-lg font-bold">{event.ticketsReward}</p>
                                 </div>
                                 <div className="space-y-1">
                                   <p className="text-sm font-medium">Clicks</p>
