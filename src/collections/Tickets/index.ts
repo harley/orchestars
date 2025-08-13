@@ -5,7 +5,8 @@ import { afterChangeSeat } from './hooks/afterChangeSeat'
 import { getBookedSeat } from './handler/getBookedSeat'
 import { toZonedTime, format as tzFormat } from 'date-fns-tz'
 
-import { createGiftTicket } from './handler/createGiftTicket'
+import { createGiftTicketHandler } from './handler/createGiftTicket'
+import { RECIPIENT_TICKET_STATUS, RECIPIENT_TICKET_STATUSES } from './constants/recipient-ticket-status'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
@@ -307,6 +308,31 @@ export const Tickets: CollectionConfig = {
             },
           },
         },
+        {
+          name: 'recipientConfirmationExpiresAt',
+          type: 'date',
+          required: false,
+          admin: {
+            readOnly: true,
+            description: 'Ngày hết hạn xác nhận vé của người nhận',
+            condition: (data) => data.giftInfo?.isGifted,
+            date: {
+              pickerAppearance: 'dayAndTime',
+              timeFormat: 'HH:mm a',
+            },
+          },
+        },
+        {
+          name: 'status',
+          type: 'select',
+          options: RECIPIENT_TICKET_STATUSES,
+          defaultValue: RECIPIENT_TICKET_STATUS.pending.value,
+          admin: {
+            condition: (data) => data.giftInfo?.isGifted,
+            readOnly: true,
+            description: 'Trạng thái người nhận vé',
+          },
+        }
       ],
     },
 
@@ -338,7 +364,7 @@ export const Tickets: CollectionConfig = {
     {
       path: '/gift-ticket',
       method: 'post',
-      handler: createGiftTicket,
+      handler: createGiftTicketHandler,
     },
   ],
 }

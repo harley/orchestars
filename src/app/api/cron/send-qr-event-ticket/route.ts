@@ -10,15 +10,15 @@ import { TICKET_STATUS } from '@/collections/Tickets/constants'
 import { ORDER_STATUS } from '@/collections/Orders/constants'
 import { sql } from '@payloadcms/db-postgres'
 import { EMAIL_TYPE } from '@/collections/Emails/constant'
+import { checkAuthorizedCronJob } from '@/utilities/checkAuthorizedCronJob'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 120 // 2 minutes max duration
 
 export async function GET(req: NextRequest) {
   try {
-    console.log('--> executing /api/cron/send-qr-event-ticket\n')
-    const authHeader = req.headers.get('authorization')
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    console.log('--> executing Send QR Ticket Code\n')
+    if (!checkAuthorizedCronJob(req)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

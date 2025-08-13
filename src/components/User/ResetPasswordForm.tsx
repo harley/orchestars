@@ -8,6 +8,7 @@ import * as z from 'zod'
 
 interface ResetPasswordFormProps {
   initialToken?: string
+  redirectTo?: string
 }
 
 // Define the validation schema
@@ -44,7 +45,7 @@ const buildFormSchema = (t: (key: string, options?: { [key: string]: any }) => s
 
 type FormValues = z.infer<ReturnType<typeof buildFormSchema>>
 
-export default function ResetPasswordForm({ initialToken }: ResetPasswordFormProps) {
+export default function ResetPasswordForm({ initialToken, redirectTo }: ResetPasswordFormProps) {
   const searchParams = useSearchParams()
   const token = initialToken || searchParams.get('token')
 
@@ -96,7 +97,11 @@ export default function ResetPasswordForm({ initialToken }: ResetPasswordFormPro
         toast({
           title: t('auth.passwordResetSuccessful'),
         })
-        window.location.href = '/user/profile' // Redirect to login after successful reset
+        if (redirectTo) {
+          window.location.href = redirectTo
+        } else {
+          window.location.href = '/user/profile' // Redirect to login after successful reset
+        }
       } else {
         const err = await res.json()
         // Set form-specific errors if needed, or a general error

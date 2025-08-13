@@ -7,7 +7,7 @@ import Link from 'next/link' // Import Link for navigation
 import { getLocale, t } from '@/providers/I18n/server'
 import PublicLayout from '@/components/User/PublicLayout'
 
-type SearchParams = Promise<{ token: string }>
+type SearchParams = Promise<{ token: string; redirectTo?: string }>
 
 export default async function ResetPasswordPage(props: { searchParams: SearchParams }) {
   // Obtain the translate function for the server component
@@ -59,7 +59,7 @@ export default async function ResetPasswordPage(props: { searchParams: SearchPar
   // If valid, render the client component with the token
   return (
     <PublicLayout>
-      <ResetPasswordClientPage token={token} />
+      <ResetPasswordClientPage token={token} redirectTo={params.redirectTo} />
     </PublicLayout>
   )
 }
