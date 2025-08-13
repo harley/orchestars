@@ -247,6 +247,8 @@
   "ticket": {
     "getDirections": "Get Directions",
     "saveQRCode": "Save QR Code",
+    "viewQR": "Get QR Code",
+    "qrCode": "QR code",
     "ticket": "Ticket",
     "readyToCheckIn": "Ready to Check In",
     "checkedIn": "Checked In",

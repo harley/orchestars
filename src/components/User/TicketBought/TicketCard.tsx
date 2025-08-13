@@ -1,8 +1,17 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { format, parse } from 'date-fns'
 import { categories } from '@/components/EventDetail/data/seat-maps/categories'
 import { Ticket } from '@/types/Ticket'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { QRCodeComponent } from '@/components/QRCode'
 // import { Ticket } from '@/payload-types'
 import { useTranslate } from '@/providers/I18n/client'
 
@@ -12,11 +21,25 @@ function getZoneId(ticket: any): string {
   return matched?.key || 'unknown'
 }
 
-export const TicketCard: React.FC<{ ticket: Ticket, onSelectTicket: (ticket: Ticket) => any }> = ({ ticket, onSelectTicket }) => {
+export const TicketCard: React.FC<{ ticket: Ticket; onSelectTicket: (ticket: Ticket) => any }> = ({
+  ticket,
+  onSelectTicket,
+}) => {
   const { t } = useTranslate()
   const zoneId = getZoneId(ticket)
   const zone = categories.find((c) => c.id === zoneId)
   const parsedDate = parse(ticket?.eventDate, 'dd/MM/yyyy', new Date())
+
+  const [open, setOpen] = useState(false)
+  const canShowQR =
+    ticket.status !== 'cancelled' &&
+    ticket.status !== 'pending_payment' &&
+    Boolean(ticket.ticketCode)
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (typeof window !== 'undefined' ? window.location.origin : '')
+
+  const qrUrl = `${baseUrl}/ticket/${encodeURIComponent(ticket.ticketCode)}`
 
   return (
     <>
@@ -84,9 +107,50 @@ export const TicketCard: React.FC<{ ticket: Ticket, onSelectTicket: (ticket: Tic
           </p>
           <p className="text-sm">{ticket.event?.eventLocation || t('userprofile.location')}</p>
         </div>
+
+        {/* QR Button (aligned to end) */}
+        <div className="flex justify-end bg-gray-100">
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              {canShowQR && (
+                <Button
+                  size="sm"
+                  disabled={!canShowQR}
+                  className="rounded-full mr-3 h-8 px-3 py-2 w-27 text-white bg-blue-500 hover:bg-blue-600 transition-colors flex items-center gap-2 mt-12"
+                >
+                  {t('ticket.viewQR') ?? 'View QR'}
+                </Button>
+              )}
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[380px]">
+              <DialogHeader>
+                <DialogTitle>{t('ticket.qrCode') ?? 'Ticket QR'}</DialogTitle>
+              </DialogHeader>
+              {/* QR only */}
+              <div className="flex justify-center py-2">
+                {canShowQR ? (
+                  <QRCodeComponent
+                    payload={qrUrl}
+                    className="w-64 h-64"
+                    options={{
+                      // Use your zone color as the dark module color if desired
+                      color: {
+                        dark: zone?.color || '#000000',
+                        light: '#FFFFFF',
+                      },
+                      // width is controlled by className; omit here or keep default
+                    }}
+                  />
+                ) : (
+                  <div className="text-sm text-gray-500">
+                    {t('ticket.qrCodeNotAvailable') ?? 'QR Code not available'}
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
-      
-   
     </>
   )
 }

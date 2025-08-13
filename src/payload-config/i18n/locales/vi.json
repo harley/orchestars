@@ -247,6 +247,8 @@
   "ticket": {
     "getDirections": "Chỉ đường",
     "saveQRCode": "Lưu mã QR",
+    "viewQR": "Lấy mã QR",
+    "qrCode": "Mã QR",
     "ticket": "Vé",
     "readyToCheckIn": "Sẵn sàng Check In",
     "checkedIn": "Đã Check In",
