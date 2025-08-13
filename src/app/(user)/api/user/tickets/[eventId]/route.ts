@@ -3,7 +3,9 @@ import { getPayload } from '@/payload-config/getPayloadConfig'
 import { checkUserAuthenticated } from '@/app/(user)/user/actions/authenticated'
 import { TICKET_STATUS } from '@/collections/Tickets/constants'
 
-export async function GET(request: NextRequest, { params }: { params: { eventId: string } }) {
+export const dynamic = 'force-dynamic'
+
+export async function GET(request: NextRequest, { params }: { params: Promise<{ eventId: string }> }) {
   try {
     // Check if user is authenticated
     const authData = await checkUserAuthenticated()
@@ -13,7 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: { eventId:
     }
 
     const userId = authData.userInfo.id
-    const eventId = params.eventId
+    const { eventId } = await params
     const payload = await getPayload()
 
     // Get tickets filtered by eventId
