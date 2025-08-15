@@ -209,18 +209,18 @@ export default function EventsPage() {
                                   <p className="text-lg font-bold">{event.totalPoints}</p>
                                 </div>
                                 <div className="space-y-1">
+                                  <p className="text-sm font-medium">Clicks</p>
+                                  <p className="text-lg font-bold">{event.clickNum}</p>
+                                </div>
+                                <div className="space-y-1">
                                   <p className="text-sm font-medium">Commission</p>
                                   <p className="text-lg font-bold">
                                     {formatMoney(event.commission)}
                                   </p>
                                 </div>
                                 <div className="space-y-1">
-                                  <p className="text-sm font-medium">Tickets Reward</p>
+                                  <p className="text-sm font-medium">Tickets Rewarded</p>
                                   <p className="text-lg font-bold">{event.ticketsReward}</p>
-                                </div>
-                                <div className="space-y-1">
-                                  <p className="text-sm font-medium">Clicks</p>
-                                  <p className="text-lg font-bold">{event.clickNum}</p>
                                 </div>
                                 <div className="space-y-1">
                                   <p className="text-sm font-medium">Price Range</p>
