@@ -15,13 +15,7 @@ export default function DashboardPage() {
           <SidebarInset className="flex-1">
             <div className="flex flex-col gap-4 p-4 pt-0">
               <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
-                <div className="p-6">
-                  <div className="mb-6">
-                    <h1 className="text-3xl font-bold tracking-tight">Performance Analytics</h1>
-                    <p className="text-muted-foreground">
-                      Detailed metrics for your affiliate link performance and revenue tracking
-                    </p>
-                  </div>
+                <div className="p-5">
                   <PerformanceAnalytics />
                 </div>
               </div>

@@ -245,10 +245,14 @@ export function PerformanceAnalytics() {
           </CardDescription>
         </CardHeader>
         <CardContent> */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">Your Rewards</h1>
+        <p className="text-muted-foreground">Metrics for commission and tickets you earned</p>
+      </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
         <Card className="shadow-md">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Commission</CardTitle>
+            <CardTitle className="text-sm font-medium">Commission Earned</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -272,7 +276,7 @@ export function PerformanceAnalytics() {
         </Card>
         <Card className="shadow-md">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Tickets</CardTitle>
+            <CardTitle className="text-sm font-medium">Tickets Rewarded</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -281,7 +285,7 @@ export function PerformanceAnalytics() {
                 <Skeleton className="h-3 w-24 bg-gray-200" />
               </div>
             ) : !rewardsData ? (
-              <div className="text-center py-8">Failed to load ticket data</div>
+              <div className="text-center py-8">Failed to load ticket reward data</div>
             ) : (
               <>
                 <div className="text-2xl font-bold">{rewardsData?.tickets ?? 0}</div>
@@ -293,118 +297,130 @@ export function PerformanceAnalytics() {
           </CardContent>
         </Card>
       </div>
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Time Range</label>
-        <Select value={timeRange} onValueChange={toggleTimeRange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="bg-white">
-            <SelectItem value="7d">Last 7 days</SelectItem>
-            <SelectItem value="30d">Last 30 days</SelectItem>
-            <SelectItem value="90d">Last 90 days</SelectItem>
-            <SelectItem value="1y">Last year</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="my-10">
+        <h1 className="text-3xl font-bold tracking-tight">Performance Analytics</h1>
+        <p className="text-muted-foreground">
+          Detailed metrics for your affiliate link performance and revenue tracking
+        </p>
       </div>
-      {/* </CardContent>
+      <Card className="shadow-md">
+        <CardContent className="space-y-6">
+          <div className="space-y-2 mt-3">
+            <label className="text-sm font-medium">Time Range</label>
+            <Select value={timeRange} onValueChange={toggleTimeRange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                <SelectItem value="7d">Last 7 days</SelectItem>
+                <SelectItem value="30d">Last 30 days</SelectItem>
+                <SelectItem value="90d">Last 90 days</SelectItem>
+                <SelectItem value="1y">Last year</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {/* </CardContent>
         </Card> */}
 
-      {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="shadow-md">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Clicks</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-20 bg-gray-200" />
-                <Skeleton className="h-3 w-24 bg-gray-200" />
-              </div>
-            ) : !performanceData ? (
-              <div className="text-center py-8">Failed to load performance data</div>
-            ) : (
-              <>
-                <div className="text-2xl font-bold">{performanceData?.clicks.toLocaleString()}</div>
-                {/* <p className="text-xs text-muted-foreground">
+          {/* Summary Cards */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="shadow-md">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Total Clicks</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-20 bg-gray-200" />
+                    <Skeleton className="h-3 w-24 bg-gray-200" />
+                  </div>
+                ) : !performanceData ? (
+                  <div className="text-center py-8">Failed to load performance data</div>
+                ) : (
+                  <>
+                    <div className="text-2xl font-bold">
+                      {performanceData?.clicks.toLocaleString()}
+                    </div>
+                    {/* <p className="text-xs text-muted-foreground">
                       {`Across all links`}
                     </p> */}
-              </>
-            )}
-          </CardContent>
-        </Card>
-        <Card className="shadow-md">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-20 bg-gray-200" />
-                <Skeleton className="h-3 w-24 bg-gray-200" />
-              </div>
-            ) : !performanceData ? (
-              <div className="text-center py-8">Failed to load performance data</div>
-            ) : (
-              <>
-                <div className="text-2xl font-bold">{performanceData?.orders.toLocaleString()}</div>
-                {/* <p className="text-xs text-muted-foreground">
+                  </>
+                )}
+              </CardContent>
+            </Card>
+            <Card className="shadow-md">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-20 bg-gray-200" />
+                    <Skeleton className="h-3 w-24 bg-gray-200" />
+                  </div>
+                ) : !performanceData ? (
+                  <div className="text-center py-8">Failed to load performance data</div>
+                ) : (
+                  <>
+                    <div className="text-2xl font-bold">
+                      {performanceData?.orders.toLocaleString()}
+                    </div>
+                    {/* <p className="text-xs text-muted-foreground">
                       {`Conversion Rate: ${performanceData?.overallConversionRate.toLocaleString()}%`}
                     </p> */}
-              </>
-            )}
-          </CardContent>
-        </Card>
-        <Card className="shadow-md">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Tickets Issued</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-20 bg-gray-200" />
-                <Skeleton className="h-3 w-24 bg-gray-200" />
-              </div>
-            ) : !performanceData ? (
-              <div className="text-center py-8">Failed to load performance data</div>
-            ) : (
-              <>
-                <div className="text-2xl font-bold">
-                  {performanceData?.ticketsIssued.toLocaleString()}
-                </div>
-                {/* <p className="text-xs text-muted-foreground">
+                  </>
+                )}
+              </CardContent>
+            </Card>
+            <Card className="shadow-md">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Tickets Issued</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-20 bg-gray-200" />
+                    <Skeleton className="h-3 w-24 bg-gray-200" />
+                  </div>
+                ) : !performanceData ? (
+                  <div className="text-center py-8">Failed to load performance data</div>
+                ) : (
+                  <>
+                    <div className="text-2xl font-bold">
+                      {performanceData?.ticketsIssued.toLocaleString()}
+                    </div>
+                    {/* <p className="text-xs text-muted-foreground">
                       {`Avg: ${performanceData?.averageTicketsPerOrder.toLocaleString()} per order`}
                     </p>  */}
-              </>
-            )}
-          </CardContent>
-        </Card>
-        <Card className="shadow-md">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Gross Revenue</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-20 bg-gray-200" />
-                <Skeleton className="h-3 w-24 bg-gray-200" />
-              </div>
-            ) : !performanceData ? (
-              <div className="text-center py-8">Failed to load performance data</div>
-            ) : (
-              <>
-                <div className="text-2xl font-bold">
-                  {`${formatMoney(performanceData?.grossRevenue ?? 0)}`}
-                </div>
-                {/* <p className="text-xs text-muted-foreground">
+                  </>
+                )}
+              </CardContent>
+            </Card>
+            <Card className="shadow-md">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Gross Revenue</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-20 bg-gray-200" />
+                    <Skeleton className="h-3 w-24 bg-gray-200" />
+                  </div>
+                ) : !performanceData ? (
+                  <div className="text-center py-8">Failed to load performance data</div>
+                ) : (
+                  <>
+                    <div className="text-2xl font-bold">
+                      {`${formatMoney(performanceData?.grossRevenue ?? 0)}`}
+                    </div>
+                    {/* <p className="text-xs text-muted-foreground">
                       {`Before discounts`}
                     </p> */}
-              </>
-            )}
-          </CardContent>
-        </Card>
-        {/* <Card className="bg-gray-200 text-gray-800 shadow-md">
+                  </>
+                )}
+              </CardContent>
+            </Card>
+            {/* <Card className="bg-gray-200 text-gray-800 shadow-md">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">Your Commission</CardTitle>
             </CardHeader>
@@ -432,229 +448,238 @@ export function PerformanceAnalytics() {
               }
             </CardContent>
           </Card> */}
-      </div>
+          </div>
 
-      {/* Link Performance Table */}
-      <Card className="shadow-md">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div className="space-y-2">
-            <CardTitle>Link Performance Breakdown</CardTitle>
-            <CardDescription>Detailed metrics for each affiliate link</CardDescription>
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Sort By</label>
-            <Select value={sortBy} onValueChange={toggleSortBy}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectItem value="revenue">Revenue</SelectItem>
-                <SelectItem value="clicks">Clicks</SelectItem>
-                <SelectItem value="orders">Orders</SelectItem>
-                <SelectItem value="conversion">Conversion Rate</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-center">Link Name</TableHead>
-                  <TableHead className="text-center">Source/Campaign</TableHead>
-                  <TableHead className="text-center">Clicks</TableHead>
-                  <TableHead className="text-center">Orders</TableHead>
-                  <TableHead className="text-center">Tickets</TableHead>
-                  <TableHead className="text-center">Conversion</TableHead>
-                  <TableHead className="text-center">Gross Revenue</TableHead>
-                  <TableHead className="text-center">Net Revenue</TableHead>
-                  {/* <TableHead className="text-center bg-gray-200 text-gray-800">Commission</TableHead> */}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell className="text-center py-8">
-                      <Skeleton className="h-4  rounded-xl bg-black/10" />
-                    </TableCell>
-                    <TableCell className="text-center py-8">
-                      <Skeleton className="h-4  rounded-xl bg-black/10" />
-                    </TableCell>
-                    <TableCell className="text-center py-8">
-                      <Skeleton className="h-4  rounded-xl bg-black/10" />
-                    </TableCell>
-                    <TableCell className="text-center py-8">
-                      <Skeleton className="h-4  rounded-xl bg-black/10" />
-                    </TableCell>
-                    <TableCell className="text-center py-8">
-                      <Skeleton className="h-4  rounded-xl bg-black/10" />
-                    </TableCell>
-                    <TableCell className="text-center py-8">
-                      <Skeleton className="h-4  rounded-xl bg-black/10" />
-                    </TableCell>
-                    <TableCell className="text-center py-8">
-                      <Skeleton className="h-4  rounded-xl bg-black/10" />
-                    </TableCell>
-                    <TableCell className="text-center py-8">
-                      <Skeleton className="h-4  rounded-xl bg-black/10" />
-                    </TableCell>
-                    {/* <TableCell className="text-center py-8">
+          {/* Link Performance Table */}
+          <Card className="shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div className="space-y-2">
+                <CardTitle>Link Performance Breakdown</CardTitle>
+                <CardDescription>Detailed metrics for each affiliate link</CardDescription>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Sort By</label>
+                <Select value={sortBy} onValueChange={toggleSortBy}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="revenue">Revenue</SelectItem>
+                    <SelectItem value="clicks">Clicks</SelectItem>
+                    <SelectItem value="orders">Orders</SelectItem>
+                    <SelectItem value="conversion">Conversion Rate</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-center">Link Name</TableHead>
+                      <TableHead className="text-center">Source/Campaign</TableHead>
+                      <TableHead className="text-center">Clicks</TableHead>
+                      <TableHead className="text-center">Orders</TableHead>
+                      <TableHead className="text-center">Tickets</TableHead>
+                      <TableHead className="text-center">Conversion</TableHead>
+                      <TableHead className="text-center">Gross Revenue</TableHead>
+                      <TableHead className="text-center">Net Revenue</TableHead>
+                      {/* <TableHead className="text-center bg-gray-200 text-gray-800">Commission</TableHead> */}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loading ? (
+                      <TableRow>
+                        <TableCell className="text-center py-8">
+                          <Skeleton className="h-4  rounded-xl bg-black/10" />
+                        </TableCell>
+                        <TableCell className="text-center py-8">
+                          <Skeleton className="h-4  rounded-xl bg-black/10" />
+                        </TableCell>
+                        <TableCell className="text-center py-8">
+                          <Skeleton className="h-4  rounded-xl bg-black/10" />
+                        </TableCell>
+                        <TableCell className="text-center py-8">
+                          <Skeleton className="h-4  rounded-xl bg-black/10" />
+                        </TableCell>
+                        <TableCell className="text-center py-8">
+                          <Skeleton className="h-4  rounded-xl bg-black/10" />
+                        </TableCell>
+                        <TableCell className="text-center py-8">
+                          <Skeleton className="h-4  rounded-xl bg-black/10" />
+                        </TableCell>
+                        <TableCell className="text-center py-8">
+                          <Skeleton className="h-4  rounded-xl bg-black/10" />
+                        </TableCell>
+                        <TableCell className="text-center py-8">
+                          <Skeleton className="h-4  rounded-xl bg-black/10" />
+                        </TableCell>
+                        {/* <TableCell className="text-center py-8">
                         <Skeleton className="h-4  rounded-xl bg-black/10" />
                       </TableCell> */}
-                  </TableRow>
-                ) : linkBreakdownData?.length === 0 || !linkBreakdownData ? (
-                  <TableRow>
-                    <TableCell colSpan={9} className="text-center py-8">
-                      No affiliate links found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  linkBreakdownData?.map((link) => (
-                    <TableRow key={link.id}>
-                      <TableCell className="font-medium text-center">{link.name}</TableCell>
-                      <TableCell className="text-center">
-                        <div className="space-y-1">
-                          <Badge variant="outline" className="text-xs">
-                            {link.utmSource || 'Unknown'}
-                          </Badge>
-                          <div className="text-xs text-muted-foreground">
-                            {link.utmCampaign || 'Unknown'}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center">{link.clicks.toLocaleString()}</TableCell>
-                      <TableCell className="text-center">{link.orders.toLocaleString()}</TableCell>
-                      <TableCell className="text-center">
-                        {link.ticketsIssued.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <span>{link.conversionRate.toLocaleString()}%</span>
-                          {link.conversionRate >= 6 ? (
-                            <TrendingUp className="h-3 w-3 text-green-500 bg-gray-200 text-gray-800" />
-                          ) : (
-                            <TrendingDown className="h-3 w-3 text-red-500" />
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {formatMoney(link.grossRevenue)}
-                      </TableCell>
-                      <TableCell className="text-center">{formatMoney(link.netRevenue)}</TableCell>
-                      {/* <TableCell className="text-center bg-gray-200 text-gray-800 font-medium text-green-600">
+                      </TableRow>
+                    ) : linkBreakdownData?.length === 0 || !linkBreakdownData ? (
+                      <TableRow>
+                        <TableCell colSpan={9} className="text-center py-8">
+                          No affiliate links found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      linkBreakdownData?.map((link) => (
+                        <TableRow key={link.id}>
+                          <TableCell className="font-medium text-center">{link.name}</TableCell>
+                          <TableCell className="text-center">
+                            <div className="space-y-1">
+                              <Badge variant="outline" className="text-xs">
+                                {link.utmSource || 'Unknown'}
+                              </Badge>
+                              <div className="text-xs text-muted-foreground">
+                                {link.utmCampaign || 'Unknown'}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {link.clicks.toLocaleString()}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {link.orders.toLocaleString()}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {link.ticketsIssued.toLocaleString()}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <span>{link.conversionRate.toLocaleString()}%</span>
+                              {link.conversionRate >= 6 ? (
+                                <TrendingUp className="h-3 w-3 text-green-500 bg-gray-200 text-gray-800" />
+                              ) : (
+                                <TrendingDown className="h-3 w-3 text-red-500" />
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {formatMoney(link.grossRevenue)}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {formatMoney(link.netRevenue)}
+                          </TableCell>
+                          {/* <TableCell className="text-center bg-gray-200 text-gray-800 font-medium text-green-600">
                           {formatMoney(link.commission)}
                         </TableCell> */}
-                    </TableRow>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+              {linkBreakdownPagination.totalPages > 1 && (
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-muted-foreground">
+                    Showing {(linkBreakdownPagination.page - 1) * linkBreakdownPagination.limit + 1}{' '}
+                    to{' '}
+                    {Math.min(
+                      linkBreakdownPagination.page * linkBreakdownPagination.limit,
+                      linkBreakdownPagination.totalDocs,
+                    )}{' '}
+                    of {linkBreakdownPagination.totalDocs} results
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePageChange(linkBreakdownPagination.page - 1)}
+                      disabled={!linkBreakdownPagination.hasPrevPage}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Previous
+                    </Button>
+                    <span className="text-sm">
+                      Page {linkBreakdownPagination.page} of {linkBreakdownPagination.totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePageChange(linkBreakdownPagination.page + 1)}
+                      disabled={!linkBreakdownPagination.hasNextPage}
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Revenue Breakdown */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="shadow-md">
+              <CardHeader>
+                <CardTitle>Revenue by Source</CardTitle>
+                <CardDescription>Performance breakdown by traffic source</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {loading ? (
+                  <div className="flex flex-row justify-between">
+                    <Skeleton className="h-4 w-32 bg-gray-200" />
+                    <Skeleton className="h-4 w-24 bg-gray-200" />
+                  </div>
+                ) : sourceCampaignBreakdownData?.bySource.length === 0 ||
+                  !sourceCampaignBreakdownData ? (
+                  <div className="text-center py-8">No traffic source found</div>
+                ) : (
+                  sourceCampaignBreakdownData?.bySource.map((item) => (
+                    <div key={item.source} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium capitalize">
+                          {item.source || 'Unknown'}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          {formatMoney(item.revenue)} ({item.percentage.toLocaleString()}%)
+                        </span>
+                      </div>
+                      <Progress value={item.percentage} className="h-2" />
+                    </div>
                   ))
                 )}
-              </TableBody>
-            </Table>
-          </div>
+              </CardContent>
+            </Card>
 
-          {/* Pagination */}
-          {linkBreakdownPagination.totalPages > 1 && (
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">
-                Showing {(linkBreakdownPagination.page - 1) * linkBreakdownPagination.limit + 1} to{' '}
-                {Math.min(
-                  linkBreakdownPagination.page * linkBreakdownPagination.limit,
-                  linkBreakdownPagination.totalDocs,
-                )}{' '}
-                of {linkBreakdownPagination.totalDocs} results
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(linkBreakdownPagination.page - 1)}
-                  disabled={!linkBreakdownPagination.hasPrevPage}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
-                </Button>
-                <span className="text-sm">
-                  Page {linkBreakdownPagination.page} of {linkBreakdownPagination.totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(linkBreakdownPagination.page + 1)}
-                  disabled={!linkBreakdownPagination.hasNextPage}
-                >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
+            <Card className="shadow-md">
+              <CardHeader>
+                <CardTitle>Revenue by Campaign</CardTitle>
+                <CardDescription>Performance breakdown by campaign</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {loading ? (
+                  <div className="flex flex-row justify-between">
+                    <Skeleton className="h-4 w-32 bg-gray-200" />
+                    <Skeleton className="h-4 w-24 bg-gray-200" />
+                  </div>
+                ) : sourceCampaignBreakdownData?.byCampaign.length === 0 ||
+                  !sourceCampaignBreakdownData ? (
+                  <div className="text-center py-8">No campaign found</div>
+                ) : (
+                  sourceCampaignBreakdownData?.byCampaign.map((item) => (
+                    <div key={item.campaign} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{item.campaign || 'Unknown'}</span>
+                        <span className="text-sm text-muted-foreground">
+                          {formatMoney(item.revenue)} ({item.percentage.toLocaleString()}%)
+                        </span>
+                      </div>
+                      <Progress value={item.percentage} className="h-2" />
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </CardContent>
       </Card>
-
-      {/* Revenue Breakdown */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle>Revenue by Source</CardTitle>
-            <CardDescription>Performance breakdown by traffic source</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {loading ? (
-              <div className="flex flex-row justify-between">
-                <Skeleton className="h-4 w-32 bg-gray-200" />
-                <Skeleton className="h-4 w-24 bg-gray-200" />
-              </div>
-            ) : sourceCampaignBreakdownData?.bySource.length === 0 ||
-              !sourceCampaignBreakdownData ? (
-              <div className="text-center py-8">No traffic source found</div>
-            ) : (
-              sourceCampaignBreakdownData?.bySource.map((item) => (
-                <div key={item.source} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium capitalize">
-                      {item.source || 'Unknown'}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      {formatMoney(item.revenue)} ({item.percentage.toLocaleString()}%)
-                    </span>
-                  </div>
-                  <Progress value={item.percentage} className="h-2" />
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle>Revenue by Campaign</CardTitle>
-            <CardDescription>Performance breakdown by campaign</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {loading ? (
-              <div className="flex flex-row justify-between">
-                <Skeleton className="h-4 w-32 bg-gray-200" />
-                <Skeleton className="h-4 w-24 bg-gray-200" />
-              </div>
-            ) : sourceCampaignBreakdownData?.byCampaign.length === 0 ||
-              !sourceCampaignBreakdownData ? (
-              <div className="text-center py-8">No campaign found</div>
-            ) : (
-              sourceCampaignBreakdownData?.byCampaign.map((item) => (
-                <div key={item.campaign} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{item.campaign || 'Unknown'}</span>
-                    <span className="text-sm text-muted-foreground">
-                      {formatMoney(item.revenue)} ({item.percentage.toLocaleString()}%)
-                    </span>
-                  </div>
-                  <Progress value={item.percentage} className="h-2" />
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-      </div>
     </div>
   )
 }
